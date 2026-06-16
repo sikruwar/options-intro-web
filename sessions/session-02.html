@@ -10,7 +10,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0D0D0D; --bg-card: #161616; --bg-card2: #1E1E1E;
-      --text: #F0EBE1; --text-muted: #8A8070; --text-dim: #5A5248;
+      --text: #F0EBE1; --text-muted: #9A9080; --text-dim: #7A7670;
       --call: #3B82F6; --call-dim: #1D3A6E;
       --put: #EF4444;  --put-dim: #6E1D1D;
       --amber: #F59E0B; --green: #22C55E; --orange: #F97316;
@@ -140,7 +140,7 @@
       letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px;
     }
     .fig-caption {
-      margin-top: 18px; font-size: 13px; color: var(--text-dim);
+      margin-top: 18px; font-size: 13px; color: var(--text-muted);
       line-height: 1.6; font-style: italic;
     }
 
@@ -497,6 +497,19 @@
       transition: opacity 0.6s ease, transform 0.6s ease;
     }
     .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── 본문 폰트 통일: figure 내부 레이블 ── */
+    .bridge-col-label, .bridge-tag, .bridge-note,
+    .sc-action, .sc-badge,
+    .chart-label,
+    .slider-field-label, .slider-row-title, .slider-result-label,
+    .be-bar,
+    .prot-col-label,
+    .dtree-branch-label, .dtree-result-sub,
+    .quiz-num, .qa-num, .quiz-btn,
+    .summary-num, .warn-title, .next-label {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 680px) {
