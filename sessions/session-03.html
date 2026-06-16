@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3회차 — 무기견의 옵션 입문</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D0D0D; --bg-card: #161616; --bg-card2: #1E1E1E;
+      --text: #F0EBE1; --text-muted: #8A8070; --text-dim: #5A5248;
+      --call: #3B82F6; --call-dim: #1D3A6E;
+      --put: #EF4444; --put-dim: #6E1D1D;
+      --amber: #F59E0B; --green: #22C55E; --orange: #F97316;
+      --seller: #A78BFA;
+      --border: #2A2520; --border-light: #3A3530;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px; line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── PROGRESS ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 2px;
+      background: linear-gradient(90deg, var(--seller), var(--amber));
+      width: 0%; z-index: 100; transition: width 0.1s linear;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      background: rgba(13,13,13,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-muted); letter-spacing: 0.08em; text-decoration: none; }
+    .nav-brand span { color: var(--amber); }
+    .nav-brand:hover { color: var(--text); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-session { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim); }
+    .nav-prev, .nav-next { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+    .nav-prev:hover, .nav-next:hover { color: var(--amber); }
+    .nav-sep { color: var(--text-dim); font-size: 12px; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 120px 10vw 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -200px; right: -100px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(167,139,250,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -100px; left: -50px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 28px; }
+    .hero h1 { font-size: clamp(34px, 6.5vw, 70px); font-weight: 900; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 20px; }
+    .hero h1 .buyer { color: var(--call); }
+    .hero h1 .seller { color: var(--seller); }
+    .hero-sub { font-size: clamp(15px, 2vw, 19px); color: var(--text-muted); font-weight: 300; max-width: 520px; margin-bottom: 48px; line-height: 1.7; }
+    .hero-thesis { background: var(--bg-card); border: 1px solid var(--border-light); border-left: 3px solid var(--amber); padding: 20px 28px; max-width: 620px; font-size: 17px; font-weight: 500; line-height: 1.65; border-radius: 0 8px 8px 0; }
+    .hero-thesis .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.15em; margin-bottom: 10px; }
+    .scroll-hint { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .scroll-hint span { font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; }
+    .scroll-dot { width: 4px; height: 24px; background: linear-gradient(var(--border-light), transparent); border-radius: 2px; animation: scrollPulse 2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+    /* ── LAYOUT ── */
+    .section { max-width: 760px; margin: 0 auto; padding: 80px 24px; }
+    .section-wide { max-width: 960px; margin: 0 auto; padding: 80px 24px; }
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+    .section-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 16px; }
+    .section h2, .section-wide h2 { font-size: clamp(22px, 4vw, 34px); font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 32px; }
+    .prose p { font-size: 16px; line-height: 1.85; color: #D4CFC8; margin-bottom: 20px; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 600; }
+
+    /* ── FIGURE BLOCK ── */
+    .fig { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px; margin: 32px 0; }
+    .fig-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; }
+    .fig-caption { margin-top: 18px; font-size: 13px; color: var(--text-dim); line-height: 1.6; font-style: italic; }
+
+    /* ── FIGURE 1: BRIDGE ── */
+    .bridge-wrap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: center; }
+    .bridge-col { padding: 18px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--bg-card2); }
+    .bridge-col-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+    .bridge-col.s2 .bridge-col-label { color: var(--call); }
+    .bridge-col.s3 .bridge-col-label { color: var(--amber); }
+    .bridge-q { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.5; }
+    .bridge-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .bridge-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; background: var(--bg); border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; color: var(--text-dim); }
+    .bridge-sep { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0 14px; }
+    .bridge-arrow { font-size: 18px; color: var(--text-dim); }
+    .bridge-note { font-size: 11px; color: var(--text-dim); text-align: center; max-width: 84px; line-height: 1.5; }
+
+    /* ── FIGURE 2: TWO PEOPLE ── */
+    .people-wrap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: center; }
+    .person-card { border-radius: 10px; padding: 20px; border: 1px solid; }
+    .person-card.buyer { border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.05); }
+    .person-card.seller { border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.05); }
+    .person-badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; letter-spacing: 0.1em; }
+    .buyer .person-badge { background: rgba(59,130,246,0.15); color: var(--call); }
+    .seller .person-badge { background: rgba(167,139,250,0.15); color: var(--seller); }
+    .person-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+    .person-rows { display: flex; flex-direction: column; gap: 8px; }
+    .person-row { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-muted); }
+    .person-row-icon { width: 16px; flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+    .people-mid { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 16px; }
+    .flow-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+    .flow-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+    .flow-label.premium { background: rgba(245,158,11,0.15); color: var(--amber); }
+    .flow-label.right { background: rgba(59,130,246,0.12); color: var(--call); }
+    .flow-arrow { font-size: 14px; color: var(--text-dim); }
+
+    /* ── COMPARISON TABLE ── */
+    .cmp-table { width: 100%; border-collapse: collapse; }
+    .cmp-table th { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; padding: 10px 16px; text-align: center; border: 1px solid var(--border); background: var(--bg-card2); }
+    .cmp-table th.buyer-h { color: var(--call); }
+    .cmp-table th.seller-h { color: var(--seller); }
+    .cmp-table th:first-child { color: var(--text-dim); }
+    .cmp-table td { padding: 14px 16px; border: 1px solid var(--border); text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; vertical-align: middle; }
+    .cmp-table td:first-child { font-size: 13px; color: var(--text-muted); background: var(--bg-card2); }
+    .cmp-table tr.be-row td { background: rgba(90,82,72,0.1); }
+    .cmp-table tr.win-row td.buyer-cell { background: rgba(34,197,94,0.05); }
+    .cmp-table tr.win-row td.seller-cell { background: rgba(239,68,68,0.05); }
+    .val-pos { color: var(--green); font-weight: 700; }
+    .val-neg { color: var(--put); font-weight: 700; }
+    .val-zero { color: var(--text-dim); }
+    .cmp-note { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); font-style: italic; }
+    .cmp-eq { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 2px 8px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 4px; color: var(--amber); }
+
+    /* ── LIMIT CARDS ── */
+    .limit-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .limit-card { border-radius: 10px; padding: 22px; border: 1px solid; }
+    .limit-card.buyer-lim { border-color: rgba(59,130,246,0.2); background: rgba(59,130,246,0.04); }
+    .limit-card.seller-lim { border-color: rgba(167,139,250,0.2); background: rgba(167,139,250,0.04); }
+    .limit-who { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; margin-bottom: 12px; }
+    .buyer-lim .limit-who { color: var(--call); }
+    .seller-lim .limit-who { color: var(--seller); }
+    .limit-max-label { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+    .limit-max-val { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; margin-bottom: 14px; }
+    .buyer-lim .limit-max-val { color: var(--put); }
+    .seller-lim .limit-max-val.profit { color: var(--green); }
+    .limit-example { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+    .limit-example-label { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+    .limit-example-nums { display: flex; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+    .limit-note { margin-top: 12px; padding: 8px 12px; background: rgba(249,115,22,0.06); border-left: 2px solid var(--orange); border-radius: 0 4px 4px 0; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── BALANCE (Figure 7) ── */
+    .balance-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .balance-row { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0; width: 100%; align-items: center; }
+    .balance-pan { border-radius: 8px; padding: 18px; border: 1px solid; }
+    .balance-pan.left { border-color: rgba(59,130,246,0.25); background: rgba(59,130,246,0.04); }
+    .balance-pan.right { border-color: rgba(167,139,250,0.25); background: rgba(167,139,250,0.04); }
+    .balance-pivot { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .balance-bar { width: 3px; height: 60px; background: var(--border-light); }
+    .balance-point { font-size: 20px; color: var(--text-dim); line-height: 1; }
+    .balance-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .balance-pan.left .balance-title { color: var(--call); }
+    .balance-pan.right .balance-title { color: var(--seller); }
+    .balance-items { display: flex; flex-direction: column; gap: 8px; }
+    .balance-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .balance-item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .balance-pan.left .balance-item-dot { background: var(--put); }
+    .balance-pan.right .balance-item-dot { background: var(--green); }
+    .balance-item-text { color: var(--text-muted); line-height: 1.4; }
+    .balance-item-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-top: 2px; }
+    .balance-foot { margin-top: 16px; padding: 10px 20px; background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; font-size: 13px; color: var(--text-muted); text-align: center; }
+    .balance-foot strong { color: var(--amber); }
+
+    /* ── FIGURE 8: BAR CHART ── */
+    .bars-wrap { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding: 0 0 4px; }
+    .bar-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar { border-radius: 4px 4px 0 0; min-width: 28px; transition: opacity 0.2s; }
+    .bar.green { background: rgba(34,197,94,0.7); border: 1px solid rgba(34,197,94,0.4); }
+    .bar.red-bar { background: rgba(239,68,68,0.7); border: 1px solid rgba(239,68,68,0.4); border-radius: 0 0 4px 4px; margin-top: auto; }
+    .bar-val { font-family: 'JetBrains Mono', monospace; font-size: 10px; white-space: nowrap; }
+    .bar-val.green { color: var(--green); }
+    .bar-val.red-bar { color: var(--put); }
+    .bar-axis { width: 100%; height: 1px; background: var(--border-light); margin: 0; }
+    .bars-chart { display: flex; flex-direction: column; }
+    .bars-label { margin-top: 10px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .bars-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-dim); }
+    .bars-legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+    /* ── INTERACTIVE SLIDER ── */
+    .slider-wrap { background: var(--bg-card2); border-radius: 10px; padding: 22px; }
+    .slider-conds { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .slider-field { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+    .slider-field-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 3px; }
+    .slider-field-val { font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 600; color: var(--amber); }
+    .slider-row-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .slider-row-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em; }
+    .slider-row-val { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; color: var(--text); }
+    input[type="range"] { width: 100%; height: 4px; border-radius: 2px; background: var(--border-light); outline: none; -webkit-appearance: none; cursor: pointer; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--amber); border: 2px solid var(--bg-card); box-shadow: 0 0 8px rgba(245,158,11,0.4); }
+    .slider-results-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .slider-result-card { border-radius: 8px; padding: 14px; text-align: center; border: 1px solid; }
+    .slider-result-card.buyer-card { border-color: rgba(59,130,246,0.2); background: rgba(59,130,246,0.04); }
+    .slider-result-card.seller-card { border-color: rgba(167,139,250,0.2); background: rgba(167,139,250,0.04); }
+    .srd-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-bottom: 6px; letter-spacing: 0.1em; }
+    .buyer-card .srd-label { color: var(--call); }
+    .seller-card .srd-label { color: var(--seller); }
+    .srd-val { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700; transition: color 0.15s; }
+    .srd-val.pos { color: var(--green); }
+    .srd-val.neg { color: var(--put); }
+    .srd-val.zero { color: var(--text-dim); }
+    .slider-eq-note { margin-top: 12px; padding: 10px 14px; background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15); border-radius: 6px; font-size: 12px; color: var(--text-muted); text-align: center; }
+
+    /* ── WARN BOX ── */
+    .warn-box { background: rgba(249,115,22,0.06); border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 22px 0; }
+    .warn-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--orange); letter-spacing: 0.12em; margin-bottom: 8px; }
+    .warn-box p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+    /* ── SUMMARY GRID ── */
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 28px 0; }
+    .summary-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 22px 20px; }
+    .summary-num { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+    .summary-num.buyer { color: var(--call); }
+    .summary-num.seller { color: var(--seller); }
+    .summary-text { font-size: 14px; line-height: 1.65; color: var(--text-muted); }
+    .summary-text strong { color: var(--text); }
+
+    /* ── QUIZ ── */
+    .quiz-section { display: flex; flex-direction: column; gap: 0; }
+    .quiz-group { margin-bottom: 24px; }
+    .quiz-group-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.12em; margin-bottom: 14px; }
+    .blank-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .blank-row:last-child { border-bottom: none; }
+    .blank-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); width: 24px; flex-shrink: 0; padding-top: 2px; }
+    .blank-text { font-size: 14px; color: var(--text-muted); line-height: 1.65; flex: 1; }
+    .blank-slot { display: inline-block; min-width: 50px; border-bottom: 1px solid var(--border-light); text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-dim); padding: 0 4px; margin: 0 2px; }
+    .quiz-cond { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--amber); background: rgba(245,158,11,0.1); padding: 1px 7px; border-radius: 4px; margin: 2px 0; }
+    .quiz-btn { display: block; width: 100%; margin-top: 18px; background: none; border: 1px solid var(--border-light); border-radius: 6px; padding: 10px; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: var(--text-muted); cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+    .quiz-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .quiz-answers { display: none; margin-top: 14px; }
+    .quiz-answers.visible { display: block; }
+    .answer-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .answer-row:last-child { border-bottom: none; }
+    .ar-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); width: 24px; }
+    .ar-text { font-size: 13px; color: var(--text-muted); flex: 1; }
+    .ar-val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; }
+    .ar-val.pos { color: var(--green); }
+    .ar-val.neg { color: var(--put); }
+    .ar-val.neutral { color: var(--amber); }
+
+    /* ── NEXT CARD ── */
+    .next-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin-top: 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; text-decoration: none; color: inherit; transition: border-color 0.2s; }
+    .next-card:hover { border-color: var(--border-light); }
+    .next-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.12em; margin-bottom: 8px; }
+    .next-title { font-size: 17px; font-weight: 600; color: var(--text); }
+    .next-arrow { width: 44px; height: 44px; border-radius: 50%; background: var(--bg-card2); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--amber); flex-shrink: 0; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid var(--border); padding: 32px 10vw; display: flex; align-items: center; justify-content: space-between; }
+    .footer-brand { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-dim); }
+    .footer-page { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      nav { padding: 12px 20px; }
+      .hero { padding: 100px 24px 60px; }
+      .section, .section-wide { padding: 60px 20px; }
+      .bridge-wrap, .people-wrap { grid-template-columns: 1fr; gap: 10px; }
+      .bridge-sep, .people-mid { flex-direction: row; padding: 8px 0; }
+      .bridge-note { max-width: none; }
+      .slider-conds { grid-template-columns: 1fr; }
+      .slider-results-duo { grid-template-columns: 1fr; }
+      .limit-pair { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .balance-row { grid-template-columns: 1fr; gap: 12px; }
+      .balance-pivot { flex-direction: row; }
+      .balance-bar { width: 60px; height: 3px; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+      .next-card { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-02.html" class="nav-prev">← 2회차</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-session">SESSION 03</span>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-eyebrow">무기견의 옵션 입문 · 3회차</div>
+  <h1><span class="buyer">매수자</span>와<br><span class="seller">매도자</span>,<br>권리와 의무</h1>
+  <p class="hero-sub">프리미엄 · 손익 비대칭 · Level 1 · 읽기 약 15분</p>
+  <div class="hero-thesis">
+    <div class="label">3회차 핵심 문장</div>
+    옵션 매수자는 프리미엄을 내고 권리를 얻습니다.<br>옵션 매도자는 프리미엄을 받고 의무를 집니다.
+  </div>
+  <div class="scroll-hint"><span>SCROLL</span><div class="scroll-dot"></div></div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ── 00 브리지 ── -->
+<div class="section reveal">
+  <div class="section-num">00 · 2회차에서 이어집니다</div>
+  <h2>권리의 반대편에는<br>의무가 있습니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 2회차 → 3회차 브리지</div>
+    <div class="bridge-wrap">
+      <div class="bridge-col s2">
+        <div class="bridge-col-label">2회차</div>
+        <div class="bridge-q">콜은 살 권리<br>풋은 팔 권리</div>
+        <div class="bridge-tags">
+          <span class="bridge-tag">행사 / 포기</span>
+          <span class="bridge-tag">손익분기점</span>
+        </div>
+      </div>
+      <div class="bridge-sep">
+        <div class="bridge-arrow">→</div>
+        <div class="bridge-note">권리의 반대편에는 의무가 있습니다</div>
+      </div>
+      <div class="bridge-col s3">
+        <div class="bridge-col-label">3회차</div>
+        <div class="bridge-q">누군가는 그<br>권리를 받아줘야 한다</div>
+        <div class="bridge-tags">
+          <span class="bridge-tag">매수자</span>
+          <span class="bridge-tag">매도자</span>
+          <span class="bridge-tag">손익 비대칭</span>
+        </div>
+      </div>
+    </div>
+    <div class="fig-caption">2회차에서 콜과 풋의 권리를 봤습니다. 3회차에서는 그 권리의 반대편, 의무를 짊어진 매도자를 봅니다.</div>
+  </div>
+
+  <div class="prose">
+    <p>2회차에서 콜옵션과 풋옵션을 권리로 나눠봤습니다. 매수자는 유리하면 행사하고, 불리하면 포기할 수 있다고 했습니다.</p>
+    <p>이번 회차에서는 그 반대편을 보겠습니다. 내가 권리를 가진다는 말은, 누군가는 그 권리를 받아줘야 한다는 뜻입니다. 옵션 시장에는 항상 매수자와 매도자가 함께 있습니다.</p>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── 01 두 사람 ── -->
+<div class="section reveal">
+  <div class="section-num">01 · 옵션 거래의 두 사람</div>
+  <h2>옵션 거래에는<br>항상 상대방이 있습니다</h2>
+  <div class="prose">
+    <p>주식을 살 때도 매도자가 있습니다. 하지만 주식 매수자와 매도자는 거래가 끝나면 관계가 끊어집니다. 옵션은 조금 다릅니다. <strong>옵션 계약은 미래의 권리와 의무를 남깁니다.</strong></p>
+  </div>
+
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 옵션 거래의 두 사람</div>
+    <div class="people-wrap">
+      <div class="person-card buyer">
+        <div class="person-badge">BUYER · 매수자</div>
+        <div class="person-title">옵션 매수자</div>
+        <div class="person-rows">
+          <div class="person-row">
+            <span class="person-row-icon" style="color:var(--put)">−</span>
+            <span>프리미엄을 <strong style="color:var(--text)">지급</strong>합니다</span>
+          </div>
+          <div class="person-row">
+            <span class="person-row-icon" style="color:var(--call)">✓</span>
+            <span><strong style="color:var(--text)">권리</strong>를 보유합니다</span>
+          </div>
+          <div class="person-row">
+            <span class="person-row-icon" style="color:var(--amber)">⇄</span>
+            <span>유리하면 행사, 불리하면 <strong style="color:var(--text)">포기</strong> 선택</span>
+          </div>
+        </div>
+      </div>
+      <div class="people-mid">
+        <div class="flow-item">
+          <span class="flow-label premium">프리미엄</span>
+          <span class="flow-arrow">→</span>
+        </div>
+        <div style="width:1px; height:24px; background:var(--border-light);"></div>
+        <div class="flow-item">
+          <span class="flow-arrow">←</span>
+          <span class="flow-label right">권리 / 의무</span>
+        </div>
+      </div>
+      <div class="person-card seller">
+        <div class="person-badge">SELLER · 매도자</div>
+        <div class="person-title">옵션 매도자</div>
+        <div class="person-rows">
+          <div class="person-row">
+            <span class="person-row-icon" style="color:var(--green)">+</span>
+            <span>프리미엄을 <strong style="color:var(--text)">수취</strong>합니다</span>
+          </div>
+          <div class="person-row">
+            <span class="person-row-icon" style="color:var(--seller)">!</span>
+            <span><strong style="color:var(--text)">의무</strong>를 부담합니다</span>
+          </div>
+          <div class="person-row">
+            <span class="person-row-icon" style="color:var(--put)">→</span>
+            <span>상대가 행사하면 <strong style="color:var(--text)">반드시 이행</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fig-caption">콜옵션을 사고팔 때, 매수자는 살 권리를 얻고 매도자는 팔아야 할 의무를 집니다. 풋옵션을 사고팔 때, 매수자는 팔 권리를 얻고 매도자는 사야 할 의무를 집니다.</div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── 02 프리미엄 ── -->
+<div class="section reveal">
+  <div class="section-num">02 · 프리미엄</div>
+  <h2>프리미엄은 권리의 가격이자<br>의무의 보상입니다</h2>
+  <div class="prose">
+    <p>옵션 매수자는 프리미엄을 냅니다. 권리를 공짜로 얻을 수는 없기 때문입니다. 옵션 매도자는 프리미엄을 받습니다. 의무를 떠안는 대가입니다. 상대방이 권리를 행사하지 않으면 매도자는 받은 프리미엄을 이익으로 가져갑니다.</p>
+    <p>하지만 받은 프리미엄이 최대이익입니다. 매도자가 얻을 수 있는 이익은 처음 받은 프리미엄으로 제한됩니다. 반대로 가격이 불리하게 움직이면 손실은 훨씬 커질 수 있습니다.</p>
+  </div>
+
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 권리와 의무의 교환</div>
+    <div class="balance-wrap">
+      <div class="balance-row">
+        <div class="balance-pan left">
+          <div class="balance-title">BUYER · 매수자</div>
+          <div class="balance-items">
+            <div class="balance-item">
+              <div class="balance-item-dot"></div>
+              <div>
+                <div class="balance-item-text">프리미엄 <strong style="color:var(--text)">비용</strong> 지급</div>
+                <div class="balance-item-val" style="color:var(--put)">−$3 (콜 예시)</div>
+              </div>
+            </div>
+            <div class="balance-item">
+              <div class="balance-item-dot" style="background:var(--call)"></div>
+              <div>
+                <div class="balance-item-text"><strong style="color:var(--call)">선택권</strong> 보유</div>
+                <div class="balance-item-val" style="color:var(--text-dim)">행사 / 포기 자유</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="balance-pivot">
+          <div class="balance-bar"></div>
+          <div class="balance-point">⇄</div>
+          <div class="balance-bar"></div>
+        </div>
+        <div class="balance-pan right">
+          <div class="balance-title">SELLER · 매도자</div>
+          <div class="balance-items">
+            <div class="balance-item">
+              <div class="balance-item-dot"></div>
+              <div>
+                <div class="balance-item-text">프리미엄 <strong style="color:var(--text)">수취</strong></div>
+                <div class="balance-item-val" style="color:var(--green)">+$3 (최대이익)</div>
+              </div>
+            </div>
+            <div class="balance-item">
+              <div class="balance-item-dot" style="background:var(--seller)"></div>
+              <div>
+                <div class="balance-item-text"><strong style="color:var(--seller)">의무</strong> 부담</div>
+                <div class="balance-item-val" style="color:var(--text-dim)">행사 시 반드시 이행</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="balance-foot">
+        프리미엄은 <strong>권리의 가격</strong>이자 <strong>의무의 보상</strong>입니다
+      </div>
+    </div>
+    <div class="fig-caption">매수자는 비용을 먼저 냅니다. 대신 불리하면 권리를 포기할 수 있습니다. 매도자는 돈을 먼저 받습니다. 대신 불리하면 계약을 이행해야 합니다.</div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── 03 콜옵션 비교 ── -->
+<div class="section reveal">
+  <div class="section-num">03 · 콜옵션 손익 비교</div>
+  <h2>콜옵션 매수자와 매도자의<br>생각은 반대입니다</h2>
+  <div class="prose">
+    <p>행사가 110달러, 프리미엄 3달러인 콜옵션입니다. 매수자는 "주가가 113달러를 넘으면 이익"이라고 생각합니다. 매도자는 "주가가 113달러를 넘지 않으면 받은 3달러가 이익으로 남는다"고 생각합니다.</p>
+  </div>
+
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 콜옵션 매수자/매도자 손익 비교 · 행사가 $110 · 프리미엄 $3</div>
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>만기 주가</th>
+          <th class="buyer-h">매수자 손익</th>
+          <th class="seller-h">매도자 손익</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>$100 (행사 포기)</td>
+          <td class="buyer-cell"><span class="val-neg">−$3</span></td>
+          <td class="seller-cell"><span class="val-pos">+$3</span></td>
+        </tr>
+        <tr class="be-row">
+          <td>$113 (손익분기점)</td>
+          <td class="buyer-cell"><span class="val-zero">$0</span></td>
+          <td class="seller-cell"><span class="val-zero">$0</span></td>
+        </tr>
+        <tr class="win-row">
+          <td>$130 (권리 행사)</td>
+          <td class="buyer-cell"><span class="val-pos">+$17</span></td>
+          <td class="seller-cell"><span class="val-neg">−$17</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="cmp-note">
+      <span class="cmp-eq">매수자 + 매도자 = 항상 $0</span>
+      한쪽의 권리는 다른 쪽의 의무
+    </div>
+    <div class="fig-caption">주가가 130달러가 되면 매수자는 110달러에 살 수 있는 권리를 행사합니다. 이 17달러 이익은 반대편 매도자에게 그대로 손실입니다.</div>
+  </div>
+
+  <div class="fig">
+    <div class="fig-label">콜옵션 매수자/매도자 손익 슬라이더 · 행사가 $110 · 프리미엄 $3</div>
+    <div class="slider-wrap">
+      <div class="slider-conds">
+        <div class="slider-field">
+          <div class="slider-field-label">행사가</div>
+          <div class="slider-field-val">$110</div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-field-label">프리미엄</div>
+          <div class="slider-field-val">$3</div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-field-label">손익분기점</div>
+          <div class="slider-field-val" style="color:var(--amber)">$113</div>
+        </div>
+      </div>
+      <div class="slider-row-label">
+        <span class="slider-row-title">만기 주가</span>
+        <span class="slider-row-val" id="callSliderVal">$105</span>
+      </div>
+      <input type="range" id="callSlider" min="90" max="140" value="105" step="1">
+      <div class="slider-results-duo">
+        <div class="slider-result-card buyer-card">
+          <div class="srd-label">매수자 손익</div>
+          <div class="srd-val neg" id="callBuyerPnl">−$3</div>
+        </div>
+        <div class="slider-result-card seller-card">
+          <div class="srd-label">매도자 손익</div>
+          <div class="srd-val pos" id="callSellerPnl">+$3</div>
+        </div>
+      </div>
+      <div class="slider-eq-note">매수자 + 매도자 손익 = 항상 $0 · 두 수는 정확히 반대입니다</div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── 04 풋옵션 비교 ── -->
+<div class="section reveal">
+  <div class="section-num">04 · 풋옵션 손익 비교</div>
+  <h2>풋옵션에서도<br>손익은 반대입니다</h2>
+  <div class="prose">
+    <p>행사가 90달러, 프리미엄 2달러인 풋옵션입니다. 매수자는 "주가가 88달러 아래로 내려가면 이익"이라고 생각합니다. 매도자는 "주가가 88달러 아래로 내려가지 않으면 받은 2달러가 이익으로 남는다"고 생각합니다.</p>
+    <p>주가가 70달러가 되면 풋옵션 매수자는 시장에서 70달러인 주식을 90달러에 팔 수 있는 권리를 행사합니다. 반대편 매도자는 70달러짜리를 90달러에 사야 하는 상황이 됩니다.</p>
+  </div>
+
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 풋옵션 매수자/매도자 손익 비교 · 행사가 $90 · 프리미엄 $2</div>
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>만기 주가</th>
+          <th class="buyer-h">매수자 손익</th>
+          <th class="seller-h">매도자 손익</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>$100 (행사 포기)</td>
+          <td class="buyer-cell"><span class="val-neg">−$2</span></td>
+          <td class="seller-cell"><span class="val-pos">+$2</span></td>
+        </tr>
+        <tr class="be-row">
+          <td>$88 (손익분기점)</td>
+          <td class="buyer-cell"><span class="val-zero">$0</span></td>
+          <td class="seller-cell"><span class="val-zero">$0</span></td>
+        </tr>
+        <tr class="win-row">
+          <td>$70 (권리 행사)</td>
+          <td class="buyer-cell"><span class="val-pos">+$18</span></td>
+          <td class="seller-cell"><span class="val-neg">−$18</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="cmp-note">
+      <span class="cmp-eq">매수자 + 매도자 = 항상 $0</span>
+      한쪽의 이익은 다른 쪽의 손실
+    </div>
+    <div class="fig-caption">풋옵션 매도자는 돈을 먼저 받았지만, 큰 하락이 나오면 그보다 훨씬 큰 손실을 감수해야 합니다.</div>
+  </div>
+
+  <div class="fig">
+    <div class="fig-label">풋옵션 매수자/매도자 손익 슬라이더 · 행사가 $90 · 프리미엄 $2</div>
+    <div class="slider-wrap">
+      <div class="slider-conds">
+        <div class="slider-field">
+          <div class="slider-field-label">행사가</div>
+          <div class="slider-field-val">$90</div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-field-label">프리미엄</div>
+          <div class="slider-field-val">$2</div>
+        </div>
+        <div class="slider-field">
+          <div class="slider-field-label">손익분기점</div>
+          <div class="slider-field-val" style="color:var(--amber)">$88</div>
+        </div>
+      </div>
+      <div class="slider-row-label">
+        <span class="slider-row-title">만기 주가</span>
+        <span class="slider-row-val" id="putSliderVal">$95</span>
+      </div>
+      <input type="range" id="putSlider" min="60" max="120" value="95" step="1">
+      <div class="slider-results-duo">
+        <div class="slider-result-card buyer-card">
+          <div class="srd-label">매수자 손익</div>
+          <div class="srd-val neg" id="putBuyerPnl">−$2</div>
+        </div>
+        <div class="slider-result-card seller-card">
+          <div class="srd-label">매도자 손익</div>
+          <div class="srd-val pos" id="putSellerPnl">+$2</div>
+        </div>
+      </div>
+      <div class="slider-eq-note">매수자 + 매도자 손익 = 항상 $0 · 두 수는 정확히 반대입니다</div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── 05 손실 제한 / 최대이익 ── -->
+<div class="section reveal">
+  <div class="section-num">05 · 손익 구조의 비대칭</div>
+  <h2>매수자는 손실이 제한되고<br>매도자는 이익이 제한됩니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 05 / 06 — 매수자 손실 제한 · 매도자 최대이익 제한</div>
+    <div class="limit-pair">
+      <div class="limit-card buyer-lim">
+        <div class="limit-who">BUYER · 매수자</div>
+        <div class="limit-max-label">최대손실 (보통)</div>
+        <div class="limit-max-val">프리미엄</div>
+        <div class="limit-example">
+          <div class="limit-example-label">콜옵션 예시 ($3 프리미엄)</div>
+          <div class="limit-example-nums">
+            <span style="color:var(--put)">최악 −$3</span>
+            <span style="color:var(--text-dim)">→</span>
+            <span style="color:var(--green)">이익 무제한</span>
+          </div>
+        </div>
+        <div class="limit-note">권리를 포기하면 손실은 프리미엄에서 멈춥니다. 불리한 상황에서 선택권이 있다는 뜻입니다.</div>
+      </div>
+      <div class="limit-card seller-lim">
+        <div class="limit-who">SELLER · 매도자</div>
+        <div class="limit-max-label">최대이익</div>
+        <div class="limit-max-val profit">프리미엄</div>
+        <div class="limit-example">
+          <div class="limit-example-label">콜옵션 예시 ($3 프리미엄)</div>
+          <div class="limit-example-nums">
+            <span style="color:var(--green)">최대 +$3</span>
+            <span style="color:var(--text-dim)">→</span>
+            <span style="color:var(--put)">손실 확대 가능</span>
+          </div>
+        </div>
+        <div class="limit-note">프리미엄 이상은 벌 수 없습니다. 가격이 크게 움직이면 손실은 프리미엄보다 훨씬 커질 수 있습니다.</div>
+      </div>
+    </div>
+    <div class="fig-caption">같은 프리미엄($3)을 사이에 두고 매수자의 손실은 3달러에서 멈추고, 매도자의 이익도 3달러에서 멈춥니다. 그 이후 움직임에서 방향이 엇갈립니다.</div>
+  </div>
+
+  <div class="warn-box">
+    <div class="warn-title">주의 — 손실 제한의 의미</div>
+    <p>한 계약의 손실이 제한된다는 말이 계좌 손실이 작다는 뜻은 아닙니다. 3달러짜리 옵션을 너무 많이 사면 계좌 전체 손실은 커집니다. 손실 제한은 포지션 크기를 마음대로 키워도 된다는 허가가 아닙니다.</p>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── 06 손익 비대칭 개념 카드 ── -->
+<div class="section reveal">
+  <div class="section-num">06 · 꼬리위험</div>
+  <h2>매도는 자주 이기지만<br>한 번의 큰 손실이 있습니다</h2>
+  <div class="prose">
+    <p>옵션 매도는 처음에는 꽤 매력적으로 보입니다. 시장이 크게 움직이지 않거나, 행사가를 넘지 못하면 매도자는 프리미엄을 가져갑니다. 이런 상황이 여러 번 반복되면 수익이 쌓입니다.</p>
+    <p>다만 기초자산이 크게 움직이는 날, 그 손실은 한 번에 커집니다. 옵션 매도는 프리미엄을 받는 대신 꼬리위험을 떠안는 구조입니다.</p>
+  </div>
+
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 작은 이익 여러 번과 큰 손실 한 번</div>
+    <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:16px; letter-spacing:0.08em;">콜옵션 매도 · 프리미엄 +$3씩 수취 (가상 시나리오)</div>
+    <div class="bars-chart">
+      <div class="bars-wrap">
+        <!-- 여러 작은 초록 막대 -->
+        <div class="bar-item">
+          <div class="bar-val green">+3</div>
+          <div class="bar green" style="height:18px;"></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-val green">+3</div>
+          <div class="bar green" style="height:18px;"></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-val green">+3</div>
+          <div class="bar green" style="height:18px;"></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-val green">+3</div>
+          <div class="bar green" style="height:18px;"></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-val green">+3</div>
+          <div class="bar green" style="height:18px;"></div>
+        </div>
+        <div class="bar-item" style="margin-left:16px;">
+          <div style="height:18px;"></div><!-- spacer for zero offset -->
+          <div class="bar red-bar" style="height:116px; min-width:44px;"></div>
+          <div class="bar-val red-bar" style="margin-top:6px;">−$35</div>
+        </div>
+      </div>
+      <div class="bar-axis"></div>
+      <div class="bars-label">
+        <div class="bars-legend-item"><div class="bars-legend-dot" style="background:var(--green);"></div> 프리미엄 수취 (여러 번)</div>
+        <div class="bars-legend-item"><div class="bars-legend-dot" style="background:var(--put);"></div> 큰 가격 이동 시 손실 (한 번)</div>
+      </div>
+    </div>
+    <div style="margin-top:14px; padding:10px 14px; background:rgba(90,82,72,0.15); border:1px solid var(--border); border-radius:6px; font-size:12px; color:var(--text-muted);">
+      프리미엄을 자주 받는 구조는 큰 움직임 앞에서 손익비가 달라집니다. 세타, 감마, 베가 같은 지표로 이 관계를 정밀하게 보는 것은 17~18회차에서 다룹니다.
+    </div>
+    <div class="fig-caption">이 카드는 매도를 나쁘다고 말하는 것이 아닙니다. 매도는 어떤 리스크를 받고 어떤 리스크를 넘기는지 이해하고 접근해야 합니다.</div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── 07 정리 ── -->
+<div class="section reveal">
+  <div class="section-num">07 · 정리</div>
+  <h2>3회차를 마치며</h2>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <div class="summary-num buyer">매수자</div>
+      <div class="summary-text"><strong>프리미엄을 내고 권리를 얻습니다.</strong> 유리하면 행사, 불리하면 포기. 손실은 보통 처음 낸 프리미엄에서 멈춥니다.</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num seller">매도자</div>
+      <div class="summary-text"><strong>프리미엄을 받고 의무를 집니다.</strong> 상대가 행사하면 반드시 이행. 최대이익은 받은 프리미엄이고, 손실은 커질 수 있습니다.</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num" style="color:var(--amber)">반대</div>
+      <div class="summary-text">같은 계약에서 매수자와 매도자의 손익은 <strong>항상 합이 0입니다.</strong> 한쪽의 이익 17달러는 다른 쪽의 손실 17달러입니다.</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num" style="color:var(--text-dim)">비대칭</div>
+      <div class="summary-text">매수자는 <strong>작게 잃고 크게 벌 수 있는</strong> 구조. 매도자는 <strong>작게 벌고 크게 잃을 수 있는</strong> 구조.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── 08 과제 ── -->
+<div class="section reveal">
+  <div class="section-num">08 · 과제</div>
+  <h2>3회차 과제</h2>
+  <div class="prose">
+    <p>빈칸을 먼저 채워보고, 그 다음 숫자로 확인해보세요.</p>
+  </div>
+
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 3회차 과제 카드</div>
+    <div class="quiz-section">
+      <div class="quiz-group">
+        <div class="quiz-group-title">PART 1 · 빈칸 채우기</div>
+        <div class="blank-row">
+          <div class="blank-num">01</div>
+          <div class="blank-text">옵션 매수자는 프리미엄을 내고 <span class="blank-slot">____</span>를 얻습니다.</div>
+        </div>
+        <div class="blank-row">
+          <div class="blank-num">02</div>
+          <div class="blank-text">옵션 매도자는 프리미엄을 받고 <span class="blank-slot">____</span>를 집니다.</div>
+        </div>
+        <div class="blank-row">
+          <div class="blank-num">03</div>
+          <div class="blank-text">콜옵션 매수자는 정해진 가격에 <span class="blank-slot">____</span> 권리를 갖습니다.</div>
+        </div>
+        <div class="blank-row">
+          <div class="blank-num">04</div>
+          <div class="blank-text">풋옵션 매도자는 상대가 행사하면 정해진 가격에 <span class="blank-slot">____</span> 의무를 집니다.</div>
+        </div>
+      </div>
+      <div class="quiz-group">
+        <div class="quiz-group-title">PART 2 · 손익 계산</div>
+        <div class="blank-row">
+          <div class="blank-num">05</div>
+          <div class="blank-text">
+            <span class="quiz-cond">콜 · 행사가 $110 · 프리미엄 $3 · 만기 주가 $130</span><br>
+            콜옵션 매수자의 순이익과 콜옵션 매도자의 순손실은 각각 얼마인가요?
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="quiz-btn" id="quizBtn" onclick="toggleQuiz()">정답 보기</button>
+    <div class="quiz-answers" id="quizAnswers">
+      <div class="answer-row">
+        <div class="ar-num">01</div>
+        <div class="ar-text">옵션 매수자는 프리미엄을 내고</div>
+        <div class="ar-val neutral">권리</div>
+      </div>
+      <div class="answer-row">
+        <div class="ar-num">02</div>
+        <div class="ar-text">옵션 매도자는 프리미엄을 받고</div>
+        <div class="ar-val neutral">의무</div>
+      </div>
+      <div class="answer-row">
+        <div class="ar-num">03</div>
+        <div class="ar-text">콜옵션 매수자는 정해진 가격에</div>
+        <div class="ar-val neutral">살</div>
+      </div>
+      <div class="answer-row">
+        <div class="ar-num">04</div>
+        <div class="ar-text">풋옵션 매도자는 상대가 행사하면 정해진 가격에</div>
+        <div class="ar-val neutral">살</div>
+      </div>
+      <div class="answer-row">
+        <div class="ar-num">05</div>
+        <div class="ar-text">권리가치 $20 − 프리미엄 $3 →</div>
+        <div class="ar-val pos">매수자 +$17 &nbsp;/&nbsp; <span class="ar-val neg">매도자 −$17</span></div>
+      </div>
+    </div>
+  </div>
+
+  <a href="session-04.html" class="next-card">
+    <div>
+      <div class="next-label">NEXT SESSION</div>
+      <div class="next-title">4회차 — 만기 손익그래프: 콜 매수, 풋 매수, 콜 매도, 풋 매도</div>
+    </div>
+    <div class="next-arrow">→</div>
+  </a>
+</div>
+
+<footer>
+  <div class="footer-brand">무기견의 옵션 입문 · 3회차</div>
+  <div class="footer-page">SESSION 03 / 30</div>
+</footer>
+
+<script>
+  /* ── Progress bar ── */
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100 + '%';
+  });
+
+  /* ── Reveal ── */
+  document.querySelectorAll('.reveal').forEach(el => {
+    new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 }).observe(el);
+  });
+
+  /* ── Call slider ── */
+  function updateCall(val) {
+    const iv    = Math.max(0, val - 110);
+    const buyer = iv - 3;
+    const seller = -buyer;
+    document.getElementById('callSliderVal').textContent = '$' + val;
+    const bEl = document.getElementById('callBuyerPnl');
+    const sEl = document.getElementById('callSellerPnl');
+    bEl.textContent = (buyer >= 0 ? '+' : '') + '$' + buyer;
+    bEl.className = 'srd-val ' + (buyer > 0 ? 'pos' : buyer < 0 ? 'neg' : 'zero');
+    sEl.textContent = (seller >= 0 ? '+' : '') + '$' + seller;
+    sEl.className = 'srd-val ' + (seller > 0 ? 'pos' : seller < 0 ? 'neg' : 'zero');
+  }
+  const callSlider = document.getElementById('callSlider');
+  callSlider.addEventListener('input', () => updateCall(+callSlider.value));
+  updateCall(105);
+
+  /* ── Put slider ── */
+  function updatePut(val) {
+    const iv    = Math.max(0, 90 - val);
+    const buyer = iv - 2;
+    const seller = -buyer;
+    document.getElementById('putSliderVal').textContent = '$' + val;
+    const bEl = document.getElementById('putBuyerPnl');
+    const sEl = document.getElementById('putSellerPnl');
+    bEl.textContent = (buyer >= 0 ? '+' : '') + '$' + buyer;
+    bEl.className = 'srd-val ' + (buyer > 0 ? 'pos' : buyer < 0 ? 'neg' : 'zero');
+    sEl.textContent = (seller >= 0 ? '+' : '') + '$' + seller;
+    sEl.className = 'srd-val ' + (seller > 0 ? 'pos' : seller < 0 ? 'neg' : 'zero');
+  }
+  const putSlider = document.getElementById('putSlider');
+  putSlider.addEventListener('input', () => updatePut(+putSlider.value));
+  updatePut(95);
+
+  /* ── Quiz toggle ── */
+  function toggleQuiz() {
+    const answers = document.getElementById('quizAnswers');
+    const btn = document.getElementById('quizBtn');
+    const visible = answers.classList.toggle('visible');
+    btn.textContent = visible ? '정답 닫기' : '정답 보기';
+  }
+</script>
+</body>
+</html>
