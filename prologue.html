@@ -59,12 +59,24 @@
     .nav-brand {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px; color: var(--text-muted); letter-spacing: 0.08em;
+      text-decoration: none;
     }
     .nav-brand span { color: var(--amber); }
+    .nav-brand:hover { color: var(--text); }
+    .nav-right {
+      display: flex; align-items: center; gap: 16px;
+    }
     .nav-session {
       font-size: 12px; color: var(--text-dim);
       font-family: 'JetBrains Mono', monospace;
     }
+    .nav-next {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text-muted);
+      text-decoration: none; display: flex; align-items: center; gap: 6px;
+      transition: color 0.15s;
+    }
+    .nav-next:hover { color: var(--amber); }
 
     /* ── HERO ── */
     .hero {
@@ -632,8 +644,11 @@
 <div id="progress-bar"></div>
 
 <nav>
-  <div class="nav-brand">무기견 <span>@mugigyon</span></div>
-  <div class="nav-session">PROLOGUE / 옵션 입문</div>
+  <a href="index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <span class="nav-session">PROLOGUE</span>
+    <a href="sessions/session-01.html" class="nav-next">1회차 →</a>
+  </div>
 </nav>
 
 <!-- ── HERO ── -->
