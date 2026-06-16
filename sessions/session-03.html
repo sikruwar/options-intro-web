@@ -10,7 +10,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #0D0D0D; --bg-card: #161616; --bg-card2: #1E1E1E;
-      --text: #F0EBE1; --text-muted: #8A8070; --text-dim: #5A5248;
+      --text: #F0EBE1; --text-muted: #9A9080; --text-dim: #7A7670;
       --call: #3B82F6; --call-dim: #1D3A6E;
       --put: #EF4444; --put-dim: #6E1D1D;
       --amber: #F59E0B; --green: #22C55E; --orange: #F97316;
@@ -92,7 +92,7 @@
     /* ── FIGURE BLOCK ── */
     .fig { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px; margin: 32px 0; }
     .fig-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; }
-    .fig-caption { margin-top: 18px; font-size: 13px; color: var(--text-dim); line-height: 1.6; font-style: italic; }
+    .fig-caption { margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.6; font-style: italic; }
 
     /* ── FIGURE 1: BRIDGE ── */
     .bridge-wrap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: center; }
@@ -291,6 +291,22 @@
       .balance-bar { width: 60px; height: 3px; }
       footer { flex-direction: column; gap: 8px; text-align: center; }
       .next-card { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ── 본문 폰트 통일: figure 내부 레이블 ── */
+    .bridge-col-label, .bridge-tag, .bridge-note,
+    .person-badge,
+    .flow-label,
+    .balance-title, .balance-item-text, .balance-foot,
+    .cmp-table th,
+    .limit-who, .limit-max-label, .limit-example-label,
+    .srd-label, .slider-field-label, .slider-row-title,
+    .slider-eq-note,
+    .bars-legend-item,
+    .quiz-group-title, .blank-num,
+    .ar-num,
+    .summary-num, .warn-title, .next-label {
+      font-family: 'Noto Sans KR', sans-serif;
     }
   </style>
 </head>
