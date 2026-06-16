@@ -536,6 +536,80 @@
       .hero { min-height: auto; padding: 40px 0 20px; }
       .quiz-answers { display: block !important; }
     }
+
+
+    /* ── THEME MODE: dark base + optional olive ── */
+    :root {
+      color-scheme: dark;
+      --nav-bg: rgba(13,13,13,0.92);
+      --hero-glow-warm: rgba(245,158,11,0.05);
+      --hero-glow-cool: rgba(59,130,246,0.04);
+      --prose-text: #D4CFC8;
+      --row-hover: rgba(255,255,255,0.02);
+      --pending-bg: rgba(90,82,72,0.3);
+      --open-bg: rgba(34,197,94,0.12);
+      --cta-text: #0D0D0D;
+    }
+    :root[data-theme="olive"] {
+      color-scheme: light;
+      --bg: #FAFAF2;
+      --bg-card: #FFFFFF;
+      --bg-card2: #F4F5E9;
+      --text: #1C2418;
+      --text-muted: #5E684F;
+      --text-dim: #8A927A;
+      --call: #2F6FB2;
+      --call-dim: #DCE8EF;
+      --put: #B94A48;
+      --put-dim: #F3DDDA;
+      --amber: #7D8F3A;
+      --green: #4F7A35;
+      --red: #B94A48;
+      --orange: #B66C25;
+      --border: #E4E7D5;
+      --border-light: #D5DBC1;
+      --nav-bg: rgba(250,250,242,0.92);
+      --hero-glow-warm: rgba(125,143,58,0.12);
+      --hero-glow-cool: rgba(96,117,63,0.08);
+      --prose-text: #34402D;
+      --row-hover: rgba(93,113,49,0.05);
+      --pending-bg: rgba(138,146,122,0.14);
+      --open-bg: rgba(79,122,53,0.12);
+      --cta-text: #FFFFFF;
+    }
+    body { transition: background 0.25s ease, color 0.25s ease; }
+    nav { background: var(--nav-bg) !important; }
+    .hero::before { background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%) !important; }
+    .hero::after { background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%) !important; }
+    .prose p { color: var(--prose-text) !important; }
+    .theme-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: var(--bg-card);
+      flex-shrink: 0;
+    }
+    .theme-btn {
+      border: 0;
+      min-width: 44px; min-height: 32px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
+    .theme-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+    @media (max-width: 680px) {
+      .nav-right { gap: 8px; }
+      .nav-session, .nav-sep { display: none; }
+      .theme-btn { min-width: 42px; min-height: 30px; padding: 5px 8px; }
+    }
   </style>
 </head>
 <body>
@@ -548,6 +622,10 @@
     <a href="session-01.html" class="nav-prev">← 1회차</a>
     <span class="nav-sep">/</span>
     <span class="nav-session">SESSION 02</span>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
   </div>
 </nav>
 
@@ -1153,6 +1231,30 @@
 </footer>
 
 <script>
+
+  const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+  const themeButtons = document.querySelectorAll('[data-theme-choice]');
+
+  function applyTheme(theme) {
+    const safeTheme = theme === 'olive' ? 'olive' : 'dark';
+    if (safeTheme === 'olive') {
+      document.documentElement.setAttribute('data-theme', 'olive');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    themeButtons.forEach(btn => {
+      const active = btn.dataset.themeChoice === safeTheme;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', String(active));
+    });
+    localStorage.setItem(THEME_KEY, safeTheme);
+  }
+
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+  themeButtons.forEach(btn => {
+    btn.addEventListener('click', () => applyTheme(btn.dataset.themeChoice));
+  });
+
   /* ── Progress bar ── */
   const bar = document.getElementById('progress-bar');
   window.addEventListener('scroll', () => {

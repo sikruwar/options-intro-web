@@ -319,8 +319,8 @@
   <div class="nav-right">
     <span class="nav-label">옵션 입문 · 30회차</span>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
       <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
-      <button class="theme-btn" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
     </div>
   </div>
 </nav>
@@ -546,7 +546,7 @@
 </footer>
 
 <script>
-  const THEME_KEY = 'mugigyeon-options-front-theme';
+  const THEME_KEY = 'mugigyeon-options-course-theme-v2';
   const themeButtons = document.querySelectorAll('[data-theme-choice]');
 
   function applyTheme(theme) {
