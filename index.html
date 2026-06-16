@@ -10,6 +10,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
+      color-scheme: dark;
       --bg: #0D0D0D;
       --bg-card: #161616;
       --bg-card2: #1E1E1E;
@@ -22,6 +23,36 @@
       --green: #22C55E;
       --border: #2A2520;
       --border-light: #3A3530;
+      --nav-bg: rgba(13,13,13,0.92);
+      --hero-glow-warm: rgba(245,158,11,0.05);
+      --hero-glow-cool: rgba(59,130,246,0.04);
+      --row-hover: rgba(255,255,255,0.02);
+      --pending-bg: rgba(90,82,72,0.3);
+      --open-bg: rgba(34,197,94,0.12);
+      --cta-text: #0D0D0D;
+    }
+
+    :root[data-theme="olive"] {
+      color-scheme: light;
+      --bg: #FAFAF2;
+      --bg-card: #FFFFFF;
+      --bg-card2: #F4F5E9;
+      --text: #1C2418;
+      --text-muted: #5E684F;
+      --text-dim: #8A927A;
+      --call: #2F6FB2;
+      --put: #B94A48;
+      --amber: #7D8F3A;
+      --green: #4F7A35;
+      --border: #E4E7D5;
+      --border-light: #D5DBC1;
+      --nav-bg: rgba(250,250,242,0.92);
+      --hero-glow-warm: rgba(125,143,58,0.12);
+      --hero-glow-cool: rgba(96,117,63,0.08);
+      --row-hover: rgba(93,113,49,0.05);
+      --pending-bg: rgba(138,146,122,0.14);
+      --open-bg: rgba(79,122,53,0.12);
+      --cta-text: #FFFFFF;
     }
 
     html { scroll-behavior: smooth; }
@@ -32,12 +63,13 @@
       font-size: 16px;
       line-height: 1.8;
       -webkit-font-smoothing: antialiased;
+      transition: background 0.25s ease, color 0.25s ease;
     }
 
     /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 90;
-      background: rgba(13,13,13,0.92);
+      background: var(--nav-bg);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 14px 32px;
@@ -50,8 +82,37 @@
     }
     .nav-brand span { color: var(--amber); }
     .nav-right {
+      display: flex; align-items: center; gap: 14px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px; color: var(--text-dim);
+    }
+    .theme-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: var(--bg-card);
+    }
+    .theme-btn {
+      border: 0;
+      min-width: 44px; min-height: 32px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .theme-btn.active {
+      background: var(--amber);
+      color: var(--cta-text);
+    }
+    .theme-btn:focus-visible {
+      outline: 2px solid var(--amber);
+      outline-offset: 2px;
     }
 
     /* ── HERO ── */
@@ -66,14 +127,14 @@
       content: '';
       position: absolute; top: -200px; right: -100px;
       width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%);
+      background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero::after {
       content: '';
       position: absolute; bottom: -100px; left: -50px;
       width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%);
+      background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero-eyebrow {
@@ -95,7 +156,7 @@
     }
     .hero-cta {
       display: inline-flex; align-items: center; gap: 12px;
-      background: var(--amber); color: #0D0D0D;
+      background: var(--amber); color: var(--cta-text);
       font-family: 'Noto Sans KR', sans-serif;
       font-size: 15px; font-weight: 700;
       padding: 14px 28px; border-radius: 8px;
@@ -173,7 +234,7 @@
       transition: background 0.15s;
     }
     .roadmap-table tbody tr:last-child { border-bottom: none; }
-    .roadmap-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .roadmap-table tbody tr:hover { background: var(--row-hover); }
     .roadmap-table td {
       padding: 16px 16px;
       vertical-align: middle;
@@ -202,8 +263,8 @@
       font-size: 10px; padding: 3px 9px;
       border-radius: 100px; white-space: nowrap;
     }
-    .rt-status.open    { background: rgba(34,197,94,0.12); color: var(--green); }
-    .rt-status.pending { background: rgba(90,82,72,0.3);   color: var(--text-dim); }
+    .rt-status.open    { background: var(--open-bg); color: var(--green); }
+    .rt-status.pending { background: var(--pending-bg); color: var(--text-dim); }
     .rt-section-row td {
       padding: 28px 0 10px;
     }
@@ -238,6 +299,9 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 680px) {
       nav { padding: 12px 20px; }
+      .nav-right { gap: 8px; }
+      .nav-label { display: none; }
+      .theme-btn { min-width: 42px; min-height: 30px; padding: 5px 8px; }
       .hero { padding: 100px 24px 60px; }
       .section { padding: 60px 20px; }
       .overview-grid { grid-template-columns: 1fr; }
@@ -252,7 +316,13 @@
 
 <nav>
   <a href="/" class="nav-brand">무기견 <span>@mugigyon</span></a>
-  <div class="nav-right">옵션 입문 · 30회차</div>
+  <div class="nav-right">
+    <span class="nav-label">옵션 입문 · 30회차</span>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+      <button class="theme-btn" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+    </div>
+  </div>
 </nav>
 
 <!-- ── HERO ── -->
@@ -476,6 +546,29 @@
 </footer>
 
 <script>
+  const THEME_KEY = 'mugigyeon-options-front-theme';
+  const themeButtons = document.querySelectorAll('[data-theme-choice]');
+
+  function applyTheme(theme) {
+    const safeTheme = theme === 'olive' ? 'olive' : 'dark';
+    if (safeTheme === 'olive') {
+      document.documentElement.setAttribute('data-theme', 'olive');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    themeButtons.forEach(btn => {
+      const active = btn.dataset.themeChoice === safeTheme;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', String(active));
+    });
+    localStorage.setItem(THEME_KEY, safeTheme);
+  }
+
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+  themeButtons.forEach(btn => {
+    btn.addEventListener('click', () => applyTheme(btn.dataset.themeChoice));
+  });
+
   const reveals = document.querySelectorAll('.reveal');
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
