@@ -727,6 +727,13 @@
   </div>
 </section>
 
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-07.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">7회차 — 시간가치, 만기가 길수록 왜 더 비싼가</div><p class="next-desc">다음 회차에서는 시간가치가 왜 만기가 길수록 커질 수 있는지, 그리고 시간이 지날수록 왜 줄어드는지 보겠습니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+
 <footer>
   <div>무기견의 옵션 입문 · Session 06</div>
   <div>Premium Layers</div>
@@ -781,7 +788,7 @@
   const label = document.getElementById('graphLabel');
 
   function updateCalc() {
-    const s = +slider.value, k = 100;
+    const s = +슬라이더.value, k = 100;
     const iv = Math.max(s - k, 0);
     sVal.textContent = '$' + s;
     intrVal.textContent = '$' + iv;

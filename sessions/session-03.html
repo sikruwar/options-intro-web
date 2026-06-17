@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3회차 — 옵션 매수자와 매도자, 프리미엄을 둘러싼 권리와 의무</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -13,9 +13,14 @@
       --text: #F0EBE1; --text-muted: #9A9080; --text-dim: #7A7670;
       --call: #3B82F6; --call-dim: #1D3A6E;
       --put: #EF4444; --put-dim: #6E1D1D;
-      --amber: #F59E0B; --green: #22C55E; --orange: #F97316;
+      --amber: #F59E0B; --green: #22C55E; --blue: #3B82F6; --orange: #F97316;
       --seller: #A78BFA;
       --border: #2A2520; --border-light: #3A3530;
+      --nav-bg: rgba(13,13,13,0.92);
+      --hero-glow-warm: rgba(245,158,11,0.08);
+      --hero-glow-cool: rgba(59,130,246,0.05);
+      --cta-text: #11130f;
+      --shadow: 0 18px 60px rgba(0,0,0,.28);
     }
     html { scroll-behavior: smooth; }
     body {
@@ -35,9 +40,9 @@
     /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 90;
-      background: rgba(13,13,13,0.92); backdrop-filter: blur(12px);
+      background: var(--nav-bg); backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      padding: 14px 32px;
+      padding: 13px 32px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .nav-brand { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-muted); letter-spacing: 0.08em; text-decoration: none; }
@@ -55,15 +60,15 @@
       padding: 122px 10vw 80px; position: relative; overflow: hidden;
     }
     .hero::before {
-      content: ''; position: absolute; top: -200px; right: -100px;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(167,139,250,0.05) 0%, transparent 70%);
+      content: ''; position: absolute; inset: -220px -160px auto auto;
+      width: 760px; height: 760px;
+      background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero::after {
-      content: ''; position: absolute; bottom: -100px; left: -50px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%);
+      content: ''; position: absolute; left: -120px; bottom: -180px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
@@ -90,7 +95,8 @@
     .prose strong { color: var(--text); font-weight: 600; }
 
     /* ── FIGURE BLOCK ── */
-    .fig { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px; margin: 32px 0; }
+    .fig { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 28px; margin: 32px 0; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+    .fig::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--amber), var(--blue), transparent); opacity: .48; }
     .fig-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; }
     .fig-caption { margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.6; font-style: italic; }
 
@@ -275,7 +281,7 @@
     .reveal.visible { opacity: 1; transform: none; }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 680px) {
+    @media (max-width: 760px) {
       nav { padding: 12px 20px; }
       .hero { padding: 100px 24px 60px; }
       .section, .section-wide { padding: 60px 20px; }
@@ -377,7 +383,7 @@
     }
     .theme-btn.active { background: var(--amber); color: var(--cta-text); }
     .theme-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-    @media (max-width: 680px) {
+    @media (max-width: 760px) {
       .nav-right { gap: 8px; }
       .nav-session, .nav-prev, .nav-index, .nav-forward, .nav-sep { display: none; }
       .theme-btn { min-width: 42px; min-height: 30px; padding: 5px 8px; }

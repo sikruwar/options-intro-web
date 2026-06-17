@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>4회차 — 만기 손익그래프, 옵션은 그림으로 이해해야 한다</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -13,15 +13,20 @@
       --text: #F0EBE1; --text-muted: #9A9080; --text-dim: #7A7670;
       --call: #3B82F6; --call-dim: #1D3A6E;
       --put: #EF4444; --put-dim: #6E1D1D;
-      --amber: #F59E0B; --green: #22C55E; --orange: #F97316;
+      --amber: #F59E0B; --green: #22C55E; --blue: #3B82F6; --orange: #F97316;
       --border: #2A2520; --border-light: #3A3530;
+      --nav-bg: rgba(13,13,13,0.92);
+      --hero-glow-warm: rgba(245,158,11,0.08);
+      --hero-glow-cool: rgba(59,130,246,0.05);
+      --cta-text: #11130f;
+      --shadow: 0 18px 60px rgba(0,0,0,.28);
     }
     html { scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; font-size: 16px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
 
     #progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--amber)); width: 0%; z-index: 100; transition: width 0.1s linear; }
 
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 90; background: rgba(13,13,13,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 90; background: var(--nav-bg); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 13px 32px; display: flex; align-items: center; justify-content: space-between; }
     .nav-brand { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-muted); letter-spacing: 0.08em; text-decoration: none; }
     .nav-brand span { color: var(--amber); }
     .nav-brand:hover { color: var(--text); }
@@ -32,7 +37,8 @@
     .nav-sep { color: var(--text-dim); font-size: 12px; }
 
     .hero { min-height: 94vh; display: flex; align-items: center; padding: 122px 10vw 80px; position: relative; overflow: hidden; }
-    .hero::before { content: ''; position: absolute; top: -200px; right: -100px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(34,197,94,0.05) 0%, transparent 70%); pointer-events: none; }
+    .hero::before { content: ''; position: absolute; inset: -220px -160px auto auto; width: 760px; height: 760px; background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%); pointer-events: none; }
+    .hero::after { content: ''; position: absolute; left: -120px; bottom: -180px; width: 620px; height: 620px; background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%); pointer-events: none; }
     .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
     .hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 28px; }
     .hero h1 { font-size: clamp(40px, 7vw, 84px); font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px; }
@@ -54,7 +60,8 @@
     .prose p:last-child { margin-bottom: 0; }
     .prose strong { color: var(--text); font-weight: 600; }
 
-    .fig { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px; margin: 32px 0; }
+    .fig { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 28px; margin: 32px 0; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+    .fig::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--amber), var(--blue), transparent); opacity: .48; }
     .fig-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; }
     .fig-caption { margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.6; font-style: italic; }
 
@@ -173,7 +180,7 @@
     .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
     .reveal.visible { opacity: 1; transform: none; }
 
-    @media (max-width: 680px) {
+    @media (max-width: 760px) {
       nav { padding: 12px 20px; }
       .hero { padding: 100px 24px 60px; }
       .section, .section-wide { padding: 60px 20px; }
@@ -255,7 +262,7 @@
     }
     .theme-btn.active { background: var(--amber); color: var(--cta-text); }
     .theme-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-    @media (max-width: 680px) {
+    @media (max-width: 760px) {
       .nav-right { gap: 8px; }
       .nav-session, .nav-prev, .nav-index, .nav-forward, .nav-sep { display: none; }
       .theme-btn { min-width: 42px; min-height: 30px; padding: 5px 8px; }
