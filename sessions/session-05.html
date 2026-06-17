@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>5회차 — 무기견의 옵션 입문</title>
+  <title>5회차 — 내가격, 등가격, 외가격</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -516,7 +516,7 @@
 <nav>
   <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
   <div class="nav-right">
-    <a href="session-04.html" class="nav-prev">← 4회차</a>
+    <a href="session-04.html" class="nav-prev">4회차</a>
     <span class="nav-session">SESSION 05</span>
     <a href="session-06.html" class="nav-next">6회차 →</a>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
@@ -888,7 +888,24 @@
         <span class="chain-badge itm">ITM</span>
       </div>
     </div>
-    <div class="fig-caption">실제 옵션 체인에서는 콜이 왼쪽, 풋이 오른쪽에 배치됩니다. 현재가 근처의 행사가가 등가격이 되고, 위아래로 콜과 풋의 상태가 반대로 나뉩니다.</div>
+    <div class="three" style="margin-top:18px">
+      <div class="mini-card">
+        <div class="mini-k">expiration · strike</div>
+        <div class="mini-v">30일 · K=$90</div>
+        <p class="mini-p">call bid/ask 10.60 / 10.90 · put bid/ask 0.40 / 0.50<br>volume 320 · open interest 4,800 · IV 24% · delta 콜 +0.82 / 풋 -0.18</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">expiration · strike</div>
+        <div class="mini-v">30일 · K=$100</div>
+        <p class="mini-p">call bid/ask 4.80 / 5.10 · put bid/ask 4.70 / 5.00<br>volume 1,240 · open interest 8,900 · IV 28% · delta 콜 +0.51 / 풋 -0.49</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">expiration · strike</div>
+        <div class="mini-v">30일 · K=$110</div>
+        <p class="mini-p">call bid/ask 1.15 / 1.30 · put bid/ask 10.80 / 11.10<br>volume 410 · open interest 5,200 · IV 25% · delta 콜 +0.20 / 풋 -0.80</p>
+      </div>
+    </div>
+    <div class="fig-caption">실제 옵션 체인에서는 콜과 풋을 같은 만기와 같은 행사가 기준으로 나란히 봅니다. bid와 ask는 실제로 사고팔 수 있는 가격 범위이고, volume과 open interest는 유동성의 단서일 뿐 안전 보증은 아닙니다. IV는 시장이 붙인 변동성 가격, delta는 방향 변화 민감도의 대략적인 숫자입니다.</div>
   </div>
 </section>
 
@@ -924,11 +941,8 @@
     </div>
   </div>
 
-  <a href="session-06.html" class="next-card">
-    <div>
-      <div class="next-label">NEXT SESSION</div>
-      <div class="next-title">6회차 — 프리미엄의 두 층, 내재가치와 시간가치</div>
-    </div>
+  <a class="next-card" href="session-06.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">6회차 — 프리미엄의 두 층, 내재가치와 시간가치</div><p class="next-desc">다음 회차에서는 옵션 가격 안을 열어보겠습니다. 옵션 가격은 내재가치와 시간가치로 나눌 수 있습니다. 오늘 배운 내가격, 등가격, 외가격이 그 구분의 출발점이 됩니다.</p></div>
     <div class="next-arrow">→</div>
   </a>
 </section>
@@ -981,7 +995,7 @@
 
   /* ── INTERACTIVE PRICE LINE ── */
   const strikes = [80, 90, 100, 110, 120];
-  const slider = document.getElementById('spSlider');
+  const 슬라이더 = document.getElementById('spSlider');
   const spVal = document.getElementById('spVal');
   const grid = document.getElementById('strikeGrid');
   const caption = document.getElementById('cpCaption');
@@ -1049,7 +1063,7 @@
     renderGrid();
   }
 
-  slider.addEventListener('input', renderGrid);
+  슬라이더.addEventListener('input', renderGrid);
   renderGrid();
 </script>
 </body>

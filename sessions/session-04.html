@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4회차 — 무기견의 옵션 입문</title>
+  <title>4회차 — 만기 손익그래프, 옵션은 그림으로 이해해야 한다</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -268,7 +268,7 @@
 <nav>
   <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
   <div class="nav-right">
-    <a href="session-03.html" class="nav-prev">← 3회차</a>
+    <a href="session-03.html" class="nav-prev">3회차</a>
     <span class="nav-sep">/</span>
     <span class="nav-session">SESSION 04</span>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
@@ -874,11 +874,8 @@
     </div>
   </div>
 
-  <a href="session-05.html" class="next-card">
-    <div>
-      <div class="next-label">NEXT SESSION</div>
-      <div class="next-title">5회차 — 내가격, 등가격, 외가격: 옵션이 얼마나 살아 있는 권리인가</div>
-    </div>
+  <a class="next-card" href="session-05.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">5회차 — 내가격, 등가격, 외가격</div><p class="next-desc">다음 회차에서는 행사가와 현재가의 관계를 더 자세히 보겠습니다. 내가격, 등가격, 외가격이라는 말은 옵션이 지금 얼마나 살아 있는 권리인지 구분하는 언어입니다.</p></div>
     <div class="next-arrow">→</div>
   </a>
 </div>
@@ -936,7 +933,7 @@
     if (target) target.classList.add('active');
   }
 
-  /* ── Premium slider ── */
+  /* ── Premium 슬라이더 ── */
   const premSlider = document.getElementById('premSlider');
   function updatePrem(p) {
     const be = 110 + parseInt(p);

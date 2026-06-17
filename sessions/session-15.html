@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>15회차 — 베가, 변동성의 가격</title>
+  <meta name="description" content="베가, 변동성의 가격">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .figure-points .mini-card { min-height:112px; }
+    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
+    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
+    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+  </style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-14.html" class="nav-prev">14회차</a>
+    <span class="nav-session">SESSION 15</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-16.html" class="nav-next nav-forward">16회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 15 · Level 3</div>
+    <h1>베가, 변동성의 가격</h1>
+    <p class="hero-sub">베가에서는 질문이 방향에서 가격으로 넘어갑니다.</p>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">베가는 내재변동성이 1%포인트 변할 때 옵션 가격이 얼마나 변하는지 보여주는 민감도입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>시간 비용에서 변동성 민감도로 넘어갑니다</h2>
+  <div class="prose">
+<p>14회차에서는 세타를 봤습니다. 옵션 가격 안에 들어 있는 시간가치가 시간이 지나며 줄어들고, 그 감소가 하루 단위 비용처럼 계좌에 반영될 수 있다는 점을 배웠습니다. 특히 짧은 만기 등가격 옵션은 감마가 커지는 동시에 세타 압박도 커질 수 있었습니다.</p>
+<p>오늘은 같은 시간가치를 다른 각도에서 봅니다. 시간이 줄어드는 힘이 세타라면, 시장이 그 시간 동안의 흔들림을 더 크게 가격에 반영하는 힘이 베가입니다. 세타가 달력의 변화라면 베가는 시장의 긴장도 변화에 가깝습니다.</p>
+<p>이 연결이 중요합니다. 실적 발표 전 콜옵션을 샀는데 주가가 조금 올라도 손실이 날 수 있습니다. 주가 방향의 이익보다 IV 하락으로 빠지는 프리미엄이 더 크면 그런 결과가 나옵니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 세타에서 베가로 넘어가는 오프닝</div>
+    <h3>세타에서 베가로 넘어가는 오프닝</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=100, T=30D. IV 20% price 2.30 vega 0.115 theta -0.032. IV 25% price 2.875 approximate vega effect +0.575.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: S, K, T, 금리, 배당. 변화: IV.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p"><code>시간 경과</code> / <code>IV 변화</code> toggle. 세타 숫자와 베가 숫자가 각각 강조된다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig01ControlVal">50</span></div>
+          <input id="fig01Control" type="range" min="0" max="100" value="50" aria-label="세타에서 베가로 넘어가는 오프닝 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">14회차 세타의 시간비용과 15회차 베가의 변동성 가격을 같은 시간가치 층에서 보여준다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>IV가 움직이면 방향이 같아도 가격이 달라집니다</h2>
+  <div class="prose">
+<p>베가에서는 질문이 방향에서 가격으로 넘어갑니다.</p>
+<p>주가가 거의 안 움직였는데, 왜 옵션 가격은 갑자기 비싸지거나 싸질까요?</p>
+<p>주식 투자자는 보통 가격과 실적, 금리, 수급을 먼저 봅니다. 옵션 투자자는 거기에 하나를 더 붙여야 합니다. 시장이 앞으로의 움직임을 얼마짜리 흔들림으로 보고 있는지입니다.</p>
+<p>현재 주가 100달러, 행사가 100달러, 만기 30일 콜옵션을 가정하겠습니다. 주가, 행사가, 만기, 금리, 배당은 교육 편의를 위해 고정합니다. IV가 20%일 때 옵션 가격은 2.30달러, 베가는 0.115라고 두겠습니다.</p>
+<p>IV가 20%에서 21%로 1%포인트 오르면, 다른 조건이 그대로라는 가정에서 옵션 가격은 대략 2.415달러가 됩니다. 이번에는 IV 하나만 움직였습니다. 왜 중요한가 하면, 이 변화는 주가가 움직이지 않아도 옵션 프리미엄을 바꿀 수 있기 때문입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>베가는 IV 1%포인트 변화에 대한 옵션 가격 민감도입니다</h2>
+  <div class="prose">
+<p>이번 회차의 기준 문장은 이렇습니다.</p>
+<p>베가는 내재변동성이 1%포인트 변할 때 옵션 가격이 얼마나 변하는지 보여주는 민감도입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>내재변동성을 가격 언어로 다시 읽습니다</h2>
+  <div class="prose">
+<p>베가를 이해하려면 먼저 내재변동성을 가격 언어로 봐야 합니다. 내재변동성은 과거에 실제로 얼마나 흔들렸는지를 계산한 숫자가 아닙니다. 시장에서 거래되는 옵션 가격을 놓고, 그 가격을 설명하려면 변동성 입력값이 어느 정도여야 하는지 역으로 읽은 값입니다.</p>
+<p>예를 들어 현재 주가 100달러, 행사가 105달러, 만기 60일 콜옵션을 봅니다. 금리와 배당은 고정합니다. 내가 생각하는 미래 변동성이 25%라면 모델 가격이 2.10달러라고 합시다. 그런데 시장 가격이 2.70달러라면, 시장은 내가 넣은 25%보다 더 큰 흔들림을 옵션 가격에 반영하고 있는 셈입니다.</p>
+<p>이때 시장 가격 2.70달러를 설명하는 IV가 31%라면, 이 옵션은 31% IV에 거래된다고 말할 수 있습니다. 이 예시에서 그대로 둔 조건은 주가, 행사가, 만기, 금리, 배당이고, 움직인 쪽은 변동성 입력값입니다. 이 관점이 생기면 옵션 가격을 달러 금액과 IV 두 언어로 동시에 읽게 됩니다.</p>
+<p>베가는 그 IV 변화에 대한 옵션 가격의 기울기입니다. 30일 100콜 가격이 2.30달러이고 베가가 0.115라면, IV가 1%포인트 오를 때 가격은 약 0.115달러 오릅니다. 옵션 1계약은 보통 100주 기준이므로, 1계약의 베가 금액은 약 11.50달러입니다.</p>
+<p>여기서 단위가 헷갈리기 쉽습니다. IV 20%에서 21%로 가는 변화는 1%포인트 변화입니다. 20%에서 20.01%로 가는 변화가 아닙니다. 베가 0.115는 변동성 1%포인트 변화에 대한 옵션 가격 단위 변화로 읽습니다.</p>
+<p>같은 조건에서 IV가 20%에서 24%로 4%포인트 오른다면 어떻게 될까요. 주가, 행사가, 만기, 금리, 배당을 고정하고 단순 근사하면 옵션 가격 변화는 <code>0.115 × 4 = 0.46달러</code>입니다. 옵션 가격은 2.30달러에서 약 2.76달러가 됩니다. 1계약 기준으로는 약 46달러 변화입니다.</p>
+<p>콜과 풋은 모두 보통 양의 베가를 갖습니다. 시장이 더 큰 움직임을 가격에 반영하면, 살 수 있는 권리인 콜도 비싸지고 팔 수 있는 권리인 풋도 비싸집니다. 큰 움직임은 위쪽과 아래쪽 어느 방향이든 권리의 가능성을 키우기 때문입니다.</p>
+<p>현재 주가 100달러, 행사가 100달러, 만기 30일 콜과 풋을 놓겠습니다. IV 20%에서 콜 가격 2.30달러, 풋 가격 2.20달러라고 합시다. 두 옵션의 베가를 각각 0.115와 0.113으로 둡니다. IV가 25%로 오르면 콜은 약 2.875달러, 풋은 약 2.765달러로 오를 수 있습니다.</p>
+<p>이 비교에서 조건을 주가, 행사가, 만기, 금리, 배당로 묶어두면, 결과를 흔드는 변수는 IV입니다. 콜과 풋의 방향은 다르지만, 변동성 상승이 옵션 권리의 가능성 값을 키운다는 점은 비슷하게 작동합니다.</p>
+<p>베가는 등가격 근처에서 크게 나타나는 경우가 많습니다. 등가격 옵션은 지금 행사해도 내재가치가 거의 없지만, 작은 움직임으로 내가격이 될 가능성이 큽니다. 그래서 시장이 미래 흔들림을 더 크게 보면 이 가능성 가격이 민감하게 바뀝니다.</p>
+<p>현재 주가 100달러, 만기 45일, IV 25%, 금리와 배당은 고정합니다. 90콜의 베가는 0.060, 100콜의 베가는 0.150, 110콜의 베가는 0.095라고 두겠습니다. 차이를 만든 것은 행사가 위치입니다. 등가격인 100콜이 총 포인트 기준으로 IV 변화에 가장 민감하게 반응합니다.</p>
+<p>다만 외가격 옵션은 수익률 기준으로 더 크게 보일 수 있습니다. 110콜 가격이 0.80달러이고 베가가 0.095라면, IV가 5%포인트 오를 때 가격 변화는 약 0.475달러입니다. 가격은 1.275달러가 되고, 단순 수익률은 약 59%입니다. 100콜 가격이 3.20달러이고 베가가 0.150이면 같은 IV 변화에서 가격 변화는 0.75달러, 단순 수익률은 약 23%입니다.</p>
+<p>여기서 주가, 만기, 금리, 배당, IV 변화 폭은 그대로 놓고 행사가와 최초 옵션 가격을 따로 움직여 보면 구조가 더 선명해집니다. 총 달러 변화는 등가격이 클 수 있고, 비율 변화는 싼 외가격 옵션이 커 보일 수 있습니다. 이 차이를 모르면 외가격 옵션이 지나치게 매력적으로 보입니다.</p>
+<p>만기도 베가를 크게 바꿉니다. 시장이 미래 흔들림을 더 크게 반영할 때, 시간이 길게 남은 옵션은 그 변화가 작용할 기간도 더 깁니다. 그래서 같은 행사가의 등가격 옵션이라면 장기 옵션이 단기 옵션보다 베가가 큰 경우가 많습니다.</p>
+<p>현재 주가 100달러, 행사가 100달러, IV 25%, 금리와 배당은 고정합니다. 7일 만기 콜의 베가는 0.055, 30일 만기 콜의 베가는 0.115, 90일 만기 콜의 베가는 0.205라고 두겠습니다. 이번 비교의 차이는 남은 만기입니다. IV 3%포인트 상승은 7일 옵션에 약 0.165달러, 90일 옵션에 약 0.615달러의 이론 가격 변화를 만들 수 있습니다.</p>
+<p>이게 장기 옵션을 더 안전하게 만든다는 뜻은 아닙니다. 장기 옵션은 베가가 커서 IV 하락에도 더 민감합니다. 긴 만기는 시간을 더 사는 대신, 변동성 가격 변화에 더 많이 노출되는 구조가 됩니다.</p>
+<p>이제 실적 이벤트를 보겠습니다. 현재 주가 100달러, 행사가 100달러, 만기 10일 콜옵션입니다. 실적 발표 전 IV는 55%, 옵션 가격은 4.80달러, 베가는 0.070, 델타는 0.52라고 두겠습니다. 실적 발표 후 주가는 102달러로 오르지만 IV가 35%로 내려간다고 가정합니다.</p>
+<p>방향 효과는 대략 <code>델타 0.52 × 주가 상승 2달러 = +1.04달러</code>입니다. 베가 효과는 <code>0.070 × IV 변화 -20%포인트 = -1.40달러</code>입니다. 세타와 감마, 실제 재가격을 단순화하면 순효과는 약 -0.36달러입니다. 주가가 올랐는데도 콜 가격이 내려갈 수 있는 구조가 여기서 나옵니다.</p>
+<p>행사가, 계약 단위, 금리와 배당은 같은 조건으로 놓고 주가와 IV만 따로 봅니다. 중요한 해석 좌표는 방향 이익과 IV 하락 손실을 나눠 읽는 것입니다. 실적 전 옵션 매수는 방향 예측과 함께 이벤트 후 IV 하락폭을 견뎌야 합니다.</p>
+<p>이 현상을 흔히 IV crush라고 부릅니다. 이벤트 전에는 불확실성이 남아 있어서 옵션 가격에 긴장도가 붙습니다. 이벤트가 지나면 결과가 좋든 나쁘든 불확실성 일부가 제거됩니다. 시장은 남은 흔들림에 더 낮은 값을 매길 수 있습니다.</p>
+<p>개인적으로는 베가를 “시장 보험료의 민감도”로 보는 편이 편합니다. 보험 사고 가능성이 커졌다고 시장이 느끼면 보험료가 오르고, 그 보험료 변화에 내 옵션이 얼마나 반응하는지가 베가입니다. 단, 비유는 여기까지입니다. 실제 옵션은 주가, 만기, 행사가, 유동성, 스큐까지 같이 움직입니다.</p>
+<p>베가는 옵션 매수자와 매도자에게 반대로 작동합니다. 옵션을 매수하면 보통 양의 베가 포지션이 됩니다. IV가 오르면 유리하고 IV가 내리면 불리합니다. 옵션을 매도하면 보통 음의 베가 포지션이 됩니다. IV가 내리면 유리하지만 IV가 튀면 손실이 커질 수 있습니다.</p>
+<p>예를 들어 100콜을 3.20달러에 매수했고 베가가 0.12라면 IV 5%포인트 상승은 약 +0.60달러로 작용합니다. 같은 옵션을 매도했다면 같은 변화가 약 -0.60달러로 작용합니다. 주가, 만기, 금리, 배당은 그대로 두고 IV만 움직인 예시입니다. 포지션 방향이 바뀌면 같은 시장 변화도 계좌에 반대로 들어옵니다.</p>
+<p>베가는 단독으로 쓰면 위험합니다. 베가가 양수라서 좋다는 식으로 보면 안 됩니다. 양의 베가 포지션은 보통 프리미엄을 지불하고, 세타 비용을 함께 부담합니다. IV가 오르지 않거나 예상보다 빨리 빠지면 시간비용이 먼저 계좌에 반영됩니다.</p>
+<p>베가가 음수인 포지션도 마찬가지입니다. IV가 내려가면 수익이 날 수 있지만, 시장 충격이 오면 IV가 오르고 기초자산도 불리하게 움직일 수 있습니다. 옵션 매도자는 세타를 받는 동안 베가와 감마, 갭 리스크를 같이 들고 있는 경우가 많습니다.</p>
+<p>초보자가 실전에서 가장 먼저 붙일 질문은 네 가지입니다. 지금 IV는 과거 대비 높은가 낮은가. 내 옵션의 베가는 얼마인가. 내가 기대하는 방향 변화가 IV 하락을 이길 수 있는가. 이벤트가 지나면 불확실성이 줄어드는 구조인가.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>베가는 공연 티켓의 기대감 프리미엄과 비슷하게 생각할 수 있습니다. 공연 전에는 기대와 불확실성 때문에 표가 비싸지만, 공연이 끝나면 같은 좌석이어도 기대감 가격은 사라집니다. 실적 발표 후 IV가 빠지는 구조도 이 감각과 닮아 있습니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 베가 1%포인트 계산기</div>
+    <h3>베가 1%포인트 계산기</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">기본값 option price 2.30, vega 0.115, IV change +1pp, contracts 1. 결과 price 2.415, contract effect 11.50달러.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“IV 20%→21%는 1%포인트 변화.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">IV change 슬라이더 -10pp~+10pp, contracts 슬라이더 1~20. DOM 텍스트로 price change와 contract dollar effect 표시.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
+          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="베가 1%포인트 계산기 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">베가 단위가 IV 1%포인트 변화에 대한 옵션 가격 변화임을 체감하게 한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 내재변동성 역산 지도</div>
+    <h3>내재변동성 역산 지도</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=105, T=60D, model vol 25% price 2.10, market price 2.70, implied vol 31%.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정 입력을 둔 뒤 가격을 설명하는 변동성을 찾는다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">market price 2.10~3.20 슬라이더. implied vol은 교육용 선형 보간 25%~36%로 표시.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
+          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="내재변동성 역산 지도 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">시장 가격에서 IV를 역으로 읽는 사고 흐름을 시각화한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 콜과 풋의 양의 베가</div>
+    <h3>콜과 풋의 양의 베가</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=100, T=30D. Call price 2.30 vega 0.115, Put price 2.20 vega 0.113. IV +5pp: call +0.575, put +0.565.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“큰 움직임 가능성은 상승 권리와 하락 권리 모두의 가능성 값을 키운다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">IV +0~+10pp 슬라이더. 콜/풋 변화가 동시에 업데이트.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig04ControlVal">50</span></div>
+          <input id="fig04Control" type="range" min="0" max="100" value="50" aria-label="콜과 풋의 양의 베가 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">콜과 풋이 모두 IV 상승에 가격이 오를 수 있음을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 행사가별 베가 지형도</div>
+    <h3>행사가별 베가 지형도</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, T=45D, IV 25%. K=90 vega 0.060, K=95 vega 0.115, K=100 vega 0.150, K=105 vega 0.130, K=110 vega 0.095.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“변화: 행사가 위치. 고정: S, T, IV, 금리, 배당.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">strike button or 마우스오버. selected vega와 moneyness label 표시.</p></div></div>
+    
+    <div class="fig-caption">등가격 근처에서 총 포인트 기준 베가가 크게 나타나는 경향을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 총 포인트 변화와 비율 변화 비교</div>
+    <h3>총 포인트 변화와 비율 변화 비교</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">100콜 price 3.20 vega 0.150 IV +5pp → +0.75, +23%. 110콜 price 0.80 vega 0.095 IV +5pp → +0.475, +59%.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“싼 옵션의 비율 변화는 커 보일 수 있다. 최초 가격과 확률, 세타를 함께 본다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">IV change 1~10pp 슬라이더. 두 옵션의 dollar/percent 값 동시 갱신.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
+          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="총 포인트 변화와 비율 변화 비교 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">등가격 옵션과 외가격 옵션의 베가 효과를 달러 변화와 수익률 변화로 나눠 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 만기별 베가 비교</div>
+    <h3>만기별 베가 비교</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=100, IV 25%. 7D vega 0.055, 30D vega 0.115, 90D vega 0.205. IV +3pp 효과: +0.165, +0.345, +0.615.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“변화: 남은 만기. 고정: S, K, IV, 금리, 배당.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">maturity select. selected maturity의 vega dollar effect 표시.</p></div></div>
+    
+    <div class="fig-caption">장기 옵션이 단기 옵션보다 IV 변화에 더 크게 반응할 수 있음을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 실적 전후 IV crush 분해</div>
+    <h3>실적 전후 IV crush 분해</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">start 4.80, delta 0.52, stock +2 → +1.04, vega 0.070, IV 55%→35% → -1.40, simplified net -0.36, result 4.44.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“세타, 감마, 실제 재가격은 교육용 단순화에서 제외.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">stock move 0~5, IV drop 0~30pp 슬라이더s. net effect 자동 업데이트.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig08ControlVal">50</span></div>
+          <input id="fig08Control" type="range" min="0" max="100" value="50" aria-label="실적 전후 IV crush 분해 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">방향이 맞아도 IV 하락으로 손실이 날 수 있는 구조를 델타 효과와 베가 효과로 분해한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 롱베가와 숏베가 포지션 카드</div>
+    <h3>롱베가와 숏베가 포지션 카드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Long 100 call vega +0.12, IV +5pp effect +0.60. Short same option vega -0.12, IV +5pp effect -0.60.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“같은 IV 변화도 포지션 방향에 따라 계좌 영향이 반대로 들어온다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">long/short toggle. sign, color, risk notes update.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
+          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="롱베가와 숏베가 포지션 카드 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">옵션 매수와 매도의 베가 노출 방향을 포지션 언어로 정리한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>IV가 높으면 매도, 낮으면 매수라는 공식은 위험합니다</h2>
+  <div class="prose">
+<p>여기서 가장 조심할 오해는 “IV가 높으면 옵션을 매도하고, IV가 낮으면 옵션을 매수하면 된다”는 생각입니다.</p>
+<p>IV가 높다는 말은 옵션 가격에 큰 움직임 가능성이 비싸게 들어가 있다는 뜻입니다. 하지만 비싼 보험료에는 이유가 있을 수 있습니다. 실적, 소송, 승인 결과, FOMC, CPI처럼 실제로 큰 움직임이 나올 수 있는 이벤트가 앞에 있으면 높은 IV가 곧바로 좋은 매도 기회가 되지는 않습니다.</p>
+<p>IV가 낮다는 말도 자동 매수 신호가 아닙니다. 시장이 조용한 이유가 있고, 실제 실현 변동성도 계속 낮게 유지될 수 있습니다. 옵션을 매수한 뒤 IV가 더 낮아지거나 주가가 움직이지 않으면 세타가 먼저 작동합니다.</p>
+<p>또 하나의 오해는 베가를 가격 변화의 전부로 보는 것입니다. 실제 옵션 가격은 델타, 감마, 세타, 베가가 같이 움직입니다. 실적 후 콜옵션 사례처럼 방향 효과와 베가 효과가 서로 다른 방향으로 작용할 수 있습니다.</p>
+<p>베가를 볼 때는 체크리스트를 붙여야 합니다. 포지션이 롱베가인지 숏베가인지, 이벤트 전후인지, IV가 과거 범위에서 어디인지, 만기가 얼마나 남았는지, 방향 효과가 IV 변화를 이길 수 있는지. 이 다섯 가지를 같이 봐야 베가가 숫자에서 판단 언어로 바뀝니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>베가는 이벤트 전후 옵션 가격 변화를 읽는 도구입니다</h2>
+  <div class="prose">
+<p>베가는 IV가 1%포인트 변할 때 옵션 가격이 얼마나 변하는지 보여주는 민감도입니다. 베가 0.115는 다른 조건이 그대로일 때 IV 1%포인트 변화가 옵션 가격에 약 0.115달러 영향을 준다는 뜻입니다. 1계약 기준으로는 약 11.50달러입니다.</p>
+<p>콜과 풋은 보통 양의 베가를 갖습니다. 시장이 더 큰 흔들림을 가격에 반영하면, 상승 권리와 하락 권리 모두 가능성 값이 커집니다. 그래서 변동성 상승은 옵션 매수자에게 유리하고, 변동성 하락은 옵션 매도자에게 유리하게 작용할 수 있습니다.</p>
+<p>베가는 등가격과 긴 만기에서 크게 나타나는 경우가 많습니다. 등가격은 작은 움직임으로 권리 가치가 달라질 수 있고, 긴 만기는 변동성 변화가 작용할 시간이 더 많이 남아 있습니다. 외가격 옵션은 총 포인트 변화보다 비율 변화가 크게 보일 수 있습니다.</p>
+<p>오늘의 체크포인트는 세 줄입니다. 옵션 가격은 주가 방향만으로 움직이지 않습니다. 이벤트 전후에는 IV 변화가 방향 이익을 지울 수 있습니다. 베가는 세타와 함께 읽어야 옵션 매수와 매도의 비용 구조가 보입니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>베가는 IV 1%포인트 변화에 대한 가격 민감도다.</li>
+<li>IV 상승은 롱 옵션에 유리할 수 있지만, 높은 IV에서 새로 사는 것은 비싼 보험료를 내는 일이다.</li>
+<li>이벤트 전후에는 방향보다 IV 하락이 손익을 더 크게 흔들 수 있다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>IV 변화가 프리미엄에 미치는 금액을 계산합니다</h2>
+  <div class="prose">
+<p>현재 주가가 100달러인 주식을 가정합니다. 옵션 1계약은 주식 100주 기준이며, 아래 숫자는 학습용 예시입니다. 실제 옵션 체인이나 매매 판단에 그대로 쓰지 않습니다.</p>
+<h3 class="subhead">Worksheet A. 베가 단위 계산하기</h3>
+<p>100콜의 현재 가격은 2.30달러이고 베가는 0.115입니다. 주가, 행사가, 만기, 금리, 배당은 고정하고 IV만 변한다고 가정합니다.</p>
+<ol>
+<li>IV가 20%에서 21%로 오르면 이론 가격은 대략 얼마입니까?</li>
+<li>IV가 20%에서 24%로 오르면 가격 변화는 대략 얼마입니까?</li>
+<li>1계약 기준 IV 4%포인트 상승의 달러 효과는 얼마입니까?</li>
+</ol>
+<p>확인 기준: 21%에서는 약 2.415달러입니다. 24%에서는 약 2.76달러입니다. 1계약 기준 변화는 약 46달러입니다. 이 계산은 IV 변화의 효과를 따로 본 것입니다.</p>
+<h3 class="subhead">Worksheet B. 콜과 풋의 베가 읽기</h3>
+<p>현재 주가 100달러, 행사가 100달러, 만기 30일입니다. 금리와 배당은 고정합니다.</p>
+<ul>
+<li>콜 가격 2.30달러, 베가 0.115</li>
+<li>풋 가격 2.20달러, 베가 0.113</li>
+</ul>
+<p>아래 질문으로 스스로 설명해보세요.</p>
+<ol>
+<li>IV가 5%포인트 오르면 콜 가격은 대략 얼마나 변합니까?</li>
+<li>풋 가격은 대략 얼마나 변합니까?</li>
+<li>콜과 풋이 모두 양의 베가를 갖는 이유를 권리의 가능성 관점에서 설명해보세요.</li>
+</ol>
+<p>답안 기준: 콜은 약 +0.575달러, 풋은 약 +0.565달러입니다. 시장이 더 큰 움직임을 가격에 반영하면 위쪽과 아래쪽 권리 모두의 가능성 값이 커집니다.</p>
+<h3 class="subhead">Worksheet C. 등가격과 외가격 비교하기</h3>
+<p>현재 주가 100달러, 만기 45일, IV 변화 폭 5%포인트, 금리와 배당은 고정합니다.</p>
+<ul>
+<li>100콜 가격 3.20달러, 베가 0.150</li>
+<li>110콜 가격 0.80달러, 베가 0.095</li>
+</ul>
+<p>아래 질문을 계산해보세요.</p>
+<ol>
+<li>각 옵션의 총 가격 변화는 얼마입니까?</li>
+<li>각 옵션의 단순 비율 변화는 몇 퍼센트입니까?</li>
+<li>외가격 옵션이 싸 보일 때 왜 포지션 크기를 조심해야 합니까?</li>
+</ol>
+<p>계산 기준: 100콜은 +0.75달러, 약 23%입니다. 110콜은 +0.475달러, 약 59%입니다. 비율 변화가 커 보여도 최초 가격이 낮고 만기 내 내가격으로 들어올 확률과 세타 부담을 같이 봐야 합니다.</p>
+<h3 class="subhead">Worksheet D. 실적 전후 IV crush 분해하기</h3>
+<p>현재 주가 100달러, 행사가 100달러, 만기 10일 콜옵션입니다. 실적 발표 전 가격 4.80달러, 델타 0.52, 베가 0.070, IV 55%라고 둡니다. 실적 후 주가는 102달러, IV는 35%가 됩니다. 세타와 감마는 단순화를 위해 제외합니다.</p>
+<ol>
+<li>델타 효과는 대략 얼마입니까?</li>
+<li>베가 효과는 대략 얼마입니까?</li>
+<li>두 효과를 합치면 순효과는 얼마입니까?</li>
+<li>이 사례에서 고정한 변수와 바뀐 변수를 적어보세요.</li>
+</ol>
+<p>풀이의 핵심: 델타 효과는 약 +1.04달러입니다. 베가 효과는 약 -1.40달러입니다. 순효과는 약 -0.36달러입니다. 행사가, 계약 단위, 금리와 배당은 고정하고, 주가와 IV가 바뀌었습니다.</p>
+<h3 class="subhead">Worksheet E. 내 옵션 베가 문장 만들기</h3>
+<p>아래 문장을 직접 채워보세요.</p>
+<p>“내 옵션의 현재 가격은 ________이고, 베가는 ________입니다. 이 숫자는 ________, ________, ________이 그대로라는 가정에서 IV가 1%포인트 변하면 옵션 가격이 대략 ________만큼 변할 수 있다는 뜻입니다. 현재 IV는 ________이고, 이벤트 전후 IV 변화 가능성은 ________입니다. 내가 기대하는 방향 이익은 IV 변화의 불리한 효과를 ________ 정도까지 감당할 수 있습니다.”</p>
+<p>예시 답안: “내 옵션의 현재 가격은 2.30달러이고, 베가는 0.115입니다. 이 숫자는 주가, 만기, 금리와 배당이 그대로라는 가정에서 IV가 1%포인트 변하면 옵션 가격이 대략 0.115달러 변할 수 있다는 뜻입니다. 현재 IV는 20%이고, 이벤트 전후 IV 변화 가능성은 5%포인트 하락입니다. 내가 기대하는 방향 이익은 IV 변화의 불리한 효과를 약 0.575달러까지 감당할 수 있습니다.”</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-10">
+  <div class="fig">
+    <div class="fig-label">Figure 10 — 베가 점검 워크시트</div>
+    <h3>베가 점검 워크시트</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">option price, IV, vega, contracts, IV change assumption, event date, expected delta gain, expected vega effect, theta estimate, long/short vega, variables held constant.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 기록지이며 매매 지시서가 아니다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">화면 입력 가능, <code>예시 채우기</code>, <code>비우기</code> 버튼. 저장 기능은 localStorage만 허용하고 외부 전송은 하지 않는다.</p></div><div class="mini-card"><div class="mini-k">모바일</div><p class="mini-p">입력칸 1열, number input과 button height 44px 이상.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig10ControlVal">50</span></div>
+          <input id="fig10Control" type="range" min="0" max="100" value="50" aria-label="베가 점검 워크시트 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">학습자가 옵션을 보기 전에 IV와 베가 노출을 문장으로 적게 한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차에서는 금리와 배당의 입력값을 봅니다</h2>
+  <div class="prose">
+<p>다음 회차는 로입니다.</p>
+<p>오늘은 시장이 미래 흔들림을 가격에 반영할 때 옵션 프리미엄이 어떻게 변하는지 봤습니다. 이제 가격 모델에 들어가는 다른 입력을 하나 더 봐야 합니다. 금리와 배당입니다.</p>
+<p>16회차에서는 로를 다룹니다. 단기 주식 옵션에서는 로가 델타, 감마, 세타, 베가보다 덜 크게 느껴지는 경우가 많습니다. 그래도 만기가 길어지거나 금리 환경이 급하게 변하면 콜과 풋의 상대가격, 선도가격, 배당 전후 옵션 가격을 이해하는 데 필요합니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-16.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">16회차 — 로, 금리와 배당은 옵션에 어떻게 반영되는가</div><p class="next-desc">다음 회차는 로입니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 무기견의 옵션 입문</div>
+  <div>SESSION 15 · 베가, 변동성의 가격</div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+document.querySelectorAll('[data-control-demo]').forEach((box) => {
+  const input = box.querySelector('input[type="range"]');
+  const output = box.querySelector('.control-value');
+  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+});
+document.querySelectorAll('[data-segmented]').forEach((group) => {
+  group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
+    group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
+  }));
+});
+
+</script>
+</body>
+</html>

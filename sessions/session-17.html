@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>17회차 — 옵션 매수의 본질, 감마를 사며 세타를 지불한다</title>
+  <meta name="description" content="옵션 매수의 본질, 감마를 사며 세타를 지불한다">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .figure-points .mini-card { min-height:112px; }
+    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
+    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
+    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+  </style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-16.html" class="nav-prev">16회차</a>
+    <span class="nav-session">SESSION 17</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-18.html" class="nav-next nav-forward">18회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 17 · Level 4</div>
+    <h1>옵션 매수의 본질, 감마를 사며 세타를 지불한다</h1>
+    <p class="hero-sub">매수 포지션을 볼 때 먼저 물어야 할 질문입니다.</p>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">옵션 매수는 제한손실 구조 안에서 감마와 베가 노출을 얻고, 그 대가로 세타 비용과 손익분기점 부담을 받아들이는 포지션입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>그릭스를 모아 옵션 매수의 성격을 다시 봅니다</h2>
+  <div class="prose">
+<p>16회차까지 우리는 그릭스를 하나씩 분해했습니다. 델타는 방향 노출, 감마는 델타가 바뀌는 속도, 세타는 시간 경과 비용, 베가는 내재변동성 민감도, 로는 금리 민감도였습니다.</p>
+<p>이제 그릭스를 외우는 구간에서 포지션을 해석하는 구간으로 넘어갑니다. 오늘부터는 “옵션을 산다”, “옵션을 판다”라는 행동을 그릭스 조합으로 읽습니다. 이 전환이 꽤 중요합니다.</p>
+<p>옵션 매수자는 프리미엄을 냅니다. 그 대가로 손실 한도를 정하고, 큰 움직임에 유리한 곡률을 얻으며, 대체로 시간 경과 비용을 부담합니다. 오늘은 이 구조를 콜 매수와 풋 매수 모두에 적용해보겠습니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 옵션 매수 그릭스 카드</div>
+    <h3>옵션 매수 그릭스 카드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Long Call: delta +, gamma +, theta -, vega +. Long Put: delta -, gamma +, theta -, vega +.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“매수자는 프리미엄을 내고 권리와 곡률을 얻는다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">Long Call / Long Put toggle. 카드 색과 방향 화살표가 업데이트된다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig01ControlVal">50</span></div>
+          <input id="fig01Control" type="range" min="0" max="100" value="50" aria-label="옵션 매수 그릭스 카드 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">옵션 매수를 델타, 감마, 세타, 베가 조합으로 읽게 한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>옵션 매수는 무엇을 얻고 무엇을 비용으로 낼까요</h2>
+  <div class="prose">
+<p>매수 포지션을 볼 때 먼저 물어야 할 질문입니다.</p>
+<p>왜 옵션 매수자는 손실이 제한되어 있는데도 계좌에서는 자주 손실을 경험할까요?</p>
+<p>현재 주가 100달러, 행사가 100달러, 만기 30일 콜옵션을 4.00달러에 매수한다고 가정하겠습니다. 1계약은 주식 100주 기준입니다. 이 예시에서 행사가, 만기 시작 시점, 계약 승수을 기준선으로 두고 주가 경로, 남은 시간, 내재변동성의 변화를 확인합니다.</p>
+<p>만기 손익만 보면 손실은 프리미엄 400달러로 제한됩니다. 주가가 104달러를 넘으면 손익분기점을 지나고, 112달러가 되면 만기 손익은 <code>12 - 4 = 8달러</code>, 1계약 기준 800달러입니다. 그림으로 보면 꽤 매력적입니다.</p>
+<p>그런데 만기 전 가격은 그렇게 단순하지 않습니다. 주가가 100달러에서 102달러로 올라도, 10일이 지나고 IV가 30%에서 24%로 내려가면 옵션 가격은 4.00달러에서 3.10달러로 낮아질 수 있습니다. 방향은 맞았지만 시간과 변동성이 불리하게 움직인 사례입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>옵션 매수는 감마와 베가를 얻고 세타를 지불하는 구조입니다</h2>
+  <div class="prose">
+<p>오늘의 중심 문장은 이렇습니다.</p>
+<p>옵션 매수는 제한손실 구조 안에서 감마와 베가 노출을 얻고, 그 대가로 세타 비용과 손익분기점 부담을 받아들이는 포지션입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>제한손실 뒤에 손익분기점과 시간 비용이 붙습니다</h2>
+  <div class="prose">
+<p>옵션 매수의 첫 장점은 손실 한도가 계약 시작 때 보인다는 점입니다. 콜을 4.00달러에 사면 1계약 기준 최대손실은 400달러입니다. 풋을 3.50달러에 사면 1계약 기준 최대손실은 350달러입니다. 프리미엄과 계약 승수로 손실 상한이 보이고, 기초자산이 어디까지 불리하게 움직여도 매수자가 추가 의무를 지지 않는 구조입니다.</p>
+<p>이 제한손실은 초보자에게 큰 심리적 안정감을 줍니다. 주식 100주를 100달러에 사면 10,000달러 노출이 생기지만, 4달러 콜 1계약은 400달러로 시작합니다. 다만 이 비교는 자본 사용액만 본 것입니다. 옵션은 만기와 손익분기점이라는 조건을 함께 요구합니다.</p>
+<p>콜 매수의 만기 손익을 먼저 보겠습니다. 현재 주가 100달러, 행사가 100달러, 프리미엄 4.00달러입니다. 만기 주가가 100달러면 옵션은 행사 가치가 없고 손실은 -4.00달러입니다. 만기 주가가 104달러면 내재가치 4.00달러가 프리미엄을 겨우 회수합니다. 손익분기점은 104달러입니다.</p>
+<p>풋 매수도 같은 방식입니다. 현재 주가 100달러, 행사가 100달러, 프리미엄 3.50달러로 둡니다. 만기 주가가 100달러면 손실은 -3.50달러입니다. 만기 주가가 96.50달러면 내재가치 3.50달러가 프리미엄을 회수합니다. 손익분기점은 96.50달러입니다.</p>
+<p>여기서 학습자가 놓치기 쉬운 지점이 있습니다. 옵션 매수자는 방향만 맞히면 되는 사람이 아닙니다. 콜 매수자는 주가가 올라야 하고, 그 상승이 프리미엄과 시간 경과 비용을 넘을 만큼 충분해야 하며, 가능하면 내재변동성도 불리하게 꺾이지 않아야 합니다.</p>
+<p>감마를 붙이면 옵션 매수의 성격이 더 분명해집니다. 롱 콜과 롱 풋은 모두 양의 감마를 가집니다. 기초자산이 크게 움직이면 델타가 유리한 방향으로 빠르게 바뀔 수 있습니다. 콜은 상승할수록 델타가 1에 가까워지고, 풋은 하락할수록 델타가 -1에 가까워집니다.</p>
+<p>숫자로 보겠습니다. 30일 만기 등가격 콜의 델타가 +0.50, 감마가 +0.06이라고 둡니다. 주가가 100달러에서 103달러로 오르면, 다른 조건을 고정한 단순 근사에서 델타는 <code>0.50 + 0.06 × 3 = 0.68</code>로 올라갑니다. 주가 변화가 중요한 이유는 옵션이 움직일수록 주식처럼 더 강하게 따라붙기 때문입니다.</p>
+<p>반대로 주가가 97달러로 내려가면 델타는 <code>0.50 - 0.06 × 3 = 0.32</code>로 낮아집니다. 콜 매수자에게 불리한 방향으로 움직이면 델타 노출이 줄어 손실 속도가 완화될 수 있습니다. 이것이 비선형성입니다. 같은 3달러 움직임이라도 유리한 쪽과 불리한 쪽의 노출 변화가 다릅니다.</p>
+<p>풋도 구조는 같습니다. 30일 만기 등가격 풋의 델타가 -0.50, 감마가 +0.06이라고 둡니다. 주가가 100달러에서 97달러로 내려가면 풋 델타는 대략 <code>-0.50 - 0.06 × 3 = -0.68</code>이 됩니다. 하락이 진행될수록 풋은 하락 방향에 더 강하게 노출됩니다.</p>
+<p>이 양의 감마는 공짜가 아닙니다. 옵션 매수자는 대체로 음의 세타를 가집니다. 아무 일도 일어나지 않으면 시간가치가 줄어듭니다. 주가, IV, 금리, 배당을 고정하고 하루만 지난다고 가정하면 콜 가격 4.00달러가 세타 -0.08 때문에 약 3.92달러가 될 수 있습니다.</p>
+<p>1계약 기준으로는 하루 약 8달러의 시간 비용입니다. 10계약이면 하루 약 80달러입니다. 이 계산은 주가와 IV가 그대로일 때 남은 시간만 줄어드는 상황입니다. 그래서 옵션 매수자는 방향을 맞히는 동안에도 시간이 자기 편인지 계속 물어야 합니다.</p>
+<p>만기가 가까워질수록 이 압박은 더 커질 수 있습니다. 같은 등가격 콜이 45일 남았을 때 세타가 -0.05, 15일 남았을 때 -0.09, 5일 남았을 때 -0.18이라고 두겠습니다. 주가가 행사가 근처에 있다는 조건을 기준선으로 두고 만기의 변화를 확인합니다. 짧은 만기 등가격 옵션은 감마가 커지는 대신 세타 비용도 빨라질 수 있습니다.</p>
+<p>베가도 옵션 매수자의 친구가 될 수 있습니다. 콜과 풋 단순 매수는 대체로 양의 베가를 가집니다. 같은 30일 등가격 콜 가격 4.00달러, 베가 +0.12라고 하겠습니다. IV가 30%에서 34%로 4%포인트 오르면, 다른 조건을 고정한 단순 근사에서 옵션 가격은 <code>4.00 + 0.12 × 4 = 4.48달러</code>가 됩니다.</p>
+<p>하지만 IV가 내려가면 같은 민감도가 손실로 작동합니다. 실적 발표 전 콜을 4.00달러에 샀는데 발표 뒤 IV가 30%에서 22%로 8%포인트 하락하고, 베가가 +0.12라면 IV 효과만 <code>-0.96달러</code>입니다. 주가가 조금 올라도 이 하락이 프리미엄을 눌러버릴 수 있습니다. 옵션 매수자가 이벤트 뒤에 자주 당황하는 구간입니다.</p>
+<p>이제 세 가지 힘을 합쳐보겠습니다. 콜을 4.00달러에 샀습니다. 하루 뒤 주가가 100달러에서 102달러로 오릅니다. 델타 효과를 +1.00달러로 잡고, 세타 효과를 -0.08달러, IV 하락 효과를 -0.72달러로 둡니다. 단순 합산 가격은 <code>4.00 + 1.00 - 0.08 - 0.72 = 4.20달러</code>입니다.</p>
+<p>방향은 맞았지만 수익은 0.20달러에 그칩니다. 1계약 기준 20달러입니다. 계약 조건은 그대로 두고, 결과를 흔드는 쪽은 주가, 하루의 시간, IV입니다. 옵션 매수의 성과는 방향 효과 하나로 설명되지 않습니다.</p>
+<p>다른 경로도 보겠습니다. 같은 콜에서 주가가 100달러에서 106달러로 빠르게 오르고, 하루만 지나며, IV가 유지된다고 하겠습니다. 델타와 감마 효과를 합쳐 +3.40달러, 세타 -0.08달러, IV 효과 0으로 두면 옵션 가격은 약 7.32달러가 됩니다. 이때는 감마가 매수자에게 힘을 실어줍니다.</p>
+<p>개인적으로 옵션 매수를 볼 때 가장 먼저 떠올리는 문장은 “움직임의 크기와 시간 제한을 같이 산다”입니다. 큰 움직임이 빨리 나오면 포지션이 살아납니다. 움직임이 작거나 늦게 나오면 손실 한도 안에서 천천히 말라갈 수 있습니다.</p>
+<p>그래서 옵션 매수 전에는 세 가지 질문을 반드시 적어야 합니다. 첫째, 내 방향 가설은 손익분기점을 넘을 만큼 충분한가. 둘째, 그 움직임은 만기 전에 나올 수 있는가. 셋째, 현재 IV는 내가 사도 될 만큼 합리적인가. 이 질문을 생략하면 옵션 매수는 작아 보이는 프리미엄에 끌려가는 행동이 됩니다.</p>
+<p>포지션 크기도 별도로 봐야 합니다. 손실이 제한된다고 해서 비중 제한이 사라지는 것은 아닙니다. 400달러 손실 한도의 콜 1계약은 괜찮아 보여도, 20계약이면 최대손실은 8,000달러입니다. 비교의 출발점은 계약당 프리미엄이고, 관찰 대상은 계약 수입니다. 제한손실도 반복되면 계좌 전체 손실이 됩니다.</p>
+<p>옵션 매수는 좋은 도구가 될 수 있습니다. 하방이 제한된 이벤트 베팅, 포트폴리오 보험, 큰 변동을 예상하는 포지션, 주식 대신 제한된 금액으로 방향 노출을 잡는 방식에 쓰일 수 있습니다. 다만 매수자는 늘 프리미엄을 먼저 냅니다. 그 프리미엄을 회수하려면 방향, 속도, 시간, IV가 함께 작동해야 합니다.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>옵션 매수는 영화 티켓을 미리 사는 것과 닮았습니다. 입장료는 정해져 있지만 영화가 기대만큼 재미없으면 티켓값은 사라집니다. 대신 예상 밖으로 큰 움직임이 빨리 나오면 제한된 비용으로 큰 노출을 얻은 효과가 생깁니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 콜 매수 만기 손익그래프</div>
+    <h3>콜 매수 만기 손익그래프</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S0=100, K=100, premium=4.00, breakeven=104, expiration prices 80~120. Profit = max(S-K,0)-4.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 행사가, 프리미엄. 변화: 만기 주가.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration price 슬라이더 80~120. 선택 주가의 손익을 옵션당/계약당으로 표시한다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
+          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="콜 매수 만기 손익그래프 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">프리미엄, 최대손실, 손익분기점, 상승 시 비선형 손익을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 풋 매수 만기 손익그래프</div>
+    <h3>풋 매수 만기 손익그래프</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S0=100, K=100, premium=3.50, breakeven=96.50, expiration prices 80~120. Profit = max(K-S,0)-3.5.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 행사가, 프리미엄. 변화: 만기 주가.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration price 슬라이더 80~120. 손익분기점 marker와 현재 선택 지점 강조.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
+          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="풋 매수 만기 손익그래프 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">풋 매수의 제한손실과 하락 시 손익 구조를 콜과 대칭으로 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 감마가 델타를 바꾸는 사다리</div>
+    <h3>감마가 델타를 바꾸는 사다리</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Call delta 0.50, gamma 0.06. S 97 → delta 0.32, S 100 → 0.50, S 103 → 0.68. Put delta -0.50, gamma 0.06. S 97 → -0.68, S 100 → -0.50, S 103 → -0.32.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 선형 근사. 실제 델타와 감마는 재계산된다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">Call / Put toggle plus stock price buttons 97, 100, 103.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig04ControlVal">50</span></div>
+          <input id="fig04Control" type="range" min="0" max="100" value="50" aria-label="감마가 델타를 바꾸는 사다리 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">롱감마가 유리한 방향의 델타 노출을 키우는 과정을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 세타 비용 타임라인</div>
+    <h3>세타 비용 타임라인</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">option price 4.00, theta -0.08, contracts 5. Day 0=4.00, Day 1=3.92, Day 5=3.60 under simplified constant S and IV.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 주가, IV. 변화: 남은 시간.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">days held 슬라이더 0~10. option price and contract theta cost update.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig05ControlVal">50</span></div>
+          <input id="fig05Control" type="range" min="0" max="100" value="50" aria-label="세타 비용 타임라인 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">옵션 매수자가 시간이 지나며 지불하는 비용을 체감하게 한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 만기 가까운 등가격 옵션의 감마, 세타 압축</div>
+    <h3>만기 가까운 등가격 옵션의 감마, 세타 압축</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">45D gamma 0.03 theta -0.05, 15D gamma 0.07 theta -0.09, 5D gamma 0.15 theta -0.18.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“만기가 짧아질수록 큰 움직임의 민감도와 시간 비용이 함께 커질 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">maturity selector. 선택 만기의 감마/세타 설명 chip 표시.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
+          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="만기 가까운 등가격 옵션의 감마, 세타 압축 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">짧은 만기 등가격 옵션에서 감마와 세타가 함께 커질 수 있음을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — IV 변화가 옵션 매수자에게 주는 영향</div>
+    <h3>IV 변화가 옵션 매수자에게 주는 영향</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">call price 4.00, vega +0.12. IV 30% baseline. IV 34% → 4.48. IV 22% → 3.04 from IV effect only.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 주가, 만기, 금리, 배당. 변화: IV.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">IV 슬라이더 20%~40%. option price effect shown as DOM text.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig07ControlVal">50</span></div>
+          <input id="fig07Control" type="range" min="0" max="100" value="50" aria-label="IV 변화가 옵션 매수자에게 주는 영향 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">롱베가 구조와 이벤트 후 IV 하락 위험을 함께 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 방향은 맞았지만 수익이 작아지는 분해표</div>
+    <h3>방향은 맞았지만 수익이 작아지는 분해표</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">start 4.00 → delta effect +1.00 → theta -0.08 → IV crush -0.72 → result 4.20. Alternative fast move: start 4.00 → direction/gamma +3.40 → theta -0.08 → IV 0 → result 7.32.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“옵션 매수 손익은 여러 가격 변수가 동시에 만든다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">scenario toggle <code>완만한 상승+IV 하락</code> / <code>빠른 상승+IV 유지</code>.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig08ControlVal">50</span></div>
+          <input id="fig08Control" type="range" min="0" max="100" value="50" aria-label="방향은 맞았지만 수익이 작아지는 분해표 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">방향, 세타, IV 하락을 합산해 옵션 매수 손익을 분해한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>손실이 제한되니 안전하다는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>초보자가 자주 빠지는 함정은 “옵션 매수는 손실이 제한되니 안전하다”는 생각입니다.</p>
+<p>손실 한도가 보인다는 점은 분명 장점입니다. 그러나 손실 확률, 손익분기점, 시간 경과, IV 하락, 유동성 비용은 남아 있습니다. 특히 외가격 옵션은 프리미엄이 작아 보여도 만기 안에 충분한 움직임이 나와야 합니다.</p>
+<p>예를 들어 100달러 주식의 110콜을 1.00달러에 샀다고 하겠습니다. 만기 손익분기점은 111달러입니다. 주가가 100달러에서 107달러로 7% 올라도, 만기에는 여전히 가치가 없습니다. 방향 판단은 맞았지만 권리의 조건을 충족하지 못한 셈입니다.</p>
+<p>또 하나의 오해는 멀티배거 사례만 보고 옵션 매수를 이해하는 것입니다. 1달러 옵션이 8달러가 되는 사례는 실제로 생길 수 있습니다. 같은 구조에서 1달러 옵션이 0.10달러가 되는 사례도 훨씬 자주 나올 수 있습니다. 학습자는 수익 배수와 발생 조건을 함께 봐야 합니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>옵션 매수는 리스크 한도와 비용이 동시에 보이는 포지션입니다</h2>
+  <div class="prose">
+<p>옵션 매수자는 프리미엄을 지불하고 권리를 삽니다. 최대손실은 일반적으로 지불한 프리미엄으로 제한됩니다. 이 구조는 리스크 한도를 계약 시작 때 보여줍니다.</p>
+<p>그 대가로 옵션 매수자는 양의 감마와 양의 베가를 얻는 경우가 많습니다. 큰 움직임이 빠르게 나오거나 IV가 올라가면 프리미엄이 유리하게 움직일 수 있습니다. 콜은 상승 방향, 풋은 하락 방향에서 델타가 강해질 수 있습니다.</p>
+<p>비용은 세타입니다. 주가와 IV가 그대로라면 시간이 지나며 시간가치가 줄어듭니다. 만기가 짧고 등가격에 가까울수록 감마와 세타가 함께 강해질 수 있습니다.</p>
+<p>오늘의 체크포인트는 네 가지입니다. 손실 한도는 프리미엄으로 계산합니다. 손익분기점은 행사가와 프리미엄으로 계산합니다. 감마는 큰 움직임의 도움을 보여줍니다. 세타와 IV 하락은 방향이 맞아도 손익을 깎을 수 있습니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>옵션 매수자는 손실 한도를 사지만 세타 비용을 지불한다.</li>
+<li>롱 콜과 롱 풋은 대체로 양의 감마와 양의 베가를 갖는다.</li>
+<li>손실이 제한되어도 계약 수가 늘면 계좌 손실은 빠르게 커진다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>매수 포지션의 장점과 비용을 직접 정리합니다</h2>
+  <div class="prose">
+<p>아래 숫자는 학습용 예시입니다. 실제 옵션 체인, 수수료, 호가 스프레드, 세금, 체결 리스크는 반영하지 않습니다.</p>
+<h3 class="subhead">Worksheet A. 콜 매수 손익분기점 계산</h3>
+<p>현재 주가 100달러, 행사가 100달러, 프리미엄 4.00달러 콜을 1계약 매수한다고 가정합니다. 1계약은 주식 100주 기준입니다.</p>
+<ol>
+<li>최대손실은 얼마입니까?</li>
+<li>만기 손익분기점은 얼마입니까?</li>
+<li>만기 주가가 112달러일 때 1계약 손익은 얼마입니까?</li>
+</ol>
+<p>계산 기준: 최대손실은 400달러입니다. 손익분기점은 104달러입니다. 만기 주가 112달러에서는 옵션당 8달러, 1계약 기준 800달러 이익입니다. 프리미엄과 행사가를 넣은 뒤 만기 주가가 손익을 결정합니다.</p>
+<h3 class="subhead">Worksheet B. 풋 매수 손익분기점 계산</h3>
+<p>현재 주가 100달러, 행사가 100달러, 프리미엄 3.50달러 풋을 1계약 매수한다고 가정합니다.</p>
+<ol>
+<li>최대손실은 얼마입니까?</li>
+<li>만기 손익분기점은 얼마입니까?</li>
+<li>만기 주가가 90달러일 때 1계약 손익은 얼마입니까?</li>
+</ol>
+<p>풀이의 핵심: 최대손실은 350달러입니다. 손익분기점은 96.50달러입니다. 만기 주가 90달러에서는 옵션당 6.50달러, 1계약 기준 650달러 이익입니다.</p>
+<h3 class="subhead">Worksheet C. 감마가 델타를 바꾸는 과정</h3>
+<p>30일 만기 등가격 콜의 델타가 +0.50, 감마가 +0.06입니다. 다른 조건은 단순화를 위해 고정합니다.</p>
+<ol>
+<li>주가가 3달러 오르면 근사 델타는 얼마입니까?</li>
+<li>주가가 3달러 내리면 근사 델타는 얼마입니까?</li>
+<li>이 변화가 옵션 매수자에게 어떤 의미인지 한 문단으로 적어보세요.</li>
+</ol>
+<p>점검 기준: 상승 시 약 +0.68, 하락 시 약 +0.32입니다. 유리한 방향으로 움직이면 노출이 커지고, 불리한 방향으로 움직이면 노출이 줄어드는 비선형성이 나타납니다.</p>
+<h3 class="subhead">Worksheet D. 세타 비용 계산</h3>
+<p>콜 가격 4.00달러, 세타 -0.08, 계약 수 5개입니다. 주가와 IV는 고정하고 하루가 지난다고 가정합니다.</p>
+<ol>
+<li>옵션당 가격 변화는 얼마입니까?</li>
+<li>5계약 기준 하루 시간 비용은 얼마입니까?</li>
+<li>같은 포지션을 5일 들고 있고 다른 조건이 그대로라면 단순 근사 손실은 얼마입니까?</li>
+</ol>
+<p>확인 기준: 옵션당 -0.08달러입니다. 5계약 기준 하루 약 -40달러입니다. 5일 단순 근사는 약 -200달러입니다. 시간만 흘렀다고 본 단순 계산입니다.</p>
+<h3 class="subhead">Worksheet E. 옵션 매수 전 체크 문장 만들기</h3>
+<p>아래 문장을 직접 채워보세요.</p>
+<p>“내가 사려는 옵션은 ________이며, 행사가 ________, 프리미엄 ________, 만기 ________입니다. 이 포지션의 최대손실은 ________이고, 손익분기점은 ________입니다. 내 시장 가설은 기초자산이 만기 전 ________까지 움직인다는 것입니다. 이 가설이 맞으려면 방향에 더해 ________, ________, ________ 조건이 함께 필요합니다. 이번 포지션에서 가장 조심할 비용은 ________입니다.”</p>
+<p>예시 답안: “내가 사려는 옵션은 콜이며, 행사가 100달러, 프리미엄 4.00달러, 만기 30일입니다. 이 포지션의 최대손실은 400달러이고, 손익분기점은 104달러입니다. 내 시장 가설은 기초자산이 만기 전 108달러까지 빠르게 움직인다는 것입니다. 이 가설이 맞으려면 방향에 더해 속도, 시간, IV 조건이 함께 필요합니다. 이번 포지션에서 가장 조심할 비용은 세타입니다.”</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 옵션 매수 전 체크 워크시트</div>
+    <h3>옵션 매수 전 체크 워크시트</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">option type, stock price, strike, premium, expiration days, contracts, breakeven, max loss, expected move, expected time, IV view, theta cost, position size rule.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 기록지이며 매매 지시서가 아니다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p"><code>예시 채우기</code>, <code>비우기</code>, <code>손익분기점 계산</code> 버튼. localStorage 저장은 선택 사항이며 외부 전송은 금지한다.</p></div><div class="mini-card"><div class="mini-k">모바일</div><p class="mini-p">입력칸 1열, button/input height 44px 이상.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
+          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="옵션 매수 전 체크 워크시트 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">학습자가 프리미엄, 손익분기점, 시간, IV, 계약 수를 매수 전 문장으로 정리하게 한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차에서는 프리미엄을 받는 옵션 매도를 봅니다</h2>
+  <div class="prose">
+<p>다음 18회차에서는 옵션 매도를 봅니다. 옵션 매도자는 프리미엄을 먼저 받지만, 그 대가로 음의 감마와 음의 베가를 떠안을 수 있습니다.</p>
+<p>오늘 배운 매수자의 구조를 뒤집어서 보면 다음 회차가 자연스럽게 이어집니다. 매수자가 시간 비용을 내고 큰 움직임을 기다린다면, 매도자는 시간 수익을 받으며 큰 움직임을 피하려 합니다. 이 둘은 같은 계약의 양쪽입니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-18.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">18회차 — 옵션 매도의 본질, 세타를 받으며 감마 리스크를 진다</div><p class="next-desc">다음 18회차에서는 옵션 매도를 봅니다. 옵션 매도자는 프리미엄을 먼저 받지만, 그 대가로 음의 감마와 음의 베가를 떠안을 수 있습니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 무기견의 옵션 입문</div>
+  <div>SESSION 17 · 옵션 매수의 본질, 감마를 사며 세타를 지불한다</div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+document.querySelectorAll('[data-control-demo]').forEach((box) => {
+  const input = box.querySelector('input[type="range"]');
+  const output = box.querySelector('.control-value');
+  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+});
+document.querySelectorAll('[data-segmented]').forEach((group) => {
+  group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
+    group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
+  }));
+});
+
+</script>
+</body>
+</html>

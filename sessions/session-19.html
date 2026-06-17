@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>19회차 — 외가격 옵션의 유혹과 위험</title>
+  <meta name="description" content="외가격 옵션의 유혹과 위험">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .figure-points .mini-card { min-height:112px; }
+    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
+    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
+    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+  </style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-18.html" class="nav-prev">18회차</a>
+    <span class="nav-session">SESSION 19</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-20.html" class="nav-next nav-forward">20회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 19 · Level 4</div>
+    <h1>외가격 옵션의 유혹과 위험</h1>
+    <p class="hero-sub">외가격 옵션 앞에서는 이 질문을 피하기 어렵습니다.</p>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">외가격 옵션은 낮은 프리미엄, 낮은 행사 가능성, 높은 배수 가능성, 빠른 가치 소멸이 한 묶음으로 붙어 있는 포지션입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>매도자의 꼬리위험에서 외가격 옵션으로 들어갑니다</h2>
+  <div class="prose">
+<p>18회차에서는 옵션 매도를 봤습니다. 매도자는 프리미엄을 먼저 받고, 시간이 지나면 유리해질 수 있지만 큰 움직임과 IV 상승이 손실을 빠르게 키울 수 있었습니다. 특히 음의 감마는 불리한 방향에서 델타 노출을 더 불리하게 만들었습니다.</p>
+<p>오늘은 외가격 옵션을 다룹니다. 외가격 옵션은 지금 행사해도 내재가치가 없습니다. 그래서 가격이 전부 시간가치와 변동성 기대에서 나옵니다.</p>
+<p>이 구조 때문에 외가격 옵션은 양쪽 모두를 유혹합니다. 매수자에게는 작은 돈으로 큰 배수를 노릴 수 있는 티켓처럼 보입니다. 매도자에게는 낮은 확률의 위험을 팔고 프리미엄을 받는 거래처럼 보이죠.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 외가격 옵션 위치 지도</div>
+    <h3>외가격 옵션 위치 지도</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">current price 100. Call strikes 110, 120 are OTM. Put strikes 90, 80 are OTM. ATM reference 100.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“외가격은 지금 행사 가치가 없고, 가격은 시간, 변동성, 가능성에서 나온다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">Call / Put toggle. 선택 모드에 따라 외가격 구간 색상이 바뀐다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig01ControlVal">50</span></div>
+          <input id="fig01Control" type="range" min="0" max="100" value="50" aria-label="외가격 옵션 위치 지도 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">현재가와 행사가의 거리로 콜/풋 외가격을 직관적으로 보여준다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>싸 보이는 옵션 앞에서 무엇을 먼저 물어야 할까요</h2>
+  <div class="prose">
+<p>외가격 옵션 앞에서는 이 질문을 피하기 어렵습니다.</p>
+<p>싸 보이는 외가격 옵션은 왜 계좌에 비싸게 돌아올 수 있을까요?</p>
+<p>현재 주가가 100달러인 종목을 가정하겠습니다. 30일 만기 110콜이 1.20달러, 120콜이 0.35달러, 90풋이 1.10달러, 80풋이 0.40달러에 거래된다고 둡니다. 현재 주가 100달러, 만기 30일, 계약 승수 100주를 출발점으로 삼고 행사가 거리, 프리미엄, 만기 주가를 비교합니다.</p>
+<p>120콜 1계약은 35달러입니다. 주식 100주를 사는 데 필요한 10,000달러와 비교하면 작습니다. 그러나 이 콜이 만기 때 가치가 있으려면 주가가 120달러를 넘어야 하고, 손익분기점은 120.35달러입니다. 30일 안에 20.35% 넘게 올라야 프리미엄을 회수합니다.</p>
+<p>숫자만 보면 싸지만 조건은 가볍지 않습니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>외가격 옵션은 낮은 프리미엄과 낮은 행사 가능성이 함께 있습니다</h2>
+  <div class="prose">
+<p>이번 회차의 기준 문장은 이렇습니다.</p>
+<p>외가격 옵션은 낮은 프리미엄, 낮은 행사 가능성, 높은 배수 가능성, 빠른 가치 소멸이 한 묶음으로 붙어 있는 포지션입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>작은 가격과 큰 배수 가능성 뒤의 조건을 봅니다</h2>
+  <div class="prose">
+<p>외가격 옵션은 지금 행사하면 얻을 수 있는 가치가 없는 옵션입니다. 현재 주가 100달러에서 110콜은 지금 110달러에 살 권리이므로 행사 가치가 없습니다. 90풋도 지금 90달러에 팔 권리이므로 행사 가치가 없습니다.</p>
+<p>그런데 가격은 있습니다. 110콜이 1.20달러라면 그 가격은 내재가치 0 위에 붙은 시간, 만기까지 주가가 110달러를 넘을 가능성, 그 가능성의 속도, 시장이 반영한 변동성에서 나옵니다. 현재 내재가치가 0이어도, 남은 시간과 움직임의 가능성이 옵션 가격을 만듭니다.</p>
+<p>외가격 옵션의 첫 유혹은 낮은 절대 가격입니다. 120콜이 0.35달러면 1계약 비용은 35달러입니다. 주식 100주를 사는 돈과 비교하면 부담이 작습니다. 그래서 “한 번만 맞으면 된다”는 생각이 쉽게 붙습니다.</p>
+<p>하지만 낮은 프리미엄은 낮은 요구 수익률을 뜻하지 않습니다. 120콜을 0.35달러에 샀다면 손익분기점은 120.35달러입니다. 현재가 100달러에서 만기까지 20.35달러 올라야 합니다. 수익률로는 20.35%입니다. 이 숫자는 고정된 현재가와 행사가, 프리미엄에서 나온 요구 이동폭입니다.</p>
+<p>110콜은 조금 다릅니다. 프리미엄이 1.20달러라면 손익분기점은 111.20달러입니다. 현재가 대비 11.2% 상승이 필요합니다. 120콜보다 비싸지만 필요한 이동폭은 작습니다. 싸게 보이는 옵션일수록 대개 더 먼 행사가와 더 낮은 델타를 갖습니다.</p>
+<p>델타로 보면 외가격 옵션의 성격이 더 분명해집니다. 110콜 델타가 0.25, 120콜 델타가 0.08이라고 가정하겠습니다. 주가가 1달러 오를 때 다른 조건을 고정하면 110콜은 대략 0.25달러, 120콜은 0.08달러 움직일 수 있습니다. 120콜은 가격이 작지만 주가 변화에 처음부터 민감하게 반응하지 않습니다.</p>
+<p>다만 감마가 붙으면 상황이 바뀔 수 있습니다. 120콜은 주가가 100달러 근처에 머물 때는 반응이 약합니다. 주가가 115달러, 118달러, 120달러에 가까워지면 델타가 빠르게 올라갈 수 있습니다. 큰 움직임이 실제로 나오면 작은 옵션 가격이 급격히 커질 수 있습니다.</p>
+<p>이 점이 외가격 옵션 매수의 매력입니다. 120콜을 0.35달러에 샀고, 만기 주가가 130달러가 되면 옵션 가치는 10달러입니다. 손익은 옵션당 <code>10 - 0.35 = 9.65달러</code>, 1계약 기준 965달러입니다. 투입금 35달러 대비 큰 배수가 됩니다. 행사가 120달러와 프리미엄 0.35달러를 기준으로 두면, 수익을 만든 변수는 만기 주가입니다.</p>
+<p>하지만 같은 옵션에서 만기 주가가 119달러면 옵션 가치는 0입니다. 주가는 19% 올랐지만 120콜 매수자는 프리미엄 35달러를 잃습니다. 방향은 맞았는데도 행사가와 프리미엄 조건을 넘지 못했습니다. 외가격 옵션은 방향의 정답보다 거리와 시간이 더 엄격합니다.</p>
+<p>풋도 같은 구조입니다. 현재 주가 100달러에서 80풋을 0.40달러에 산다고 하겠습니다. 손익분기점은 79.60달러입니다. 30일 안에 20.4% 하락해야 프리미엄을 회수합니다. 시장 급락이 나오면 큰 배수가 가능하지만, 평범한 하락에서는 옵션이 만기 소멸할 수 있습니다.</p>
+<p>외가격 옵션 매도자는 이 낮은 행사 가능성을 보고 프리미엄을 팔고 싶어집니다. 예를 들어 80풋을 0.40달러에 10계약 매도하면 400달러를 받습니다. 현재가 100달러에서 80달러까지는 거리가 멀어 보입니다. 이 거리감이 매도자를 안심시킵니다.</p>
+<p>그런데 손실은 거리의 착시를 무너뜨릴 수 있습니다. 만기 주가가 70달러가 되면 80풋의 내재가치는 10달러입니다. 매도자 손익은 옵션당 <code>0.40 - 10 = -9.60달러</code>, 10계약 기준 -9,600달러입니다. 처음 받은 돈은 400달러였지만, 만기 주가가 크게 내려가면 그 24배 손실도 가능합니다.</p>
+<p>외가격 옵션에서 확률과 손익 크기는 반드시 따로 봐야 합니다. 어떤 거래의 승률이 높아 보인다고 해서 포지션 크기를 키워도 된다는 뜻은 아닙니다. 작은 손실이 자주 나오거나 작은 수익이 자주 나오다가, 한 번의 큰 움직임이 누적 손익을 바꿀 수 있습니다.</p>
+<p>기댓값 감각을 붙여보겠습니다. 120콜이 0.35달러입니다. 단순화해서 만기 때 3% 확률로 주가가 130달러가 되고, 97% 확률로 120달러 아래에서 끝난다고 둡니다. 성공 시 옵션 가치는 10달러, 실패 시 0입니다. 기대 가치는 <code>0.03 × 10 + 0.97 × 0 = 0.30달러</code>입니다.</p>
+<p>이 단순 가정에서는 0.35달러를 지불하면 기대 가치 0.30달러보다 비싸게 산 셈입니다. 성공 확률 3%와 성공 시 가치 10달러를 기준선으로 두고 실제 지불 가격의 변화를 확인합니다. 가격이 0.25달러라면 기대 가치보다 낮게 살 수 있지만, 0.35달러라면 장기 반복 관점에서 부담이 생깁니다.</p>
+<p>물론 실제 시장 확률은 이렇게 단순하지 않습니다. 주가는 다양한 가격으로 끝날 수 있고, IV, 금리, 배당, 유동성도 반영됩니다. 그래도 이 예시는 한 가지를 보여줍니다. 외가격 옵션은 “맞으면 크게 번다”는 말만으로 평가할 수 없습니다. 맞을 확률, 맞았을 때 평균 크기, 지불한 가격을 함께 봐야 합니다.</p>
+<p>포지션 크기는 여기서 가장 현실적인 문제입니다. 35달러짜리 옵션을 1계약 사면 최대손실은 35달러입니다. 20계약 사면 최대손실은 700달러입니다. 100계약 사면 3,500달러입니다. 옵션 하나의 가격은 작아도 계약 수가 커지면 계좌 리스크는 작지 않습니다.</p>
+<p>매도도 같습니다. 0.40달러 풋을 1계약 매도하면 최대 수취 프리미엄은 40달러입니다. 50계약이면 2,000달러입니다. 겉으로는 수익이 커진 것처럼 보이지만, 기초자산이 큰 폭으로 하락할 때 손실도 계약 수만큼 곱해집니다. 포지션 크기는 프리미엄 기준을 넘어 불리한 시나리오 손실 기준으로 잡아야 합니다.</p>
+<p>개인적으로 외가격 옵션을 볼 때 가장 조심하는 문장은 “얼마 안 하니까”입니다. 이 말은 매수자에게 계약 수를 늘리게 만들고, 매도자에게 거리감만 보게 만듭니다. 외가격 옵션은 작게 시작하지만, 만기와 행사가를 통과하는 순간 손익의 기울기가 빨라집니다.</p>
+<p>그래서 외가격 옵션을 평가할 때는 네 단계를 씁니다. 첫째, 손익분기점까지 필요한 이동률을 계산합니다. 둘째, 델타와 감마로 처음 반응과 가까워질수록의 변화를 봅니다. 셋째, IV가 비싼지 싼지 확인합니다. 넷째, 0이 되는 경우와 큰 수익이 나는 경우를 모두 계좌 비중으로 환산합니다.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>외가격 옵션은 멀리 있는 표적을 맞히는 작은 베팅입니다. 가격은 싸지만 표적까지 필요한 거리와 시간이 더 빡빡합니다. 0.50달러가 2달러가 되는 이야기보다, 0이 되는 경로가 얼마나 짧은지 먼저 봐야 합니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 행사가 거리별 프리미엄과 손익분기점</div>
+    <h3>행사가 거리별 프리미엄과 손익분기점</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">110콜 premium 1.20, breakeven 111.20, required move 11.2%. 120콜 premium 0.35, breakeven 120.35, required move 20.35%. 90풋 premium 1.10, breakeven 88.90, required move -11.1%. 80풋 premium 0.40, breakeven 79.60, required move -20.4%.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 현재가 100, 만기 30일. 변화: 행사가 거리와 프리미엄.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">option selector. 선택한 옵션의 손익분기점과 필요한 이동률을 강조한다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
+          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="행사가 거리별 프리미엄과 손익분기점 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">더 먼 행사가의 낮은 프리미엄과 더 큰 요구 이동폭을 같이 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 외가격 콜 매수 payoff calculator</div>
+    <h3>외가격 콜 매수 payoff calculator</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S0=100, K=120, premium=0.35, expiration price range 90~135. Profit = max(S-K,0)-0.35. Breakeven 120.35.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“119달러에서는 -35달러, 130달러에서는 +965달러.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration price 슬라이더. 옵션당 손익, 1계약 손익, 투자금 대비 배수를 표시한다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
+          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="외가격 콜 매수 payoff calculator 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">작은 프리미엄, 0이 되는 결과, 큰 배수가 같은 구조에 있음을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 외가격 풋 매도 tail-loss calculator</div>
+    <h3>외가격 풋 매도 tail-loss calculator</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S0=100, K=80, premium=0.40, contracts=10, expiration price range 50~110. Profit per option = 0.40 - max(80-S,0). At S=70, total P/L -9,600 dollars.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 수취 프리미엄 400달러. 변화: 만기 주가.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration price 슬라이더 and contracts selector 1~20.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig04ControlVal">50</span></div>
+          <input id="fig04Control" type="range" min="0" max="100" value="50" aria-label="외가격 풋 매도 tail-loss calculator 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">작은 수취 프리미엄이 큰 하락 손실로 바뀌는 구조를 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 낮은 델타와 감마 가속 사다리</div>
+    <h3>낮은 델타와 감마 가속 사다리</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">120콜 example: S=100 delta 0.08, S=110 delta 0.22, S=118 delta 0.45, S=122 delta 0.62. Educational approximation.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“행사가에 가까워질수록 옵션의 방향 민감도가 빨라질 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">stock price buttons 100, 110, 118, 122. 델타 카드와 curve marker가 업데이트된다.</p></div></div>
+    
+    <div class="fig-caption">낮은 델타가 고정된 안전 신호가 아님을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 기대 가치 미니 실험</div>
+    <h3>기대 가치 미니 실험</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">success probability 3%, success payoff 10.00, failure probability 97%, failure payoff 0, expected value 0.30, market premium 0.35.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“단순 두 결과 모형. 현실 옵션 가격은 더 많은 만기 가격과 IV를 반영한다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">probability 슬라이더 1~10%, success payoff input 5~20. EV와 premium difference를 계산한다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
+          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="기대 가치 미니 실험 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">큰 배수 가능성과 지불 가격을 기대 가치로 비교하게 한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 계약 수가 리스크를 키우는 position-size scaler</div>
+    <h3>계약 수가 리스크를 키우는 position-size scaler</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">premium 0.35, multiplier 100, contracts 1/5/20/100. Max loss for buyer: 35/175/700/3,500 dollars. Account size input default 50,000 dollars; risk % displayed.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“포지션 크기는 옵션 한 개 가격보다 계좌 대비 손실액으로 본다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">contracts 슬라이더 1~100 and account size input.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig07ControlVal">50</span></div>
+          <input id="fig07Control" type="range" min="0" max="100" value="50" aria-label="계약 수가 리스크를 키우는 position-size scaler 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">작은 프리미엄도 계약 수가 커지면 계좌 리스크가 커지는 것을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 외가격 매수자와 매도자 사고 비교</div>
+    <h3>외가격 매수자와 매도자 사고 비교</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Buyer sees low cost, convex payoff, max loss premium, frequent zero risk. Seller sees premium income, low probability, short gamma/vega, tail loss and margin risk.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“같은 계약의 양쪽은 서로 다른 리스크를 받는다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">none required. 모바일에서는 세로 card stack.</p></div></div>
+    
+    <div class="fig-caption">같은 외가격 옵션을 매수자와 매도자가 서로 다른 유혹으로 보는 구조를 정리한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>프리미엄이 작으니 리스크도 작다는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>이 회차에서 꼭 내려놓아야 할 생각은 “프리미엄이 작으니 리스크도 작다”는 생각입니다.</p>
+<p>매수자에게 최대손실은 프리미엄으로 제한됩니다. 이 말은 맞습니다. 다만 같은 작은 프리미엄을 여러 계약으로 반복해서 사면 계좌 손실은 누적됩니다. 35달러 손실은 작아 보여도, 20계약이면 700달러이고, 매월 반복하면 연간 손실 패턴이 됩니다.</p>
+<p>매도자에게는 더 조심해야 합니다. 작은 프리미엄은 최대 이익이 작다는 뜻입니다. 그 작은 이익을 얻기 위해 꼬리 리스크를 떠안는 구조라면, 한 번의 큰 움직임이 여러 번의 프리미엄을 지울 수 있습니다.</p>
+<p>또 하나의 오해는 낮은 델타를 낮은 리스크로 해석하는 것입니다. 낮은 델타는 지금 가격 변화에 대한 민감도가 작다는 뜻입니다. 주가가 행사가에 가까워지고 시간이 줄어들면 델타와 감마가 빠르게 달라질 수 있습니다. 외가격 옵션의 리스크는 정적인 숫자보다 경로와 속도에서 드러납니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>외가격 옵션은 싸다와 유리하다를 구분해야 합니다</h2>
+  <div class="prose">
+<p>외가격 옵션은 지금 내재가치가 없습니다. 프리미엄은 만기까지 남은 가능성, 시간, 변동성 가격에서 나옵니다. 그래서 싸 보일 수 있지만, 손익분기점까지 필요한 이동폭은 클 수 있습니다.</p>
+<p>매수자는 작은 돈으로 큰 배수를 노릴 수 있습니다. 대신 0이 되는 결과를 자주 만날 수 있습니다. 방향이 맞아도 행사가와 프리미엄을 넘지 못하면 손실이 납니다.</p>
+<p>매도자는 낮은 행사 가능성을 팔고 프리미엄을 받을 수 있습니다. 대신 한 번의 큰 움직임이 수취 프리미엄을 크게 초과하는 손실로 바뀔 수 있습니다. 낮은 델타와 먼 행사가만 보고 계약 수를 키우면 계좌 리스크가 숨어버립니다.</p>
+<p>오늘의 체크포인트는 네 가지입니다. 손익분기점까지 필요한 이동률을 계산합니다. 델타와 감마를 같이 봅니다. IV와 이벤트 가격을 확인합니다. 포지션 크기는 프리미엄이 아닌 불리한 시나리오 손실로 정합니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>외가격 옵션은 싸 보이지만 필요한 이동폭과 속도가 더 크다.</li>
+<li>작은 프리미엄은 작은 리스크가 아니라 낮은 행사 가능성과 짧은 생존 시간을 뜻할 수 있다.</li>
+<li>수익 배수보다 손익분기점, 만기, IV 가격을 먼저 본다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>외가격 옵션의 손익분기점과 기대 조건을 계산합니다</h2>
+  <div class="prose">
+<p>아래 숫자는 학습용 예시입니다. 실제 옵션 체인, 수수료, 호가 스프레드, 세금, 체결 리스크, 브로커별 증거금 산식은 반영하지 않습니다.</p>
+<h3 class="subhead">Worksheet A. 외가격 콜 매수의 요구 이동폭</h3>
+<p>현재 주가 100달러, 30일 만기 120콜 프리미엄 0.35달러를 1계약 매수한다고 가정합니다.</p>
+<ol>
+<li>손익분기점은 얼마입니까?</li>
+<li>현재가 대비 몇 % 상승해야 손익분기점입니까?</li>
+<li>만기 주가가 119달러일 때 손익은 얼마입니까?</li>
+</ol>
+<p>점검 기준: 손익분기점은 120.35달러입니다. 현재가 대비 20.35% 상승이 필요합니다. 만기 주가 119달러에서는 옵션 가치가 0이므로 1계약 기준 -35달러입니다. 현재가, 행사가, 프리미엄은 그대로 두고, 결과를 흔드는 쪽은 만기 주가입니다.</p>
+<h3 class="subhead">Worksheet B. 큰 배수와 0의 공존</h3>
+<p>같은 120콜을 0.35달러에 매수했습니다.</p>
+<ol>
+<li>만기 주가가 130달러일 때 옵션당 손익은 얼마입니까?</li>
+<li>1계약 기준 손익은 얼마입니까?</li>
+<li>만기 주가 119달러와 130달러의 차이를 한 문단으로 설명해보세요.</li>
+</ol>
+<p>확인 기준: 만기 주가 130달러에서는 옵션 가치 10달러, 옵션당 손익 9.65달러, 1계약 기준 +965달러입니다. 119달러에서는 0이고, 130달러에서는 큰 배수가 됩니다. 외가격 옵션은 행사가 통과 여부와 통과 폭에 민감합니다.</p>
+<h3 class="subhead">Worksheet C. 외가격 풋 매도 시나리오</h3>
+<p>현재 주가 100달러, 30일 만기 80풋을 0.40달러에 10계약 매도한다고 가정합니다.</p>
+<ol>
+<li>최대 이익은 얼마입니까?</li>
+<li>만기 주가가 70달러일 때 손익은 얼마입니까?</li>
+<li>받은 프리미엄 대비 손실 배수는 얼마입니까?</li>
+</ol>
+<p>답안 기준: 최대 이익은 400달러입니다. 만기 주가 70달러에서는 옵션당 손익 <code>0.40 - 10 = -9.60달러</code>, 10계약 기준 -9,600달러입니다. 수취 프리미엄 400달러 대비 24배 손실입니다.</p>
+<h3 class="subhead">Worksheet D. 기대 가치 감각</h3>
+<p>120콜이 0.35달러입니다. 단순화해서 3% 확률로 만기 주가 130달러, 97% 확률로 120달러 아래에서 끝난다고 둡니다.</p>
+<ol>
+<li>이 단순 분포의 기대 가치는 얼마입니까?</li>
+<li>0.35달러에 사면 기대 가치 대비 어떤 가격입니까?</li>
+<li>이 계산에서 현실과 다른 단순화 조건을 두 가지 적어보세요.</li>
+</ol>
+<p>계산 기준: 기대 가치는 <code>0.03 × 10 = 0.30달러</code>입니다. 0.35달러는 이 단순 기대 가치보다 비싼 가격입니다. 현실에서는 만기 주가가 두 가지 결과만 있는 것이 아니며, IV와 유동성도 가격에 반영됩니다.</p>
+<h3 class="subhead">Worksheet E. 외가격 옵션 체크 문장 만들기</h3>
+<p>아래 문장을 직접 채워보세요.</p>
+<p>“내가 보는 외가격 옵션은 ________이며, 현재가 ________, 행사가 ________, 프리미엄 ________, 만기 ________입니다. 손익분기점은 ________이고 현재가 대비 필요한 이동률은 ________입니다. 이 옵션의 델타는 ________이고, 행사가에 가까워질 때 감마 영향은 ________일 수 있습니다. 최대손실 또는 불리한 시나리오 손실은 계좌의 ________% 안에 두겠습니다.”</p>
+<p>예시 답안: “내가 보는 외가격 옵션은 콜 매수이며, 현재가 100달러, 행사가 120달러, 프리미엄 0.35달러, 만기 30일입니다. 손익분기점은 120.35달러이고 현재가 대비 필요한 이동률은 20.35%입니다. 이 옵션의 델타는 0.08이고, 행사가에 가까워질 때 감마 영향은 델타를 빠르게 키울 수 있습니다. 최대손실은 계좌의 0.5% 안에 두겠습니다.”</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 외가격 옵션 체크 워크시트</div>
+    <h3>외가격 옵션 체크 워크시트</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">option type, current price, strike, premium, expiration days, delta, contracts, account size, breakeven, required move %, max loss or tail scenario loss, IV/event note, exit rule.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 기록지이며 매매 지시서가 아니다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p"><code>예시 채우기</code>, <code>비우기</code>, <code>손익분기점 계산</code>, <code>필요 이동률 계산</code>, <code>계좌 대비 리스크 계산</code> 버튼. 외부 전송 금지, localStorage 저장은 선택 사항.</p></div><div class="mini-card"><div class="mini-k">모바일</div><p class="mini-p">입력칸 1열, button/input height 44px 이상.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
+          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="외가격 옵션 체크 워크시트 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">학습자가 외가격 옵션을 보기 전 손익분기점, 필요한 이동률, 델타, 감마, 포지션 크기를 기록하게 한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차에서는 내가격 옵션의 주식 대체 효과를 봅니다</h2>
+  <div class="prose">
+<p>다음 20회차에서는 내가격 옵션을 봅니다. 외가격 옵션이 작은 프리미엄과 큰 배수 가능성으로 투자자를 끌어당긴다면, 내가격 옵션은 높은 델타와 주식 대체 효과로 다른 매력을 줍니다.</p>
+<p>20회차에서는 내가격 콜이 왜 주식처럼 움직일 수 있는지, 자본효율이 좋아 보이는 구조 안에 어떤 만기 리스크와 시간가치 비용이 들어 있는지 보겠습니다. 외가격 옵션을 배운 뒤 내가격 옵션을 보면, 옵션의 행사가 선택이 곧 포지션 성격 선택이라는 점이 더 선명해집니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-20.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">20회차 — 내가격 옵션과 주식 대체 효과</div><p class="next-desc">다음 20회차에서는 내가격 옵션을 봅니다. 외가격 옵션이 작은 프리미엄과 큰 배수 가능성으로 투자자를 끌어당긴다면, 내가격 옵션은 높은 델타와 주식 대체 효과로 다른 매력을 줍니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 무기견의 옵션 입문</div>
+  <div>SESSION 19 · 외가격 옵션의 유혹과 위험</div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+document.querySelectorAll('[data-control-demo]').forEach((box) => {
+  const input = box.querySelector('input[type="range"]');
+  const output = box.querySelector('.control-value');
+  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+});
+document.querySelectorAll('[data-segmented]').forEach((group) => {
+  group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
+    group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
+  }));
+});
+
+</script>
+</body>
+</html>

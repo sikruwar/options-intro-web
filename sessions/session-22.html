@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>22회차 — 보호적 풋, 포트폴리오 보험의 기본형</title>
+  <meta name="description" content="보호적 풋, 포트폴리오 보험의 기본형">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .figure-points .mini-card { min-height:112px; }
+    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
+    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
+    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+  </style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-21.html" class="nav-prev">21회차</a>
+    <span class="nav-session">SESSION 22</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-23.html" class="nav-next nav-forward">23회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 22 · Level 4</div>
+    <h1>보호적 풋, 포트폴리오 보험의 기본형</h1>
+    <p class="hero-sub">보호적 풋은 보험이라는 말 때문에 오해가 생깁니다.</p>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">보호적 풋은 보유 주식의 하방 손실을 행사가 근처에서 제한하기 위해 풋 프리미엄을 지불하는 포트폴리오 보험 구조입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>커버드콜의 상방 제한에서 포트폴리오 보험으로 넘어갑니다</h2>
+  <div class="prose">
+<p>21회차에서는 커버드콜을 봤습니다. 주식 100주를 보유한 상태에서 콜을 매도하면 프리미엄이 먼저 들어오고, 손익분기점은 낮아졌습니다. 대신 행사가 위의 상승 참여가 제한됐죠.</p>
+<p>오늘은 반대 방향의 결합 구조로 넘어갑니다. 주식은 그대로 보유하고, 그 아래에 풋옵션을 매수합니다. 현금이 먼저 들어오지 않습니다. 현금을 먼저 지불하고 하방 한도를 정하는 구조입니다.</p>
+<p>커버드콜이 상방 일부를 넘기며 프리미엄을 받는 전략이었다면, 보호적 풋은 프리미엄을 내고 바닥을 정하는 전략입니다. 두 전략 모두 주식과 옵션을 결합하지만 계좌가 받는 리스크의 모양은 꽤 다릅니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 보호적 풋 구조 카드</div>
+    <h3>보호적 풋 구조 카드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">long stock 100 shares at 100. long 95 put, premium 2.50, multiplier 100.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“주식은 보유하고, 95 아래의 하락을 풋 권리로 제한한다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">none. 첫 화면에서 구조를 빠르게 이해시키는 static card.</p></div></div>
+    
+    <div class="fig-caption">주식 100주 보유와 풋 1계약 매수를 한 장에서 연결한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>보험처럼 보이는 풋에도 비용과 빈틈이 있습니다</h2>
+  <div class="prose">
+<p>보호적 풋은 보험이라는 말 때문에 오해가 생깁니다.</p>
+<p>내 주식 포트폴리오가 무너질까 두려울 때, 풋옵션을 사면 정말 보험처럼 작동할까요?</p>
+<p>현재 주가가 100달러인 종목을 100주 보유한다고 가정하겠습니다. 30일 만기 95풋을 2.50달러에 매수합니다. 계산 기준은 주식 매수가 100달러, 보유 수량 100주, 풋 행사가 95달러, 지불 프리미엄 2.50달러, 계약 승수 100주입니다. 결과를 결정하는 큰 변수는 만기 주가입니다.</p>
+<p>주식만 들고 있으면 만기 주가가 80달러로 내려갈 때 손실은 -2,000달러입니다. 보호적 풋은 95달러에 팔 수 있는 권리를 보유하므로, 95달러 아래의 추가 하락을 크게 제한합니다. 다만 250달러의 보험료는 먼저 지불했습니다.</p>
+<p>이 지점이 초보자에게 불편합니다. 보험을 샀는데 주가가 오르면 풋은 거의 사라집니다. 주가가 오르는 좋은 상황에서도 계좌 수익률은 보험료만큼 낮아집니다. 보험이 필요한 순간에는 고맙지만, 사고가 없으면 비용으로 남습니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>보호적 풋은 주식 하방을 제한하는 보험료 구조입니다</h2>
+  <div class="prose">
+<p>이번 회차의 기준 문장은 이렇습니다.</p>
+<p>보호적 풋은 보유 주식의 하방 손실을 행사가 근처에서 제한하기 위해 풋 프리미엄을 지불하는 포트폴리오 보험 구조입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>주식 보유와 풋 매수가 손실선을 어떻게 바꾸는지 봅니다</h2>
+  <div class="prose">
+<p>보호적 풋의 구조는 주식 보유와 풋 매수의 결합입니다. 주식 100주를 들고 같은 기초자산의 풋 1계약을 삽니다. 풋은 정해진 행사가에 팔 수 있는 권리이므로, 주가가 크게 내려갈 때 손실을 제한하는 기능을 합니다.</p>
+<p>예시를 숫자로 보겠습니다. 현재 주가 100달러, 주식 100주 보유, 30일 만기 95풋 매수, 풋 프리미엄 2.50달러입니다. 풋 매수 비용은 <code>2.50 × 100 = 250달러</code>입니다. 이 250달러는 보험료처럼 먼저 나가는 비용입니다.</p>
+<p>만기 주가가 110달러라면 주식 손익은 +1,000달러입니다. 풋은 95달러에 팔 수 있는 권리인데 시장에서 110달러에 팔 수 있으므로 행사할 이유가 없습니다. 풋은 만기 가치가 0이 되고, 총손익은 주식 이익 1,000달러에서 풋 비용 250달러를 뺀 +750달러입니다.</p>
+<p>만기 주가가 100달러라면 주식 손익은 0달러입니다. 풋은 외가격으로 끝나며 가치가 사라집니다. 총손익은 -250달러입니다. 주가가 제자리였으니 보험 사고가 없었고, 풋 비용만 비용으로 남은 셈입니다.</p>
+<p>만기 주가가 95달러라면 주식 손실은 -500달러입니다. 풋은 행사가와 만기 주가가 같아 만기 내재가치가 거의 없습니다. 총손익은 주식 손실 -500달러와 풋 비용 -250달러를 합친 -750달러입니다. 이 가격이 이 보호 구조의 손익분기선 아래쪽으로 내려가는 문턱입니다.</p>
+<p>만기 주가가 80달러라면 주식 손실은 -2,000달러입니다. 풋은 95달러에 팔 수 있는 권리라서 <code>95 - 80 = 15달러</code>의 내재가치를 가집니다. 100주 기준 풋 가치는 1,500달러입니다. 총손익은 주식 손실 -2,000달러, 풋 이익 +1,500달러, 풋 비용 -250달러를 합쳐 -750달러입니다.</p>
+<p>이 예시에서 최대 손실은 대략 750달러입니다. 계산식은 <code>(주식 매수가 100 - 풋 행사가 95 + 풋 프리미엄 2.50) × 100 = 750달러</code>입니다. 매수가, 행사가, 프리미엄이 손실 상한을 정합니다. 주가가 80달러든 60달러든 만기 기준 손실은 이 근처에서 멈춥니다.</p>
+<p>상방 손익분기점도 계산해야 합니다. 주식을 100달러에 사고 풋 보험료 2.50달러를 냈으므로, 주가가 102.50달러를 넘어야 전체 포지션이 플러스가 됩니다. 식은 <code>주식 매수가 100 + 풋 프리미엄 2.50 = 102.50달러</code>입니다. 보험료는 하방을 막는 대가이면서 상방 수익률의 출발점을 높입니다.</p>
+<p>보호적 풋은 콜 매수와 비슷한 손익 모양을 만듭니다. 주식 보유로 상승 참여는 열려 있고, 풋 매수로 하방 손실은 제한됩니다. 그래서 만기 손익그래프는 아래쪽이 바닥을 만들고 위쪽은 계속 올라가는 형태가 됩니다. 이 형태가 보험이라는 직관을 줍니다.</p>
+<p>그릭스로 보면 구조가 더 잘 보입니다. 주식 100주는 델타 +100입니다. 95풋 델타가 -0.30이라면 풋 1계약 매수는 약 -30주 노출입니다. 결합 포지션의 초기 순델타는 약 +70주입니다. 주식을 들고 있지만 풋이 일부 하락 노출을 줄인 상태입니다.</p>
+<p>이 순델타는 주가가 내려갈수록 더 작아질 수 있습니다. 풋이 내가격으로 들어가면 풋 델타의 절댓값이 커집니다. 주식 델타 +100에 풋 델타 -70, -90이 붙으면 계좌의 추가 하락 민감도가 줄어듭니다. 그래서 급락이 깊어질수록 풋의 방어력이 더 뚜렷해집니다.</p>
+<p>감마는 보호적 풋 매수자에게 양의 방향으로 작용합니다. 주가가 크게 움직일 때 풋 델타가 빠르게 변해 하방 방어가 강화됩니다. 세타는 비용입니다. 시간이 지나고 주가가 큰 폭으로 내려가지 않으면 풋의 시간가치는 줄어듭니다.</p>
+<p>베가는 보호적 풋 매수자에게 대체로 우호적입니다. 시장 공포가 커져 내재변동성이 오르면 풋 가격이 비싸질 수 있습니다. 주가 하락과 IV 상승이 같이 나오면 풋은 델타와 베가 두 경로로 방어 기여를 할 수 있습니다. 반대로 시장이 안정되면 풋 가격은 시간가치와 변동성 하락을 함께 맞을 수 있습니다.</p>
+<p>보험료가 언제 비싸지는지도 중요합니다. VIX가 높고, 실적이나 FOMC 같은 이벤트가 가까우며, 시장이 하방 위험을 크게 가격에 반영할 때 풋 프리미엄은 비싸질 수 있습니다. 이때 풋을 사면 보호는 강하지만 비용도 큽니다. 보험을 가장 사고 싶은 순간이 보험료가 가장 부담스러운 순간일 때가 많습니다.</p>
+<p>행사가 선택은 공제액을 정하는 일과 비슷합니다. 100달러 주식에 95풋을 사면 처음 5달러 하락은 내가 감당하고, 그 아래를 풋이 막기 시작합니다. 90풋을 사면 보험료는 싸질 수 있지만 10달러 하락까지는 계좌가 감당해야 합니다. 100풋을 사면 보호는 두껍지만 보험료가 비쌉니다.</p>
+<p>예를 들어 30일 만기 90풋이 1.00달러, 95풋이 2.50달러, 100풋이 5.00달러라고 하겠습니다. 현재 주가 100달러와 주식 100주 보유는 같고, 풋 행사가와 보험료만 다릅니다. 90풋의 최대 손실은 1,100달러, 95풋은 750달러, 100풋은 500달러입니다.</p>
+<p>비용도 같이 봐야 합니다. 90풋은 100달러만 지불하지만 손실 바닥이 낮습니다. 100풋은 500달러를 지불하지만 만기 기준 손실 한도를 500달러로 좁힙니다. 어느 쪽이 낫다는 결론보다, 내가 감당할 하락 폭과 지불할 보험료를 같은 표에 두는 일이 먼저입니다.</p>
+<p>보호적 풋은 장기투자자에게도 쓸 수 있습니다. 세금, 포지션 유지, 매도 제한, 이벤트 리스크 때문에 주식을 팔고 싶지 않을 때 하방을 한시적으로 제한할 수 있습니다. 다만 매번 풋을 사면 보험료가 누적됩니다. 매달 2% 보험료를 내면 1년 누적 비용은 단순 합산으로도 24%에 가까워질 수 있습니다. 실제로는 만기와 IV에 따라 다르지만, 반복 보험은 장기 성과를 갉아먹을 수 있습니다.</p>
+<p>개인적으로 보호적 풋을 볼 때 가장 먼저 묻는 것은 “나는 어떤 손실 구간부터 정말 견디기 어려운가”입니다. 3% 조정도 못 견디는지, 10% 급락부터 막고 싶은지에 따라 행사가가 달라집니다. 손실 허용 범위를 적지 않고 풋 가격만 보면, 비싼 보험을 사고도 마음이 편하지 않을 수 있습니다.</p>
+<p>포트폴리오 단위에서는 개별주 풋보다 지수 풋을 쓰는 경우도 있습니다. 예를 들어 S&amp;P 500 ETF를 많이 보유한 투자자는 SPY 풋이나 지수 옵션으로 일부 하방을 막을 수 있습니다. 하지만 내 포트폴리오가 지수와 얼마나 비슷하게 움직이는지, 베타와 섹터 편중이 어떤지 확인해야 합니다. 지수 풋 하나로 개별 성장주 집중 포트폴리오를 완전히 보호한다고 생각하면 오차가 커질 수 있습니다.</p>
+<p>보호적 풋은 안심 장치지만 실행 비용도 있습니다. 호가 스프레드, 만기 선택, 유동성, 세금, 롤오버 시점, 급락 중 체결 가격이 모두 결과에 영향을 줍니다. 특히 공포가 이미 커진 뒤에는 풋 가격이 크게 올라 있습니다. 그때 사는 보험은 심리적으로 편하지만 기대 보상은 낮아질 수 있습니다.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>보호적 풋은 자동차 보험과 비슷합니다. 사고가 나면 도움이 되지만, 사고가 나지 않아도 보험료는 비용으로 사라집니다. 보험을 매달 반복하면 포트폴리오가 그 비용을 이길 만큼 충분히 벌어야 합니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 보험료 현금흐름과 상방 손익분기점</div>
+    <h3>보험료 현금흐름과 상방 손익분기점</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">stock entry 100, put premium 2.50, insurance cost 250 dollars, upside breakeven 102.50.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 주식 매수가 100. 변화: 풋 프리미엄 2.50 지불로 손익분기점 102.50.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">premium 슬라이더 0.5~6.0. insurance cost and upside breakeven update.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
+          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="보험료 현금흐름과 상방 손익분기점 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">풋 프리미엄이 먼저 나가고, 상방 손익분기점이 높아지는 과정을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 만기 손익그래프: 주식 단독 vs 보호적 풋</div>
+    <h3>만기 손익그래프: 주식 단독 vs 보호적 풋</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">stock entry 100, protective put K=95, premium=2.50, multiplier 100, expiration price range 70~130. Stock P/L = (S-100)×100. Protective put P/L = (S-100)×100 + max(95-S,0)×100 - 250.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“102.50 상방 손익분기점, 95 보호 시작점, 최대 손실 -750달러.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration price 슬라이더 with quick buttons 80, 95, 100, 110, 130.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
+          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="만기 손익그래프: 주식 단독 vs 보호적 풋 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">하방 바닥과 상방 참여를 동시에 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 시나리오 결과 보드</div>
+    <h3>시나리오 결과 보드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">expiration prices 80, 95, 100, 110, 130. Stock P/L: -2000, -500, 0, 1000, 3000. Protective put P/L: -750, -750, -250, 750, 2750.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“급락에서는 손실 바닥이 생기고, 상승장에서는 보험료만큼 뒤처진다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">card 마우스오버 or tap highlights matching point on Figure 3.</p></div></div>
+    
+    <div class="fig-caption">급락, 보호 시작점, 제자리, 상승, 강한 상승에서 보호적 풋의 성격을 비교한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 행사가 선택 비교 패널</div>
+    <h3>행사가 선택 비교 패널</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">90 put premium 1.00, max loss 1100, upside breakeven 101. 95 put premium 2.50, max loss 750, upside breakeven 102.50. 100 put premium 5.00, max loss 500, upside breakeven 105.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“낮은 행사가: 낮은 보험료와 큰 공제액. 높은 행사가: 높은 보험료와 좁은 손실 한도.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">select strike. Selected values update a mini payoff chart.</p></div></div>
+    
+    <div class="fig-caption">낮은 행사가, 중간 행사가, 등가격 풋의 보험료와 보호 범위를 비교한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 보호적 풋 그릭스 번역기</div>
+    <h3>보호적 풋 그릭스 번역기</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">stock delta +100. long put delta -30 when put delta -0.30. net delta +70. gamma positive, theta negative, vega positive.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“현재 조건의 순델타는 약 +70주. 주가가 내려가면 풋 델타 방어가 커질 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">put delta absolute value 슬라이더 0.10~0.80. net delta updates live.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
+          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="보호적 풋 그릭스 번역기 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">주식 + 롱풋을 델타, 감마, 세타, 베가로 읽게 한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 보험료가 비싸지는 환경 카드</div>
+    <h3>보험료가 비싸지는 환경 카드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">calm regime VIX 14, put premium 1.40. event regime VIX 22, put premium 2.50. stress regime VIX 35, put premium 5.50. Label all numbers as simplified illustration.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“보험을 사고 싶은 순간일수록 보험료가 이미 올라 있을 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">regime tabs <code>차분한 시장</code>, <code>이벤트 전</code>, <code>스트레스</code>.</p></div></div>
+    
+    <div class="fig-caption">VIX, 이벤트, 하방 수요가 풋 프리미엄에 영향을 준다는 점을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 포트폴리오 보험 범위 지도</div>
+    <h3>포트폴리오 보험 범위 지도</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">portfolio 60% broad index beta 1.0, 25% growth stocks beta 1.5, 15% cash. SPY put covers broad beta but leaves single-name and sector basis risk.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“지수 풋은 시장 베타를 줄이지만, 개별 종목 리스크까지 완전히 지우지는 않는다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">toggle <code>개별주 풋 / 지수 풋</code>; coverage chips change.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig08ControlVal">50</span></div>
+          <input id="fig08Control" type="range" min="0" max="100" value="50" aria-label="포트폴리오 보험 범위 지도 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">개별주 풋과 지수 풋의 보호 범위 차이를 보여준다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>풋을 샀으니 손실 걱정이 사라진다는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>초보자가 자주 빠지는 함정은 “풋을 샀으니 손실 걱정이 사라진다”는 생각입니다.</p>
+<p>풋은 행사가와 만기 안에서 작동하는 계약입니다. 95풋은 95달러 아래 손실을 제한하지만, 100달러에서 95달러까지의 하락과 풋 프리미엄은 투자자가 부담합니다. 예시에서는 최대 손실이 0달러로 사라지지 않았습니다. 750달러가 남았습니다.</p>
+<p>두 번째 오해는 “보험은 언제 사도 좋다”는 생각입니다. 시장이 이미 급락했고 VIX가 크게 오른 상태에서는 풋 가격이 비쌀 수 있습니다. 이 경우 하방 방어는 얻지만, 이후 시장이 안정되면 주가 반등과 IV 하락 속에서 풋 비용이 빠르게 사라질 수 있습니다.</p>
+<p>세 번째 오해는 “풋 매수는 하락장 예측이다”라는 생각입니다. 보호적 풋은 꼭 하락 확신에서만 쓰는 도구가 아닙니다. 장기 보유 포지션을 유지하면서 특정 기간의 꼬리위험을 줄이는 용도로도 쓸 수 있습니다. 목적이 예측인지 보험인지 먼저 적어야 합니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>보험료는 손익분기점과 장기 성과에 영향을 줍니다</h2>
+  <div class="prose">
+<p>보호적 풋은 주식 100주와 풋 매수 1계약을 결합한 구조입니다. 주식 상승 참여는 열어두고, 하방은 풋 행사가 근처에서 제한합니다. 예시에서는 100달러 주식에 95풋을 2.50달러에 매수해 최대 손실이 약 750달러로 제한됐습니다.</p>
+<p>보험료는 분명한 비용입니다. 주가가 오르거나 제자리이면 풋 프리미엄은 수익률을 낮춥니다. 상방 손익분기점은 102.50달러로 올라갔습니다. 보험을 산 만큼 주식이 더 올라야 전체 포지션이 플러스가 됩니다.</p>
+<p>그릭스로 보면 보호적 풋은 양의 델타를 유지하면서 하락 구간에서 델타를 줄이고, 양의 감마와 양의 베가를 가집니다. 대신 세타 비용을 부담합니다. 급락과 변동성 상승이 같이 나올 때 방어 효과가 커질 수 있고, 조용한 시장에서는 보험료가 비용으로 남습니다.</p>
+<p>오늘의 체크포인트는 다섯 가지입니다. 보호하려는 기간을 적습니다. 감당 가능한 하락 폭을 정합니다. 행사가와 보험료를 함께 비교합니다. 최대 손실과 상방 손익분기점을 계산합니다. VIX와 이벤트 일정으로 보험료가 비싼 구간인지 확인합니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>보호적 풋은 하방 보험이지만 보험료가 성과 허들을 높인다.</li>
+<li>반복적으로 보험을 사면 비용 누적이 장기 수익률을 크게 깎을 수 있다.</li>
+<li>보험의 목적, 보호 구간, 만기, 비용을 포트폴리오 단위로 계산한다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>보호적 풋의 최대손실과 보험료를 계산합니다</h2>
+  <div class="prose">
+<p>아래 숫자는 학습용 예시입니다. 실제 옵션 체인, 세금, 수수료, 호가 스프레드, 조기행사, 체결 가격, 브로커별 증거금 산식은 반영하지 않습니다.</p>
+<h3 class="subhead">Worksheet A. 기본 보호적 풋 손익 계산</h3>
+<p>현재 주가 100달러인 주식 100주를 보유하고 있습니다. 30일 만기 95풋을 2.50달러에 매수했습니다.</p>
+<ol>
+<li>풋 매수 비용 총액은 얼마입니까?</li>
+<li>최대 손실은 얼마입니까?</li>
+<li>상방 손익분기점은 얼마입니까?</li>
+<li>만기 주가 80달러에서 총손익은 얼마입니까?</li>
+</ol>
+<p>계산 기준: 풋 비용은 250달러입니다. 최대 손실은 <code>(100 - 95 + 2.50) × 100 = 750달러</code>입니다. 상방 손익분기점은 102.50달러입니다. 만기 주가 80달러에서 주식 손실 -2,000달러, 풋 가치 +1,500달러, 풋 비용 -250달러를 합쳐 -750달러입니다.</p>
+<h3 class="subhead">Worksheet B. 보험료가 수익률에 미치는 영향</h3>
+<p>같은 보호적 풋에서 만기 주가가 110달러가 되었습니다.</p>
+<ol>
+<li>주식 단독 손익은 얼마입니까?</li>
+<li>보호적 풋 총손익은 얼마입니까?</li>
+<li>보험료가 줄인 수익은 몇 달러입니까?</li>
+</ol>
+<p>풀이의 핵심: 주식 단독 손익은 +1,000달러입니다. 보호적 풋 총손익은 +750달러입니다. 풋 비용 250달러가 상승장에서 수익을 줄였습니다. 주식 수량과 풋 비용을 기준선으로 두고 만기 주가가 상승했다는 점의 변화를 확인합니다.</p>
+<h3 class="subhead">Worksheet C. 행사가 선택 비교</h3>
+<p>현재 주가 100달러, 주식 100주 보유는 같습니다. 세 가지 풋 매수를 비교합니다.</p>
+<ul>
+<li>90풋 프리미엄 1.00달러</li>
+<li>95풋 프리미엄 2.50달러</li>
+<li>100풋 프리미엄 5.00달러</li>
+</ul>
+<p>각 선택지에 대해 최대 손실과 상방 손익분기점을 계산해보세요.</p>
+<p>점검 기준: 90풋은 최대 손실 1,100달러, 손익분기점 101달러입니다. 95풋은 최대 손실 750달러, 손익분기점 102.50달러입니다. 100풋은 최대 손실 500달러, 손익분기점 105달러입니다. 현재 주가 100달러은 그대로 두고, 결과를 흔드는 쪽은 보호 시작 가격과 보험료입니다.</p>
+<h3 class="subhead">Worksheet D. 순델타 계산</h3>
+<p>주식 100주를 보유하고 95풋을 1계약 매수했습니다. 95풋 델타는 -0.30이라고 둡니다.</p>
+<ol>
+<li>주식 델타는 얼마입니까?</li>
+<li>롱풋 델타는 몇 주 노출입니까?</li>
+<li>결합 포지션의 초기 순델타는 얼마입니까?</li>
+</ol>
+<p>확인 기준: 주식 델타는 +100주입니다. 롱풋 델타는 -30주입니다. 결합 포지션의 초기 순델타는 +70주입니다. 지금 계산에는 현재 풋 델타를 썼고, 주가가 하락하면 풋 델타의 절댓값이 커질 수 있습니다.</p>
+<h3 class="subhead">Worksheet E. 내 포트폴리오 보험 문장</h3>
+<p>아래 문장을 직접 채워보세요.</p>
+<p>“내가 보호하려는 자산은 ________이고, 현재가 ________, 보유 수량 ________주입니다. 내가 걱정하는 기간은 ________까지입니다. 내가 감당할 수 있는 하락 폭은 약 ________%입니다. 고려하는 풋은 행사가 ________, 만기 ________, 프리미엄 ________입니다. 보험료 총액은 ________이고, 최대 손실은 ________입니다. 상방 손익분기점은 ________입니다. 현재 VIX와 이벤트 일정상 보험료는 ________한 편으로 판단합니다. 이 보험은 계좌 전체에서 ________% 손실 제한을 위해 사용합니다.”</p>
+<p>예시 답안: “내가 보호하려는 자산은 ABC이고, 현재가 100달러, 보유 수량 100주입니다. 내가 걱정하는 기간은 다음 실적 발표까지입니다. 내가 감당할 수 있는 하락 폭은 약 5%입니다. 고려하는 풋은 행사가 95달러, 만기 30일, 프리미엄 2.50달러입니다. 보험료 총액은 250달러이고, 최대 손실은 750달러입니다. 상방 손익분기점은 102.50달러입니다. 현재 VIX와 이벤트 일정상 보험료는 다소 높은 편으로 판단합니다. 이 보험은 계좌 전체에서 3% 손실 제한을 위해 사용합니다.”</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 보호적 풋 판단 워크시트</div>
+    <h3>보호적 풋 판단 워크시트</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">ticker, current price, share count, cost basis, put strike, put premium, days to expiration, put delta, VIX level, event date, loss tolerance, account size, max insurance budget.</p></div><div class="mini-card"><div class="mini-k">계산</div><p class="mini-p">insurance cost = premium × 100 × contracts. max loss per 100 shares = (cost basis - strike + premium) × 100. upside breakeven = cost basis + premium. net delta = shares + put delta × contracts × 100.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“막고 싶은 손실 구간을 먼저 적고, 그다음 보험료를 본다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p"><code>예시 채우기</code>, <code>비우기</code>, <code>계산하기</code>, <code>인쇄용 보기</code> 버튼. 외부 전송 없이 브라우저 내부에서만 계산한다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
+          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="보호적 풋 판단 워크시트 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">학습자가 실제 포지션에 보험 비용과 손실 한도를 적어보게 한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차에서는 옵션을 함께 사고팔아 비용을 조정합니다</h2>
+  <div class="prose">
+<p>다음 23회차에서는 스프레드 전략을 다룹니다. 보호적 풋은 하방을 제한하지만 보험료를 전액 지불합니다. 그래서 투자자는 때때로 다른 옵션을 함께 팔아 비용을 줄이려 합니다.</p>
+<p>스프레드는 한쪽 옵션으로 다른 리스크를 줄이는 구조입니다. 비용을 낮추는 대신 수익이나 보호 범위도 같이 제한될 수 있습니다. 다음 회차에서는 단일 옵션보다 스프레드가 나을 수 있는 조건과, 그 대가로 무엇을 포기하는지 보겠습니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-23.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">23회차 — 스프레드 전략, 한쪽 옵션으로 다른 리스크를 줄인다</div><p class="next-desc">다음 23회차에서는 스프레드 전략을 다룹니다. 보호적 풋은 하방을 제한하지만 보험료를 전액 지불합니다. 그래서 투자자는 때때로 다른 옵션을 함께 팔아 비용을 줄이려 합니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 무기견의 옵션 입문</div>
+  <div>SESSION 22 · 보호적 풋, 포트폴리오 보험의 기본형</div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+document.querySelectorAll('[data-control-demo]').forEach((box) => {
+  const input = box.querySelector('input[type="range"]');
+  const output = box.querySelector('.control-value');
+  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+});
+document.querySelectorAll('[data-segmented]').forEach((group) => {
+  group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
+    group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
+  }));
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>11회차 — 델타 1편, 방향성과 변화율</title>
+  <meta name="description" content="델타 1편, 방향성과 변화율">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .figure-points .mini-card { min-height:112px; }
+    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
+    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
+    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+  </style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-10.html" class="nav-prev">10회차</a>
+    <span class="nav-session">SESSION 11</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-12.html" class="nav-next nav-forward">12회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 11 · Level 3</div>
+    <h1>델타 1편, 방향성과 변화율</h1>
+    <p class="hero-sub">델타를 배우기 전 먼저 걸리는 질문이 있습니다.</p>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">델타는 기초자산의 1달러 움직임이 옵션 가격에 전달되는 비율이며, 옵션이 주식처럼 움직이는 정도를 보여주는 첫 번째 방향성 민감도입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>그릭스 지도에서 델타를 먼저 꺼냅니다</h2>
+  <div class="prose">
+<p>10회차에서는 그릭스를 옵션 포지션의 계기판으로 봤습니다. 델타는 주가 변화, 감마는 델타 변화, 세타는 시간, 베가는 IV, 로는 금리 변화에 대한 민감도였습니다.</p>
+<p>오늘은 그중 델타만 확대합니다. 델타는 가장 먼저 배우는 그릭스이면서, 초보자가 가장 자주 오해하는 숫자이기도 합니다. “델타 0.50이면 대충 절반 움직인다” 정도로 끝내면 실제 옵션 가격을 읽을 때 금방 막힙니다.</p>
+<p>이번 회차에서는 델타를 세 겹으로 봅니다. 첫째, 기초자산 1달러 변화가 옵션 가격에 얼마나 전달되는가. 둘째, 콜과 풋의 델타 범위가 왜 다른가. 셋째, 외가격, 등가격, 내가격 위치에 따라 델타가 왜 달라지는가입니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 델타 오프닝: 주식 직선과 옵션 곡선</div>
+    <h3>델타 오프닝: 주식 직선과 옵션 곡선</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">주가 90~115, 옵션 가격 교육용 곡선. 현재 주가 100, 행사가 105, 델타 0.35 marker.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“델타는 이 곡선의 현재 기울기다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">주가 슬라이더 90~115. marker가 움직이며 현재 델타 라벨이 변한다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig01ControlVal">50</span></div>
+          <input id="fig01Control" type="range" min="0" max="100" value="50" aria-label="델타 오프닝: 주식 직선과 옵션 곡선 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">주식은 1달러 움직임이 1달러로 전달되지만, 옵션은 위치에 따라 전달 비율이 달라진다는 출발점을 보여준다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>기초자산이 1달러 움직이면 옵션은 얼마나 움직일까요</h2>
+  <div class="prose">
+<p>델타를 배우기 전 먼저 걸리는 질문이 있습니다.</p>
+<p>같은 1달러 상승인데, 왜 어떤 콜옵션은 0.20달러만 오르고 어떤 콜옵션은 0.80달러 가까이 오를까요?</p>
+<p>주식은 단순합니다. 주식 1주를 들고 있으면 주가가 1달러 오를 때 내 포지션도 1달러 움직입니다. 주식 100주면 100달러입니다. 물론 환율, 세금, 체결가는 따로 있지만, 가격 민감도 자체는 직선에 가깝습니다.</p>
+<p>옵션은 그 직선을 접어서 곡선으로 만든 상품입니다. 현재가 100달러인 주식에서 95콜, 100콜, 110콜은 모두 콜옵션입니다. 그런데 95콜은 이미 행사할 가치가 있으니 주식처럼 꽤 민감하게 움직이고, 110콜은 아직 멀리 있으니 주가 1달러 상승을 가격에 조금만 반영합니다.</p>
+<p>숫자로 보겠습니다. 현재 주가를 100달러, 만기를 30일, IV와 금리와 배당을 고정한다고 가정합니다. 95콜의 델타가 0.78, 100콜의 델타가 0.52, 110콜의 델타가 0.18이라고 하겠습니다. 기초자산 가격만 1달러 움직인다고 놓습니다.</p>
+<p>주가가 100에서 101달러로 오르면, 95콜은 대략 0.78달러, 100콜은 0.52달러, 110콜은 0.18달러 오를 수 있습니다. 같은 상승인데 옵션 가격 반응이 다릅니다. 이 차이가 델타입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>델타는 옵션이 주식처럼 움직이는 정도를 보여줍니다</h2>
+  <div class="prose">
+<p>이번 회차의 한 문장은 이렇습니다.</p>
+<p>델타는 기초자산의 1달러 움직임이 옵션 가격에 전달되는 비율이며, 옵션이 주식처럼 움직이는 정도를 보여주는 첫 번째 방향성 민감도입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>콜 델타와 풋 델타의 부호와 크기를 읽습니다</h2>
+  <div class="prose">
+<p>델타를 가장 쉽게 읽는 방식은 “주가 1달러 변화에 대한 옵션 가격 변화”입니다. 델타가 0.40인 콜옵션은 다른 조건이 그대로라면 주가가 1달러 오를 때 옵션 가격이 약 0.40달러 오를 수 있다는 뜻입니다. 여기서 “다른 조건”은 만기까지 남은 시간, IV, 금리, 배당, 호가 스프레드입니다.</p>
+<p>이 가정이 중요합니다. 실제 시장에서는 주가가 오르는 동안 시간도 지나고 IV도 변합니다. 그래도 델타를 따로 떼어 보는 이유는 기초자산 가격 변화가 옵션 가격에 전달되는 첫 번째 경로를 분리하기 위해서입니다.</p>
+<p>콜옵션부터 보겠습니다. 콜은 정해진 가격에 살 수 있는 권리입니다. 기초자산 가격이 오르면 이 권리는 유리해집니다. 그래서 콜옵션 델타는 일반적으로 0과 1 사이에 있습니다.</p>
+<p>현재 주가 100달러, 행사가 105달러, 만기 30일인 콜옵션을 생각해보겠습니다. 이 콜의 델타가 0.35라면, 주가가 100에서 101달러로 오를 때 옵션 가격은 델타 효과만으로 약 0.35달러 오를 수 있습니다. 주가가 100에서 99달러로 내려가면 약 0.35달러 내려갈 수 있겠죠. 이 예시에서 그대로 둔 조건은 IV, 시간, 금리, 배당이고, 움직인 쪽은 주가 1달러입니다.</p>
+<p>풋옵션은 부호가 반대입니다. 풋은 정해진 가격에 팔 수 있는 권리입니다. 기초자산 가격이 오르면 이 권리는 불리해지고, 기초자산 가격이 내려가면 유리해집니다. 그래서 풋옵션 델타는 일반적으로 -1과 0 사이에 있습니다.</p>
+<p>현재 주가 100달러, 행사가 95달러, 만기 30일인 풋옵션의 델타가 -0.28이라고 해보겠습니다. 주가가 100에서 101달러로 오르면 풋 가격은 델타 효과만으로 약 0.28달러 내려갈 수 있습니다. 주가가 100에서 99달러로 내려가면 풋 가격은 약 0.28달러 오를 수 있습니다. 이때도 IV, 시간, 금리, 배당은 같은 조건으로 둡니다.</p>
+<p>콜 델타가 1을 넘기 어렵다는 점도 중요합니다. 콜옵션은 기초자산보다 더 빠르게 1대1 이상으로 움직이는 권리가 아닙니다. 매우 깊은 내가격 콜은 주식처럼 움직여서 델타가 1에 가까워질 수 있지만, 주가 1달러 변화에 옵션이 1달러보다 더 크게 지속적으로 반응하는 구조는 아닙니다.</p>
+<p>외가격 콜은 반대입니다. 현재 주가가 100달러인데 120콜을 들고 있다면, 지금 당장 행사할 가치는 없습니다. 주가가 100에서 101달러로 올라도 아직 행사가까지 멀죠. 그래서 델타는 낮습니다. 시장은 “조금 가까워졌다” 정도만 가격에 반영합니다.</p>
+<p>델타를 위치별로 나누면 감각이 더 선명해집니다. 현재가 100달러, 만기 30일, 같은 IV를 가정하겠습니다. 90콜은 깊은 내가격이라 델타가 0.90 근처일 수 있습니다. 100콜은 등가격이라 0.50 근처일 수 있습니다. 115콜은 외가격이라 0.15 근처일 수 있습니다.</p>
+<p>이 숫자에서 조건을 현재 주가, 만기, IV, 금리, 배당로 묶어두면, 결과를 흔드는 변수는 행사가입니다. 행사가가 낮아져 이미 권리가 살아 있는 콜일수록 델타는 1에 가까워지고, 행사가가 높아져 권리가 멀리 있는 콜일수록 델타는 0에 가까워집니다.</p>
+<p>풋은 거울처럼 보되 부호가 음수입니다. 현재가 100달러에서 110풋은 이미 내가격입니다. 델타가 -0.85 근처일 수 있습니다. 100풋은 등가격이라 -0.50 근처일 수 있습니다. 85풋은 외가격이라 -0.12 근처일 수 있습니다.</p>
+<p>여기서 조심할 점이 있습니다. 델타의 절댓값이 크다고 해서 그 옵션이 무조건 좋은 옵션이라는 뜻은 아닙니다. 깊은 내가격 옵션은 주식처럼 잘 움직이지만 프리미엄이 큽니다. 외가격 옵션은 싸 보이지만 움직임이 옵션 가격에 적게 전달됩니다. 델타는 옵션의 매력도를 채점하지 않고, 가격 전달 비율을 보여줍니다.</p>
+<p>델타는 옵션이 주식처럼 움직이는 정도를 보여주기도 합니다. 옵션 1계약이 주식 100주를 기준으로 한다면, 델타 0.40인 콜 1계약은 대략 주식 40주와 비슷한 방향 노출을 가집니다. 델타 0.75인 콜 1계약은 대략 주식 75주 방향 노출입니다.</p>
+<p>예를 들어 델타 0.40인 콜 3계약을 매수했다고 해보겠습니다. 계약 승수는 100입니다. 총 델타는 0.40 × 100 × 3 = 120주입니다. 기준으로 둔 숫자는 델타 0.40과 승수 100이고, 노출을 키운 요인은 계약 수입니다. 이 포지션은 방향 노출만 보면 주식 120주를 들고 있는 것처럼 상승에 민감합니다.</p>
+<p>풋 매수는 음의 주식 노출처럼 볼 수 있습니다. 델타 -0.30인 풋 2계약을 매수하면 총 델타는 -0.30 × 100 × 2 = -60주입니다. 주식 100주를 보유하고 이 풋 2계약을 함께 들고 있다면 총 델타는 +40주입니다. 이 상태에서는 하락 위험이 완전히 사라지지 않고, 방향 노출이 일부 낮아집니다.</p>
+<p>이 계산은 개인투자자에게 꽤 실용적입니다. 옵션을 매수할 때 프리미엄만 보면 “300달러만 잃으면 된다”는 생각에 머물기 쉽습니다. 그런데 델타로 바꾸면 내 계좌가 지금 주식 몇 주만큼 움직이는지 볼 수 있습니다. 개인적으로는 초보자가 옵션 가격보다 이 델타 환산을 먼저 적어보는 편이 낫다고 봅니다.</p>
+<p>델타는 고정 숫자가 아닙니다. 이 부분은 다음 회차의 감마와도 이어집니다. 주가가 움직이면 옵션의 내가격, 등가격, 외가격 위치가 바뀌고, 델타도 함께 바뀝니다.</p>
+<p>현재가 100달러, 105콜 델타 0.35를 다시 보겠습니다. 주가가 100에서 101달러로 오르면 델타 효과로 옵션 가격이 약 0.35달러 오릅니다. 그런데 주가가 101달러가 된 뒤에는 이 옵션이 행사가 105달러에 조금 더 가까워졌습니다. 그래서 델타가 0.38이나 0.39로 올라갈 수 있습니다.</p>
+<p>한 번 더 1달러 오르면 처음의 0.35보다 새 델타에 가까운 반응을 보일 수 있습니다. 이게 옵션 가격이 곡선처럼 움직이는 출발점입니다. 오늘은 감마 계산을 깊게 하지 않지만, 델타가 주가 위치에 따라 이동한다는 점은 꼭 잡아야 합니다.</p>
+<p>델타는 만기와 변동성에도 영향을 받습니다. 같은 행사가 105콜이라도 만기가 7일 남았는지 90일 남았는지에 따라 델타 분포가 다릅니다. 시간이 많이 남아 있으면 외가격 옵션도 내가격으로 들어올 가능성이 남아 있으므로 델타가 완전히 죽지 않을 수 있습니다.</p>
+<p>변동성도 비슷합니다. IV가 높으면 먼 행사가까지 도달할 가능성이 가격에 더 많이 들어옵니다. 그래서 외가격 옵션의 델타가 낮더라도, 변동성이 커지면 그 델타가 올라갈 수 있습니다. 여기서 현재 주가와 행사가은 그대로 두고, 결과를 흔드는 쪽은 만기 또는 IV입니다.</p>
+<p>하지만 이번 회차의 초점은 단순합니다. 기초자산 1달러 움직임이 옵션 가격에 얼마나 전달되는가. 델타의 부호가 어느 방향 노출을 뜻하는가. 델타의 크기가 옵션이 주식처럼 움직이는 정도를 어떻게 보여주는가. 이 세 가지만 확실히 잡으면 됩니다.</p>
+<p>델타를 볼 때는 세 문장을 같이 적으면 좋습니다. “내 델타는 양수인가 음수인가.” “1달러 움직임에 옵션 가격은 대략 얼마나 반응하는가.” “계약 수를 반영하면 총 델타는 주식 몇 주 정도인가.” 이 정도만 해도 옵션 체인을 보는 눈이 달라집니다.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>짧게 말하면 델타는 운전대의 방향 감각입니다. 주식 100주를 들고 있으면 방향 노출이 거의 100주 그대로지만, 델타 0.35 콜 1계약은 대략 35주처럼 움직입니다. 그래서 프리미엄이 작아 보여도 실제 방향 노출은 생각보다 클 수 있습니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 콜 델타 범위 바</div>
+    <h3>콜 델타 범위 바</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">110콜 0.18, 100콜 0.52, 95콜 0.78, 90콜 0.90.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 현재 주가 100, 만기 30일, IV. 변화: 행사가.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">행사가 버튼 90/95/100/110을 누르면 델타 marker 이동.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
+          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="콜 델타 범위 바 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">콜 델타가 일반적으로 0~1 사이에서 움직인다는 점을 시각화한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 풋 델타 범위 바</div>
+    <h3>풋 델타 범위 바</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">105풋 -0.72, 100풋 -0.49, 90풋 -0.16.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“부호는 방향을, 절댓값은 반응 정도를 보여준다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">주가 +1달러 / -1달러 toggle. 풋 가격 변화 부호가 바뀌도록 표시.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
+          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="풋 델타 범위 바 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">풋 델타가 -1~0 사이이며, 주가와 반대로 움직인다는 점을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 델타 가격변화 계산기</div>
+    <h3>델타 가격변화 계산기</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">기본값 delta 0.35, stock move +1.00 → option move +0.35.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: IV, 시간, 금리, 배당. 변화: 주가.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">delta 슬라이더와 stock move 슬라이더. 결과값은 실제 텍스트로 표시.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig04ControlVal">50</span></div>
+          <input id="fig04Control" type="range" min="0" max="100" value="50" aria-label="델타 가격변화 계산기 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption"><code>ΔOption ≈ Delta × ΔStock</code>을 학습자가 직접 계산하게 한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 위치별 콜옵션 3종 비교 카드</div>
+    <h3>위치별 콜옵션 3종 비교 카드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">95콜 price 7.50 delta 0.78 equivalent 78 shares; 100콜 price 4.20 delta 0.52 equivalent 52 shares; 110콜 price 1.20 delta 0.18 equivalent 18 shares.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“싸 보이는 옵션은 가격 전달 비율도 낮을 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">카드 선택 시 주가 +1달러 시 예상 변화와 새 가격을 보여준다.</p></div></div>
+    
+    <div class="fig-caption">같은 콜옵션이라도 행사가 위치에 따라 가격, 델타, 주식 환산 노출이 다름을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 주식 환산 델타 계산기</div>
+    <h3>주식 환산 델타 계산기</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">기본값 contracts 3, delta 0.40, multiplier 100, stock shares 0 → total delta 120 shares.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“프리미엄 금액과 별개로, 계좌가 어느 방향에 얼마나 민감한지 확인한다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">입력값 변경, 매수/매도 toggle 선택 가능. 매도 시 옵션 델타 부호 반전.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
+          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="주식 환산 델타 계산기 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">옵션 계약 수와 승수를 반영해 총 방향 노출을 계산한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 보호적 풋 총 델타 카드</div>
+    <h3>보호적 풋 총 델타 카드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">shares 100, put delta -0.35, contracts 1, multiplier 100 → total +65.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“하락 위험은 남아 있고, 현재 조건의 방향 민감도만 낮아진 상태다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">풋 델타 슬라이더 -0.10~-0.80. 총 델타가 실시간 변경.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig07ControlVal">50</span></div>
+          <input id="fig07Control" type="range" min="0" max="100" value="50" aria-label="보호적 풋 총 델타 카드 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">풋 매수가 주식 보유 포지션의 방향 노출을 일부 줄이는 구조를 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 델타가 움직이는 미니 애니메이션</div>
+    <h3>델타가 움직이는 미니 애니메이션</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100 delta 0.35, S=101 delta 0.39, S=105 delta 0.52.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“다음 1달러는 처음 1달러와 같은 델타로 움직이지 않을 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">play button 또는 슬라이더. 감마라는 단어는 작은 preview 라벨로만 사용.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig08ControlVal">50</span></div>
+          <input id="fig08Control" type="range" min="0" max="100" value="50" aria-label="델타가 움직이는 미니 애니메이션 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">델타가 고정 숫자가 아니며 주가가 행사가에 가까워질수록 변할 수 있음을 예고한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 델타 오해 교정 패널</div>
+    <h3>델타 오해 교정 패널</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">95콜 price 7.50 delta 0.78, 110콜 price 1.20 delta 0.18. 주가 +1달러 시 예상 새 가격 8.28 vs 1.38.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“델타는 가격 전달 비율이지 유리함 점수가 아니다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p"><code>빠른 +1달러 상승</code>, <code>느린 횡보</code>, <code>큰 +8달러 상승</code> 시나리오 버튼. 정확한 모델 가격으로 보이지 않게 델타 감각용이라고 표시.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
+          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="델타 오해 교정 패널 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">델타가 높으면 좋은 옵션이라는 오해를 가격, 프리미엄, 반응비율로 분해한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>델타가 높을수록 좋은 옵션이라는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>이 대목에서 경계할 착각은 “델타가 높을수록 좋은 옵션”이라는 생각입니다.</p>
+<p>델타가 높은 콜은 주가 상승에 더 민감합니다. 하지만 그만큼 이미 내가격이거나 프리미엄이 비쌀 가능성이 큽니다. 델타가 낮은 외가격 콜은 싸 보이지만, 주가가 조금 움직여도 옵션 가격 반응이 약할 수 있습니다. 델타는 가격 전달 비율이지 매력 점수가 아닙니다.</p>
+<p>예를 들어 현재 주가 100달러에서 95콜 가격이 7.50달러, 델타가 0.78이라고 해보겠습니다. 110콜 가격은 1.20달러, 델타가 0.18입니다. 주가가 1달러 오르면 95콜은 대략 0.78달러, 110콜은 0.18달러 오를 수 있습니다. 같은 주가 변화 1달러와 같은 IV, 시간 조건은 그대로 놓고 행사가와 그에 따른 델타 차이를 따로 보면 구조가 더 선명해집니다.</p>
+<p>95콜은 비싸지만 더 주식처럼 움직입니다. 110콜은 싸지만 주가 상승이 가격에 천천히 전달됩니다. 어느 쪽이 낫다고 바로 말할 수 없습니다. 내 가설이 얼마나 빠른 상승인지, 만기까지 시간이 얼마나 남았는지, IV가 비싼지 싼지, 손실 가능 금액을 얼마로 제한할지에 따라 판단이 달라집니다.</p>
+<p>또 다른 오해는 “델타 0.30이면 30% 확률”이라고 바로 결론 내리는 습관입니다. 델타는 확률 감각으로 쓰일 때가 있지만, 오늘 회차에서는 변화율과 방향성에 집중합니다. 확률 해석은 금리, 배당, 변동성, 행사가 위치, 모델 가정의 영향을 받습니다. 12회차에서 따로 다루겠습니다.</p>
+<p>마지막으로 델타는 현재 조건 근처의 숫자입니다. 주가가 크게 갭상승하거나 갭하락하면 델타도 달라지고, IV와 시간가치도 함께 움직입니다. 델타 하나로 옵션 손익 전체를 설명하려고 하면 9회차에서 봤던 실수가 반복됩니다. 방향은 맞았는데 손실이 나는 상황 말입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>델타는 방향과 반응 정도를 함께 보여줍니다</h2>
+  <div class="prose">
+<p>델타는 기초자산 1달러 변화가 옵션 가격에 대략 얼마나 전달되는지 보여주는 숫자입니다. 콜 델타는 보통 0과 1 사이, 풋 델타는 보통 -1과 0 사이입니다. 부호는 방향을, 크기는 반응 정도를 보여줍니다.</p>
+<p>같은 콜옵션이라도 내가격은 델타가 1에 가까워지고, 등가격은 0.50 근처, 외가격은 0에 가까워지는 경향이 있습니다. 풋은 음수 부호로 같은 구조를 가집니다. 여기서 숫자는 고정된 진리로 쓰기보다 현재 주가, 행사가, 만기, IV 조건에서 나온 민감도로 읽어야 합니다.</p>
+<p>옵션 1계약이 주식 100주를 기준으로 한다면, 델타는 주식 환산 노출로도 읽을 수 있습니다. 델타 0.40인 콜 3계약은 대략 주식 120주 방향 노출입니다. 주식 100주에 델타 -0.30 풋 2계약을 더하면 총 델타는 약 +40주로 줄어듭니다.</p>
+<p>오늘 배운 델타는 다음 회차에서 한 번 더 확장됩니다. 델타는 변화율이면서 헷지 비율이고, 경우에 따라 내가격 종료 확률을 대략 가늠하는 언어로도 쓰입니다. 다만 확률로 쓰기 전에 변화율로 먼저 몸에 익히는 편이 안전합니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>델타는 옵션이 주식처럼 움직이는 정도를 보여준다.</li>
+<li>콜 델타는 보통 양수, 풋 델타는 보통 음수이며 크기는 행사가와 만기에 따라 달라진다.</li>
+<li>델타가 높다는 말은 안전하다는 뜻이 아니라 방향 노출이 크다는 뜻이다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>델타로 옵션 가격 변화와 주식 환산 노출을 계산합니다</h2>
+  <div class="prose">
+<p>현재 주가가 100달러인 주식을 가정합니다. 옵션 1계약은 주식 100주를 기준으로 하고, 금리와 배당은 교육 편의를 위해 무시합니다. 아래 숫자는 실제 추천 종목이나 실제 옵션 가격으로 쓰지 않는, 델타 감각 연습용 값입니다.</p>
+<h3 class="subhead">Worksheet A. 콜 델타로 가격 변화 추정</h3>
+<p>다음 콜옵션들이 있습니다. IV, 만기, 금리, 배당은 고정하고, 주가만 1달러 오른다고 가정합니다.</p>
+<ul>
+<li>95콜: 가격 7.50달러, 델타 0.78</li>
+<li>100콜: 가격 4.20달러, 델타 0.52</li>
+<li>110콜: 가격 1.20달러, 델타 0.18</li>
+</ul>
+<p>아래 질문으로 점검해보세요.</p>
+<ol>
+<li>주가가 1달러 오르면 95콜은 대략 얼마 오릅니까?</li>
+<li>100콜은 대략 얼마 오릅니까?</li>
+<li>110콜은 대략 얼마 오릅니까?</li>
+<li>같은 1달러 상승인데 반응이 다른 이유를 한 문장으로 적어보세요.</li>
+</ol>
+<p>답안 기준: +0.78달러, +0.52달러, +0.18달러입니다. IV, 만기, 금리, 배당은 그대로 두고 주가만 1달러 움직였습니다. 행사가 위치가 달라 델타가 다르기 때문에 가격 반응도 다릅니다.</p>
+<h3 class="subhead">Worksheet B. 풋 델타 부호 읽기</h3>
+<p>다음 풋옵션들이 있습니다. 주가만 1달러 오른다고 가정합니다.</p>
+<ul>
+<li>105풋: 델타 -0.72</li>
+<li>100풋: 델타 -0.49</li>
+<li>90풋: 델타 -0.16</li>
+</ul>
+<p>아래 질문을 계산해보세요.</p>
+<ol>
+<li>105풋 가격은 델타 효과만으로 대략 어떻게 변합니까?</li>
+<li>100풋 가격은 어떻게 변합니까?</li>
+<li>90풋 가격은 어떻게 변합니까?</li>
+<li>주가가 1달러 내려가면 부호는 어떻게 해석해야 합니까?</li>
+</ol>
+<p>계산 기준: 주가가 1달러 오르면 각각 약 -0.72달러, -0.49달러, -0.16달러입니다. 주가가 1달러 내려가면 풋에는 유리하므로 각각 약 +0.72달러, +0.49달러, +0.16달러로 생각할 수 있습니다. 단, 다른 조건은 고정한 교육용 추정입니다.</p>
+<h3 class="subhead">Worksheet C. 총 델타 계산</h3>
+<p>델타 0.42인 콜옵션 2계약을 매수했고, 주식 30주를 함께 보유하고 있습니다.</p>
+<ol>
+<li>콜옵션 2계약의 주식 환산 델타는 몇 주입니까?</li>
+<li>주식 30주를 더한 총 델타는 몇 주입니까?</li>
+<li>주가가 1달러 오르면 전체 포지션은 대략 얼마 움직입니까?</li>
+</ol>
+<p>풀이의 핵심: 0.42 × 100 × 2 = 84주입니다. 주식 30주를 더하면 총 델타는 약 114주입니다. 주가가 1달러 오르면 델타 효과만으로 약 +114달러 움직일 수 있습니다.</p>
+<h3 class="subhead">Worksheet D. 보호적 풋 델타 감각</h3>
+<p>주식 100주를 보유하고 있고, 델타 -0.35인 풋 1계약을 매수했습니다.</p>
+<ol>
+<li>풋 1계약의 주식 환산 델타는 몇 주입니까?</li>
+<li>총 델타는 몇 주입니까?</li>
+<li>이 포지션은 하락 위험을 완전히 제거한 상태입니까, 일부 줄인 상태입니까?</li>
+</ol>
+<p>점검 기준: 풋 1계약은 -35주입니다. 주식 100주와 합치면 총 델타는 +65주입니다. 방향 노출을 일부 줄인 상태입니다. 풋 가격, 만기, IV, 행사가에 따라 실제 보호력은 달라집니다.</p>
+<h3 class="subhead">Worksheet E. 델타 점검 문장 만들기</h3>
+<p>아래 문장을 직접 채워보세요.</p>
+<p>“내가 보는 옵션의 델타는 ________이고, 옵션 1계약 기준 주식 환산 노출은 ________주입니다. 기초자산이 1달러 움직이면 옵션 가격은 다른 조건이 같을 때 약 ________달러 움직일 수 있습니다. 이 계산에서 기준으로 둔 입력은 ________이고, 결과를 흔드는 변수는 ________입니다.”</p>
+<p>예시 답안: “델타는 0.40이고, 옵션 1계약 기준 주식 환산 노출은 40주입니다. 기초자산이 1달러 움직이면 옵션 가격은 다른 조건이 같을 때 약 0.40달러 움직일 수 있습니다. 이 숫자에서 IV, 시간, 금리, 배당을 기준선으로 두고 기초자산 가격의 변화를 확인합니다.”</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-10">
+  <div class="fig">
+    <div class="fig-label">Figure 10 — 델타 점검 워크시트</div>
+    <h3>델타 점검 워크시트</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">기본 빈칸 + 예시 하나: delta 0.42, contracts 2, multiplier 100, shares 30 → total 114.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 연습지이며, 매매 전 기록 양식으로 쓰지 않는다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">화면에서는 입력 가능, 정답 예시 toggle. 인쇄 시 입력칸은 빈 선으로 남는다.</p></div><div class="mini-card"><div class="mini-k">모바일</div><p class="mini-p">각 입력과 버튼은 최소 44px 높이. 계산 결과는 카드 상단에 크게 표시.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig10ControlVal">50</span></div>
+          <input id="fig10Control" type="range" min="0" max="100" value="50" aria-label="델타 점검 워크시트 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">학습자가 실제 옵션 체인을 볼 때 델타를 문장으로 바꾸게 한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차에서는 델타를 확률과 헷지 언어로 확장합니다</h2>
+  <div class="prose">
+<p>다음 회차는 델타 2편입니다.</p>
+<p>오늘은 델타를 방향성과 변화율로 봤습니다. 다음에는 같은 델타가 왜 헷지 비율로 쓰이는지, 그리고 왜 시장에서는 델타를 내가격 종료 확률의 대략적인 감각으로도 이야기하는지 다룹니다.</p>
+<p>확률 해석은 꽤 유용하지만 조심해서 써야 합니다. 델타 0.30을 보고 “30% 확률이니 열 번 중 세 번만 맞으면 된다”로 넘어가면 기대값과 손익 크기를 놓치기 쉽습니다. 다음 회차에서는 그 함정을 같이 보겠습니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-12.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">12회차 — 델타 2편, 확률과 헷지비율</div><p class="next-desc">다음 회차는 델타 2편입니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 무기견의 옵션 입문</div>
+  <div>SESSION 11 · 델타 1편, 방향성과 변화율</div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+document.querySelectorAll('[data-control-demo]').forEach((box) => {
+  const input = box.querySelector('input[type="range"]');
+  const output = box.querySelector('.control-value');
+  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+});
+document.querySelectorAll('[data-segmented]').forEach((group) => {
+  group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
+    group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
+  }));
+});
+
+</script>
+</body>
+</html>

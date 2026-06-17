@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>21회차 — 커버드콜, 수익을 앞당겨 받는 대신 상승 일부를 넘긴다</title>
+  <meta name="description" content="커버드콜, 수익을 앞당겨 받는 대신 상승 일부를 넘긴다">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .figure-points .mini-card { min-height:112px; }
+    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
+    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
+    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+  </style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-20.html" class="nav-prev">20회차</a>
+    <span class="nav-session">SESSION 21</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-22.html" class="nav-next nav-forward">22회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 21 · Level 4</div>
+    <h1>커버드콜, 수익을 앞당겨 받는 대신 상승 일부를 넘긴다</h1>
+    <p class="hero-sub">커버드콜을 볼 때 먼저 이 질문을 놓치면 안 됩니다.</p>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">커버드콜은 주식 보유자가 콜 프리미엄을 받아 손익분기점을 낮추는 대신, 행사가 위의 상승 참여를 제한하는 숏콜 결합 포지션입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>단일 옵션에서 주식과 옵션의 결합으로 넘어갑니다</h2>
+  <div class="prose">
+<p>20회차에서는 내가격 옵션을 주식 대체 관점에서 봤습니다. 높은 델타는 적은 현금으로 큰 방향 노출을 만들 수 있었고, 그 안에는 시간가치와 만기 리스크가 같이 들어 있었습니다. 델타 등가 주식 수를 계산하지 않으면 포지션 크기를 착각하기 쉬웠죠.</p>
+<p>오늘은 주식을 이미 보유한 사람이 콜옵션을 파는 구조로 넘어갑니다. 커버드콜은 주식 100주를 들고, 그 주식에 대해 콜 1계약을 매도하는 조합입니다. 주식은 계속 들고 있지만, 특정 가격 위의 상승 일부는 콜 매수자에게 넘길 수 있습니다.</p>
+<p>이 전략이 인컴처럼 보이는 이유는 프리미엄이 먼저 들어오기 때문입니다. 다만 프리미엄은 공짜 수익이 아닙니다. 미래의 상방 일부와 교환해 받은 현금입니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 커버드콜 구조 카드</div>
+    <h3>커버드콜 구조 카드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">long stock 100 shares at 100. short 105 call, premium 2, multiplier 100.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“주식은 보유하고, 행사가 위의 상승권리를 일부 넘긴다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">none. 첫 화면에서 구조를 빠르게 이해시키는 static card.</p></div></div>
+    
+    <div class="fig-caption">주식 100주 보유와 콜 1계약 매도를 한 장에서 연결한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>커버드콜은 월세처럼 보이지만 상승을 넘기는 구조입니다</h2>
+  <div class="prose">
+<p>커버드콜을 볼 때 먼저 이 질문을 놓치면 안 됩니다.</p>
+<p>커버드콜은 왜 안정적인 수익처럼 보이고, 어떤 시장에서는 오히려 내 계좌의 기회비용을 크게 만들까요?</p>
+<p>현재 주가가 100달러인 종목을 100주 보유한다고 가정하겠습니다. 30일 만기 105콜을 2달러에 매도합니다. 주식 매수가 100달러, 보유 수량 100주, 콜 행사가 105달러, 받은 프리미엄 2달러, 계약 승수 100주를 놓고 만기 주가별 손익을 비교합니다.</p>
+<p>주식만 들고 있으면 주가가 110달러로 올랐을 때 1,000달러를 법니다. 커버드콜은 105콜을 매도했기 때문에 105달러 위의 상승을 거의 가져가지 못합니다. 대신 처음에 받은 200달러는 손익을 완충합니다.</p>
+<p>이게 꽤 미묘합니다. 주가가 제자리거나 조금 오르면 커버드콜이 좋아 보입니다. 주가가 크게 오르면 주식만 들고 있던 계좌보다 뒤처집니다. 주가가 크게 내리면 프리미엄 200달러는 하락 손실을 조금 줄일 뿐입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>커버드콜은 프리미엄을 받는 대신 상방을 제한합니다</h2>
+  <div class="prose">
+<p>오늘의 중심 문장은 이렇습니다.</p>
+<p>커버드콜은 주식 보유자가 콜 프리미엄을 받아 손익분기점을 낮추는 대신, 행사가 위의 상승 참여를 제한하는 숏콜 결합 포지션입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>주식 보유와 콜 매도가 손익선을 어떻게 바꾸는지 봅니다</h2>
+  <div class="prose">
+<p>커버드콜의 기본 구조는 단순합니다. 주식 100주를 보유하고 같은 기초자산의 콜옵션 1계약을 매도합니다. 미국 주식 옵션 1계약은 보통 100주 단위이므로, 주식 100주가 콜 매도 의무를 덮어주는 담보 역할을 합니다.</p>
+<p>현재 주가 100달러, 보유 주식 100주, 105콜 매도 프리미엄 2달러를 보겠습니다. 콜 매도로 받은 현금은 <code>2 × 100 = 200달러</code>입니다. 이 200달러는 즉시 들어오지만, 만기 주가가 105달러를 넘으면 주식을 105달러에 넘겨야 할 수 있습니다.</p>
+<p>먼저 만기 주가가 100달러라고 하겠습니다. 주식 손익은 0달러입니다. 콜은 외가격으로 끝나므로 매도자는 받은 프리미엄 200달러를 보유합니다. 총손익은 +200달러입니다. 주식 매수가와 콜 프리미엄을 놓고 보면, 주가가 제자리였던 덕분에 프리미엄이 그대로 남았습니다.</p>
+<p>만기 주가가 103달러라면 주식에서 300달러 이익이 납니다. 콜은 105달러 아래에서 끝났으므로 행사되지 않습니다. 총손익은 주식 이익 300달러와 콜 프리미엄 200달러를 더한 +500달러입니다. 이런 완만한 상승 구간에서는 커버드콜이 주식 단독보다 더 좋게 보입니다.</p>
+<p>만기 주가가 110달러라면 구조가 달라집니다. 주식만 들고 있으면 +1,000달러입니다. 커버드콜은 주식이 105달러에 팔리는 효과가 생기므로 주식 이익은 500달러로 제한되고, 프리미엄 200달러를 더해 총 +700달러입니다. 상승은 맞았지만 105달러 위의 5달러 구간을 가져가지 못했습니다.</p>
+<p>만기 주가가 90달러라면 주식 100주는 -1,000달러입니다. 커버드콜은 콜 프리미엄 200달러가 있으므로 총손익은 -800달러입니다. 손실이 줄기는 했습니다. 그러나 하락을 막은 것은 2달러뿐입니다. 20달러 하락에는 작은 쿠션입니다.</p>
+<p>손익분기점은 주식 매수가에서 받은 콜 프리미엄을 뺀 값입니다. 이번 예시에서는 <code>100 - 2 = 98달러</code>입니다. 만기 주가가 98달러이면 주식 손실 -200달러와 콜 프리미엄 +200달러가 상쇄됩니다. 진입 주가와 받은 프리미엄을 연결하면, 핵심 조건은 만기 주가가 98달러 아래로 내려가지 않는 것입니다.</p>
+<p>최대 이익도 계산할 수 있습니다. 행사가 105달러까지의 주식 상승 5달러와 받은 프리미엄 2달러가 합쳐져 주당 7달러입니다. 100주 기준 최대 이익은 700달러입니다. 주가가 110달러든 130달러든, 만기 기준으로 커버드콜의 이익은 대체로 이 근처에서 멈춥니다.</p>
+<p>하방 손실은 주식 보유와 거의 같이 움직입니다. 주가가 0달러가 되는 극단을 놓으면 주식 손실은 -10,000달러입니다. 받은 프리미엄 200달러가 있으므로 커버드콜 손실은 -9,800달러입니다. 손실 한도가 프리미엄만큼 개선될 뿐, 주식 하락 리스크는 남습니다.</p>
+<p>그릭스로 번역하면 더 선명해집니다. 주식 100주는 델타 +100입니다. 105콜을 매도하면 콜 델타만큼 델타가 줄어듭니다. 예를 들어 105콜 델타가 0.35라면 숏콜은 -35주 노출입니다. 결합 포지션의 초기 델타는 약 +65주입니다.</p>
+<p>이 델타는 고정되지 않습니다. 주가가 105달러 근처로 올라가면 콜 델타가 커지고, 숏콜의 음의 델타도 커집니다. 주식 상승을 따라가던 포지션이 점점 더 눌립니다. 이것이 행사가 근처에서 커버드콜의 상방이 둔해지는 이유입니다.</p>
+<p>감마는 숏콜 쪽에서 나옵니다. 커버드콜은 주식을 보유하고 있지만 콜을 매도했기 때문에 순포지션에 음의 감마가 붙습니다. 주가가 빠르게 오르면 콜 델타가 커져 상승 참여가 줄어듭니다. 주가가 빠르게 내리면 콜 델타는 줄어들지만 주식 손실이 그대로 남습니다.</p>
+<p>세타는 보통 커버드콜 편입니다. 시간이 지나고 주가가 행사가 아래에 머물면 매도한 콜의 시간가치가 줄어듭니다. 매도자는 그 감소를 이익으로 인식할 수 있습니다. 그래서 커버드콜은 횡보장이나 완만한 상승장에서 인컴 전략처럼 보입니다.</p>
+<p>베가는 반대입니다. 콜을 매도했으므로 커버드콜은 대체로 음의 베가를 가집니다. 내재변동성이 내려가면 매도한 콜 가격이 내려가 유리할 수 있습니다. 내재변동성이 올라가면 콜 가격이 비싸져 중간 청산이나 롤오버가 부담스러워질 수 있습니다.</p>
+<p>콜 행사가 선택은 전략 성격을 바꿉니다. 102콜을 3달러에 팔면 손익분기점은 97달러로 낮아지고 프리미엄은 큽니다. 대신 최대 이익은 <code>(102 - 100 + 3) × 100 = 500달러</code>입니다. 110콜을 0.80달러에 팔면 손익분기점은 99.20달러이고 최대 이익은 1,080달러입니다. 보호 쿠션은 작지만 상승 여지는 더 큽니다.</p>
+<p>현재 주가 100달러와 주식 100주 보유는 같은 조건으로 둡니다. 달라지는 쪽은 콜 행사가와 프리미엄입니다. 낮은 행사가 콜을 팔수록 받은 현금은 커질 수 있지만, 주식이 팔릴 가능성과 상방 제한이 커집니다. 높은 행사가 콜을 팔수록 받은 현금은 작아지고, 주식 상승 참여는 더 남습니다.</p>
+<p>커버드콜 ETF를 볼 때도 같은 구조를 적용합니다. 기초 ETF나 지수를 보유하고 주기적으로 콜을 매도하면 분배금이 높아 보일 수 있습니다. 그러나 그 분배금의 상당 부분은 콜 프리미엄에서 옵니다. 시장이 크게 오르는 구간에서는 기초자산 대비 뒤처질 수 있고, 급락장에서는 프리미엄만으로 하락을 다 막기 어렵습니다.</p>
+<p>개인적으로 커버드콜을 볼 때 가장 먼저 확인하는 것은 “내가 이 주식을 행사가에 팔려도 되는가”입니다. 팔리면 아쉬울 종목에 커버드콜을 붙이면, 프리미엄 2달러를 받으려다 20달러 상승 구간을 놓칠 수 있습니다. 반대로 목표 매도가가 이미 정해져 있다면, 그 가격의 콜 매도는 매도 계획에 프리미엄을 붙이는 방식이 될 수 있습니다.</p>
+<p>배당과 조기배정도 현실 조건입니다. 현재 주가가 110달러이고, 투자자가 주식 100주를 보유한 채 105콜을 매도했다고 하겠습니다. 이 콜은 깊은 내가격입니다. 배당락 전날 남은 시간가치가 거의 없고 받을 배당의 매력이 더 크면, 콜 매수자는 조기행사를 고려할 수 있습니다.</p>
+<p>그 결과 배정이 일어나면 주식 100주가 105달러에 넘어갈 수 있습니다. 프리미엄을 받았더라도 배당을 받을 계획, 세금, 보유 의사, 목표 매도가가 달라질 수 있습니다. 조기배정이 반드시 일어난다는 뜻은 아닙니다. 다만 배당락일, 남은 시간가치, 행사가 대비 현재가, 호가 스프레드, 브로커 안내는 체크리스트에 들어가야 합니다.</p>
+<p>커버드콜은 포트폴리오 변동성을 낮추는 효과도 가질 수 있습니다. 프리미엄이 하락 일부를 완충하고, 상방을 제한하기 때문에 수익률 분포가 조금 눌립니다. 이 특성은 일정한 현금흐름을 원하는 투자자에게 매력적으로 보일 수 있습니다. 다만 포트폴리오의 장기 상승 포텐셜도 함께 눌릴 수 있습니다.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>커버드콜은 월세 비유가 자주 붙지만 실제로는 집값 상승 일부를 미리 넘기는 계약에 가깝습니다. 월세를 받는 대신 집값이 크게 오를 때의 일부 이익을 포기합니다. 그래서 받은 프리미엄만 보면 안 되고, 넘긴 상방을 함께 봐야 합니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 프리미엄 현금흐름과 손익분기점</div>
+    <h3>프리미엄 현금흐름과 손익분기점</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">stock entry 100, call premium 2, breakeven 98, premium cash 200 dollars.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 주식 매수가 100. 변화: 프리미엄 2달러 수취로 손익분기점 98.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">premium 슬라이더 0.5~5.0. breakeven and premium cash update.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
+          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="프리미엄 현금흐름과 손익분기점 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">받은 프리미엄이 손익분기점을 낮추는 과정을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 만기 손익그래프: 주식 단독 vs 커버드콜</div>
+    <h3>만기 손익그래프: 주식 단독 vs 커버드콜</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">stock entry 100, covered call K=105, premium=2, multiplier 100, expiration price range 80~130. Stock P/L = (S-100)×100. Covered call P/L = (S-100)×100 + 200 - max(S-105,0)×100.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“98 손익분기점, 105 위 이익 상단, 최대 이익 700달러.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration price 슬라이더 with quick buttons 90, 100, 103, 110, 130.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
+          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="만기 손익그래프: 주식 단독 vs 커버드콜 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">상방 제한과 하락 완충을 동시에 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 시나리오 결과 보드</div>
+    <h3>시나리오 결과 보드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">expiration prices 90, 100, 103, 110, 130. Stock P/L: -1000, 0, 300, 1000, 3000. Covered call P/L: -800, 200, 500, 700, 700.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“완만한 상승까지는 프리미엄이 보태지고, 큰 상승에서는 상단이 막힌다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">card 마우스오버 or tap highlights matching point on Figure 3.</p></div></div>
+    
+    <div class="fig-caption">제자리, 완만한 상승, 급등, 하락에서 커버드콜의 성격을 비교한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 행사가 선택 비교 패널</div>
+    <h3>행사가 선택 비교 패널</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">102 call premium 3.00, breakeven 97, max profit 500. 105 call premium 2.00, breakeven 98, max profit 700. 110 call premium 0.80, breakeven 99.20, max profit 1080.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“낮은 행사가: 더 큰 현금과 더 낮은 상단. 높은 행사가: 작은 현금과 더 넓은 상방.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">select strike. Selected values update a mini payoff chart.</p></div></div>
+    
+    <div class="fig-caption">낮은 행사가, 등가격에 가까운 행사가, 높은 행사가의 교환관계를 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 커버드콜 그릭스 번역기</div>
+    <h3>커버드콜 그릭스 번역기</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">stock delta +100. short call delta -35 when call delta 0.35. net delta +65. gamma negative, theta positive, vega negative.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“현재 조건의 순델타는 약 +65주. 시간이 지나며 이 값은 변한다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">call delta 슬라이더 0.10~0.80. net delta updates live.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
+          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="커버드콜 그릭스 번역기 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">주식 + 숏콜을 델타, 감마, 세타, 베가로 읽게 한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 커버드콜 ETF 읽기 카드</div>
+    <h3>커버드콜 ETF 읽기 카드</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">illustrative monthly call sale premium 1.0%, underlying monthly return scenarios -8%, 0%, +3%, +10%. Covered call rough result: -7%, +1%, +3%, +4% when upside cap around 3% plus premium. Label all numbers as simplified illustration.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“분배금은 총수익의 한 부분이다. 가격 변화와 상방 제한을 함께 본다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">none or simple scenario tabs.</p></div></div>
+    
+    <div class="fig-caption">높은 분배율과 총수익을 분리해 보게 한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 배당과 조기배정 체크 타임라인</div>
+    <h3>배당과 조기배정 체크 타임라인</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">현재 주가 110달러, 보유 주식 100주, 매도한 105콜, ex-dividend date D18, option expiration D30.</p></div><div class="mini-card"><div class="mini-k">시간가치</div><p class="mini-p">배당락 전날 남은 시간가치가 거의 없고 배당 매력이 더 크면 콜 매수자는 조기행사를 고려할 수 있다.</p></div><div class="mini-card"><div class="mini-k">배정 결과</div><p class="mini-p">배정되면 주식 100주가 105달러에 넘어갈 수 있다. 프리미엄, 배당, 세금, 보유 의사, 목표 매도가를 함께 확인한다.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">toggle <code>배당 있음 / 없음</code>; risk flag copy changes. 가능성은 배당, 남은 시간가치, 브로커 규칙에 따라 달라진다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig08ControlVal">50</span></div>
+          <input id="fig08Control" type="range" min="0" max="100" value="50" aria-label="배당과 조기배정 체크 타임라인 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">미국식 주식 옵션에서 배당락일, 남은 시간가치, 행사가 대비 현재가, 만기를 확인하게 한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>커버드콜이 안전한 월세 전략이라는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>이 대목에서 경계할 착각은 “커버드콜은 안전한 월세 전략”이라는 생각입니다.</p>
+<p>커버드콜의 프리미엄은 주식 하락을 제한적으로만 줄입니다. 100달러 주식에 대해 2달러 프리미엄을 받았다면 손익분기점은 98달러입니다. 주가가 80달러로 내려가면 손실은 -1,800달러입니다. 받은 현금은 완충재이지 보험 한도는 아닙니다.</p>
+<p>두 번째 오해는 “콜을 팔았으니 주가가 올라가도 좋다”는 생각입니다. 주가가 조금 오르면 좋을 수 있습니다. 그러나 주가가 행사가를 크게 넘어가면 이익이 상단에서 막힙니다. 장기 우상향 종목에 반복적으로 낮은 행사가 콜을 팔면, 큰 상승일의 수익을 계속 양보할 수 있습니다.</p>
+<p>세 번째 오해는 “분배금이 높으면 총수익도 높다”는 생각입니다. 커버드콜 ETF의 높은 분배율은 보기 편한 숫자입니다. 그러나 총수익은 가격 변화와 분배금을 합쳐 봐야 합니다. 상방 제한, 하락 방어 수준, 세금, 비용, 롤오버 방식까지 같이 봐야 합니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>받은 프리미엄은 하방을 조금 낮추고 상방을 제한합니다</h2>
+  <div class="prose">
+<p>커버드콜은 주식 100주와 콜 매도 1계약을 결합한 구조입니다. 받은 프리미엄은 손익분기점을 낮춥니다. 예시에서는 100달러 주식에 105콜 2달러를 매도해 손익분기점이 98달러로 내려갔습니다.</p>
+<p>대가도 명확합니다. 최대 이익은 행사가까지의 주식 상승분과 받은 프리미엄으로 제한됩니다. 105콜 2달러 예시에서는 최대 이익이 700달러입니다. 주가가 130달러로 가도 만기 기준 이익은 크게 늘지 않습니다.</p>
+<p>그릭스로 보면 커버드콜은 양의 델타, 양의 세타, 음의 감마, 음의 베가 성격을 가집니다. 완만한 상승이나 횡보에는 유리할 수 있고, 급등장에서는 뒤처질 수 있으며, 급락장에서는 주식 하락 손실이 남습니다.</p>
+<p>오늘의 체크포인트는 다섯 가지입니다. 내가 그 주식을 행사가에 팔려도 되는지 적습니다. 받은 프리미엄이 손익분기점을 얼마나 낮추는지 계산합니다. 최대 이익과 하락 손실을 같은 표에 둡니다. 콜 델타로 순델타를 추정합니다. 배당락일, 조기배정, 롤오버 계획을 확인합니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>커버드콜은 프리미엄을 받는 대신 상승 일부를 넘기는 구조다.</li>
+<li>하방 손실은 주식 보유 리스크로 남고, 프리미엄은 그 손실을 조금 낮출 뿐이다.</li>
+<li>분배금이나 월세 이미지보다 손익분기점과 상방 제한을 먼저 계산한다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>커버드콜의 손익분기점과 최대이익을 계산합니다</h2>
+  <div class="prose">
+<p>아래 숫자는 학습용 예시입니다. 실제 옵션 체인, 세금, 수수료, 호가 스프레드, 배당, 조기배정, 브로커별 증거금 산식은 반영하지 않습니다.</p>
+<h3 class="subhead">Worksheet A. 기본 커버드콜 손익 계산</h3>
+<p>현재 주가 100달러인 주식 100주를 보유하고 있습니다. 30일 만기 105콜을 2달러에 매도했습니다.</p>
+<ol>
+<li>받은 프리미엄 총액은 얼마입니까?</li>
+<li>손익분기점은 얼마입니까?</li>
+<li>최대 이익은 얼마입니까?</li>
+<li>만기 주가 110달러에서 총손익은 얼마입니까?</li>
+</ol>
+<p>답안 기준: 받은 프리미엄은 200달러입니다. 손익분기점은 98달러입니다. 최대 이익은 <code>(105 - 100 + 2) × 100 = 700달러</code>입니다. 만기 주가 110달러에서도 주식은 105달러에 팔리는 효과가 있으므로 총손익은 700달러입니다.</p>
+<h3 class="subhead">Worksheet B. 하락 완충 효과 보기</h3>
+<p>같은 커버드콜에서 만기 주가가 90달러가 되었습니다.</p>
+<ol>
+<li>주식 단독 손익은 얼마입니까?</li>
+<li>커버드콜 총손익은 얼마입니까?</li>
+<li>프리미엄이 줄여준 손실은 몇 달러입니까?</li>
+</ol>
+<p>계산 기준: 주식 단독 손익은 -1,000달러입니다. 커버드콜 총손익은 -800달러입니다. 프리미엄 200달러가 손실을 줄였지만, 하락 자체를 막지는 못했습니다.</p>
+<h3 class="subhead">Worksheet C. 행사가 선택 비교</h3>
+<p>현재 주가 100달러, 주식 100주 보유는 같습니다. 세 가지 콜 매도를 비교합니다.</p>
+<ul>
+<li>102콜 프리미엄 3.00달러</li>
+<li>105콜 프리미엄 2.00달러</li>
+<li>110콜 프리미엄 0.80달러</li>
+</ul>
+<p>각 선택지에 대해 손익분기점과 최대 이익을 계산해보세요.</p>
+<p>풀이의 핵심: 102콜은 손익분기점 97달러, 최대 이익 500달러입니다. 105콜은 손익분기점 98달러, 최대 이익 700달러입니다. 110콜은 손익분기점 99.20달러, 최대 이익 1,080달러입니다. 주식 매수가 100달러를 기준선으로 두고 행사가와 프리미엄의 변화를 확인합니다.</p>
+<h3 class="subhead">Worksheet D. 순델타 계산</h3>
+<p>주식 100주를 보유하고 105콜을 1계약 매도했습니다. 105콜 델타는 0.35라고 둡니다.</p>
+<ol>
+<li>주식 델타는 얼마입니까?</li>
+<li>숏콜 델타는 몇 주 노출입니까?</li>
+<li>결합 포지션의 초기 순델타는 얼마입니까?</li>
+</ol>
+<p>점검 기준: 주식 델타는 +100주입니다. 숏콜 델타는 -35주입니다. 결합 포지션의 초기 순델타는 +65주입니다. 지금 쓰는 값은 현재 콜 델타이고, 주가와 시간이 바뀌면 이 델타도 변할 수 있습니다.</p>
+<h3 class="subhead">Worksheet E. 내 종목 커버드콜 판단 문장</h3>
+<p>아래 문장을 직접 채워보세요.</p>
+<p>“내가 보유한 종목은 ________이고, 현재가 ________, 보유 수량 ________주입니다. 내가 고려하는 콜은 행사가 ________, 만기 ________, 프리미엄 ________입니다. 받은 프리미엄 총액은 ________이고, 손익분기점은 ________입니다. 최대 이익은 ________이며, 주가가 행사가를 넘으면 이 종목을 그 가격에 넘겨도 ________합니다. 배당락일과 조기배정 가능성은 ________로 확인했습니다. 이 포지션은 계좌 전체에서 ________% 이내로만 운용하겠습니다.”</p>
+<p>예시 답안: “내가 보유한 종목은 ABC이고, 현재가 100달러, 보유 수량 100주입니다. 내가 고려하는 콜은 행사가 105달러, 만기 30일, 프리미엄 2달러입니다. 받은 프리미엄 총액은 200달러이고, 손익분기점은 98달러입니다. 최대 이익은 700달러이며, 주가가 행사가를 넘으면 이 종목을 그 가격에 넘겨도 괜찮습니다. 배당락일과 조기배정 조건은 브로커 안내와 옵션 체인에서 확인했습니다. 이 포지션은 계좌 전체에서 15% 이내로만 운용하겠습니다.”</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 커버드콜 판단 워크시트</div>
+    <h3>커버드콜 판단 워크시트</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">ticker, current price, share count, cost basis, call strike, call premium, days to expiration, call delta, ex-dividend date, assignment comfort, account size, max allocation.</p></div><div class="mini-card"><div class="mini-k">계산</div><p class="mini-p">premium cash = premium × 100 × contracts. breakeven = cost basis - premium. max profit per 100 shares = (strike - cost basis + premium) × 100. net delta = shares - call delta × contracts × 100.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“행사가에 팔려도 되는 주식인지 먼저 적고, 그다음 프리미엄을 본다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p"><code>예시 채우기</code>, <code>비우기</code>, <code>계산하기</code>, <code>인쇄용 보기</code> 버튼. 외부 전송 없이 브라우저 내부에서만 계산한다.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
+          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="커버드콜 판단 워크시트 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">학습자가 실제 보유 종목에 커버드콜을 붙일지 점검한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차에서는 하방을 제한하는 보호적 풋을 봅니다</h2>
+  <div class="prose">
+<p>다음 22회차에서는 보호적 풋을 다룹니다. 커버드콜은 보유 주식 위에 콜을 매도해 프리미엄을 받는 구조였습니다. 보호적 풋은 보유 주식 아래에 풋을 매수해 하방을 제한하는 구조입니다.</p>
+<p>두 전략은 모두 주식과 옵션을 결합합니다. 커버드콜은 상방 일부를 넘기며 현금을 먼저 받고, 보호적 풋은 현금을 먼저 내고 하방 한도를 정합니다. 다음 회차에서는 이 보험료가 언제 비싸지고, 어떤 투자자에게 필요한지 보겠습니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-22.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">22회차 — 보호적 풋, 포트폴리오 보험의 기본형</div><p class="next-desc">다음 22회차에서는 보호적 풋을 다룹니다. 커버드콜은 보유 주식 위에 콜을 매도해 프리미엄을 받는 구조였습니다. 보호적 풋은 보유 주식 아래에 풋을 매수해 하방을 제한하는 구조입니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 무기견의 옵션 입문</div>
+  <div>SESSION 21 · 커버드콜, 수익을 앞당겨 받는 대신 상승 일부를 넘긴다</div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+document.querySelectorAll('[data-control-demo]').forEach((box) => {
+  const input = box.querySelector('input[type="range"]');
+  const output = box.querySelector('.control-value');
+  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+});
+document.querySelectorAll('[data-segmented]').forEach((group) => {
+  group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
+    group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
+  }));
+});
+
+</script>
+</body>
+</html>

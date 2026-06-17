@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>6회차 — 무기견의 옵션 입문</title>
+  <title>6회차 — 프리미엄의 두 층, 내재가치와 시간가치</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -408,7 +408,7 @@
 <nav>
   <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
   <div class="nav-right">
-    <a href="session-05.html" class="nav-prev">← 5회차</a>
+    <a href="session-05.html" class="nav-prev">5회차</a>
     <span class="nav-session">SESSION 06</span>
     <a href="session-07.html" class="nav-next">7회차 →</a>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
@@ -641,6 +641,11 @@
   </div>
 
   <div class="prose">
+    <h3 class="subhead">콜과 풋 가격은 서로 따로 움직이지 않습니다</h3>
+    <p>같은 기초자산, 같은 행사가, 같은 만기의 콜과 풋은 별개의 복권처럼 따로 가격이 붙지 않습니다. 현재가가 100달러이고 행사가도 100달러인 같은 만기 콜과 풋을 보겠습니다. 배당과 금리를 잠시 접어두면, 콜 가격과 풋 가격의 차이는 현재가와 행사가의 차이와 연결됩니다.</p>
+    <p>단순화하면 <code>C - P ≈ S - K</code>로 볼 수 있습니다. 더 일반적으로는 <code>C + PV(K) ≈ P + S</code>라고 씁니다. 여기서 C는 콜 가격, P는 풋 가격, S는 현재 주가, K는 행사가입니다. 지금 예시처럼 S와 K가 둘 다 100에 가까우면, 콜만 크게 비싸지고 풋은 그대로인 상태가 오래 지속되기 어렵다는 감각을 얻으면 충분합니다.</p>
+    <p>이 관계의 출발점은 합성 포지션입니다. 콜 매수와 현금 일부 보유, 풋 매수와 주식 보유가 비슷한 만기 손익을 만들 수 있다면 가격 관계도 크게 어긋나기 어렵습니다. 풋-콜 패리티의 목적은 공식 암기가 아니라, 콜과 풋이 같은 시장 구조 안에서 연결된 가격이라는 감각을 갖는 것입니다.</p>
+    <p>실제 시장에서는 금리, 배당, 미국식 조기행사, 유동성, 호가 스프레드 때문에 완전히 기계적으로 맞아떨어지지 않습니다. 그래도 풋-콜 패리티를 알면 옵션 체인에서 콜 가격만 보거나 풋 가격만 보는 습관을 줄일 수 있습니다.</p>
     <p>시간가치는 공짜 기대감이 아닙니다. <strong>옵션 매수자가 지불하는 비용이고, 옵션 매도자가 받는 보상</strong>입니다. 시간이 지나도 유리한 움직임이 나오지 않으면 이 층은 줄어듭니다.</p>
     <p>그래서 옵션은 방향만 맞히는 상품이 아닙니다. 방향이 맞아도 속도가 느리면 시간가치 감소가 수익을 갉아먹을 수 있습니다.</p>
   </div>
@@ -699,15 +704,25 @@
   </div>
 
   <div class="fig">
-    <div class="fig-label">Figure 09 — 다음 회차 연결 카드</div>
-    <a href="session-07.html" class="next-card">
-      <div>
-        <div class="next-label">NEXT SESSION</div>
-        <div class="next-title">7회차 — 시간가치, 만기가 길수록 왜 더 비싼가</div>
+    <div class="fig-label">Figure 09 — 풋-콜 패리티 저울</div>
+    <div class="two">
+      <div class="mini-card">
+        <div class="mini-k">왼쪽 저울</div>
+        <div class="mini-v">콜 + 행사가 현금</div>
+        <p class="mini-p"><code>C + PV(K)</code>는 콜 권리와 만기 행사가를 지불할 현금을 함께 보는 쪽입니다.</p>
       </div>
-      <div class="next-arrow">→</div>
-    </a>
-    <div class="fig-caption">프리미엄을 내재가치와 시간가치로 나눴다면, 다음 회차에서는 시간가치가 만기에 가까워질수록 어떻게 사라지는지 봅니다.</div>
+      <div class="mini-card">
+        <div class="mini-k">오른쪽 저울</div>
+        <div class="mini-v">풋 + 주식</div>
+        <p class="mini-p"><code>P + S</code>는 풋 권리와 주식 보유를 함께 보는 쪽입니다. 비슷한 만기 손익은 가격도 크게 벌어지기 어렵습니다.</p>
+      </div>
+    </div>
+    <div class="mini-card" style="margin-top:16px">
+      <div class="mini-k">단순 감각</div>
+      <div class="mini-v">C - P ≈ S - K</div>
+      <p class="mini-p">금리와 배당을 잠시 접어두면, 콜과 풋 가격 차이는 현재가와 행사가의 차이와 연결됩니다.</p>
+    </div>
+    <div class="fig-caption">풋-콜 패리티는 콜과 풋을 별개의 복권 가격이 아니라 같은 시장 구조 안의 연결된 가격으로 보는 장치입니다. 실제 시장에서는 금리, 배당, 미국식 조기행사, 유동성 때문에 차이가 날 수 있습니다.</div>
   </div>
 </section>
 
@@ -758,7 +773,7 @@
   }
 
   /* ── STOCK SLIDER ── */
-  const slider = document.getElementById('stockSlider');
+  const 슬라이더 = document.getElementById('stockSlider');
   const sVal = document.getElementById('sVal');
   const intrVal = document.getElementById('intrVal');
   const dot = document.getElementById('graphDot');
@@ -778,7 +793,7 @@
     label.textContent = `S=$${s} · IV=$${iv}`;
   }
 
-  slider.addEventListener('input', updateCalc);
+  슬라이더.addEventListener('input', updateCalc);
   updateCalc();
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3회차 — 무기견의 옵션 입문</title>
+  <title>3회차 — 옵션 매수자와 매도자, 프리미엄을 둘러싼 권리와 의무</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -391,7 +391,7 @@
 <nav>
   <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
   <div class="nav-right">
-    <a href="session-02.html" class="nav-prev">← 2회차</a>
+    <a href="session-02.html" class="nav-prev">2회차</a>
     <span class="nav-sep">/</span>
     <span class="nav-session">SESSION 03</span>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
@@ -962,11 +962,8 @@
     </div>
   </div>
 
-  <a href="session-04.html" class="next-card">
-    <div>
-      <div class="next-label">NEXT SESSION</div>
-      <div class="next-title">4회차 — 만기 손익그래프: 콜 매수, 풋 매수, 콜 매도, 풋 매도</div>
-    </div>
+  <a class="next-card" href="session-04.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">4회차 — 만기 손익그래프, 옵션은 그림으로 이해해야 한다</div><p class="next-desc">다음 회차에서는 이 손익 비대칭을 그래프로 그려보겠습니다. 콜 매수, 풋 매수, 콜 매도, 풋 매도 네 가지 기본 포지션의 만기 손익그래프를 보면 옵션의 구조가 훨씬 선명해집니다.</p></div>
     <div class="next-arrow">→</div>
   </a>
 </div>
@@ -1015,7 +1012,7 @@
     }, { threshold: 0.08 }).observe(el);
   });
 
-  /* ── Call slider ── */
+  /* ── Call 슬라이더 ── */
   function updateCall(val) {
     const iv    = Math.max(0, val - 110);
     const buyer = iv - 3;
@@ -1032,7 +1029,7 @@
   callSlider.addEventListener('input', () => updateCall(+callSlider.value));
   updateCall(105);
 
-  /* ── Put slider ── */
+  /* ── Put 슬라이더 ── */
   function updatePut(val) {
     const iv    = Math.max(0, 90 - val);
     const buyer = iv - 2;

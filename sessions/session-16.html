@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>16회차 — 로, 금리와 배당은 옵션에 어떻게 반영되는가</title>
+  <meta name="description" content="로, 금리와 배당은 옵션에 어떻게 반영되는가">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .figure-points .mini-card { min-height:112px; }
+    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
+    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
+    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+  </style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-15.html" class="nav-prev">15회차</a>
+    <span class="nav-session">SESSION 16</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-17.html" class="nav-next nav-forward">17회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 16 · Level 3</div>
+    <h1>로, 금리와 배당은 옵션에 어떻게 반영되는가</h1>
+    <p class="hero-sub">금리와 배당을 넣으면 질문이 이렇게 바뀝니다.</p>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">로는 금리 1%포인트 변화가 옵션 가격에 미치는 영향을 보여주며, 배당은 금리와 반대 방향으로 콜과 풋의 상대가치를 흔드는 입력값입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>베가까지 본 뒤 금리와 배당을 마지막 입력값으로 봅니다</h2>
+  <div class="prose">
+<p>15회차에서는 베가를 봤습니다. 시장이 미래의 흔들림을 더 비싸게 가격에 넣으면 콜과 풋 프리미엄이 함께 올라갈 수 있고, 실적 발표 뒤에는 방향을 맞혀도 IV 하락이 수익을 지울 수 있었습니다.</p>
+<p>오늘은 가격 모델의 마지막 그릭스인 로를 봅니다. 로는 금리가 1%포인트 변할 때 옵션 가격이 얼마나 바뀌는지 보여주는 민감도입니다. 델타, 감마, 세타, 베가보다 실전 체감이 약한 경우가 많지만, 금리와 배당은 콜과 풋의 상대가격을 이해하는 데 필요합니다.</p>
+<p>조금 불편할 수 있습니다. 지금까지는 주가, 시간, 변동성처럼 옵션 프리미엄에 바로 닿는 변수를 다뤘죠. 금리와 배당은 한 단계 돌아갑니다. 선도가격을 바꾸고, 그 선도가격 변화가 콜과 풋의 가격 균형을 바꿉니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 그릭스 지도에서 로 위치 찾기</div>
+    <h3>그릭스 지도에서 로 위치 찾기</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">delta=direction, gamma=delta change, theta=time decay, vega=IV, rho=rate 1pp sensitivity.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“로는 금리 입력값 변화에 대한 옵션 가격 민감도.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">greek card 마우스오버 or tap. 로 선택 시 금리 레버와 콜/풋 가격 카드가 강조된다.</p></div></div>
+    
+    <div class="fig-caption">델타, 감마, 세타, 베가 뒤에 로가 어떤 질문을 담당하는지 보여준다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>금리와 배당은 왜 콜과 풋의 상대가격을 바꿀까요</h2>
+  <div class="prose">
+<p>금리와 배당을 넣으면 질문이 이렇게 바뀝니다.</p>
+<p>주가가 그대로인데 금리나 배당 전망이 바뀌면, 왜 콜과 풋 가격이 서로 다른 방향으로 움직일까요?</p>
+<p>현재 주가 100달러, 행사가 100달러, 만기 1년 콜옵션을 가정하겠습니다. 주가, 행사가, 만기, IV, 배당은 교육 편의를 위해 고정합니다. 콜 가격은 4.20달러, 로는 +0.18이라고 두겠습니다.</p>
+<p>금리가 4%에서 5%로 1%포인트 오르면, 다른 조건이 그대로라는 가정에서 콜 가격은 대략 4.38달러가 됩니다. 금리 입력값 하나만 움직인 예시입니다. 왜 중요하냐면, 같은 주식을 지금 100주 사는 선택과 1년 뒤 살 권리를 사는 선택의 상대 매력이 금리에 따라 달라지기 때문입니다.</p>
+<p>풋은 반대로 움직일 수 있습니다. 같은 조건의 풋 가격이 3.90달러이고 로가 -0.16이라면, 금리 1%포인트 상승은 풋 가격을 대략 3.74달러로 낮춥니다. 주가, 행사가, 만기, IV, 배당은 그대로 두고 금리만 바꿔 본 결과입니다. 콜과 풋의 부호가 갈라지는 대목입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>로는 금리 변화가 옵션 가격에 미치는 영향을 보여줍니다</h2>
+  <div class="prose">
+<p>이번 회차는 이 문장으로 잡겠습니다.</p>
+<p>로는 금리 1%포인트 변화가 옵션 가격에 미치는 영향을 보여주며, 배당은 금리와 반대 방향으로 콜과 풋의 상대가치를 흔드는 입력값입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>선도가격을 통해 금리와 배당의 방향을 읽습니다</h2>
+  <div class="prose">
+<p>로를 이해하려면 선도가격 감각이 먼저 필요합니다. 선도가격은 아주 단순하게 말하면, 오늘 주식을 사는 선택과 미래에 사는 선택이 균형을 이루도록 조정된 미래 기준가격입니다. 금리가 높아지면 현금을 지금 묶어두는 비용과 현금을 보유하는 가치가 달라지고, 이 변화가 미래 기준가격에 반영됩니다.</p>
+<p>주식 콜옵션은 정해진 행사가에 미래에 살 수 있는 권리입니다. 금리가 올라가면 지금 주식 100주를 바로 사는 것보다, 프리미엄만 내고 현금을 더 오래 들고 있는 선택의 매력이 커질 수 있습니다. 그래서 일반적인 주식 옵션에서 콜은 양의 로를 갖는 경우가 많습니다.</p>
+<p>풋옵션은 정해진 행사가에 미래에 팔 수 있는 권리입니다. 금리가 올라가면 미래에 받을 행사가의 현재가치가 낮아지는 효과가 들어갑니다. 그래서 일반적인 주식 옵션에서 풋은 음의 로를 갖는 경우가 많습니다.</p>
+<p>숫자로 보겠습니다. 현재 주가 100달러, 행사가 100달러, 만기 1년, IV 25%, 배당 없음으로 둡니다. 콜 가격 4.20달러, 로 +0.18입니다. 금리가 4%에서 6%로 2%포인트 오르면, 단순 근사 가격 변화는 <code>0.18 × 2 = 0.36달러</code>입니다. 콜 가격은 약 4.56달러가 됩니다.</p>
+<p>이 계산에서 이 예시에서 그대로 둔 조건은 주가, 행사가, 만기, IV, 배당이고, 움직인 쪽은 금리입니다. 1계약이 100주 기준이면 2%포인트 금리 상승의 로 효과는 약 36달러입니다. 포지션 규모가 작고 만기가 짧으면 체감이 약하지만, 장기 옵션이나 큰 포지션에서는 무시하기 어렵습니다.</p>
+<p>같은 조건의 풋을 보겠습니다. 풋 가격 3.90달러, 로 -0.16입니다. 금리가 4%에서 5%로 1%포인트 오르면 가격 변화는 <code>-0.16 × 1 = -0.16달러</code>입니다. 풋 가격은 약 3.74달러가 됩니다. 주가가 움직이지 않아도 금리 입력값이 프리미엄을 바꾼 사례입니다.</p>
+<p>로는 단기 옵션에서 작게 보이는 경우가 많습니다. 현재 주가 100달러, 행사가 100달러, IV와 배당을 고정합니다. 14일 만기 콜의 로가 +0.01이고, 1년 만기 콜의 로가 +0.18이며, 2년 만기 콜의 로가 +0.82라고 둡니다. 금리 1%포인트 변화의 가격 영향은 각각 약 0.01달러, 0.18달러, 0.82달러입니다.</p>
+<p>차이를 만든 것은 만기입니다. 시간이 길수록 금리 변화가 작용할 기간도 길어집니다. 그래서 LEAPS처럼 긴 만기 옵션에서는 로가 가격 설명에 들어올 수 있습니다. 반대로 며칠 남은 등가격 옵션에서는 델타, 감마, 세타, 베가가 훨씬 크게 느껴질 수 있습니다.</p>
+<p>이제 배당을 붙이겠습니다. 배당은 주식 보유자가 받는 현금흐름입니다. 옵션 매수자는 주식을 보유한 상태가 아니므로, 콜을 들고 있다고 해서 배당을 받는 것은 아닙니다. 이 차이가 콜과 풋 가격에 반영됩니다.</p>
+<p>예상 배당이 커지면 콜에는 부담이 될 수 있습니다. 배당락 때 주가는 배당만큼 조정될 수 있고, 콜 매수자는 그 배당을 직접 받지 못합니다. 같은 주가, 행사가, 만기, IV, 금리를 고정하고 예상 배당만 올리면 콜 가격은 낮아질 수 있습니다.</p>
+<p>풋에는 반대 방향의 힘이 작동합니다. 배당락으로 주가가 낮아질 가능성이 커지면, 정해진 가격에 팔 수 있는 권리의 상대가치는 올라갈 수 있습니다. 그래서 예상 배당 증가는 풋 가격에 우호적으로 작용하는 경우가 많습니다.</p>
+<p>미국식 개별주 옵션에서는 배당이 조기행사와도 연결됩니다. 깊은 내가격 콜을 보유한 투자자는 배당을 받기 위해 배당락 전 권리를 행사할 유인이 생길 수 있습니다. 이 경우 콜 매도자는 예상보다 일찍 배정될 수 있습니다. 입문자는 배당이 단순히 가격 모델의 입력값이 아니라, 실제 행사와 배정 타이밍을 흔드는 변수라는 점을 기억하면 됩니다.</p>
+<p>숫자를 붙여보겠습니다. 현재 주가 100달러, 행사가 100달러, 만기 6개월, IV 25%, 금리 4%를 고정합니다. 콜 가격 4.20달러, 풋 가격 3.90달러입니다. 예상 배당이 0.50달러 늘어날 때 콜의 배당 민감도를 -0.22, 풋의 배당 민감도를 +0.20으로 둡니다.</p>
+<p>이 경우 콜은 <code>4.20 - 0.22 × 0.5 = 4.09달러</code>가 됩니다. 풋은 <code>3.90 + 0.20 × 0.5 = 4.00달러</code>가 됩니다. 예상 배당 입력값이 달라지자 콜과 풋이 같은 기초자산을 보는데도 서로 다른 방향으로 움직입니다.</p>
+<p>실전에서는 금리와 배당이 함께 움직일 수 있습니다. 금리 1%포인트 상승과 예상 배당 0.50달러 증가가 동시에 온다고 가정하겠습니다. 콜의 로는 +0.18, 배당 민감도는 -0.22입니다. 콜 가격 4.20달러는 금리 효과 +0.18과 배당 효과 -0.11을 합쳐 약 4.27달러가 됩니다.</p>
+<p>풋은 로 -0.16, 배당 민감도 +0.20으로 둡니다. 풋 가격 3.90달러는 금리 효과 -0.16과 배당 효과 +0.10을 합쳐 약 3.84달러가 됩니다. 조건을 주가, 행사가, 만기, IV로 묶어두면, 결과를 흔드는 변수는 금리와 예상 배당입니다. 서로 반대 힘이 섞이면 최종 변화는 더 작게 보일 수 있습니다.</p>
+<p>배당락일도 체크해야 합니다. 예를 들어 주가 50달러인 배당주가 0.80달러 배당을 앞두고 있고, 만기 20일 옵션이 배당락일을 포함한다고 하겠습니다. 같은 행사가 50달러 옵션이라도 배당락일 전후로 콜과 풋의 상대가격, 조기행사 가능성, 스프레드 손익이 달라질 수 있습니다.</p>
+<p>특히 미국식 주식 옵션에서는 깊은 내가격 콜의 조기행사 가능성이 문제가 될 수 있습니다. 배당을 받기 위해 옵션 권리를 행사하고 주식으로 바꾸는 선택이 경제적으로 유리한 순간이 생길 수 있기 때문입니다. 초보자는 이 대목을 지나치기 쉽습니다.</p>
+<p>로는 모든 상품에서 같은 부호로 움직인다고 외우면 곤란합니다. 주식 옵션에서의 일반적 방향은 콜 양의 로, 풋 음의 로입니다. 하지만 선물옵션, 외환옵션, 현금결제 방식, 담보 구조가 달라지면 금리 민감도의 의미도 달라질 수 있습니다. 이 강의에서는 입문 과정이므로 주식 옵션 중심으로 이해하면 충분합니다.</p>
+<p>개인적으로는 로를 “나중에 돈을 주고받는 계약의 할인율 감각”으로 잡는 편이 편합니다. 할인율이 바뀌면 미래 현금흐름의 현재가치가 달라집니다. 옵션은 미래의 권리와 의무를 사고파는 계약이니, 금리 변화가 작은 손잡이처럼 가격에 붙습니다.</p>
+<p>다만 손잡이의 크기는 회차마다 다릅니다. 짧은 만기 이벤트 옵션에서는 베가와 감마가 훨씬 강하게 움직일 수 있습니다. 장기 옵션, 금리 급변기, 배당주, 배당락일 근처, 캘린더 스프레드에서는 로와 배당 입력값이 화면 앞으로 나옵니다.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>금리와 배당은 옵션 가격의 배경 온도처럼 작동합니다. 짧은 만기에서는 잘 느껴지지 않을 수 있지만, 만기가 길어질수록 선도가격과 조기행사 판단에 영향을 줍니다. 그래서 장기 옵션에서는 작은 입력도 누적되어 가격 차이를 만들 수 있습니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 로 1%포인트 계산기</div>
+    <h3>로 1%포인트 계산기</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">기본값 call price 4.20, rho +0.18, rate change +1pp, contracts 1. 결과 price 4.38, contract effect 18달러.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: S, K, T, IV, 배당. 변화: 금리.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">rate change 슬라이더 -3pp~+3pp, contracts 슬라이더 1~20. price change와 contract dollar effect를 DOM 텍스트로 표시.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
+          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="로 1%포인트 계산기 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">로 단위를 베가처럼 1%포인트 변화 기준으로 익히게 한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 금리 상승과 콜/풋 부호</div>
+    <h3>금리 상승과 콜/풋 부호</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Call price 4.20 rho +0.18. Put price 3.90 rho -0.16. Rate +1pp → call 4.38, put 3.74.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“같은 금리 변화도 권리의 방향에 따라 가격 영향이 달라진다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">rate +0~+3pp 슬라이더. 콜/풋 가격 변화가 동시에 업데이트.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
+          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="금리 상승과 콜/풋 부호 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">주식 옵션에서 콜은 양의 로, 풋은 음의 로가 될 수 있음을 시각화한다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 선도가격 경로 지도</div>
+    <h3>선도가격 경로 지도</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=100, r=4% to 5%, T=1Y. 교육용 forward index 104 → 105.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“모델을 단순화한 교육용 지도.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">r toggle 4% / 5%. forward index와 option arrows update.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig04ControlVal">50</span></div>
+          <input id="fig04Control" type="range" min="0" max="100" value="50" aria-label="선도가격 경로 지도 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">금리가 옵션 가격에 직접 꽂히기보다 선도가격과 현재가치 경로를 통해 들어간다는 점을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 만기별 로 크기 비교</div>
+    <h3>만기별 로 크기 비교</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">14D rho +0.01, 1Y rho +0.18, 2Y rho +0.82. Rate +1pp effects identical to rho values.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“변화: 만기. 고정: S, K, IV, 배당.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">maturity select. 선택 만기의 contract effect for 10 contracts 표시.</p></div></div>
+    
+    <div class="fig-caption">로가 긴 만기에서 커지는 경향을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 배당이 콜과 풋에 주는 방향</div>
+    <h3>배당이 콜과 풋에 주는 방향</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Call 4.20 div sensitivity -0.22 per $1, Put 3.90 div sensitivity +0.20 per $1, dividend increase +0.50 → call 4.09, put 4.00.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: S, K, T, IV, 금리. 변화: 예상 배당.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">dividend increase 슬라이더 0~2 dollars. 콜/풋 가격 업데이트.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
+          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="배당이 콜과 풋에 주는 방향 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">예상 배당 증가가 콜과 풋의 상대가치를 다르게 바꿀 수 있음을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 배당락일과 만기 위치</div>
+    <h3>배당락일과 만기 위치</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Today D0, ex-div D12, expiration D20, dividend $0.80. Alternative expiration D8 scenario.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“만기 안에 배당락일이 들어오면 가격과 조기행사 판단이 달라질 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration before/after ex-div toggle. checklist chips update.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig07ControlVal">50</span></div>
+          <input id="fig07Control" type="range" min="0" max="100" value="50" aria-label="배당락일과 만기 위치 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">옵션 만기 안에 배당락일이 들어오는지에 따라 체크포인트가 달라짐을 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 금리와 배당의 동시 효과 분해</div>
+    <h3>금리와 배당의 동시 효과 분해</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Call start 4.20 → rate +0.18 → dividend -0.11 → result 4.27. Put start 3.90 → rate -0.16 → dividend +0.10 → result 3.84.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 선형 근사. 실제 가격은 재계산이 필요하다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">call/put toggle. waterfall sign and colors update.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig08ControlVal">50</span></div>
+          <input id="fig08Control" type="range" min="0" max="100" value="50" aria-label="금리와 배당의 동시 효과 분해 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">금리와 배당이 서로 다른 방향으로 작용할 때 최종 가격 변화가 어떻게 합산되는지 보여준다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 상품 유형별 로 주의표</div>
+    <h3>상품 유형별 로 주의표</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">주식 옵션: 콜 +, 풋 -. 단기 옵션: 대체로 작음. 장기 옵션: 커질 수 있음. 배당주: 배당 입력 중요. 선물옵션/외환옵션: 구조 확인 필요.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“입문 과정은 주식 옵션을 기본값으로 둔다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">row expand. 각 행의 체크 질문 1개 표시.</p></div></div>
+    
+    <div class="fig-caption">로의 부호와 중요도가 기초자산과 결제 방식에 따라 달라질 수 있음을 알려준다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>로가 작으니 완전히 빼도 된다는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>이 대목에서 경계할 착각은 “로는 작으니 완전히 빼도 된다”는 생각입니다.</p>
+<p>짧은 만기 소액 포지션에서는 실제로 로가 큰 판단 변수가 되지 않는 경우가 많습니다. 하지만 작은 민감도도 만기와 계약 수가 커지면 달러 금액으로 커집니다. 2년 만기 콜 20계약을 들고 있고 로가 계약당 옵션 가격 기준 +0.82라면, 금리 1%포인트 변화의 이론 효과는 <code>0.82 × 100 × 20 = 1,640달러</code>입니다.</p>
+<p>또 다른 오해는 배당을 과거 평균 배당으로만 보면 된다는 생각입니다. 배당은 금액, 배당락일, 만기 사이의 위치를 함께 봐야 합니다. 옵션 만기 안에 배당락일이 들어오는지, 배당이 예상보다 커지거나 줄어들 가능성이 있는지, 깊은 내가격 콜의 조기행사 유인이 생기는지 확인해야 합니다.</p>
+<p>로와 배당은 보조 변수처럼 보입니다. 그래도 이 둘을 알면 콜과 풋의 상대가격, 장기 옵션 가격, 배당주 옵션, 캘린더 스프레드의 작은 어긋남을 읽을 수 있습니다. 초보자에게 필요한 결론은 단순합니다. 단기 옵션에서는 우선순위를 낮게 두되, 긴 만기와 배당 이벤트에서는 체크리스트에 올립니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>금리와 배당은 상황에 따라 무시할 수 없는 입력값입니다</h2>
+  <div class="prose">
+<p>로는 금리 1%포인트 변화에 대한 옵션 가격 민감도입니다. 주식 옵션에서는 일반적으로 콜이 양의 로, 풋이 음의 로를 갖는 경우가 많습니다. 금리 상승은 콜 가격에는 우호적으로, 풋 가격에는 비우호적으로 작용할 수 있습니다.</p>
+<p>배당은 대체로 금리와 반대 방향의 힘을 냅니다. 예상 배당 증가는 콜 가격에는 부담이 되고, 풋 가격에는 도움이 될 수 있습니다. 옵션 매수자는 주식을 보유한 주주가 아니므로 배당 현금흐름을 직접 받지 못한다는 점이 출발점입니다.</p>
+<p>로는 단기 옵션에서 작게 보일 수 있습니다. 그러나 만기가 길어지거나 금리 변화가 크거나 포지션 규모가 커지면 달러 금액으로 의미가 생깁니다. 배당락일을 포함한 주식 옵션에서는 배당 금액과 날짜가 가격과 조기행사 판단에 들어갑니다.</p>
+<p>오늘의 체크포인트는 세 가지입니다. 금리 변화는 선도가격을 통해 콜과 풋의 상대가격을 바꿉니다. 배당 전망은 콜과 풋에 반대 방향으로 들어갈 수 있습니다. 로와 배당은 평소에는 작게 보이다가 긴 만기, 배당주, 큰 포지션에서 존재감을 드러냅니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>로는 금리 변화, 배당은 선도가격을 통해 옵션 상대가격에 영향을 준다.</li>
+<li>단기 개별주 옵션에서는 작아 보일 수 있지만 장기 옵션과 금리 급변기에는 무시하기 어렵다.</li>
+<li>콜/풋 가격을 볼 때 금리, 배당, 조기행사 가능성은 계약 조건과 함께 확인한다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>금리와 배당 변화가 콜과 풋에 주는 영향을 계산합니다</h2>
+  <div class="prose">
+<p>현재 주가가 100달러인 주식을 가정합니다. 옵션 1계약은 주식 100주 기준이며, 아래 숫자는 학습용 예시입니다. 실제 옵션 체인이나 매매 판단에 그대로 쓰지 않습니다.</p>
+<h3 class="subhead">Worksheet A. 로 단위 계산하기</h3>
+<p>100콜의 현재 가격은 4.20달러이고 로는 +0.18입니다. 주가, 행사가, 만기, IV, 배당은 고정하고 금리만 변한다고 가정합니다.</p>
+<ol>
+<li>금리가 4%에서 5%로 오르면 이론 가격은 대략 얼마입니까?</li>
+<li>금리가 4%에서 6%로 오르면 가격 변화는 대략 얼마입니까?</li>
+<li>1계약 기준 금리 2%포인트 상승의 달러 효과는 얼마입니까?</li>
+</ol>
+<p>답안 기준: 5%에서는 약 4.38달러입니다. 6%에서는 약 4.56달러입니다. 1계약 기준 2%포인트 상승의 달러 효과는 약 36달러입니다. 이 계산은 금리 변화만 따로 본 것입니다.</p>
+<h3 class="subhead">Worksheet B. 콜과 풋의 로 부호 읽기</h3>
+<p>현재 주가 100달러, 행사가 100달러, 만기 1년입니다. IV와 배당은 고정합니다.</p>
+<ul>
+<li>콜 가격 4.20달러, 로 +0.18</li>
+<li>풋 가격 3.90달러, 로 -0.16</li>
+</ul>
+<p>아래 질문을 계산해보세요.</p>
+<ol>
+<li>금리 1%포인트 상승 시 콜 가격 변화는 대략 얼마입니까?</li>
+<li>같은 금리 변화에서 풋 가격 변화는 대략 얼마입니까?</li>
+<li>콜과 풋의 부호가 갈라지는 이유를 선도가격과 미래 현금흐름 관점에서 설명해보세요.</li>
+</ol>
+<p>계산 기준: 콜은 약 +0.18달러, 풋은 약 -0.16달러입니다. 금리 변화는 미래에 사고파는 권리의 현재가치와 상대 매력을 바꿉니다.</p>
+<h3 class="subhead">Worksheet C. 만기별 로 비교하기</h3>
+<p>현재 주가 100달러, 행사가 100달러, IV 25%, 배당 없음으로 둡니다.</p>
+<ul>
+<li>14일 만기 콜 로 +0.01</li>
+<li>1년 만기 콜 로 +0.18</li>
+<li>2년 만기 콜 로 +0.82</li>
+</ul>
+<p>다음 질문으로 구조를 확인해보세요.</p>
+<ol>
+<li>금리 1%포인트 상승 시 각 옵션의 이론 가격 변화는 얼마입니까?</li>
+<li>2년 만기 옵션 10계약이면 로 효과는 계약 단위로 얼마입니까?</li>
+<li>단기 옵션에서 로의 우선순위가 낮아지는 이유를 적어보세요.</li>
+</ol>
+<p>풀이의 핵심: 각각 +0.01달러, +0.18달러, +0.82달러입니다. 2년 만기 10계약은 약 820달러 효과입니다. 시간이 길수록 금리 변화가 작용할 기간도 길어집니다.</p>
+<h3 class="subhead">Worksheet D. 배당 민감도 분해하기</h3>
+<p>현재 주가 100달러, 행사가 100달러, 만기 6개월, IV 25%, 금리 4%를 고정합니다.</p>
+<ul>
+<li>콜 가격 4.20달러, 배당 민감도 -0.22</li>
+<li>풋 가격 3.90달러, 배당 민감도 +0.20</li>
+<li>예상 배당 증가 0.50달러</li>
+</ul>
+<p>숫자를 넣어 확인해보세요.</p>
+<ol>
+<li>콜 가격은 대략 얼마가 됩니까?</li>
+<li>풋 가격은 대략 얼마가 됩니까?</li>
+<li>예상 배당 증가가 콜과 풋에 다르게 들어가는 이유를 설명해보세요.</li>
+</ol>
+<p>점검 기준: 콜은 약 4.09달러, 풋은 약 4.00달러입니다. 옵션 보유자는 주주 배당 현금흐름을 직접 받지 못하며, 배당락 가능성은 콜과 풋의 상대가치를 다르게 바꿉니다.</p>
+<h3 class="subhead">Worksheet E. 금리와 배당 체크 문장 만들기</h3>
+<p>아래 문장을 직접 채워보세요.</p>
+<p>“내 옵션의 만기는 ________이고, 로는 ________입니다. 이 숫자는 주가, 행사가, IV, 예상 배당이 그대로라는 가정에서 금리 1%포인트 변화가 옵션 가격을 대략 ________만큼 바꿀 수 있다는 뜻입니다. 이 옵션의 만기 안에는 배당락일이 ________ 들어오며, 예상 배당 변화는 콜/풋 가격에 ________ 방향으로 작용할 수 있습니다. 이번 포지션에서 로와 배당을 체크리스트에 올릴 이유는 ________입니다.”</p>
+<p>예시 답안: “내 옵션의 만기는 1년이고, 로는 +0.18입니다. 이 숫자는 주가, 행사가, IV, 예상 배당이 그대로라는 가정에서 금리 1%포인트 변화가 옵션 가격을 대략 0.18달러 바꿀 수 있다는 뜻입니다. 이 옵션의 만기 안에는 배당락일이 한 번 들어오며, 예상 배당 변화는 콜 가격에 부담 방향으로 작용할 수 있습니다. 이번 포지션에서 로와 배당을 체크리스트에 올릴 이유는 만기가 길고 배당락일을 포함하기 때문입니다.”</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-10">
+  <div class="fig">
+    <div class="fig-label">Figure 10 — 금리, 배당 체크 워크시트</div>
+    <h3>금리, 배당 체크 워크시트</h3>
+    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">option type, price, rho, expiration, contracts, rate change assumption, dividend amount, ex-div date, dividend inside expiration, fixed variables, expected direction of call/put effect.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 기록지이며 매매 지시서가 아니다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">화면 입력 가능, <code>예시 채우기</code>, <code>비우기</code> 버튼. 저장 기능은 localStorage만 허용하고 외부 전송은 하지 않는다.</p></div><div class="mini-card"><div class="mini-k">모바일</div><p class="mini-p">입력칸 1열, number/date input과 button height 44px 이상.</p></div></div>
+    <div class="control-demo" data-control-demo>
+          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig10ControlVal">50</span></div>
+          <input id="fig10Control" type="range" min="0" max="100" value="50" aria-label="금리, 배당 체크 워크시트 조절값">
+          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
+        </div>
+    <div class="fig-caption">학습자가 실제 옵션을 보기 전에 로, 만기, 배당락일을 기록하게 한다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차부터 옵션 매수와 매도의 본질로 넘어갑니다</h2>
+  <div class="prose">
+<p>다음 회차부터는 그릭스를 하나씩 외우는 구간을 넘어 옵션 매수와 매도의 본질을 정리합니다.</p>
+<p>17회차에서는 옵션 매수를 다룹니다. 옵션 매수자는 프리미엄을 내고 감마와 베가 노출을 얻는 대신 세타 비용을 부담합니다. 이제 델타, 감마, 세타, 베가, 로를 재료로 삼아 “옵션을 산다”는 행동이 실제로 어떤 리스크 조합인지 보겠습니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-17.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">17회차 — 옵션 매수의 본질, 감마를 사며 세타를 지불한다</div><p class="next-desc">다음 회차부터는 그릭스를 하나씩 외우는 구간을 넘어 옵션 매수와 매도의 본질을 정리합니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 무기견의 옵션 입문</div>
+  <div>SESSION 16 · 로, 금리와 배당은 옵션에 어떻게 반영되는가</div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+document.querySelectorAll('[data-control-demo]').forEach((box) => {
+  const input = box.querySelector('input[type="range"]');
+  const output = box.querySelector('.control-value');
+  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+});
+document.querySelectorAll('[data-segmented]').forEach((group) => {
+  group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
+    group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
+  }));
+});
+
+</script>
+</body>
+</html>
