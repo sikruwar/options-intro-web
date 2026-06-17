@@ -104,6 +104,22 @@
     return Math.max(0, waitSeconds - Math.floor((Date.now() - sentAt) / 1000));
   }
 
+  function authUrlError() {
+    const params = new URLSearchParams(`${window.location.search || ''}&${(window.location.hash || '').replace(/^#/, '')}`);
+    const code = params.get('error_code') || params.get('error');
+    const description = params.get('error_description') || params.get('error');
+    if (!code && !description) return '';
+    if (/expired|invalid|otp|token|access_denied/i.test(`${code} ${description}`)) {
+      return '인증 링크가 만료됐거나 이미 사용된 링크입니다. 같은 메일함에 최신 링크가 있으면 그 링크를 누르고, 없다면 잠시 뒤 인증 링크를 다시 받아주세요.';
+    }
+    return `인증 링크 처리 중 문제가 생겼습니다: ${description || code}`;
+  }
+
+  function cleanAuthUrlError() {
+    if (!authUrlError()) return;
+    history.replaceState(null, document.title, window.location.pathname + window.location.search.replace(/[?&](error|error_code|error_description)=[^&]*/g, ''));
+  }
+
   function loadSupabase() {
     return new Promise((resolve, reject) => {
       if (window.supabase?.createClient) return resolve(window.supabase);
@@ -266,6 +282,13 @@
       <p>이메일 인증과 승인 상태를 확인하고 있습니다.</p>
     `);
     try {
+      const linkError = authUrlError();
+      if (linkError) {
+        renderLogin();
+        statusMessage(linkError);
+        cleanAuthUrlError();
+        return;
+      }
       const supabase = await getClient();
       const { data } = await supabase.auth.getSession();
       state.session = data?.session || null;

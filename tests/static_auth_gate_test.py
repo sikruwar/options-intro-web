@@ -46,3 +46,9 @@ def test_auth_rate_limit_message_is_friendly():
     assert 'authErrorMessage' in js
     assert '인증 메일 요청이 잠시 제한됐습니다' in js
     assert 'secondsUntilOtpRetry' in js
+
+
+def test_expired_magic_link_message_is_friendly():
+    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
+    assert 'authUrlError' in js
+    assert '인증 링크가 만료됐거나 이미 사용된 링크입니다' in js
