@@ -19,10 +19,10 @@ def test_protected_pages_load_gate_after_config():
         assert html.index('auth-config.js') < html.index('auth-gate.js')
 
 
-def test_public_index_links_to_admin_and_request_flow():
+def test_public_index_hides_admin_link_and_request_copy():
     html = (ROOT / 'index.html').read_text(encoding='utf-8')
-    assert 'admin.html' in html
-    assert '승인' in html
+    assert 'admin.html' not in html
+    assert '접근 제한을 켜면' not in html
 
 
 def test_admin_page_loads_admin_script():
