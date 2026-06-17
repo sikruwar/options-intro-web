@@ -123,18 +123,73 @@
     .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
     .reveal.visible { opacity:1; transform:none; }
 
-    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-    .figure-points .mini-card { min-height:112px; }
-    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
-    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
-    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
-    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
-    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
-    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+
+    .viz-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
+    .viz-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:18px; min-width:0; }
+    .viz-panel.accent { background:linear-gradient(135deg,rgba(245,177,76,.11),rgba(125,211,252,.06)),var(--bg-card2); border-color:var(--border-light); }
+    .viz-panel h4 { font-size:15px; line-height:1.42; color:var(--text); margin:0 0 12px; }
+    .viz-copy { color:var(--text-muted); font-size:13px; line-height:1.62; margin:8px 0 0; overflow-wrap:anywhere; }
+    .viz-svg { width:100%; min-height:238px; display:block; overflow:visible; }
+    .viz-axis { stroke:var(--border-light); stroke-width:1; }
+    .viz-gridline { stroke:var(--border); stroke-width:1; opacity:.72; }
+    .viz-line { fill:none; stroke:var(--amber); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .viz-line.blue { stroke:var(--blue); }
+    .viz-line.green { stroke:var(--green); }
+    .viz-line.red { stroke:var(--red); }
+    .viz-area { fill:rgba(245,177,76,.13); }
+    .viz-label { font-family:'JetBrains Mono', monospace; font-size:10px; fill:var(--text-muted); }
+    .viz-number { font-family:'JetBrains Mono', monospace; font-size:13px; fill:var(--text); font-weight:700; }
+    .viz-dot { fill:var(--amber); stroke:var(--bg-card); stroke-width:3; }
+    .viz-dot.blue { fill:var(--blue); }
+    .viz-dot.green { fill:var(--green); }
+    .viz-dot.red { fill:var(--red); }
+    .viz-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .viz-metric { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:13px; min-width:0; }
+    .viz-metric span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:6px; text-transform:uppercase; }
+    .viz-metric strong { display:block; color:var(--text); font-size:17px; line-height:1.3; overflow-wrap:anywhere; }
+    .viz-metric small { display:block; margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+    .viz-range { margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); }
+    .viz-range label { display:flex; align-items:baseline; justify-content:space-between; gap:12px; color:var(--text); font-weight:800; font-size:14px; }
+    .viz-range output { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:18px; }
+    .viz-range input[type="range"] { width:100%; margin-top:12px; accent-color:var(--amber); }
+    .viz-bars { display:grid; gap:10px; margin-top:12px; }
+    .viz-bar { display:grid; grid-template-columns:128px 1fr 62px; gap:10px; align-items:center; }
+    .viz-bar span { color:var(--text-muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+    .viz-bar b { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text); text-align:right; }
+    .viz-track { height:14px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; }
+    .viz-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--amber)); }
+    .viz-fill.good { background:linear-gradient(90deg,var(--green),var(--blue)); }
+    .viz-fill.bad { background:linear-gradient(90deg,var(--amber),var(--red)); }
+    .viz-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; margin-top:14px; }
+    .viz-step { border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); padding:14px; min-height:116px; position:relative; }
+    .viz-step::after { content:'→'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--amber); font-family:'JetBrains Mono', monospace; }
+    .viz-step:last-child::after { content:''; }
+    .viz-step span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+    .viz-step strong { display:block; color:var(--text); font-size:15px; line-height:1.4; }
+    .viz-step p { margin:8px 0 0; color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .viz-timeline { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .viz-time { border:1px solid var(--border); background:var(--bg-card2); border-radius:12px; padding:14px; min-height:120px; }
+    .viz-time span { display:block; font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:11px; margin-bottom:8px; }
+    .viz-time strong { color:var(--text); font-size:15px; line-height:1.35; }
+    .viz-time p { color:var(--text-muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .viz-matrix { width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--border); font-size:13px; }
+    .viz-matrix th,.viz-matrix td { border-bottom:1px solid var(--border); padding:12px; text-align:left; color:var(--text-muted); vertical-align:top; }
+    .viz-matrix th { background:var(--bg-card2); color:var(--text); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .viz-matrix tr:last-child td { border-bottom:0; }
+    .viz-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .viz-check { display:flex; gap:10px; align-items:flex-start; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-muted); font-size:13px; line-height:1.45; }
+    .viz-check input { margin-top:3px; accent-color:var(--amber); }
+    .viz-toggle { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .viz-toggle button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 12px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .viz-toggle button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .viz-note { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
+    .viz-pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .viz-pill { border:1px solid var(--border-light); border-radius:999px; padding:6px 10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
+    @media (max-width:760px) { .viz-grid,.viz-flow,.viz-timeline,.viz-checklist { grid-template-columns:1fr; } .viz-metrics { grid-template-columns:1fr; } .viz-step::after { display:none; } .viz-bar { grid-template-columns:1fr; } .viz-bar b { text-align:left; } .viz-svg { min-height:200px; } }
     .worksheet-answer { display:none; margin-top:14px; }
     .worksheet-answer.open { display:block; }
-    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
     @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
   </style>
 </head>
@@ -175,13 +230,12 @@
   <div class="fig">
     <div class="fig-label">Figure 01 — 외가격 옵션 위치 지도</div>
     <h3>외가격 옵션 위치 지도</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">current price 100. Call strikes 110, 120 are OTM. Put strikes 90, 80 are OTM. ATM reference 100.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“외가격은 지금 행사 가치가 없고, 가격은 시간, 변동성, 가능성에서 나온다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">Call / Put toggle. 선택 모드에 따라 외가격 구간 색상이 바뀐다.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig01ControlVal">50</span></div>
-          <input id="fig01Control" type="range" min="0" max="100" value="50" aria-label="외가격 옵션 위치 지도 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">현재가와 행사가의 거리로 콜/풋 외가격을 직관적으로 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
+      <div class="viz-panel"><h4>외가격 옵션 위치 지도</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>current price 100. Call strikes 110, 120 are OTM. Put strikes 90, 80 are OTM. ATM reference 100.</strong></div><div class="viz-metric"><span>판정</span><strong>“외가격은 지금 행사 가치가 없고, 가격은 시간, 변동성, 가능성에서 나온다.”</strong></div><div class="viz-metric"><span>주의</span><strong>Call / Put toggle. 선택 모드에 따라 외가격 구간 색상이 바뀐다.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    </div>
+
+    <div class="viz-note">현재가와 행사가의 거리로 콜/풋 외가격을 직관적으로 보여준다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-02">
@@ -234,77 +288,80 @@
   <div class="fig">
     <div class="fig-label">Figure 02 — 행사가 거리별 프리미엄과 손익분기점</div>
     <h3>행사가 거리별 프리미엄과 손익분기점</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">110콜 premium 1.20, breakeven 111.20, required move 11.2%. 120콜 premium 0.35, breakeven 120.35, required move 20.35%. 90풋 premium 1.10, breakeven 88.90, required move -11.1%. 80풋 premium 0.40, breakeven 79.60, required move -20.4%.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 현재가 100, 만기 30일. 변화: 행사가 거리와 프리미엄.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">option selector. 선택한 옵션의 손익분기점과 필요한 이동률을 강조한다.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
-          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="행사가 거리별 프리미엄과 손익분기점 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">더 먼 행사가의 낮은 프리미엄과 더 큰 요구 이동폭을 같이 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
+      <div class="viz-panel"><h4>행사가 거리별 프리미엄과 손익분기점</h4><p class="viz-copy">더 먼 행사가의 낮은 프리미엄과 더 큰 요구 이동폭을 같이 보여준다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>110콜 premium 1.20, breakeven 111.20, required move 11.2%. 120콜 premium 0.35, breakeven 120.35, required move 20.35%. 90풋 premium 1.10, breakeven 88.90, required move -11.1%. 80풋 premium 0.40, breakeven 79.60, required mo…</strong></div><div class="viz-metric"><span>판정</span><strong>“고정: 현재가 100, 만기 30일. 변화: 행사가 거리와 프리미엄.”</strong></div><div class="viz-metric"><span>주의</span><strong>option selector. 선택한 옵션의 손익분기점과 필요한 이동률을 강조한다.</strong></div></div></div>
+    </div>
+    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>102</output></label><input type="range" min="80" max="130" value="102" aria-label="만기 주가 조정"></div>
+
+    <div class="viz-note">더 먼 행사가의 낮은 프리미엄과 더 큰 요구 이동폭을 같이 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-03">
   <div class="fig">
     <div class="fig-label">Figure 03 — 외가격 콜 매수 payoff calculator</div>
     <h3>외가격 콜 매수 payoff calculator</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S0=100, K=120, premium=0.35, expiration price range 90~135. Profit = max(S-K,0)-0.35. Breakeven 120.35.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“119달러에서는 -35달러, 130달러에서는 +965달러.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration price 슬라이더. 옵션당 손익, 1계약 손익, 투자금 대비 배수를 표시한다.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
-          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="외가격 콜 매수 payoff calculator 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">작은 프리미엄, 0이 되는 결과, 큰 배수가 같은 구조에 있음을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
+      <div class="viz-panel"><h4>외가격 콜 매수 payoff calculator</h4><p class="viz-copy">작은 프리미엄, 0이 되는 결과, 큰 배수가 같은 구조에 있음을 보여준다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>S0=100, K=120, premium=0.35, expiration price range 90~135. Profit = max(S-K,0)-0.35. Breakeven 120.35.</strong></div><div class="viz-metric"><span>판정</span><strong>“119달러에서는 -35달러, 130달러에서는 +965달러.”</strong></div><div class="viz-metric"><span>주의</span><strong>expiration price slider. 옵션당 손익, 1계약 손익, 투자금 대비 배수를 표시한다.</strong></div></div></div>
+    </div>
+    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>103</output></label><input type="range" min="80" max="130" value="103" aria-label="만기 주가 조정"></div>
+
+    <div class="viz-note">작은 프리미엄, 0이 되는 결과, 큰 배수가 같은 구조에 있음을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-04">
   <div class="fig">
     <div class="fig-label">Figure 04 — 외가격 풋 매도 tail-loss calculator</div>
     <h3>외가격 풋 매도 tail-loss calculator</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S0=100, K=80, premium=0.40, contracts=10, expiration price range 50~110. Profit per option = 0.40 - max(80-S,0). At S=70, total P/L -9,600 dollars.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 수취 프리미엄 400달러. 변화: 만기 주가.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">expiration price 슬라이더 and contracts selector 1~20.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig04ControlVal">50</span></div>
-          <input id="fig04Control" type="range" min="0" max="100" value="50" aria-label="외가격 풋 매도 tail-loss calculator 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">작은 수취 프리미엄이 큰 하락 손실로 바뀌는 구조를 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
+      <div class="viz-panel"><h4>외가격 풋 매도 tail-loss calculator</h4><p class="viz-copy">작은 수취 프리미엄이 큰 하락 손실로 바뀌는 구조를 보여준다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>S0=100, K=80, premium=0.40, contracts=10, expiration price range 50~110. Profit per option = 0.40 - max(80-S,0). At S=70, total P/L -9,600 dollars.</strong></div><div class="viz-metric"><span>판정</span><strong>“고정: 수취 프리미엄 400달러. 변화: 만기 주가.”</strong></div><div class="viz-metric"><span>주의</span><strong>expiration price slider and contracts selector 1~20.</strong></div></div></div>
+    </div>
+    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>104</output></label><input type="range" min="80" max="130" value="104" aria-label="만기 주가 조정"></div>
+
+    <div class="viz-note">작은 수취 프리미엄이 큰 하락 손실로 바뀌는 구조를 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-05">
   <div class="fig">
     <div class="fig-label">Figure 05 — 낮은 델타와 감마 가속 사다리</div>
     <h3>낮은 델타와 감마 가속 사다리</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">120콜 example: S=100 delta 0.08, S=110 delta 0.22, S=118 delta 0.45, S=122 delta 0.62. Educational approximation.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“행사가에 가까워질수록 옵션의 방향 민감도가 빨라질 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">stock price buttons 100, 110, 118, 122. 델타 카드와 curve marker가 업데이트된다.</p></div></div>
-    
-    <div class="fig-caption">낮은 델타가 고정된 안전 신호가 아님을 보여준다.</div>
+    <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line green" d="M72 188 C160 82, 250 82, 330 136 S488 206, 560 72"/><circle class="viz-dot green" cx="72" cy="188" r="7"/><circle class="viz-dot" cx="330" cy="136" r="7"/><circle class="viz-dot red" cx="560" cy="72" r="7"/><text class="viz-label" x="62" y="34">flow chart</text><text class="viz-number" x="342" y="132">재조정 지점</text></svg></div>
+    <div class="viz-flow"><div class="viz-step"><span>STEP 1</span><strong>가격 변화</strong><p>delta ladder / curve hybrid.</p></div><div class="viz-step"><span>STEP 2</span><strong>민감도 변화</strong><p>“행사가에 가까워질수록 옵션의 방향 민감도가 빨라질 수 있다.”</p></div><div class="viz-step"><span>STEP 3</span><strong>포지션 조정</strong><p>120콜 example: S=100 delta 0.08, S=110 delta 0.22, S=118 delta 0.45, S=122 delta 0.62. Educational approximation.</p></div><div class="viz-step"><span>STEP 4</span><strong>계좌 영향</strong><p>stock price buttons 100, 110, 118, 122. 델타 카드와 curve marker가 업데이트된다.</p></div></div>
+
+    <div class="viz-note">낮은 델타가 고정된 안전 신호가 아님을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-06">
   <div class="fig">
     <div class="fig-label">Figure 06 — 기대 가치 미니 실험</div>
     <h3>기대 가치 미니 실험</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">success probability 3%, success payoff 10.00, failure probability 97%, failure payoff 0, expected value 0.30, market premium 0.35.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“단순 두 결과 모형. 현실 옵션 가격은 더 많은 만기 가격과 IV를 반영한다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">probability 슬라이더 1~10%, success payoff input 5~20. EV와 premium difference를 계산한다.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
-          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="기대 가치 미니 실험 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">큰 배수 가능성과 지불 가격을 기대 가치로 비교하게 한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
+      <div class="viz-panel"><h4>기대 가치 미니 실험</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>success probability 3%, success payoff 10.00, failure probability 97%, failure payoff 0, expected value 0.30, market premium 0.35.</strong></div><div class="viz-metric"><span>판정</span><strong>“단순 두 결과 모형. 현실 옵션 가격은 더 많은 만기 가격과 IV를 반영한다.”</strong></div><div class="viz-metric"><span>주의</span><strong>probability slider 1~10%, success payoff input 5~20. EV와 premium difference를 계산한다.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    </div>
+
+    <div class="viz-note">큰 배수 가능성과 지불 가격을 기대 가치로 비교하게 한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-07">
   <div class="fig">
     <div class="fig-label">Figure 07 — 계약 수가 리스크를 키우는 position-size scaler</div>
     <h3>계약 수가 리스크를 키우는 position-size scaler</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">premium 0.35, multiplier 100, contracts 1/5/20/100. Max loss for buyer: 35/175/700/3,500 dollars. Account size input default 50,000 dollars; risk % displayed.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“포지션 크기는 옵션 한 개 가격보다 계좌 대비 손실액으로 본다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">contracts 슬라이더 1~100 and account size input.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig07ControlVal">50</span></div>
-          <input id="fig07Control" type="range" min="0" max="100" value="50" aria-label="계약 수가 리스크를 키우는 position-size scaler 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">작은 프리미엄도 계약 수가 커지면 계좌 리스크가 커지는 것을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
+      <div class="viz-panel"><h4>계약 수가 리스크를 키우는 position-size scaler</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>premium 0.35, multiplier 100, contracts 1/5/20/100. Max loss for buyer: 35/175/700/3,500 dollars. Account size input default 50,000 dollars; risk % displayed.</strong></div><div class="viz-metric"><span>판정</span><strong>“포지션 크기는 옵션 한 개 가격보다 계좌 대비 손실액으로 본다.”</strong></div><div class="viz-metric"><span>주의</span><strong>contracts slider 1~100 and account size input.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    </div>
+
+    <div class="viz-note">작은 프리미엄도 계약 수가 커지면 계좌 리스크가 커지는 것을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-08">
   <div class="fig">
     <div class="fig-label">Figure 08 — 외가격 매수자와 매도자 사고 비교</div>
     <h3>외가격 매수자와 매도자 사고 비교</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Buyer sees low cost, convex payoff, max loss premium, frequent zero risk. Seller sees premium income, low probability, short gamma/vega, tail loss and margin risk.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“같은 계약의 양쪽은 서로 다른 리스크를 받는다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">none required. 모바일에서는 세로 card stack.</p></div></div>
-    
-    <div class="fig-caption">같은 외가격 옵션을 매수자와 매도자가 서로 다른 유혹으로 보는 구조를 정리한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="110" y="111" width="70" height="99" rx="8" fill="var(--blue)"/><text class="viz-label" x="118" y="234">A</text><rect x="240" y="88" width="70" height="122" rx="8" fill="var(--amber)"/><text class="viz-label" x="248" y="234">B</text><rect x="370" y="127" width="70" height="83" rx="8" fill="var(--red)"/><text class="viz-label" x="378" y="234">C</text><text class="viz-label" x="62" y="34">bar chart</text></svg></div>
+      <div class="viz-panel"><h4>외가격 매수자와 매도자 사고 비교</h4><div class="viz-bars"><div class="viz-bar"><span>기준</span><div class="viz-track"><div class="viz-fill " style="width:62%"></div></div><b>62%</b></div><div class="viz-bar"><span>비교</span><div class="viz-track"><div class="viz-fill good" style="width:76%"></div></div><b>76%</b></div><div class="viz-bar"><span>위험</span><div class="viz-track"><div class="viz-fill bad" style="width:52%"></div></div><b>52%</b></div></div><p class="viz-copy">Buyer sees low cost, convex payoff, max loss premium, frequent zero risk. Seller sees premium income, low probability, short gamma/vega, tail loss and margin risk.</p></div>
+    </div>
+    <div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>Buyer sees low cost, convex payoff, max loss premium, frequent zero risk. Seller sees premium income, low probability, short gamma/vega, tail loss and margin risk.</strong></div><div class="viz-metric"><span>판정</span><strong>“같은 계약의 양쪽은 서로 다른 리스크를 받는다.”</strong></div><div class="viz-metric"><span>주의</span><strong>none required. 모바일에서는 세로 card stack.</strong></div></div>
+
+    <div class="viz-note">같은 외가격 옵션을 매수자와 매도자가 서로 다른 유혹으로 보는 구조를 정리한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-05">
@@ -379,13 +436,12 @@
   <div class="fig">
     <div class="fig-label">Figure 09 — 외가격 옵션 체크 워크시트</div>
     <h3>외가격 옵션 체크 워크시트</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">option type, current price, strike, premium, expiration days, delta, contracts, account size, breakeven, required move %, max loss or tail scenario loss, IV/event note, exit rule.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 기록지이며 매매 지시서가 아니다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p"><code>예시 채우기</code>, <code>비우기</code>, <code>손익분기점 계산</code>, <code>필요 이동률 계산</code>, <code>계좌 대비 리스크 계산</code> 버튼. 외부 전송 금지, localStorage 저장은 선택 사항.</p></div><div class="mini-card"><div class="mini-k">모바일</div><p class="mini-p">입력칸 1열, button/input height 44px 이상.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
-          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="외가격 옵션 체크 워크시트 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">학습자가 외가격 옵션을 보기 전 손익분기점, 필요한 이동률, 델타, 감마, 포지션 크기를 기록하게 한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>외가격 옵션 체크 워크시트</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>option type, current price, strike, premium, expiration days, delta, contracts, account size, breakeven, required move %, max loss or tail scenario loss, IV/event note, exit rule.</span></label><label class="viz-check"><input type="checkbox"><span>“교육용 기록지이며 매매 지시서가 아니다.”</span></label><label class="viz-check"><input type="checkbox"><span>예시 채우기, 비우기, 손익분기점 계산, 필요 이동률 계산, 계좌 대비 리스크 계산 버튼. 외부 전송 금지, localStorage 저장은 선택 사항.</span></label><label class="viz-check"><input type="checkbox"><span>학습자가 외가격 옵션을 보기 전 손익분기점, 필요한 이동률, 델타, 감마, 포지션 크기를 기록하게 한다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">학습자가 외가격 옵션을 보기 전 손익분기점, 필요한 이동률, 델타, 감마, 포지션 크기를 기록하게 한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-08">
@@ -436,16 +492,21 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-document.querySelectorAll('[data-control-demo]').forEach((box) => {
+document.querySelectorAll('[data-viz-range]').forEach((box) => {
   const input = box.querySelector('input[type="range"]');
-  const output = box.querySelector('.control-value');
-  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+  const output = box.querySelector('[data-range-out]');
+  if (input && output) {
+    const render = () => { output.textContent = input.value; };
+    input.addEventListener('input', render);
+    render();
+  }
 });
-document.querySelectorAll('[data-segmented]').forEach((group) => {
+document.querySelectorAll('[data-viz-toggle]').forEach((group) => {
   group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
     group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
   }));
 });
+
 
 </script>
 </body>

@@ -123,18 +123,73 @@
     .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
     .reveal.visible { opacity:1; transform:none; }
 
-    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-    .figure-points .mini-card { min-height:112px; }
-    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
-    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
-    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
-    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
-    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
-    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+
+    .viz-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
+    .viz-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:18px; min-width:0; }
+    .viz-panel.accent { background:linear-gradient(135deg,rgba(245,177,76,.11),rgba(125,211,252,.06)),var(--bg-card2); border-color:var(--border-light); }
+    .viz-panel h4 { font-size:15px; line-height:1.42; color:var(--text); margin:0 0 12px; }
+    .viz-copy { color:var(--text-muted); font-size:13px; line-height:1.62; margin:8px 0 0; overflow-wrap:anywhere; }
+    .viz-svg { width:100%; min-height:238px; display:block; overflow:visible; }
+    .viz-axis { stroke:var(--border-light); stroke-width:1; }
+    .viz-gridline { stroke:var(--border); stroke-width:1; opacity:.72; }
+    .viz-line { fill:none; stroke:var(--amber); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .viz-line.blue { stroke:var(--blue); }
+    .viz-line.green { stroke:var(--green); }
+    .viz-line.red { stroke:var(--red); }
+    .viz-area { fill:rgba(245,177,76,.13); }
+    .viz-label { font-family:'JetBrains Mono', monospace; font-size:10px; fill:var(--text-muted); }
+    .viz-number { font-family:'JetBrains Mono', monospace; font-size:13px; fill:var(--text); font-weight:700; }
+    .viz-dot { fill:var(--amber); stroke:var(--bg-card); stroke-width:3; }
+    .viz-dot.blue { fill:var(--blue); }
+    .viz-dot.green { fill:var(--green); }
+    .viz-dot.red { fill:var(--red); }
+    .viz-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .viz-metric { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:13px; min-width:0; }
+    .viz-metric span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:6px; text-transform:uppercase; }
+    .viz-metric strong { display:block; color:var(--text); font-size:17px; line-height:1.3; overflow-wrap:anywhere; }
+    .viz-metric small { display:block; margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+    .viz-range { margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); }
+    .viz-range label { display:flex; align-items:baseline; justify-content:space-between; gap:12px; color:var(--text); font-weight:800; font-size:14px; }
+    .viz-range output { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:18px; }
+    .viz-range input[type="range"] { width:100%; margin-top:12px; accent-color:var(--amber); }
+    .viz-bars { display:grid; gap:10px; margin-top:12px; }
+    .viz-bar { display:grid; grid-template-columns:128px 1fr 62px; gap:10px; align-items:center; }
+    .viz-bar span { color:var(--text-muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+    .viz-bar b { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text); text-align:right; }
+    .viz-track { height:14px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; }
+    .viz-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--amber)); }
+    .viz-fill.good { background:linear-gradient(90deg,var(--green),var(--blue)); }
+    .viz-fill.bad { background:linear-gradient(90deg,var(--amber),var(--red)); }
+    .viz-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; margin-top:14px; }
+    .viz-step { border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); padding:14px; min-height:116px; position:relative; }
+    .viz-step::after { content:'→'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--amber); font-family:'JetBrains Mono', monospace; }
+    .viz-step:last-child::after { content:''; }
+    .viz-step span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+    .viz-step strong { display:block; color:var(--text); font-size:15px; line-height:1.4; }
+    .viz-step p { margin:8px 0 0; color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .viz-timeline { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .viz-time { border:1px solid var(--border); background:var(--bg-card2); border-radius:12px; padding:14px; min-height:120px; }
+    .viz-time span { display:block; font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:11px; margin-bottom:8px; }
+    .viz-time strong { color:var(--text); font-size:15px; line-height:1.35; }
+    .viz-time p { color:var(--text-muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .viz-matrix { width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--border); font-size:13px; }
+    .viz-matrix th,.viz-matrix td { border-bottom:1px solid var(--border); padding:12px; text-align:left; color:var(--text-muted); vertical-align:top; }
+    .viz-matrix th { background:var(--bg-card2); color:var(--text); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .viz-matrix tr:last-child td { border-bottom:0; }
+    .viz-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .viz-check { display:flex; gap:10px; align-items:flex-start; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-muted); font-size:13px; line-height:1.45; }
+    .viz-check input { margin-top:3px; accent-color:var(--amber); }
+    .viz-toggle { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .viz-toggle button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 12px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .viz-toggle button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .viz-note { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
+    .viz-pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .viz-pill { border:1px solid var(--border-light); border-radius:999px; padding:6px 10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
+    @media (max-width:760px) { .viz-grid,.viz-flow,.viz-timeline,.viz-checklist { grid-template-columns:1fr; } .viz-metrics { grid-template-columns:1fr; } .viz-step::after { display:none; } .viz-bar { grid-template-columns:1fr; } .viz-bar b { text-align:left; } .viz-svg { min-height:200px; } }
     .worksheet-answer { display:none; margin-top:14px; }
     .worksheet-answer.open { display:block; }
-    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
     @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
   </style>
 </head>
@@ -175,9 +230,12 @@
   <div class="fig">
     <div class="fig-label">Figure 01 — 전체 여정 맵: 권리에서 시장 언어까지</div>
     <h3>전체 여정 맵: 권리에서 시장 언어까지</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">6개 구간 타임라인. 동기 점검, 계약 구조, 가격 구조, 그릭스, 전략, 헷지, 시장 구조, 사용 원칙.</p></div><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">각 구간에 대표 회차와 대표 질문 1개씩 표시.</p></div><div class="mini-card"><div class="mini-k">시각</div><p class="mini-p">dark-first 배경에 muted blue 라인, 완료 구간은 olive glow를 아주 약하게 사용.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">구간 마우스오버/tap 시 “이 구간이 투자 판단에서 바뀌게 하는 질문”을 표시.</p></div></div>
-    
-    <div class="fig-caption">프롤로그부터 30회차까지의 학습 흐름을 한 장으로 회수한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
+      <div class="viz-panel"><h4>전체 여정 맵: 권리에서 시장 언어까지</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>각 구간에 대표 회차와 대표 질문 1개씩 표시.</strong></div><div class="viz-metric"><span>판정</span><strong>손익분기점과 남은 시간 확인</strong></div><div class="viz-metric"><span>주의</span><strong>구간 hover/tap 시 “이 구간이 투자 판단에서 바뀌게 하는 질문”을 표시.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    </div>
+
+    <div class="viz-note">프롤로그부터 30회차까지의 학습 흐름을 한 장으로 회수한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-02">
@@ -226,61 +284,76 @@
   <div class="fig">
     <div class="fig-label">Figure 02 — 옵션 학습 전후 시장 해석 비교</div>
     <h3>옵션 학습 전후 시장 해석 비교</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">좌측은 “주가 상승/하락 중심” 카드, 우측은 방향, 시간, 변동성, 포지션, 유동성 5축 카드.</p></div><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">예시 뉴스 “실적 후 주가 +5%, IV 60%에서 35%로 하락”.</p></div><div class="mini-card"><div class="mini-k">해석 좌표</div><p class="mini-p">주가 상승만 보면 놓치기 쉬운 IV와 시간가치 변화를 함께 읽는다.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">토글로 학습 전/후 설명 문장을 전환한다.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
-          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="옵션 학습 전후 시장 해석 비교 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">같은 시장 뉴스를 옵션 학습 전후에 어떻게 다르게 읽는지 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="92" y="86" width="144" height="102" rx="14" fill="rgba(125,211,252,.16)" stroke="var(--blue)"/><rect x="384" y="122" width="144" height="66" rx="14" fill="rgba(239,68,68,.14)" stroke="var(--red)"/><path class="viz-line" d="M250 138 L360 138"/><text class="viz-number" x="120" y="130">전</text><text class="viz-number" x="414" y="156">후</text><text class="viz-label" x="62" y="34">before / after panel</text></svg></div>
+      <div class="viz-panel"><h4>옵션 학습 전후 시장 해석 비교</h4><div class="viz-toggle" data-viz-toggle><button type="button" class="active">전</button><button type="button">후</button><button type="button">차이</button></div><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>예시 뉴스 “실적 후 주가 +5%, IV 60%에서 35%로 하락”.</strong></div><div class="viz-metric"><span>판정</span><strong>고정한 것은 주가 상승, 바뀐 것은 IV와 시간가치.</strong></div><div class="viz-metric"><span>주의</span><strong>토글로 학습 전/후 설명 문장을 전환한다.</strong></div></div></div>
+    </div>
+
+    <div class="viz-note">같은 시장 뉴스를 옵션 학습 전후에 어떻게 다르게 읽는지 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-03">
   <div class="fig">
     <div class="fig-label">Figure 03 — 시장 변수 번역기: 뉴스에서 가격 변수로</div>
     <h3>시장 변수 번역기: 뉴스에서 가격 변수로</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">FOMC, CPI, 실적, 신용불안, 급등 랠리, 횡보장 6개 뉴스 카드. 각 카드가 IV, 스큐, 기간구조, 감마, 세타로 연결된다.</p></div><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">정량 데이터 없음. 각 연결선에 “보험료 상승”, “단기 변동성 집중”, “시간가치 소진” 같은 라벨.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">카드를 클릭하면 관련 변수와 투자자 질문이 열린다.</p></div></div>
-    
-    <div class="fig-caption">뉴스가 옵션 변수로 어떻게 번역되는지 연습한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
+      <div class="viz-panel"><h4>시장 변수 번역기: 뉴스에서 가격 변수로</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>정량 데이터 없음. 각 연결선에 “보험료 상승”, “단기 변동성 집중”, “시간가치 소진” 같은 라벨.</strong></div><div class="viz-metric"><span>판정</span><strong>손익분기점과 남은 시간 확인</strong></div><div class="viz-metric"><span>주의</span><strong>카드를 클릭하면 관련 변수와 투자자 질문이 열린다.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    </div>
+
+    <div class="viz-note">뉴스가 옵션 변수로 어떻게 번역되는지 연습한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-04">
   <div class="fig">
     <div class="fig-label">Figure 04 — VIX, 스큐, 기간구조 읽기 대시보드</div>
     <h3>VIX, 스큐, 기간구조 읽기 대시보드</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">VIX level, term structure, downside skew, event IV 네 패널.</p></div><div class="mini-card"><div class="mini-k">기본값</div><p class="mini-p">VIX 18, 근월 변동성 20, 3개월 변동성 17, 25-delta put skew +6 vol point.</p></div><div class="mini-card"><div class="mini-k">해석 좌표</div><p class="mini-p">같은 지수라도 만기와 행사가에 따라 보험료가 다르게 붙는다.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">값을 바꾸면 “단기 긴장”, “하방 보호 비쌈”, “보험료 안정” 같은 중립 라벨이 바뀐다.</p></div></div>
-    
-    <div class="fig-caption">직접 옵션 매매 없이도 쓸 수 있는 변동성 시장 읽기 루틴을 제공한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="92" y="86" width="144" height="102" rx="14" fill="rgba(125,211,252,.16)" stroke="var(--blue)"/><rect x="384" y="122" width="144" height="66" rx="14" fill="rgba(239,68,68,.14)" stroke="var(--red)"/><path class="viz-line" d="M250 138 L360 138"/><text class="viz-number" x="120" y="130">전</text><text class="viz-number" x="414" y="156">후</text><text class="viz-label" x="62" y="34">before / after panel</text></svg></div>
+      <div class="viz-panel"><h4>VIX, 스큐, 기간구조 읽기 대시보드</h4><div class="viz-toggle" data-viz-toggle><button type="button" class="active">전</button><button type="button">후</button><button type="button">차이</button></div><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>VIX 18, 근월 변동성 20, 3개월 변동성 17, 25-delta put skew +6 vol point.</strong></div><div class="viz-metric"><span>판정</span><strong>고정한 것은 같은 지수, 바뀐 것은 만기와 행사가별 보험료.</strong></div><div class="viz-metric"><span>주의</span><strong>값을 바꾸면 “단기 긴장”, “하방 보호 비쌈”, “보험료 안정” 같은 중립 라벨이 바뀐다.</strong></div></div></div>
+    </div>
+
+    <div class="viz-note">직접 옵션 매매 없이도 쓸 수 있는 변동성 시장 읽기 루틴을 제공한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-05">
   <div class="fig">
     <div class="fig-label">Figure 05 — 포트폴리오 적용 지도: 매매, 헷지, 해석</div>
     <h3>포트폴리오 적용 지도: 매매, 헷지, 해석</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">중앙에 “옵션 지식” 노드. 세 방향으로 직접 매매, 포트폴리오 보호, 시장 해석 가지를 만든다.</p></div><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">직접 매매=손실 한도, 유동성, 청산 조건, 보호=보험료, 보호 기간, 하방 기준, 해석=VIX, 스큐, 감마, IV crush.</p></div><div class="mini-card"><div class="mini-k">한국 투자자 체크</div><p class="mini-p">세금, 환율, 브로커 승인 레벨, 시장별 계약 명세를 실행 전 별도로 확인한다.</p></div><div class="mini-card"><div class="mini-k">시각</div><p class="mini-p">직접 매매는 amber caution, 보호는 green, 해석은 blue.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">사용 경로를 선택하면 필요한 최소 체크리스트가 표시된다.</p></div></div>
-    
-    <div class="fig-caption">옵션 지식을 세 가지 사용 경로로 분리한다.</div>
+    <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line green" d="M72 188 C160 82, 250 82, 330 136 S488 206, 560 72"/><circle class="viz-dot green" cx="72" cy="188" r="7"/><circle class="viz-dot" cx="330" cy="136" r="7"/><circle class="viz-dot red" cx="560" cy="72" r="7"/><text class="viz-label" x="62" y="34">flow chart</text><text class="viz-number" x="342" y="132">재조정 지점</text></svg></div>
+    <div class="viz-flow"><div class="viz-step"><span>STEP 1</span><strong>가격 변화</strong><p>중앙에 “옵션 지식” 노드. 세 방향으로 직접 매매, 포트폴리오 보호, 시장 해석 가지를 만든다.</p></div><div class="viz-step"><span>STEP 2</span><strong>민감도 변화</strong><p>다음 단계의 리스크가 계좌에 전달됩니다.</p></div><div class="viz-step"><span>STEP 3</span><strong>포지션 조정</strong><p>직접 매매=손실 한도, 유동성, 청산 조건, 보호=보험료, 보호 기간, 하방 기준, 해석=VIX, 스큐, 감마, IV crush. 한국 투자자 추가 체크=세금, 환율, 브로커, 시장별 계약 명세.</p></div><div class="viz-step"><span>STEP 4</span><strong>계좌 영향</strong><p>사용 경로를 선택하면 필요한 최소 체크리스트가 표시된다.</p></div></div>
+
+    <div class="viz-note">옵션 지식을 세 가지 사용 경로로 분리한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-06">
   <div class="fig">
     <div class="fig-label">Figure 06 — 대응 수단 비교 테이블: 매도, 축소, 풋, 현금</div>
     <h3>대응 수단 비교 테이블: 매도, 축소, 풋, 현금</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">50,000달러 지수 ETF 보유 사례에서 네 선택을 비교. 아무 행동 없음, 20% 현금화, 5% OTM 풋 매수, 비중 10% 축소.</p></div><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">풋 보험료 1.5%=750달러, 20% 현금화=10,000달러, 10% 축소=5,000달러.</p></div><div class="mini-card"><div class="mini-k">해석 좌표</div><p class="mini-p">같은 하락 불안을 두고 비용, 방어력, 상승 참여도를 비교한다.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">하락률 -5%, -10%, -20%를 선택하면 결과 설명이 바뀐다.</p></div></div>
-    
-    <div class="fig-caption">하락 불안에 대한 여러 선택을 계좌 결과로 비교한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>대응 수단 비교 테이블: 매도, 축소, 풋, 현금</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>풋 보험료 1.5%=750달러, 20% 현금화=10,000달러, 10% 축소=5,000달러.</span></label><label class="viz-check"><input type="checkbox"><span>고정한 것은 같은 하락 불안, 바뀐 것은 비용과 상승 참여도.</span></label><label class="viz-check"><input type="checkbox"><span>하락률 -5%, -10%, -20%를 선택하면 결과 설명이 바뀐다.</span></label><label class="viz-check"><input type="checkbox"><span>하락 불안에 대한 여러 선택을 계좌 결과로 비교한다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">하락 불안에 대한 여러 선택을 계좌 결과로 비교한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-07">
   <div class="fig">
     <div class="fig-label">Figure 07 — 옵션 미사용 원칙 카드</div>
     <h3>옵션 미사용 원칙 카드</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">“직접 거래 보류”, “시장 해석에 사용”, “포트폴리오 비중 조절 우선”, “설명 불가 포지션 금지” 4개 카드.</p></div><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">정량 데이터 없음.</p></div><div class="mini-card"><div class="mini-k">시각</div><p class="mini-p">차분한 slate/olive 카드. 과한 경고 색을 피한다.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">각 카드에 사용자가 자기 원칙 한 줄을 입력할 수 있게 한다.</p></div></div>
-    
-    <div class="fig-caption">옵션을 쓰지 않는 선택도 완성된 투자 원칙이 될 수 있음을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>옵션 미사용 원칙 카드</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>정량 데이터 없음.</span></label><label class="viz-check"><input type="checkbox"><span>설명할 수 없는 포지션은 보류합니다.</span></label><label class="viz-check"><input type="checkbox"><span>각 카드에 사용자가 자기 원칙 한 줄을 입력할 수 있게 한다.</span></label><label class="viz-check"><input type="checkbox"><span>옵션을 쓰지 않는 선택도 완성된 투자 원칙이 될 수 있음을 보여준다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">옵션을 쓰지 않는 선택도 완성된 투자 원칙이 될 수 있음을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-08">
   <div class="fig">
     <div class="fig-label">Figure 08 — 나의 옵션 사용 원칙 작성 워크시트</div>
     <h3>나의 옵션 사용 원칙 작성 워크시트</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">직접 매매 여부, 허용 목적, 손실 한도, 금지 구조, 대체 수단, 시황 활용 방식, 손실 시 금지 행동 입력칸.</p></div><div class="mini-card"><div class="mini-k">기본 예시</div><p class="mini-p">계좌 손실 한도 0.5%, 단순 매도 금지, VIX는 기간구조와 함께 읽기.</p></div><div class="mini-card"><div class="mini-k">출력</div><p class="mini-p">“내 옵션 원칙 7줄” 미리보기.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">예시 불러오기, 비우기, 인쇄용 보기, localStorage 임시 저장.</p></div></div>
-    
-    <div class="fig-caption">학습자가 강의 이후 행동 경계를 문서로 남긴다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>나의 옵션 사용 원칙 작성 워크시트</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>입력값과 계약 명세를 확인합니다.</span></label><label class="viz-check"><input type="checkbox"><span>“내 옵션 원칙 7줄” 미리보기.</span></label><label class="viz-check"><input type="checkbox"><span>예시 불러오기, 비우기, 인쇄용 보기, localStorage 임시 저장.</span></label><label class="viz-check"><input type="checkbox"><span>학습자가 강의 이후 행동 경계를 문서로 남긴다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">학습자가 강의 이후 행동 경계를 문서로 남긴다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-05">
@@ -330,9 +403,12 @@
   <div class="fig">
     <div class="fig-label">Figure 09 — 마지막 체크: 설명 가능한 포지션인가</div>
     <h3>마지막 체크: 설명 가능한 포지션인가</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">구성</div><p class="mini-p">6문항 체크. 목적, 기초자산, 만기, 손실 한도, 그릭스, 청산 조건.</p></div><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">체크 수 0~6에 따라 상태 문구 표시.</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">체크가 6개 모두 채워져도 추천 문구를 쓰지 않는다. “기록 완료, 계좌 기준 재확인” 정도로 표시한다.</p></div><div class="mini-card"><div class="mini-k">인쇄</div><p class="mini-p">워크시트와 함께 한 페이지로 출력 가능하게 한다.</p></div></div>
-    
-    <div class="fig-caption">강의 전체를 하나의 실행 전 질문으로 마무리한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
+      <div class="viz-panel"><h4>마지막 체크: 설명 가능한 포지션인가</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>체크 수 0~6에 따라 상태 문구 표시.</strong></div><div class="viz-metric"><span>판정</span><strong>손익분기점과 남은 시간 확인</strong></div><div class="viz-metric"><span>주의</span><strong>체크가 6개 모두 채워져도 추천 문구를 쓰지 않는다. “기록 완료, 계좌 기준 재확인” 정도로 표시한다.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    </div>
+
+    <div class="viz-note">강의 전체를 하나의 실행 전 질문으로 마무리한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-08">
@@ -386,16 +462,21 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-document.querySelectorAll('[data-control-demo]').forEach((box) => {
+document.querySelectorAll('[data-viz-range]').forEach((box) => {
   const input = box.querySelector('input[type="range"]');
-  const output = box.querySelector('.control-value');
-  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+  const output = box.querySelector('[data-range-out]');
+  if (input && output) {
+    const render = () => { output.textContent = input.value; };
+    input.addEventListener('input', render);
+    render();
+  }
 });
-document.querySelectorAll('[data-segmented]').forEach((group) => {
+document.querySelectorAll('[data-viz-toggle]').forEach((group) => {
   group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
     group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
   }));
 });
+
 
 </script>
 </body>

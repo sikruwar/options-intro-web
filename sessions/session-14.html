@@ -123,18 +123,73 @@
     .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
     .reveal.visible { opacity:1; transform:none; }
 
-    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-    .figure-points .mini-card { min-height:112px; }
-    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
-    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
-    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
-    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
-    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
-    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+
+    .viz-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
+    .viz-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:18px; min-width:0; }
+    .viz-panel.accent { background:linear-gradient(135deg,rgba(245,177,76,.11),rgba(125,211,252,.06)),var(--bg-card2); border-color:var(--border-light); }
+    .viz-panel h4 { font-size:15px; line-height:1.42; color:var(--text); margin:0 0 12px; }
+    .viz-copy { color:var(--text-muted); font-size:13px; line-height:1.62; margin:8px 0 0; overflow-wrap:anywhere; }
+    .viz-svg { width:100%; min-height:238px; display:block; overflow:visible; }
+    .viz-axis { stroke:var(--border-light); stroke-width:1; }
+    .viz-gridline { stroke:var(--border); stroke-width:1; opacity:.72; }
+    .viz-line { fill:none; stroke:var(--amber); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .viz-line.blue { stroke:var(--blue); }
+    .viz-line.green { stroke:var(--green); }
+    .viz-line.red { stroke:var(--red); }
+    .viz-area { fill:rgba(245,177,76,.13); }
+    .viz-label { font-family:'JetBrains Mono', monospace; font-size:10px; fill:var(--text-muted); }
+    .viz-number { font-family:'JetBrains Mono', monospace; font-size:13px; fill:var(--text); font-weight:700; }
+    .viz-dot { fill:var(--amber); stroke:var(--bg-card); stroke-width:3; }
+    .viz-dot.blue { fill:var(--blue); }
+    .viz-dot.green { fill:var(--green); }
+    .viz-dot.red { fill:var(--red); }
+    .viz-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .viz-metric { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:13px; min-width:0; }
+    .viz-metric span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:6px; text-transform:uppercase; }
+    .viz-metric strong { display:block; color:var(--text); font-size:17px; line-height:1.3; overflow-wrap:anywhere; }
+    .viz-metric small { display:block; margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+    .viz-range { margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); }
+    .viz-range label { display:flex; align-items:baseline; justify-content:space-between; gap:12px; color:var(--text); font-weight:800; font-size:14px; }
+    .viz-range output { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:18px; }
+    .viz-range input[type="range"] { width:100%; margin-top:12px; accent-color:var(--amber); }
+    .viz-bars { display:grid; gap:10px; margin-top:12px; }
+    .viz-bar { display:grid; grid-template-columns:128px 1fr 62px; gap:10px; align-items:center; }
+    .viz-bar span { color:var(--text-muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+    .viz-bar b { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text); text-align:right; }
+    .viz-track { height:14px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; }
+    .viz-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--amber)); }
+    .viz-fill.good { background:linear-gradient(90deg,var(--green),var(--blue)); }
+    .viz-fill.bad { background:linear-gradient(90deg,var(--amber),var(--red)); }
+    .viz-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; margin-top:14px; }
+    .viz-step { border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); padding:14px; min-height:116px; position:relative; }
+    .viz-step::after { content:'→'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--amber); font-family:'JetBrains Mono', monospace; }
+    .viz-step:last-child::after { content:''; }
+    .viz-step span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+    .viz-step strong { display:block; color:var(--text); font-size:15px; line-height:1.4; }
+    .viz-step p { margin:8px 0 0; color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .viz-timeline { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .viz-time { border:1px solid var(--border); background:var(--bg-card2); border-radius:12px; padding:14px; min-height:120px; }
+    .viz-time span { display:block; font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:11px; margin-bottom:8px; }
+    .viz-time strong { color:var(--text); font-size:15px; line-height:1.35; }
+    .viz-time p { color:var(--text-muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .viz-matrix { width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--border); font-size:13px; }
+    .viz-matrix th,.viz-matrix td { border-bottom:1px solid var(--border); padding:12px; text-align:left; color:var(--text-muted); vertical-align:top; }
+    .viz-matrix th { background:var(--bg-card2); color:var(--text); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .viz-matrix tr:last-child td { border-bottom:0; }
+    .viz-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .viz-check { display:flex; gap:10px; align-items:flex-start; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-muted); font-size:13px; line-height:1.45; }
+    .viz-check input { margin-top:3px; accent-color:var(--amber); }
+    .viz-toggle { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .viz-toggle button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 12px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .viz-toggle button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .viz-note { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
+    .viz-pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .viz-pill { border:1px solid var(--border-light); border-radius:999px; padding:6px 10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
+    @media (max-width:760px) { .viz-grid,.viz-flow,.viz-timeline,.viz-checklist { grid-template-columns:1fr; } .viz-metrics { grid-template-columns:1fr; } .viz-step::after { display:none; } .viz-bar { grid-template-columns:1fr; } .viz-bar b { text-align:left; } .viz-svg { min-height:200px; } }
     .worksheet-answer { display:none; margin-top:14px; }
     .worksheet-answer.open { display:block; }
-    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
     @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
   </style>
 </head>
@@ -175,13 +230,13 @@
   <div class="fig">
     <div class="fig-label">Figure 01 — 감마에서 세타로 넘어가는 오프닝</div>
     <h3>감마에서 세타로 넘어가는 오프닝</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">7일 100콜 가격 1.55, 감마 0.12, 세타 -0.105. 30일 100콜 가격 3.20, 감마 0.055, 세타 -0.045.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 주가, IV, 금리, 배당. 변화: 남은 시간.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">7일 / 30일 toggle. 감마와 세타 숫자가 함께 변경.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig01ControlVal">50</span></div>
-          <input id="fig01Control" type="range" min="0" max="100" value="50" aria-label="감마에서 세타로 넘어가는 오프닝 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">13회차 감마의 “큰 움직임 민감도”가 14회차 세타의 “시간비용”과 연결됨을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>감마에서 세타로 넘어가는 오프닝</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:46%"></div></div><b>46%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:59%"></div></div><b>59%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:35%"></div></div><b>35%</b></div></div><p class="viz-copy">“고정: 주가, IV, 금리, 배당. 변화: 남은 시간.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>5</output></label><input type="range" min="0" max="100" value="5" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">13회차 감마의 “큰 움직임 민감도”가 14회차 세타의 “시간비용”과 연결됨을 보여준다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-02">
@@ -242,89 +297,94 @@
   <div class="fig">
     <div class="fig-label">Figure 02 — 프리미엄 분해와 세타의 위치</div>
     <h3>프리미엄 분해와 세타의 위치</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100. 90콜 가격 11.20, 내재가치 10.00, 시간가치 1.20. 100콜 가격 3.20, 내재가치 0, 시간가치 3.20. 110콜 가격 0.85, 내재가치 0, 시간가치 0.85.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“세타는 사라질 수 있는 시간가치의 속도다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">strike 선택 버튼. 선택된 옵션의 내재가치, 시간가치, 시간가치 비중 표시.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
-          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="프리미엄 분해와 세타의 위치 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">세타가 주로 시간가치 감소와 연결된다는 점을 시각화한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>프리미엄 분해와 세타의 위치</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:47%"></div></div><b>47%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:60%"></div></div><b>60%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:36%"></div></div><b>36%</b></div></div><p class="viz-copy">“세타는 사라질 수 있는 시간가치의 속도다.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>10</output></label><input type="range" min="0" max="100" value="10" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">세타가 주로 시간가치 감소와 연결된다는 점을 시각화한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-03">
   <div class="fig">
     <div class="fig-label">Figure 03 — 하루 세타 비용 계산기</div>
     <h3>하루 세타 비용 계산기</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">기본값 price 3.20, theta -0.045, contracts 1. 결과: next day price 3.155, one-contract decay 4.50달러.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“세타는 다른 조건 고정 가정의 하루 변화 근사치.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">contracts 슬라이더 1~20, theta input -0.005~-0.200. 계약 단위 금액 자동 계산.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
-          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="하루 세타 비용 계산기 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">세타 단위가 옵션 가격 단위와 계약 단위에서 다르게 체감됨을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
+      <div class="viz-panel"><h4>하루 세타 비용 계산기</h4><p class="viz-copy">세타 단위가 옵션 가격 단위와 계약 단위에서 다르게 체감됨을 보여준다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>기본값 price 3.20, theta -0.045, contracts 1. 결과: next day price 3.155, one-contract decay 4.50달러.</strong></div><div class="viz-metric"><span>판정</span><strong>“세타는 다른 조건 고정 가정의 하루 변화 근사치.”</strong></div><div class="viz-metric"><span>주의</span><strong>contracts slider 1~20, theta input -0.005~-0.200. 계약 단위 금액 자동 계산.</strong></div></div></div>
+    </div>
+    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>103</output></label><input type="range" min="80" max="130" value="103" aria-label="만기 주가 조정"></div>
+
+    <div class="viz-note">세타 단위가 옵션 가격 단위와 계약 단위에서 다르게 체감됨을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-04">
   <div class="fig">
     <div class="fig-label">Figure 04 — 만기별 등가격 세타 비교</div>
     <h3>만기별 등가격 세타 비교</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=100, IV, 금리, 배당 고정. 60D price 4.50 theta -0.035, 30D price 3.20 theta -0.045, 7D price 1.55 theta -0.105.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“변화: 남은 만기. 고정: S, K, IV, 금리, 배당.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">maturity 선택. 하루 비용과 1계약 기준 금액 표시.</p></div></div>
-    
-    <div class="fig-caption">만기가 가까워질수록 등가격 세타가 커질 수 있음을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line red curve" d="M70 70 C170 72, 270 92, 350 140 S500 196, 560 214"/><path class="viz-line blue" d="M70 190 L220 150 L380 108 L560 72" opacity=".8"/><text class="viz-label" x="62" y="34">timeline curve</text><text class="viz-label" x="70" y="238">오늘</text><text class="viz-label" x="500" y="238">만기</text></svg></div>
+      <div class="viz-panel"><h4>만기별 등가격 세타 비교</h4><div class="viz-timeline timeline"><div class="viz-time"><span>TODAY</span><strong>프리미엄 지불</strong><p>S=100, K=100, IV, 금리, 배당 고정. 60D price 4.50 theta -0.035, 30D price 3.20 theta -0.045, 7D price 1.55 theta -0.105.</p></div><div class="viz-time"><span>MID</span><strong>시간가치 변화</strong><p>“변화: 남은 만기. 고정: S, K, IV, 금리, 배당.”</p></div><div class="viz-time"><span>EXP</span><strong>만기 정산</strong><p>maturity 선택. 하루 비용과 1계약 기준 금액 표시.</p></div></div></div>
+    </div>
+
+    <div class="viz-note">만기가 가까워질수록 등가격 세타가 커질 수 있음을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-05">
   <div class="fig">
     <div class="fig-label">Figure 05 — 시간가치 감소 곡선</div>
     <h3>시간가치 감소 곡선</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">초기 시간가치 3.00. 근사식 TV_t = 3.00 × √(t/30). t=30: 3.00, t=15: 2.12, t=7: 1.45, t=1: 0.55, t=0: 0.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 등가격 근사. 실제 가격은 주가와 IV 변화도 반영.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">days 슬라이더 0~30. 선택된 날짜의 시간가치와 하루 감소분 표시.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig05ControlVal">50</span></div>
-          <input id="fig05Control" type="range" min="0" max="100" value="50" aria-label="시간가치 감소 곡선 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">시간가치가 선형으로 줄지 않고 만기 근처에서 더 빠르게 줄 수 있음을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line red curve" d="M70 70 C170 72, 270 92, 350 140 S500 196, 560 214"/><path class="viz-line blue" d="M70 190 L220 150 L380 108 L560 72" opacity=".8"/><text class="viz-label" x="62" y="34">timeline curve</text><text class="viz-label" x="70" y="238">오늘</text><text class="viz-label" x="500" y="238">만기</text></svg></div>
+      <div class="viz-panel"><h4>시간가치 감소 곡선</h4><div class="viz-timeline timeline"><div class="viz-time"><span>TODAY</span><strong>프리미엄 지불</strong><p>초기 시간가치 3.00. 근사식 TV_t = 3.00 × √(t/30). t=30: 3.00, t=15: 2.12, t=7: 1.45, t=1: 0.55, t=0: 0.</p></div><div class="viz-time"><span>MID</span><strong>시간가치 변화</strong><p>“교육용 등가격 근사. 실제 가격은 주가와 IV 변화도 반영.”</p></div><div class="viz-time"><span>EXP</span><strong>만기 정산</strong><p>days slider 0~30. 선택된 날짜의 시간가치와 하루 감소분 표시.</p></div></div></div>
+    </div>
+
+    <div class="viz-note">시간가치가 선형으로 줄지 않고 만기 근처에서 더 빠르게 줄 수 있음을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-06">
   <div class="fig">
     <div class="fig-label">Figure 06 — ITM/ATM/OTM 세타 지형도</div>
     <h3>ITM/ATM/OTM 세타 지형도</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">교육용 theta magnitude. K=90: 0.018, K=95: 0.032, K=100: 0.055, K=105: 0.038, K=110: 0.020.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“시간가치가 많이 쌓이는 곳에서 세타도 커질 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">strike 마우스오버 또는 tap. moneyness label과 theta 표시.</p></div></div>
-    
-    <div class="fig-caption">세타가 등가격 근처에서 크게 나타나는 경향을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>ITM/ATM/OTM 세타 지형도</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:51%"></div></div><b>51%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:64%"></div></div><b>64%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:40%"></div></div><b>40%</b></div></div><p class="viz-copy">“시간가치가 많이 쌓이는 곳에서 세타도 커질 수 있다.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>30</output></label><input type="range" min="0" max="100" value="30" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">세타가 등가격 근처에서 크게 나타나는 경향을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-07">
   <div class="fig">
     <div class="fig-label">Figure 07 — IV와 세타 절댓값 비교</div>
     <h3>IV와 세타 절댓값 비교</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=100, T=30D. IV 20% price 2.30 theta -0.032. IV 40% price 4.55 theta -0.064.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“변화: IV. 고정: 현재가, 행사가, 만기, 금리, 배당.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">IV 슬라이더 15~45%. 가격과 세타를 선형 보간해 교육용 값으로 표시.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig07ControlVal">50</span></div>
-          <input id="fig07Control" type="range" min="0" max="100" value="50" aria-label="IV와 세타 절댓값 비교 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">IV 상승이 시간가치와 세타 절댓값을 키울 수 있음을 연결한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>IV와 세타 절댓값 비교</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:52%"></div></div><b>52%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:65%"></div></div><b>65%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:41%"></div></div><b>41%</b></div></div><p class="viz-copy">“변화: IV. 고정: 현재가, 행사가, 만기, 금리, 배당.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>35</output></label><input type="range" min="0" max="100" value="35" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">IV 상승이 시간가치와 세타 절댓값을 키울 수 있음을 연결한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-08">
   <div class="fig">
     <div class="fig-label">Figure 08 — 감마-세타 교환관계 카드</div>
     <h3>감마-세타 교환관계 카드</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Long option: gamma +0.12, theta -0.105. Short option: gamma -0.12, theta +0.105.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“시간을 받는 포지션은 큰 움직임 리스크를 같이 확인한다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">long/short toggle. payoff direction arrows와 greek signs 변경.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig08ControlVal">50</span></div>
-          <input id="fig08Control" type="range" min="0" max="100" value="50" aria-label="감마-세타 교환관계 카드 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">롱감마 포지션이 대체로 시간비용을 부담하고, 세타 수취 포지션이 큰 움직임 리스크를 가질 수 있음을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>감마-세타 교환관계 카드</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:53%"></div></div><b>53%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:66%"></div></div><b>66%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:42%"></div></div><b>42%</b></div></div><p class="viz-copy">“시간을 받는 포지션은 큰 움직임 리스크를 같이 확인한다.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>40</output></label><input type="range" min="0" max="100" value="40" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">롱감마 포지션이 대체로 시간비용을 부담하고, 세타 수취 포지션이 큰 움직임 리스크를 가질 수 있음을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-09">
   <div class="fig">
     <div class="fig-label">Figure 09 — 방향은 맞았지만 늦은 콜 매수 시나리오</div>
     <h3>방향은 맞았지만 늦은 콜 매수 시나리오</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">Day 0 콜 가격 3.20, theta -0.045. Day 10 세타 누적 -0.45, 주가 변화 0. Day 20 주가 +2, 델타 이익 +1.00 가정, 누적 세타 -0.90, 순효과 +0.10.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정 가정 단순화: IV, 금리, 배당 변화 제외. 시간비용 회복이 먼저 필요하다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">move day 슬라이더 1~20. 움직임이 빠를수록 순효과가 달라지는 구조 표시.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
-          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="방향은 맞았지만 늦은 콜 매수 시나리오 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">옵션 매수자가 방향과 시간을 함께 맞혀야 하는 이유를 사례로 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="92" y="86" width="144" height="102" rx="14" fill="rgba(125,211,252,.16)" stroke="var(--blue)"/><rect x="384" y="122" width="144" height="66" rx="14" fill="rgba(239,68,68,.14)" stroke="var(--red)"/><path class="viz-line" d="M250 138 L360 138"/><text class="viz-number" x="120" y="130">전</text><text class="viz-number" x="414" y="156">후</text><text class="viz-label" x="62" y="34">before / after panel</text></svg></div>
+      <div class="viz-panel"><h4>방향은 맞았지만 늦은 콜 매수 시나리오</h4><div class="viz-toggle" data-viz-toggle><button type="button" class="active">전</button><button type="button">후</button><button type="button">차이</button></div><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>Day 0 콜 가격 3.20, theta -0.045. Day 10 세타 누적 -0.45, 주가 변화 0. Day 20 주가 +2, 델타 이익 +1.00 가정, 누적 세타 -0.90, 순효과 +0.10.</strong></div><div class="viz-metric"><span>판정</span><strong>“고정 가정 단순화: IV, 금리, 배당 변화 제외. 시간비용 회복이 먼저 필요하다.”</strong></div><div class="viz-metric"><span>주의</span><strong>move day slider 1~20. 움직임이 빠를수록 순효과가 달라지는 구조 표시.</strong></div></div></div>
+    </div>
+
+    <div class="viz-note">옵션 매수자가 방향과 시간을 함께 맞혀야 하는 이유를 사례로 보여준다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-05">
@@ -416,13 +476,12 @@
   <div class="fig">
     <div class="fig-label">Figure 10 — 세타 점검 워크시트</div>
     <h3>세타 점검 워크시트</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">option price, intrinsic value, time value, theta, contracts, days to thesis, expected move date, IV level, gamma sign, max acceptable time cost, variables held constant.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 기록지이며 매매 지시서가 아니다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">화면 입력 가능, <code>예시 채우기</code>, <code>비우기</code> 버튼. 저장 기능이 필요하면 localStorage만 사용하고 외부 전송은 하지 않는다.</p></div><div class="mini-card"><div class="mini-k">모바일</div><p class="mini-p">입력칸은 1열, 숫자 input 높이 44px 이상.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig10ControlVal">50</span></div>
-          <input id="fig10Control" type="range" min="0" max="100" value="50" aria-label="세타 점검 워크시트 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">학습자가 옵션을 보기 전에 시간비용을 계약 단위로 적게 한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>세타 점검 워크시트</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>option price, intrinsic value, time value, theta, contracts, days to thesis, expected move date, IV level, gamma sign, max acceptable time cost, variables held constant.</span></label><label class="viz-check"><input type="checkbox"><span>“교육용 기록지이며 매매 지시서가 아니다.”</span></label><label class="viz-check"><input type="checkbox"><span>화면 입력 가능, 예시 채우기, 비우기 버튼. 저장 기능이 필요하면 localStorage만 사용하고 외부 전송은 하지 않는다.</span></label><label class="viz-check"><input type="checkbox"><span>학습자가 옵션을 보기 전에 시간비용을 계약 단위로 적게 한다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">학습자가 옵션을 보기 전에 시간비용을 계약 단위로 적게 한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-08">
@@ -474,16 +533,21 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-document.querySelectorAll('[data-control-demo]').forEach((box) => {
+document.querySelectorAll('[data-viz-range]').forEach((box) => {
   const input = box.querySelector('input[type="range"]');
-  const output = box.querySelector('.control-value');
-  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+  const output = box.querySelector('[data-range-out]');
+  if (input && output) {
+    const render = () => { output.textContent = input.value; };
+    input.addEventListener('input', render);
+    render();
+  }
 });
-document.querySelectorAll('[data-segmented]').forEach((group) => {
+document.querySelectorAll('[data-viz-toggle]').forEach((group) => {
   group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
     group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
   }));
 });
+
 
 </script>
 </body>

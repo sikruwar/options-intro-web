@@ -123,18 +123,73 @@
     .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
     .reveal.visible { opacity:1; transform:none; }
 
-    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-    .figure-points .mini-card { min-height:112px; }
-    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
-    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
-    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
-    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
-    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
-    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+
+    .viz-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
+    .viz-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:18px; min-width:0; }
+    .viz-panel.accent { background:linear-gradient(135deg,rgba(245,177,76,.11),rgba(125,211,252,.06)),var(--bg-card2); border-color:var(--border-light); }
+    .viz-panel h4 { font-size:15px; line-height:1.42; color:var(--text); margin:0 0 12px; }
+    .viz-copy { color:var(--text-muted); font-size:13px; line-height:1.62; margin:8px 0 0; overflow-wrap:anywhere; }
+    .viz-svg { width:100%; min-height:238px; display:block; overflow:visible; }
+    .viz-axis { stroke:var(--border-light); stroke-width:1; }
+    .viz-gridline { stroke:var(--border); stroke-width:1; opacity:.72; }
+    .viz-line { fill:none; stroke:var(--amber); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .viz-line.blue { stroke:var(--blue); }
+    .viz-line.green { stroke:var(--green); }
+    .viz-line.red { stroke:var(--red); }
+    .viz-area { fill:rgba(245,177,76,.13); }
+    .viz-label { font-family:'JetBrains Mono', monospace; font-size:10px; fill:var(--text-muted); }
+    .viz-number { font-family:'JetBrains Mono', monospace; font-size:13px; fill:var(--text); font-weight:700; }
+    .viz-dot { fill:var(--amber); stroke:var(--bg-card); stroke-width:3; }
+    .viz-dot.blue { fill:var(--blue); }
+    .viz-dot.green { fill:var(--green); }
+    .viz-dot.red { fill:var(--red); }
+    .viz-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .viz-metric { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:13px; min-width:0; }
+    .viz-metric span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:6px; text-transform:uppercase; }
+    .viz-metric strong { display:block; color:var(--text); font-size:17px; line-height:1.3; overflow-wrap:anywhere; }
+    .viz-metric small { display:block; margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+    .viz-range { margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); }
+    .viz-range label { display:flex; align-items:baseline; justify-content:space-between; gap:12px; color:var(--text); font-weight:800; font-size:14px; }
+    .viz-range output { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:18px; }
+    .viz-range input[type="range"] { width:100%; margin-top:12px; accent-color:var(--amber); }
+    .viz-bars { display:grid; gap:10px; margin-top:12px; }
+    .viz-bar { display:grid; grid-template-columns:128px 1fr 62px; gap:10px; align-items:center; }
+    .viz-bar span { color:var(--text-muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+    .viz-bar b { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text); text-align:right; }
+    .viz-track { height:14px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; }
+    .viz-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--amber)); }
+    .viz-fill.good { background:linear-gradient(90deg,var(--green),var(--blue)); }
+    .viz-fill.bad { background:linear-gradient(90deg,var(--amber),var(--red)); }
+    .viz-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; margin-top:14px; }
+    .viz-step { border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); padding:14px; min-height:116px; position:relative; }
+    .viz-step::after { content:'→'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--amber); font-family:'JetBrains Mono', monospace; }
+    .viz-step:last-child::after { content:''; }
+    .viz-step span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+    .viz-step strong { display:block; color:var(--text); font-size:15px; line-height:1.4; }
+    .viz-step p { margin:8px 0 0; color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .viz-timeline { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .viz-time { border:1px solid var(--border); background:var(--bg-card2); border-radius:12px; padding:14px; min-height:120px; }
+    .viz-time span { display:block; font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:11px; margin-bottom:8px; }
+    .viz-time strong { color:var(--text); font-size:15px; line-height:1.35; }
+    .viz-time p { color:var(--text-muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .viz-matrix { width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--border); font-size:13px; }
+    .viz-matrix th,.viz-matrix td { border-bottom:1px solid var(--border); padding:12px; text-align:left; color:var(--text-muted); vertical-align:top; }
+    .viz-matrix th { background:var(--bg-card2); color:var(--text); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .viz-matrix tr:last-child td { border-bottom:0; }
+    .viz-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .viz-check { display:flex; gap:10px; align-items:flex-start; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-muted); font-size:13px; line-height:1.45; }
+    .viz-check input { margin-top:3px; accent-color:var(--amber); }
+    .viz-toggle { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .viz-toggle button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 12px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .viz-toggle button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .viz-note { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
+    .viz-pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .viz-pill { border:1px solid var(--border-light); border-radius:999px; padding:6px 10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
+    @media (max-width:760px) { .viz-grid,.viz-flow,.viz-timeline,.viz-checklist { grid-template-columns:1fr; } .viz-metrics { grid-template-columns:1fr; } .viz-step::after { display:none; } .viz-bar { grid-template-columns:1fr; } .viz-bar b { text-align:left; } .viz-svg { min-height:200px; } }
     .worksheet-answer { display:none; margin-top:14px; }
     .worksheet-answer.open { display:block; }
-    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
     @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
   </style>
 </head>
@@ -175,9 +230,10 @@
   <div class="fig">
     <div class="fig-label">Figure 01 — 전략명에서 리스크 카드로 가는 번역 흐름</div>
     <h3>전략명에서 리스크 카드로 가는 번역 흐름</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">strategy name → payoff shape → net delta/gamma/theta/vega → max loss/max gain → hated market → action checklist.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“이름은 라벨, 관리는 민감도.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">none. Hero 직후 학습 지도.</p></div></div>
-    
-    <div class="fig-caption">전략 이름을 외우는 단계에서 포지션 그릭스를 읽는 단계로 넘어가게 한다.</div>
+    <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line green" d="M72 188 C160 82, 250 82, 330 136 S488 206, 560 72"/><circle class="viz-dot green" cx="72" cy="188" r="7"/><circle class="viz-dot" cx="330" cy="136" r="7"/><circle class="viz-dot red" cx="560" cy="72" r="7"/><text class="viz-label" x="62" y="34">flow chart</text><text class="viz-number" x="342" y="132">재조정 지점</text></svg></div>
+    <div class="viz-flow"><div class="viz-step"><span>STEP 1</span><strong>가격 변화</strong><p>horizontal flow diagram.</p></div><div class="viz-step"><span>STEP 2</span><strong>민감도 변화</strong><p>“이름은 라벨, 관리는 민감도.”</p></div><div class="viz-step"><span>STEP 3</span><strong>포지션 조정</strong><p>strategy name → payoff shape → net delta/gamma/theta/vega → max loss/max gain → hated market → action checklist.</p></div><div class="viz-step"><span>STEP 4</span><strong>계좌 영향</strong><p>none. Hero 직후 학습 지도.</p></div></div>
+
+    <div class="viz-note">전략 이름을 외우는 단계에서 포지션 그릭스를 읽는 단계로 넘어가게 한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-02">
@@ -235,73 +291,80 @@
   <div class="fig">
     <div class="fig-label">Figure 02 — 기본 옵션 4종 그릭스 부호 매트릭스</div>
     <h3>기본 옵션 4종 그릭스 부호 매트릭스</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">long call +delta +gamma -theta +vega, long put -delta +gamma -theta +vega, short call -delta -gamma +theta -vega, short put +delta -gamma +theta -vega.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“매수는 대체로 감마와 베가를 사고 세타를 낸다. 매도는 대체로 세타를 받고 감마와 베가를 부담한다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">hover/tap on each cell reveals one-sentence meaning.</p></div></div>
-    
-    <div class="fig-caption">콜 매수, 풋 매수, 콜 매도, 풋 매도의 델타, 감마, 세타, 베가 부호를 한눈에 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>기본 옵션 4종 그릭스 부호 매트릭스</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>long call +delta +gamma -theta +vega, long put -delta +gamma -theta +vega, short call -delta -gamma +theta -vega, short put +delta -gamma +theta -vega.</span></label><label class="viz-check"><input type="checkbox"><span>“매수는 대체로 감마와 베가를 사고 세타를 낸다. 매도는 대체로 세타를 받고 감마와 베가를 부담한다.”</span></label><label class="viz-check"><input type="checkbox"><span>hover/tap on each cell reveals one-sentence meaning.</span></label><label class="viz-check"><input type="checkbox"><span>콜 매수, 풋 매수, 콜 매도, 풋 매도의 델타, 감마, 세타, 베가 부호를 한눈에 보여준다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">콜 매수, 풋 매수, 콜 매도, 풋 매도의 델타, 감마, 세타, 베가 부호를 한눈에 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-03">
   <div class="fig">
     <div class="fig-label">Figure 03 — 단일 콜 매수 리스크 카드</div>
     <h3>단일 콜 매수 리스크 카드</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">underlying 100, strike 100, expiry 30 days, premium 4.00, delta +0.52, gamma +0.055, theta -0.08, vega +0.12, multiplier 100, max loss 400.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 현재 그릭스와 계약 수. 변화: 가격, 시간, IV.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">IV change input 0~5%포인트 and days passed input 0~10. Approx P/L effect from theta and vega updates.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
-          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="단일 콜 매수 리스크 카드 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">100콜 매수 예시를 전략명보다 구체적인 리스크 카드로 번역한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
+      <div class="viz-panel"><h4>단일 콜 매수 리스크 카드</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>underlying 100, strike 100, expiry 30 days, premium 4.00, delta +0.52, gamma +0.055, theta -0.08, vega +0.12, multiplier 100, max loss 400.</strong></div><div class="viz-metric"><span>판정</span><strong>“고정: 현재 그릭스와 계약 수. 변화: 가격, 시간, IV.”</strong></div><div class="viz-metric"><span>주의</span><strong>IV change input 0~5%포인트 and days passed input 0~10. Approx P/L effect from theta and vega updates.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    </div>
+
+    <div class="viz-note">100콜 매수 예시를 전략명보다 구체적인 리스크 카드로 번역한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-04">
   <div class="fig">
     <div class="fig-label">Figure 04 — 주요 전략별 순그릭스 비교표</div>
     <h3>주요 전략별 순그릭스 비교표</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">POINT</div><p class="mini-p">데이터</p></div><div class="mini-card"><div class="mini-k">covered call</div><p class="mini-p">delta positive but reduced, gamma negative, theta positive, vega negative.</p></div><div class="mini-card"><div class="mini-k">protective put</div><p class="mini-p">delta positive but protected, gamma positive, theta negative, vega positive.</p></div><div class="mini-card"><div class="mini-k">bull call spread</div><p class="mini-p">delta positive limited, gamma mixed/usually smaller than long call, theta depends on moneyness, vega reduced.</p></div><div class="mini-card"><div class="mini-k">bear put spread</div><p class="mini-p">delta negative limited, gamma mixed/usually smaller than long put, theta depends on moneyness, vega reduced.</p></div><div class="mini-card"><div class="mini-k">long straddle</div><p class="mini-p">delta near neutral at start, gamma positive, theta negative, vega positive.</p></div><div class="mini-card"><div class="mini-k">long strangle</div><p class="mini-p">delta near neutral at start, gamma positive, theta negative, vega positive, lower premium and farther breakevens.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“전략명보다 싫어하는 시장까지 읽어야 한다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">strategy filter buttons update detail panel.</p></div></div>
-    
-    <div class="fig-caption">커버드콜, 보호적 풋, 콜스프레드, 풋스프레드, 스트래들, 스트랭글을 같은 기준으로 비교한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>주요 전략별 순그릭스 비교표</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>입력값과 계약 명세를 확인합니다.</span></label><label class="viz-check"><input type="checkbox"><span>“전략명보다 싫어하는 시장까지 읽어야 한다.”</span></label><label class="viz-check"><input type="checkbox"><span>strategy filter buttons update detail panel.</span></label><label class="viz-check"><input type="checkbox"><span>커버드콜, 보호적 풋, 콜스프레드, 풋스프레드, 스트래들, 스트랭글을 같은 기준으로 비교한다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">커버드콜, 보호적 풋, 콜스프레드, 풋스프레드, 스트래들, 스트랭글을 같은 기준으로 비교한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-05">
   <div class="fig">
     <div class="fig-label">Figure 05 — 커버드콜 총 델타 계산기</div>
     <h3>커버드콜 총 델타 계산기</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">stock shares 100, short call delta +0.32 default, net delta = 100 - callDelta*100 = +68. Scenario call delta +0.50 gives +50.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 주식 100주와 숏콜 1계약. 변화: 콜 델타.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">call delta 슬라이더 0.05~0.95. Net delta card updates. Visual bar compares stock-only +100 vs covered-call net delta.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig05ControlVal">50</span></div>
-          <input id="fig05Control" type="range" min="0" max="100" value="50" aria-label="커버드콜 총 델타 계산기 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">주식 델타와 숏콜 델타를 합산해 상승 제한 구조를 숫자로 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
+      <div class="viz-panel"><h4>커버드콜 총 델타 계산기</h4><p class="viz-copy">주식 델타와 숏콜 델타를 합산해 상승 제한 구조를 숫자로 보여준다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>stock shares 100, short call delta +0.32 default, net delta = 100 - callDelta*100 = +68. Scenario call delta +0.50 gives +50.</strong></div><div class="viz-metric"><span>판정</span><strong>“고정: 주식 100주와 숏콜 1계약. 변화: 콜 델타.”</strong></div><div class="viz-metric"><span>주의</span><strong>call delta slider 0.05~0.95. Net delta card updates. Visual bar compares stock-only +100 vs covered-call net delta.</strong></div></div></div>
+    </div>
+    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>105</output></label><input type="range" min="80" max="130" value="105" aria-label="만기 주가 조정"></div>
+
+    <div class="viz-note">주식 델타와 숏콜 델타를 합산해 상승 제한 구조를 숫자로 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-06">
   <div class="fig">
     <div class="fig-label">Figure 06 — 보호적 풋 총 델타 계산기</div>
     <h3>보호적 풋 총 델타 계산기</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">stock +100, put delta -0.25 initial → net +75, put delta -0.60 downside scenario → net +40.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“하락이 깊어질수록 풋 방어력이 커진다. 보험료는 별도 비용이다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">put delta 슬라이더 -0.05~-0.95. Net delta card updates. Downside protection meter changes.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
-          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="보호적 풋 총 델타 계산기 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">하락 시 풋 델타 절댓값이 커지며 주식 노출을 줄이는 구조를 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
+      <div class="viz-panel"><h4>보호적 풋 총 델타 계산기</h4><p class="viz-copy">하락 시 풋 델타 절댓값이 커지며 주식 노출을 줄이는 구조를 보여준다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>stock +100, put delta -0.25 initial → net +75, put delta -0.60 downside scenario → net +40.</strong></div><div class="viz-metric"><span>판정</span><strong>“하락이 깊어질수록 풋 방어력이 커진다. 보험료는 별도 비용이다.”</strong></div><div class="viz-metric"><span>주의</span><strong>put delta slider -0.05~-0.95. Net delta card updates. Downside protection meter changes.</strong></div></div></div>
+    </div>
+    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>106</output></label><input type="range" min="80" max="130" value="106" aria-label="만기 주가 조정"></div>
+
+    <div class="viz-note">하락 시 풋 델타 절댓값이 커지며 주식 노출을 줄이는 구조를 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-07">
   <div class="fig">
     <div class="fig-label">Figure 07 — 스프레드와 단일 옵션 비교 보드</div>
     <h3>스프레드와 단일 옵션 비교 보드</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">long 100 call premium 4.00, delta +52, max loss 400, max gain open-ended; 100/110 call spread net premium 2.80, net delta +30, max loss 280, max gain 720. Long 100 put premium 3.70, delta -48, max loss 370; 100/90 put spread net premium 2.60, net delta -28, max loss 260, max gain 740.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“스프레드는 비용과 노출을 줄이지만 수익 한도도 바꾼다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">toggle call side / put side.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig07ControlVal">50</span></div>
-          <input id="fig07Control" type="range" min="0" max="100" value="50" aria-label="스프레드와 단일 옵션 비교 보드 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">단일 콜 매수와 콜스프레드, 단일 풋 매수와 풋스프레드의 비용, 델타, 최대손익 차이를 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="92" y="86" width="144" height="102" rx="14" fill="rgba(125,211,252,.16)" stroke="var(--blue)"/><rect x="384" y="122" width="144" height="66" rx="14" fill="rgba(239,68,68,.14)" stroke="var(--red)"/><path class="viz-line" d="M250 138 L360 138"/><text class="viz-number" x="120" y="130">전</text><text class="viz-number" x="414" y="156">후</text><text class="viz-label" x="62" y="34">before / after panel</text></svg></div>
+      <div class="viz-panel"><h4>스프레드와 단일 옵션 비교 보드</h4><div class="viz-toggle" data-viz-toggle><button type="button" class="active">전</button><button type="button">후</button><button type="button">차이</button></div><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>long 100 call premium 4.00, delta +52, max loss 400, max gain open-ended; 100/110 call spread net premium 2.80, net delta +30, max loss 280, max gain 720. Long 100 put premium 3.70, delta -48, max loss 370; 100/90 put sp…</strong></div><div class="viz-metric"><span>판정</span><strong>“스프레드는 비용과 노출을 줄이지만 수익 한도도 바꾼다.”</strong></div><div class="viz-metric"><span>주의</span><strong>toggle call side / put side.</strong></div></div></div>
+    </div>
+
+    <div class="viz-note">단일 콜 매수와 콜스프레드, 단일 풋 매수와 풋스프레드의 비용, 델타, 최대손익 차이를 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-08">
   <div class="fig">
     <div class="fig-label">Figure 08 — 전략별 싫어하는 시장 지도</div>
     <h3>전략별 싫어하는 시장 지도</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 axes</div><p class="mini-p">price move small/large, IV up/down, time passes. Rows: long call, short put, covered call, protective put, bull call spread, long straddle, short strangle as warning preview.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“좋아하는 시장보다 싫어하는 시장을 먼저 적으면 포지션 크기가 달라진다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">click a strategy row to reveal plain Korean risk sentence.</p></div></div>
-    
-    <div class="fig-caption">각 전략이 어떤 시장 조건에서 불리한지 직관적으로 연결한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
+      <div class="viz-panel"><h4>전략별 싫어하는 시장 지도</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>price move small/large, IV up/down, time passes. Rows: long call, short put, covered call, protective put, bull call spread, long straddle, short strangle as warning preview.</strong></div><div class="viz-metric"><span>판정</span><strong>“좋아하는 시장보다 싫어하는 시장을 먼저 적으면 포지션 크기가 달라진다.”</strong></div><div class="viz-metric"><span>주의</span><strong>click a strategy row to reveal plain Korean risk sentence.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    </div>
+
+    <div class="viz-note">각 전략이 어떤 시장 조건에서 불리한지 직관적으로 연결한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-05">
@@ -426,9 +489,12 @@
   <div class="fig">
     <div class="fig-label">Figure 09 — 나의 포지션 그릭스 워크시트</div>
     <h3>나의 포지션 그릭스 워크시트</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">입력칸</div><p class="mini-p">underlying, strategy, contract count, long/short legs, delta, gamma, theta, vega, max loss, max gain, account risk budget, hated market, invalidation condition.</p></div><div class="mini-card"><div class="mini-k">계산</div><p class="mini-p">net delta in share equivalents, daily theta dollars, IV 1%포인트 vega effect, max loss as percent of risk budget.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“표를 채우지 못하면 아직 전략을 계좌 언어로 번역하지 못한 상태다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p"><code>예시 불러오기: 콜 매수</code>, <code>예시 불러오기: 커버드콜</code>, <code>예시 불러오기: 보호적 풋</code>, <code>계산하기</code>, <code>비우기</code>, <code>인쇄용 보기</code>. 외부 전송 없이 브라우저 내부에서만 계산한다.</p></div></div>
-    
-    <div class="fig-caption">학습자가 전략 후보를 리스크 카드로 직접 번역하게 한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>나의 포지션 그릭스 워크시트</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>입력값과 계약 명세를 확인합니다.</span></label><label class="viz-check"><input type="checkbox"><span>“표를 채우지 못하면 아직 전략을 계좌 언어로 번역하지 못한 상태다.”</span></label><label class="viz-check"><input type="checkbox"><span>예시 불러오기: 콜 매수, 예시 불러오기: 커버드콜, 예시 불러오기: 보호적 풋, 계산하기, 비우기, 인쇄용 보기. 외부 전송 없이 브라우저 내부에서만 계산한다.</span></label><label class="viz-check"><input type="checkbox"><span>학습자가 전략 후보를 리스크 카드로 직접 번역하게 한다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">학습자가 전략 후보를 리스크 카드로 직접 번역하게 한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-08">
@@ -479,16 +545,21 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-document.querySelectorAll('[data-control-demo]').forEach((box) => {
+document.querySelectorAll('[data-viz-range]').forEach((box) => {
   const input = box.querySelector('input[type="range"]');
-  const output = box.querySelector('.control-value');
-  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+  const output = box.querySelector('[data-range-out]');
+  if (input && output) {
+    const render = () => { output.textContent = input.value; };
+    input.addEventListener('input', render);
+    render();
+  }
 });
-document.querySelectorAll('[data-segmented]').forEach((group) => {
+document.querySelectorAll('[data-viz-toggle]').forEach((group) => {
   group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
     group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
   }));
 });
+
 
 </script>
 </body>

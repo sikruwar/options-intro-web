@@ -123,18 +123,73 @@
     .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
     .reveal.visible { opacity:1; transform:none; }
 
-    .figure-points { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-    .figure-points .mini-card { min-height:112px; }
-    .control-demo { margin-top:16px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px; }
-    .control-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; }
-    .control-value { font-family:'JetBrains Mono', monospace; color:var(--amber); }
-    .segmented { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-    .segmented button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 11px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
-    .segmented button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
-    .note-strip { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+
+    .viz-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
+    .viz-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:18px; min-width:0; }
+    .viz-panel.accent { background:linear-gradient(135deg,rgba(245,177,76,.11),rgba(125,211,252,.06)),var(--bg-card2); border-color:var(--border-light); }
+    .viz-panel h4 { font-size:15px; line-height:1.42; color:var(--text); margin:0 0 12px; }
+    .viz-copy { color:var(--text-muted); font-size:13px; line-height:1.62; margin:8px 0 0; overflow-wrap:anywhere; }
+    .viz-svg { width:100%; min-height:238px; display:block; overflow:visible; }
+    .viz-axis { stroke:var(--border-light); stroke-width:1; }
+    .viz-gridline { stroke:var(--border); stroke-width:1; opacity:.72; }
+    .viz-line { fill:none; stroke:var(--amber); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .viz-line.blue { stroke:var(--blue); }
+    .viz-line.green { stroke:var(--green); }
+    .viz-line.red { stroke:var(--red); }
+    .viz-area { fill:rgba(245,177,76,.13); }
+    .viz-label { font-family:'JetBrains Mono', monospace; font-size:10px; fill:var(--text-muted); }
+    .viz-number { font-family:'JetBrains Mono', monospace; font-size:13px; fill:var(--text); font-weight:700; }
+    .viz-dot { fill:var(--amber); stroke:var(--bg-card); stroke-width:3; }
+    .viz-dot.blue { fill:var(--blue); }
+    .viz-dot.green { fill:var(--green); }
+    .viz-dot.red { fill:var(--red); }
+    .viz-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .viz-metric { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:13px; min-width:0; }
+    .viz-metric span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:6px; text-transform:uppercase; }
+    .viz-metric strong { display:block; color:var(--text); font-size:17px; line-height:1.3; overflow-wrap:anywhere; }
+    .viz-metric small { display:block; margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+    .viz-range { margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); }
+    .viz-range label { display:flex; align-items:baseline; justify-content:space-between; gap:12px; color:var(--text); font-weight:800; font-size:14px; }
+    .viz-range output { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:18px; }
+    .viz-range input[type="range"] { width:100%; margin-top:12px; accent-color:var(--amber); }
+    .viz-bars { display:grid; gap:10px; margin-top:12px; }
+    .viz-bar { display:grid; grid-template-columns:128px 1fr 62px; gap:10px; align-items:center; }
+    .viz-bar span { color:var(--text-muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+    .viz-bar b { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text); text-align:right; }
+    .viz-track { height:14px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; }
+    .viz-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--amber)); }
+    .viz-fill.good { background:linear-gradient(90deg,var(--green),var(--blue)); }
+    .viz-fill.bad { background:linear-gradient(90deg,var(--amber),var(--red)); }
+    .viz-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; margin-top:14px; }
+    .viz-step { border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); padding:14px; min-height:116px; position:relative; }
+    .viz-step::after { content:'→'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--amber); font-family:'JetBrains Mono', monospace; }
+    .viz-step:last-child::after { content:''; }
+    .viz-step span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+    .viz-step strong { display:block; color:var(--text); font-size:15px; line-height:1.4; }
+    .viz-step p { margin:8px 0 0; color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .viz-timeline { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .viz-time { border:1px solid var(--border); background:var(--bg-card2); border-radius:12px; padding:14px; min-height:120px; }
+    .viz-time span { display:block; font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:11px; margin-bottom:8px; }
+    .viz-time strong { color:var(--text); font-size:15px; line-height:1.35; }
+    .viz-time p { color:var(--text-muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .viz-matrix { width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--border); font-size:13px; }
+    .viz-matrix th,.viz-matrix td { border-bottom:1px solid var(--border); padding:12px; text-align:left; color:var(--text-muted); vertical-align:top; }
+    .viz-matrix th { background:var(--bg-card2); color:var(--text); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .viz-matrix tr:last-child td { border-bottom:0; }
+    .viz-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .viz-check { display:flex; gap:10px; align-items:flex-start; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-muted); font-size:13px; line-height:1.45; }
+    .viz-check input { margin-top:3px; accent-color:var(--amber); }
+    .viz-toggle { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .viz-toggle button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 12px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .viz-toggle button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .viz-note { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
+    .viz-pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .viz-pill { border:1px solid var(--border-light); border-radius:999px; padding:6px 10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
+    @media (max-width:760px) { .viz-grid,.viz-flow,.viz-timeline,.viz-checklist { grid-template-columns:1fr; } .viz-metrics { grid-template-columns:1fr; } .viz-step::after { display:none; } .viz-bar { grid-template-columns:1fr; } .viz-bar b { text-align:left; } .viz-svg { min-height:200px; } }
     .worksheet-answer { display:none; margin-top:14px; }
     .worksheet-answer.open { display:block; }
-    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.figure-points { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
     @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
   </style>
 </head>
@@ -175,13 +230,13 @@
   <div class="fig">
     <div class="fig-label">Figure 01 — 델타에서 감마로 넘어가는 오프닝</div>
     <h3>델타에서 감마로 넘어가는 오프닝</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">현재 델타 0.50, 감마 0.06. 주가 +1달러 시 새 델타 0.56, 주가 -1달러 시 새 델타 0.44.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“고정: 만기, IV, 금리, 배당. 변화: 기초자산 가격.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">+1달러 / -1달러 버튼으로 델타 숫자와 기울기 표시 변경.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig01ControlVal">50</span></div>
-          <input id="fig01Control" type="range" min="0" max="100" value="50" aria-label="델타에서 감마로 넘어가는 오프닝 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">12회차 델타가 13회차 감마로 연결되는 구조를 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>델타에서 감마로 넘어가는 오프닝</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:46%"></div></div><b>46%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:59%"></div></div><b>59%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:35%"></div></div><b>35%</b></div></div><p class="viz-copy">“고정: 만기, IV, 금리, 배당. 변화: 기초자산 가격.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>5</output></label><input type="range" min="0" max="100" value="5" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">12회차 델타가 13회차 감마로 연결되는 구조를 보여준다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-02">
@@ -239,97 +294,96 @@
   <div class="fig">
     <div class="fig-label">Figure 02 — 옵션 가격 곡선과 접선</div>
     <h3>옵션 가격 곡선과 접선</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">교육용 곡선. S=100, option price 4.00, delta 0.50, gamma 0.06.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“델타는 순간 기울기다. 감마는 접선이 돌아가는 속도다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">spot 슬라이더 94~106. 접선 기울기와 delta label이 이동.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig02ControlVal">50</span></div>
-          <input id="fig02Control" type="range" min="0" max="100" value="50" aria-label="옵션 가격 곡선과 접선 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">델타가 곡선 위 한 점의 기울기이고, 감마가 그 기울기의 변화임을 시각화한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>옵션 가격 곡선과 접선</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:47%"></div></div><b>47%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:60%"></div></div><b>60%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:36%"></div></div><b>36%</b></div></div><p class="viz-copy">“델타는 순간 기울기다. 감마는 접선이 돌아가는 속도다.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>10</output></label><input type="range" min="0" max="100" value="10" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">델타가 곡선 위 한 점의 기울기이고, 감마가 그 기울기의 변화임을 시각화한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-03">
   <div class="fig">
     <div class="fig-label">Figure 03 — 콜 감마 미니 계산기</div>
     <h3>콜 감마 미니 계산기</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">기본값 delta 0.50, gamma 0.06, stock move +1 → new delta 0.56. stock move -1 → 0.44.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“작은 움직임에 대한 근사치.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">stock move 슬라이더 -3~+3. new delta를 0~1 범위로 clamp.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig03ControlVal">50</span></div>
-          <input id="fig03Control" type="range" min="0" max="100" value="50" aria-label="콜 감마 미니 계산기 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">콜 델타가 감마만큼 변하는 과정을 숫자로 계산하게 한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
+      <div class="viz-panel"><h4>콜 감마 미니 계산기</h4><p class="viz-copy">콜 델타가 감마만큼 변하는 과정을 숫자로 계산하게 한다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>기본값 delta 0.50, gamma 0.06, stock move +1 → new delta 0.56. stock move -1 → 0.44.</strong></div><div class="viz-metric"><span>판정</span><strong>“작은 움직임에 대한 근사치.”</strong></div><div class="viz-metric"><span>주의</span><strong>stock move slider -3~+3. new delta를 0~1 범위로 clamp.</strong></div></div></div>
+    </div>
+    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>103</output></label><input type="range" min="80" max="130" value="103" aria-label="만기 주가 조정"></div>
+
+    <div class="viz-note">콜 델타가 감마만큼 변하는 과정을 숫자로 계산하게 한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-04">
   <div class="fig">
     <div class="fig-label">Figure 04 — 풋 감마 부호 설명 카드</div>
     <h3>풋 감마 부호 설명 카드</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">콜 delta 0.50/gamma 0.06, 풋 delta -0.50/gamma 0.06. 주가 +1: 콜 0.56, 풋 -0.44. 주가 -1: 콜 0.44, 풋 -0.56.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“같은 감마, 다른 출발 부호.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">up/down toggle. 콜과 풋 델타가 동시에 바뀜.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig04ControlVal">50</span></div>
-          <input id="fig04Control" type="range" min="0" max="100" value="50" aria-label="풋 감마 부호 설명 카드 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">풋의 델타는 음수지만 감마는 양수일 수 있다는 혼동을 줄인다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>풋 감마 부호 설명 카드</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:49%"></div></div><b>49%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:62%"></div></div><b>62%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:38%"></div></div><b>38%</b></div></div><p class="viz-copy">“같은 감마, 다른 출발 부호.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>20</output></label><input type="range" min="0" max="100" value="20" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">풋의 델타는 음수지만 감마는 양수일 수 있다는 혼동을 줄인다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-05">
   <div class="fig">
     <div class="fig-label">Figure 05 — 행사가별 감마 지도</div>
     <h3>행사가별 감마 지도</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">현재가 100. 90콜 delta 0.88/gamma 0.02, 100콜 delta 0.50/gamma 0.07, 110콜 delta 0.16/gamma 0.03.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“등가격 근처에서 델타가 가장 빨리 바뀐다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">strike 선택 버튼. 선택 시 delta/gamma 카드 변경.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig05ControlVal">50</span></div>
-          <input id="fig05Control" type="range" min="0" max="100" value="50" aria-label="행사가별 감마 지도 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">감마가 등가격 근처에서 가장 크다는 감각을 만든다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>행사가별 감마 지도</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:50%"></div></div><b>50%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:63%"></div></div><b>63%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:39%"></div></div><b>39%</b></div></div><p class="viz-copy">“등가격 근처에서 델타가 가장 빨리 바뀐다.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>25</output></label><input type="range" min="0" max="100" value="25" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">감마가 등가격 근처에서 가장 크다는 감각을 만든다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-06">
   <div class="fig">
     <div class="fig-label">Figure 06 — 만기별 등가격 감마 비교</div>
     <h3>만기별 등가격 감마 비교</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=100, IV, 금리, 배당 고정. 60D gamma 0.035, 30D gamma 0.055, 7D gamma 0.115. 교육용 값.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“변화: 남은 시간. 고정: S, K, IV, 금리, 배당.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">days-to-expiry 슬라이더 7~60. gamma marker 이동.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig06ControlVal">50</span></div>
-          <input id="fig06Control" type="range" min="0" max="100" value="50" aria-label="만기별 등가격 감마 비교 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">만기가 짧아질수록 등가격 감마가 날카로워질 수 있음을 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line red curve" d="M70 70 C170 72, 270 92, 350 140 S500 196, 560 214"/><path class="viz-line blue" d="M70 190 L220 150 L380 108 L560 72" opacity=".8"/><text class="viz-label" x="62" y="34">timeline curve</text><text class="viz-label" x="70" y="238">오늘</text><text class="viz-label" x="500" y="238">만기</text></svg></div>
+      <div class="viz-panel"><h4>만기별 등가격 감마 비교</h4><div class="viz-timeline timeline"><div class="viz-time"><span>TODAY</span><strong>프리미엄 지불</strong><p>S=100, K=100, IV, 금리, 배당 고정. 60D gamma 0.035, 30D gamma 0.055, 7D gamma 0.115. 교육용 값.</p></div><div class="viz-time"><span>MID</span><strong>시간가치 변화</strong><p>“변화: 남은 시간. 고정: S, K, IV, 금리, 배당.”</p></div><div class="viz-time"><span>EXP</span><strong>만기 정산</strong><p>days-to-expiry slider 7~60. gamma marker 이동.</p></div></div></div>
+    </div>
+
+    <div class="viz-note">만기가 짧아질수록 등가격 감마가 날카로워질 수 있음을 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-07">
   <div class="fig">
     <div class="fig-label">Figure 07 — IV와 감마의 폭 비교</div>
     <h3>IV와 감마의 폭 비교</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">S=100, K=100, T=30일. IV 20% gamma 0.08, IV 45% gamma 0.04. 교육용 값.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“변화: IV. 고정: 현재가, 행사가, 만기.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">IV toggle 20% / 45% 또는 슬라이더 15~50%.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig07ControlVal">50</span></div>
-          <input id="fig07Control" type="range" min="0" max="100" value="50" aria-label="IV와 감마의 폭 비교 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">IV가 높아질 때 등가격 감마가 넓게 퍼지고 낮아질 수 있다는 직관을 제공한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>IV와 감마의 폭 비교</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:52%"></div></div><b>52%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:65%"></div></div><b>65%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:41%"></div></div><b>41%</b></div></div><p class="viz-copy">“변화: IV. 고정: 현재가, 행사가, 만기.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>35</output></label><input type="range" min="0" max="100" value="35" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">IV가 높아질 때 등가격 감마가 넓게 퍼지고 낮아질 수 있다는 직관을 제공한다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-08">
   <div class="fig">
     <div class="fig-label">Figure 08 — 델타 추정 vs 감마 보정</div>
     <h3>델타 추정 vs 감마 보정</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">option price 4.00, delta 0.50, gamma 0.06. 주가변화 +2: delta-only 5.00, gamma-adjusted 5.12. 주가변화 +5: delta-only 6.50, gamma-adjusted 7.25.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“주가 변화가 커질수록 곡률 보정이 커진다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">stock move 슬라이더 0~5. 두 추정값을 실시간 표시.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig08ControlVal">50</span></div>
-          <input id="fig08Control" type="range" min="0" max="100" value="50" aria-label="델타 추정 vs 감마 보정 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">큰 움직임에서 델타만 쓰는 추정과 감마 보정 추정의 차이를 보여준다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>델타 추정 vs 감마 보정</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:53%"></div></div><b>53%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:66%"></div></div><b>66%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:42%"></div></div><b>42%</b></div></div><p class="viz-copy">“주가 변화가 커질수록 곡률 보정이 커진다.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>40</output></label><input type="range" min="0" max="100" value="40" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">큰 움직임에서 델타만 쓰는 추정과 감마 보정 추정의 차이를 보여준다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-09">
   <div class="fig">
     <div class="fig-label">Figure 09 — 롱감마와 숏감마 방향 리스크 카드</div>
     <h3>롱감마와 숏감마 방향 리스크 카드</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">조건</div><p class="mini-p">롱감마: 상승 시 델타 증가, 하락 시 델타 감소. 숏감마: 상승 시 불리한 델타 증가, 하락 시 불리한 하락 노출 증가.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“롱감마는 큰 움직임에 민감하고, 숏감마는 큰 움직임에 취약해질 수 있다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">market up/down toggle. 각 카드의 델타 화살표 방향 변경.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig09ControlVal">50</span></div>
-          <input id="fig09Control" type="range" min="0" max="100" value="50" aria-label="롱감마와 숏감마 방향 리스크 카드 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">옵션 매수와 매도의 감마 성격을 포지션 리스크로 번역한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
+      <div class="viz-panel"><h4>롱감마와 숏감마 방향 리스크 카드</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:54%"></div></div><b>54%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:67%"></div></div><b>67%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:43%"></div></div><b>43%</b></div></div><p class="viz-copy">“롱감마는 큰 움직임에 민감하고, 숏감마는 큰 움직임에 취약해질 수 있다.”</p></div>
+    </div>
+    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>45</output></label><input type="range" min="0" max="100" value="45" aria-label="곡선 입력 변화"></div>
+
+    <div class="viz-note">옵션 매수와 매도의 감마 성격을 포지션 리스크로 번역한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-05">
@@ -411,13 +465,12 @@
   <div class="fig">
     <div class="fig-label">Figure 10 — 감마 점검 워크시트</div>
     <h3>감마 점검 워크시트</h3>
-    <div class="figure-points"><div class="mini-card"><div class="mini-k">데이터 입력칸</div><p class="mini-p">option type, position long/short, strike, spot, days to expiry, delta, gamma, +1 move new delta, -1 move new delta, ATM distance, long/short gamma note, variables held constant.</p></div><div class="mini-card"><div class="mini-k">핵심</div><p class="mini-p">“교육용 기록지이며 매매 지시서가 아니다.”</p></div><div class="mini-card"><div class="mini-k">확인</div><p class="mini-p">화면 입력 가능, <code>예시 채우기</code>, <code>비우기</code> 버튼. localStorage 저장은 선택 사항이며 외부 전송은 하지 않는다.</p></div><div class="mini-card"><div class="mini-k">모바일</div><p class="mini-p">입력칸은 1열, 숫자 input 높이 44px 이상.</p></div></div>
-    <div class="control-demo" data-control-demo>
-          <div class="control-row"><strong>학습용 조절값</strong><span class="control-value" id="fig10ControlVal">50</span></div>
-          <input id="fig10Control" type="range" min="0" max="100" value="50" aria-label="감마 점검 워크시트 조절값">
-          <div class="segmented" data-segmented><button type="button" class="active">기본</button><button type="button">비교</button><button type="button">위험</button></div>
-        </div>
-    <div class="fig-caption">학습자가 자신의 옵션을 감마 관점에서 기록하게 한다.</div>
+    <div class="viz-grid">
+      <div class="viz-panel accent"><h4>감마 점검 워크시트</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
+      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>option type, position long/short, strike, spot, days to expiry, delta, gamma, +1 move new delta, -1 move new delta, ATM distance, long/short gamma note, variables held constant.</span></label><label class="viz-check"><input type="checkbox"><span>“교육용 기록지이며 매매 지시서가 아니다.”</span></label><label class="viz-check"><input type="checkbox"><span>화면 입력 가능, 예시 채우기, 비우기 버튼. localStorage 저장은 선택 사항이며 외부 전송은 하지 않는다.</span></label><label class="viz-check"><input type="checkbox"><span>학습자가 자신의 옵션을 감마 관점에서 기록하게 한다.</span></label></div></div>
+    </div>
+
+    <div class="viz-note">학습자가 자신의 옵션을 감마 관점에서 기록하게 한다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-08">
@@ -469,16 +522,21 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-document.querySelectorAll('[data-control-demo]').forEach((box) => {
+document.querySelectorAll('[data-viz-range]').forEach((box) => {
   const input = box.querySelector('input[type="range"]');
-  const output = box.querySelector('.control-value');
-  if (input && output) input.addEventListener('input', () => { output.textContent = input.value; });
+  const output = box.querySelector('[data-range-out]');
+  if (input && output) {
+    const render = () => { output.textContent = input.value; };
+    input.addEventListener('input', render);
+    render();
+  }
 });
-document.querySelectorAll('[data-segmented]').forEach((group) => {
+document.querySelectorAll('[data-viz-toggle]').forEach((group) => {
   group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
     group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
   }));
 });
+
 
 </script>
 </body>
