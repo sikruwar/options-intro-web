@@ -267,6 +267,9 @@
       .nav-session, .nav-prev, .nav-index, .nav-forward, .nav-sep { display: none; }
       .theme-btn { min-width: 42px; min-height: 30px; padding: 5px 8px; }
     }
+  
+    /* Mobile title tuning: keep session hero titles readable on phones. */
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
   </style>
 </head>
 <body>
@@ -274,7 +277,7 @@
 <div id="progress-bar"></div>
 
 <nav>
-  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
   <div class="nav-right">
     <a href="session-03.html" class="nav-prev">3회차</a>
     <span class="nav-session">SESSION 04</span>

@@ -363,12 +363,15 @@
       .fig, .mini-card, .controls, .metric, .worksheet-field, .gate { box-shadow: none; break-inside: avoid; background: #fff; color: #111; border-color: #bbb; }
       .answers, .gate-detail { display: block !important; }
     }
+  
+    /* Mobile title tuning: keep session hero titles readable on phones. */
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
   </style>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
 <nav>
-  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
   <div class="nav-right">
     <a href="session-08.html" class="nav-prev">8회차</a>
     <span class="nav-session">SESSION 09</span>

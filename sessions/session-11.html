@@ -345,12 +345,15 @@
       .worksheet-field input { border: 1px solid #999; background: #fff; color: #111; }
       .num-input { border: 1px solid #999; background: #fff; color: #111; }
     }
+  
+    /* Mobile title tuning: keep session hero titles readable on phones. */
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
   </style>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
 <nav>
-  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
   <div class="nav-right">
     <a href="session-10.html" class="nav-prev">10회차</a>
     <span class="nav-session">SESSION 11</span>
