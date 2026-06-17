@@ -85,6 +85,25 @@
     if (el) el.textContent = text;
   }
 
+  function authErrorMessage(error) {
+    const message = String(error?.message || error || '');
+    if (/rate limit|too many|email rate/i.test(message)) {
+      return '인증 메일 요청이 잠시 제한됐습니다. 이미 받은 메일이 있으면 최신 인증 링크를 눌러주세요. 메일이 없다면 잠시 뒤 다시 시도하면 됩니다.';
+    }
+    return `처리 중 문제가 생겼습니다: ${message}`;
+  }
+
+  function otpCooldownKey(email) {
+    return `howinsight-auth-otp-sent-at:${normalizeEmail(email)}`;
+  }
+
+  function secondsUntilOtpRetry(email) {
+    const sentAt = Number(localStorage.getItem(otpCooldownKey(email)) || 0);
+    if (!sentAt) return 0;
+    const waitSeconds = 90;
+    return Math.max(0, waitSeconds - Math.floor((Date.now() - sentAt) / 1000));
+  }
+
   function loadSupabase() {
     return new Promise((resolve, reject) => {
       if (window.supabase?.createClient) return resolve(window.supabase);
@@ -218,6 +237,11 @@
       const xHandle = normalizeXHandle(form.x_handle.value);
       btn.disabled = true;
       try {
+        const retryAfter = secondsUntilOtpRetry(email);
+        if (retryAfter > 0) {
+          statusMessage(`인증 메일을 방금 요청했습니다. 메일함을 먼저 확인해주세요. 다시 요청은 약 ${retryAfter}초 뒤에 가능합니다.`);
+          return;
+        }
         await upsertRequest(email, xHandle, 'pending');
         const supabase = await getClient();
         const { error } = await supabase.auth.signInWithOtp({
@@ -225,9 +249,10 @@
           options: { emailRedirectTo: window.location.href }
         });
         if (error) throw error;
+        localStorage.setItem(otpCooldownKey(email), String(Date.now()));
         statusMessage('인증 링크를 보냈습니다. 메일함에서 링크를 누르면 승인 상태를 확인합니다.');
       } catch (error) {
-        statusMessage(`처리 중 문제가 생겼습니다: ${error.message}`);
+        statusMessage(authErrorMessage(error));
       } finally {
         btn.disabled = false;
       }

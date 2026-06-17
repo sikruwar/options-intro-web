@@ -39,3 +39,10 @@ def test_approved_user_identity_badge_exists():
     assert '승인 계정' in js
     assert 'x_handle' in js
     assert 'hi-approved-sign-out' in js
+
+
+def test_auth_rate_limit_message_is_friendly():
+    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
+    assert 'authErrorMessage' in js
+    assert '인증 메일 요청이 잠시 제한됐습니다' in js
+    assert 'secondsUntilOtpRetry' in js
