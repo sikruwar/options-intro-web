@@ -1,1292 +1,217 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>프롤로그 — 무기견의 옵션 입문</title>
+  <meta name="description" content="옵션을 배우려는 동기를 점검하고, 빠른 수익 욕구를 리스크 가격 언어로 바꾸는 옵션 입문 프롤로그입니다.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0D0D0D;
-      --bg-card: #161616;
-      --bg-card2: #1E1E1E;
-      --text: #F0EBE1;
-      --text-muted: #8A8070;
-      --text-dim: #5A5248;
-      --call: #3B82F6;
-      --call-dim: #1D3A6E;
-      --put: #EF4444;
-      --put-dim: #6E1D1D;
-      --amber: #F59E0B;
-      --green: #22C55E;
-      --red: #EF4444;
-      --orange: #F97316;
-      --border: #2A2520;
-      --border-light: #3A3530;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 16px;
-      line-height: 1.8;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── PROGRESS BAR ── */
-    #progress-bar {
-      position: fixed; top: 0; left: 0; height: 2px;
-      background: linear-gradient(90deg, var(--call), var(--amber));
-      width: 0%; z-index: 100;
-      transition: width 0.1s linear;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
-      background: rgba(13,13,13,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 32px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-brand {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px; color: var(--text-muted); letter-spacing: 0.08em;
-      text-decoration: none;
-    }
-    .nav-brand span { color: var(--amber); }
-    .nav-brand:hover { color: var(--text); }
-    .nav-right {
-      display: flex; align-items: center; gap: 16px;
-    }
-    .nav-session {
-      font-size: 12px; color: var(--text-dim);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .nav-next {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px; color: var(--text-muted);
-      text-decoration: none; display: flex; align-items: center; gap: 6px;
-      transition: color 0.15s;
-    }
-    .nav-next:hover { color: var(--amber); }
-
-    /* ── HERO ── */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: flex-start;
-      padding: 120px 10vw 80px;
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; top: -200px; right: -100px;
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; bottom: -100px; left: -50px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-eyebrow {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px; color: var(--amber);
-      letter-spacing: 0.15em; text-transform: uppercase;
-      margin-bottom: 28px;
-    }
-    .hero h1 {
-      font-size: clamp(38px, 7vw, 76px);
-      font-weight: 900; line-height: 1.1;
-      letter-spacing: -0.03em;
-      margin-bottom: 20px;
-    }
-    .hero h1 em {
-      font-style: normal;
-      color: var(--amber);
-    }
-    .hero-sub {
-      font-size: clamp(15px, 2vw, 19px);
-      color: var(--text-muted);
-      font-weight: 300; max-width: 520px;
-      margin-bottom: 48px; line-height: 1.7;
-    }
-    .hero-thesis {
-      background: var(--bg-card);
-      border: 1px solid var(--border-light);
-      border-left: 3px solid var(--amber);
-      padding: 20px 28px;
-      max-width: 600px;
-      font-size: 17px; font-weight: 500;
-      line-height: 1.6; border-radius: 0 8px 8px 0;
-    }
-    .hero-thesis .label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--amber);
-      letter-spacing: 0.15em; margin-bottom: 10px;
-    }
-
-    /* ── SCROLL HINT ── */
-    .scroll-hint {
-      position: absolute; bottom: 40px; left: 50%;
-      transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-    }
-    .scroll-hint span { font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; }
-    .scroll-dot {
-      width: 4px; height: 24px;
-      background: linear-gradient(var(--border-light), transparent);
-      border-radius: 2px; animation: scrollPulse 2s ease-in-out infinite;
-    }
-    @keyframes scrollPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-
-    /* ── LAYOUT ── */
-    .section {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 80px 24px;
-    }
-    .section-wide {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 80px 24px;
-    }
-    .section-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 0;
-    }
-
-    /* ── SECTION HEADER ── */
-    .section-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; color: var(--text-dim);
-      letter-spacing: 0.15em; margin-bottom: 16px;
-    }
-    .section h2, .section-wide h2 {
-      font-size: clamp(22px, 4vw, 34px);
-      font-weight: 700; line-height: 1.25;
-      letter-spacing: -0.02em; margin-bottom: 32px;
-    }
-
-    /* ── PROSE ── */
-    .prose p {
-      font-size: 16px; line-height: 1.85;
-      color: #D4CFC8;
-      margin-bottom: 20px;
-    }
-    .prose p:last-child { margin-bottom: 0; }
-    .prose strong { color: var(--text); font-weight: 600; }
-
-    /* ── FIGURE BLOCK ── */
-    .fig {
-      background: var(--bg-card);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      padding: 32px;
-      margin: 36px 0;
-    }
-    .fig-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--amber);
-      letter-spacing: 0.15em; text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .fig-caption {
-      margin-top: 20px;
-      font-size: 13px; color: var(--text-dim);
-      line-height: 1.6; font-style: italic;
-    }
-
-    /* ── FIGURE 1: 2×2 MOTIVATION CARDS ── */
-    .mot-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .mot-card {
-      border-radius: 10px;
-      padding: 22px 20px;
-      border: 1px solid;
-      position: relative;
-    }
-    .mot-card.d1 { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
-    .mot-card.d2 { background: rgba(249,115,22,0.05); border-color: rgba(249,115,22,0.2); }
-    .mot-card.s1 { background: rgba(59,130,246,0.05); border-color: rgba(59,130,246,0.2); }
-    .mot-card.s2 { background: rgba(34,197,94,0.05); border-color: rgba(34,197,94,0.2); }
-    .mot-icon { font-size: 22px; margin-bottom: 10px; display: block; }
-    .mot-label {
-      font-size: 14px; font-weight: 700; margin-bottom: 6px;
-    }
-    .mot-card.d1 .mot-label { color: var(--red); }
-    .mot-card.d2 .mot-label { color: var(--orange); }
-    .mot-card.s1 .mot-label { color: var(--call); }
-    .mot-card.s2 .mot-label { color: var(--green); }
-    .mot-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-    .mot-tag {
-      display: inline-block;
-      margin-top: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 600;
-      padding: 3px 9px; border-radius: 4px;
-      letter-spacing: 0.08em;
-    }
-    .mot-card.d1 .mot-tag, .mot-card.d2 .mot-tag {
-      background: rgba(239,68,68,0.15); color: var(--red);
-    }
-    .mot-card.d2 .mot-tag {
-      background: rgba(249,115,22,0.15); color: var(--orange);
-    }
-    .mot-card.s1 .mot-tag { background: rgba(59,130,246,0.15); color: var(--call); }
-    .mot-card.s2 .mot-tag { background: rgba(34,197,94,0.15); color: var(--green); }
-
-    /* ── FIGURE 2: COMPARISON ── */
-    .compare-wrap {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 0;
-      align-items: start;
-    }
-    .compare-col {
-      border-radius: 10px;
-      padding: 22px 20px;
-      border: 1px solid;
-    }
-    .compare-col.danger { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
-    .compare-col.safe   { background: rgba(59,130,246,0.05); border-color: rgba(59,130,246,0.2); }
-    .compare-col-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 600;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-    .compare-col.danger .compare-col-label { color: var(--red); }
-    .compare-col.safe   .compare-col-label { color: var(--call); }
-    .compare-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .compare-list li {
-      font-size: 13px; line-height: 1.5;
-      color: var(--text-muted);
-      padding-left: 14px; position: relative;
-    }
-    .compare-list li::before { content: "·"; position: absolute; left: 0; color: var(--text-dim); }
-    .compare-sep {
-      display: flex; align-items: flex-start;
-      padding: 20px 14px;
-      font-size: 18px; color: var(--text-dim);
-    }
-    .compare-note {
-      margin-top: 16px;
-      font-size: 13px; color: var(--text-dim);
-      text-align: center; font-style: italic;
-      padding: 12px 16px;
-      background: var(--bg-card2);
-      border-radius: 8px;
-    }
-
-    /* ── WARN BOX ── */
-    .warn-box {
-      background: rgba(249,115,22,0.06);
-      border-left: 3px solid var(--orange);
-      border-radius: 0 8px 8px 0;
-      padding: 18px 22px;
-      margin: 28px 0;
-    }
-    .warn-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--orange);
-      letter-spacing: 0.12em; margin-bottom: 10px;
-    }
-    .warn-box p {
-      font-size: 14px; color: var(--text-muted); line-height: 1.7;
-    }
-
-    /* ── FIGURE 3: PREMIUM DIAGRAM ── */
-    .prem-diagram {
-      display: flex; flex-direction: column; align-items: center; gap: 0;
-    }
-    .prem-inputs {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 10px; width: 100%; max-width: 520px;
-    }
-    .prem-input {
-      background: var(--bg-card2);
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      padding: 14px 16px; text-align: center;
-    }
-    .prem-icon { font-size: 18px; margin-bottom: 6px; }
-    .prem-input-label {
-      font-size: 13px; font-weight: 700; color: var(--text);
-      margin-bottom: 4px;
-    }
-    .prem-input-desc { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
-    .prem-connector {
-      display: flex; justify-content: center; gap: 90px;
-      color: var(--text-dim); font-size: 18px;
-      padding: 6px 0;
-    }
-    .prem-center {
-      background: rgba(245,158,11,0.08);
-      border: 1.5px solid rgba(245,158,11,0.35);
-      border-radius: 50px;
-      padding: 14px 36px; text-align: center;
-    }
-    .prem-center-label {
-      font-size: 14px; font-weight: 700; color: var(--amber);
-      letter-spacing: 0.03em;
-    }
-    .prem-center-sub {
-      font-size: 11px; color: var(--amber); opacity: 0.6; margin-top: 3px;
-    }
-    .greek-badges {
-      display: flex; gap: 8px; flex-wrap: wrap;
-      justify-content: center; margin-top: 18px;
-    }
-    .greek-badge {
-      background: var(--bg-card2);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 4px 12px;
-      font-size: 12px; color: var(--text-muted);
-    }
-    .greek-badge em { font-style: italic; color: var(--amber); font-weight: 600; }
-
-    /* ── 3-STEP LEARNING ── */
-    .step-list { display: flex; flex-direction: column; gap: 0; margin: 8px 0; }
-    .step-item {
-      display: flex; gap: 20px; align-items: flex-start;
-      padding: 24px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .step-item:last-child { border-bottom: none; }
-    .step-num {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: var(--bg-card2); border: 1px solid var(--border-light);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px; font-weight: 600; color: var(--amber);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 2px;
-    }
-    .step-body strong {
-      display: block; font-size: 15px; font-weight: 700;
-      color: var(--text); margin-bottom: 6px;
-    }
-    .step-body p {
-      font-size: 14px; color: var(--text-muted); line-height: 1.7; margin: 0;
-    }
-
-    /* ── FIGURE 4: MARKET LANGUAGE MAP ── */
-    .lang-center-row {
-      display: flex; justify-content: center; margin-bottom: 16px;
-    }
-    .lang-center {
-      background: var(--bg-card2);
-      border: 1px solid var(--border-light);
-      border-radius: 50px;
-      padding: 12px 28px; text-align: center;
-    }
-    .lang-center-label {
-      font-size: 14px; font-weight: 700; color: var(--text);
-    }
-    .lang-center-sub {
-      font-size: 11px; color: var(--text-dim); margin-top: 3px;
-    }
-    .lang-nodes {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    .lang-node {
-      background: var(--bg-card2);
-      border: 1px solid var(--border);
-      border-radius: 8px; padding: 14px 16px; text-align: center;
-      transition: border-color 0.2s;
-    }
-    .lang-node:hover { border-color: var(--amber); }
-    .lang-node-icon { font-size: 18px; margin-bottom: 6px; }
-    .lang-node-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-    .lang-node-desc { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
-
-    /* ── FIGURE 5: ROADMAP ── */
-    .roadmap-v { display: flex; flex-direction: column; gap: 0; }
-    .rm-item {
-      display: flex; gap: 16px; align-items: stretch;
-      cursor: pointer;
-    }
-    .rm-left {
-      display: flex; flex-direction: column; align-items: center;
-      flex-shrink: 0; width: 40px;
-    }
-    .rm-dot {
-      width: 14px; height: 14px; border-radius: 50%;
-      border: 2px solid var(--border-light);
-      background: var(--bg-card2);
-      flex-shrink: 0; margin-top: 4px;
-      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-    }
-    .rm-item.current .rm-dot {
-      background: var(--amber);
-      border-color: var(--amber);
-      box-shadow: 0 0 14px rgba(245,158,11,0.4);
-    }
-    .rm-line {
-      flex: 1; width: 1px; background: var(--border);
-      margin-top: 4px;
-    }
-    .rm-right { flex: 1; padding: 0 0 24px; }
-    .rm-meta {
-      display: flex; align-items: center; gap: 8px;
-      margin-bottom: 2px;
-    }
-    .rm-part {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--text-dim);
-      letter-spacing: 0.1em; text-transform: uppercase;
-    }
-    .rm-item.current .rm-part { color: var(--amber); }
-    .rm-sessions { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); }
-    .rm-now {
-      display: none;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 600;
-      background: rgba(245,158,11,0.15); color: var(--amber);
-      padding: 2px 8px; border-radius: 100px; letter-spacing: 0.08em;
-    }
-    .rm-item.current .rm-now { display: inline; }
-    .rm-title {
-      font-size: 15px; font-weight: 700; color: var(--text);
-      margin-bottom: 0;
-    }
-    .rm-item.current .rm-title { color: var(--amber); }
-    .rm-detail {
-      display: none;
-      font-size: 13px; color: var(--text-muted);
-      margin-top: 10px; line-height: 1.65;
-      padding: 12px 16px;
-      background: var(--bg-card2);
-      border-radius: 6px;
-      border-left: 2px solid var(--border-light);
-    }
-    .rm-item.open .rm-detail { display: block; }
-
-    /* ── FIGURE 6: ASSIGNMENT ── */
-    .assignment {
-      background: var(--bg-card2);
-      border: 1px solid var(--border-light);
-      border-radius: 12px; overflow: hidden;
-      margin: 28px 0;
-    }
-    .assignment-header {
-      background: var(--bg-card);
-      padding: 14px 24px;
-      border-bottom: 1px solid var(--border);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; color: var(--amber);
-      letter-spacing: 0.12em;
-    }
-    .assignment-body { padding: 24px; }
-    .assignment-q {
-      font-size: 17px; font-weight: 700; color: var(--text);
-      margin-bottom: 16px; line-height: 1.4;
-    }
-    .assignment-hints {
-      list-style: none; display: flex; flex-direction: column;
-      gap: 8px; margin-bottom: 20px;
-    }
-    .assignment-hints li {
-      font-size: 13px; color: var(--text-muted);
-      padding-left: 18px; position: relative;
-    }
-    .assignment-hints li::before {
-      content: "→"; position: absolute; left: 0; color: var(--text-dim);
-    }
-    .assignment-textarea {
-      width: 100%; min-height: 100px;
-      background: var(--bg); color: var(--text);
-      border: 1px solid var(--border-light);
-      border-radius: 8px; padding: 14px 16px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 15px; line-height: 1.7;
-      resize: vertical; outline: none;
-      transition: border-color 0.2s;
-    }
-    .assignment-textarea:focus { border-color: var(--amber); }
-    .assignment-textarea::placeholder { color: var(--text-dim); }
-    .assignment-actions {
-      display: flex; align-items: center; gap: 10px;
-      margin-top: 12px;
-    }
-    .btn-save {
-      background: var(--amber); color: #0D0D0D;
-      border: none; border-radius: 6px;
-      padding: 8px 18px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 14px; font-weight: 700;
-      cursor: pointer; transition: opacity 0.15s;
-    }
-    .btn-save:hover { opacity: 0.88; }
-    .btn-clear {
-      background: none;
-      border: 1px solid var(--border-light);
-      border-radius: 6px; padding: 7px 14px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 14px; color: var(--text-muted);
-      cursor: pointer; transition: border-color 0.15s;
-    }
-    .btn-clear:hover { border-color: var(--text-muted); }
-    .save-hint {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; color: var(--text-dim); margin-left: 4px;
-    }
-
-    /* ── SUMMARY GRID ── */
-    .summary-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 14px; margin: 28px 0;
-    }
-    .summary-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px; padding: 22px 20px;
-    }
-    .summary-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 26px; font-weight: 600;
-      color: var(--amber); margin-bottom: 8px;
-    }
-    .summary-text { font-size: 14px; line-height: 1.65; color: var(--text-muted); }
-    .summary-text strong { color: var(--text); }
-
-    /* ── NEXT CARD ── */
-    .next-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px; padding: 28px 32px;
-      margin-top: 40px;
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 24px;
-      text-decoration: none; color: inherit;
-      transition: border-color 0.2s;
-    }
-    .next-card:hover { border-color: var(--border-light); }
-    .next-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--text-dim);
-      letter-spacing: 0.12em; margin-bottom: 8px;
-    }
-    .next-title { font-size: 17px; font-weight: 600; color: var(--text); }
-    .next-arrow {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: var(--bg-card2); border: 1px solid var(--border-light);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: var(--amber); flex-shrink: 0;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 32px 10vw;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .footer-brand {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px; color: var(--text-dim);
-    }
-    .footer-page {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; color: var(--text-dim);
-    }
-
-    /* ── REVEAL ── */
-    .reveal {
-      opacity: 0; transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    .reveal.visible { opacity: 1; transform: none; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 680px) {
-      nav { padding: 12px 20px; }
-      .hero { padding: 100px 24px 60px; }
-      .section, .section-wide { padding: 60px 20px; }
-      .mot-grid { grid-template-columns: 1fr; }
-      .compare-wrap { grid-template-columns: 1fr; }
-      .compare-sep { display: none; }
-      .lang-nodes { grid-template-columns: 1fr 1fr; }
-      .prem-inputs { grid-template-columns: 1fr 1fr; }
-      .summary-grid { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 8px; text-align: center; }
-      .next-card { flex-direction: column; align-items: flex-start; }
-    }
-
-    /* ── PRINT ── */
-    @media print {
-      nav, #progress-bar, .scroll-hint { display: none; }
-      .hero { min-height: auto; padding: 40px 0 20px; }
-      .rm-detail { display: block !important; }
-      .assignment-textarea { height: 80px; }
-      .btn-save, .btn-clear { display: none; }
-    }
-
-
-    /* ── THEME MODE: dark base + optional olive ── */
-    :root {
-      color-scheme: dark;
-      --nav-bg: rgba(13,13,13,0.92);
-      --hero-glow-warm: rgba(245,158,11,0.05);
-      --hero-glow-cool: rgba(59,130,246,0.04);
-      --prose-text: #D4CFC8;
-      --row-hover: rgba(255,255,255,0.02);
-      --pending-bg: rgba(90,82,72,0.3);
-      --open-bg: rgba(34,197,94,0.12);
-      --cta-text: #0D0D0D;
-    }
-    :root[data-theme="olive"] {
-      color-scheme: light;
-      --bg: #FAFAF2;
-      --bg-card: #FFFFFF;
-      --bg-card2: #F4F5E9;
-      --text: #1C2418;
-      --text-muted: #5E684F;
-      --text-dim: #8A927A;
-      --call: #2F6FB2;
-      --call-dim: #DCE8EF;
-      --put: #B94A48;
-      --put-dim: #F3DDDA;
-      --amber: #7D8F3A;
-      --green: #4F7A35;
-      --red: #B94A48;
-      --orange: #B66C25;
-      --border: #E4E7D5;
-      --border-light: #D5DBC1;
-      --nav-bg: rgba(250,250,242,0.92);
-      --hero-glow-warm: rgba(125,143,58,0.12);
-      --hero-glow-cool: rgba(96,117,63,0.08);
-      --prose-text: #34402D;
-      --row-hover: rgba(93,113,49,0.05);
-      --pending-bg: rgba(138,146,122,0.14);
-      --open-bg: rgba(79,122,53,0.12);
-      --cta-text: #FFFFFF;
-    }
-    body { transition: background 0.25s ease, color 0.25s ease; }
-    nav { background: var(--nav-bg) !important; }
-    .hero::before { background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%) !important; }
-    .hero::after { background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%) !important; }
-    .prose p { color: var(--prose-text) !important; }
-    .theme-toggle {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 3px;
-      border: 1px solid var(--border-light);
-      border-radius: 999px;
-      background: var(--bg-card);
-      flex-shrink: 0;
-    }
-    .theme-btn {
-      border: 0;
-      min-width: 44px; min-height: 32px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: transparent;
-      color: var(--text-dim);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 600;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
-    .theme-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-    @media (max-width: 680px) {
-      .nav-right { gap: 8px; }
-      .nav-session, .nav-sep { display: none; }
-      .theme-btn { min-width: 42px; min-height: 30px; padding: 5px 8px; }
-    }
-  </style>
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; } body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; } a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--amber),var(--blue),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); } .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); } .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; } .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; } .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; } .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; } .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; } .hero h1 { font-size:clamp(38px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; } .hero h1 .hi { color:var(--amber); } .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:700px; line-height:1.72; margin-bottom:38px; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; } .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; } .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); } .section { max-width:810px; margin:0 auto; padding:78px 24px; } .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; } .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; } .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; } .prose p:last-child { margin-bottom:0; } .prose strong { color:var(--text); font-weight:700; } .prose code,code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); } .prose ul { color:var(--prose-text); margin:0 0 18px 20px; } .prose li { margin:7px 0; } .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; } .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; } .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; } .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:14px; } .mini-card,.motive-card,.path-card,.premium-card,.language-node { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; } .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; } .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; } .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .motivation-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; } .motive-card.danger,.path-card.danger { border-color:rgba(239,68,68,.4); } .motive-card.danger .mini-v,.path-card.danger .mini-v { color:var(--red); } .motive-card.productive,.path-card.productive { border-color:rgba(53,208,127,.35); } .motive-card.productive .mini-v,.path-card.productive .mini-v { color:var(--green); } .check-list { margin:15px 0 0 18px; color:var(--text-muted); font-size:14px; line-height:1.7; }
+    .premium-map { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:stretch; } .premium-center { grid-row:span 2; min-height:230px; border-radius:16px; border:1px solid var(--border-light); background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; } .premium-center span { font-family:'JetBrains Mono', monospace; font-size:20px; font-weight:800; color:var(--amber); line-height:1.35; } .premium-center small { color:var(--text-muted); margin-top:10px; } .premium-card b { display:block; color:var(--text); font-size:18px; margin-bottom:6px; } .premium-card p { color:var(--text-muted); font-size:14px; line-height:1.6; margin-bottom:10px; } .premium-card em { font-style:normal; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); }
+    .language-map { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; } .language-core { grid-column:1/-1; background:linear-gradient(135deg,rgba(245,177,76,.12),rgba(125,211,252,.08)); border:1px solid var(--border-light); border-radius:14px; padding:24px; text-align:center; font-size:22px; font-weight:900; line-height:1.45; } .language-node { text-align:center; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); min-height:62px; display:flex; align-items:center; justify-content:center; }
+    .roadmap-stack { display:grid; gap:10px; } .roadmap-stack details { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:16px 18px; } .roadmap-stack summary { cursor:pointer; color:var(--text); font-weight:800; } .roadmap-stack summary span { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:12px; margin-right:10px; } .roadmap-stack p { color:var(--text-muted); font-size:14px; line-height:1.65; margin-top:10px; }
+    .worksheet-prompts { display:grid; gap:8px; margin-bottom:16px; } .worksheet-prompts span { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:11px 13px; color:var(--text-muted); font-size:14px; } textarea { width:100%; min-height:150px; resize:vertical; background:var(--bg-card2); border:1px solid var(--border-light); border-radius:12px; color:var(--text); padding:16px; font:inherit; line-height:1.7; } textarea:focus { outline:2px solid rgba(245,177,76,.28); outline-offset:2px; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; } .next-card:hover { border-color:var(--amber); } .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; } .next-title { font-size:17px; font-weight:800; } .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; } .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; } .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; } .reveal.visible { opacity:1; transform:none; }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(40px,12.5vw,54px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { overflow-wrap:anywhere; word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .section h2,.section-wide h2 { word-break:break-all; overflow-wrap:anywhere; } .two,.motivation-grid,.premium-map,.language-map { grid-template-columns:1fr; } .premium-center { grid-row:auto; min-height:170px; } .fig { padding:20px; max-width:calc(100vw - 40px); } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.motive-card,.path-card,.premium-card,.language-node,.roadmap-stack details { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.roadmap-stack p { color:#333; } }
+</style>
 </head>
 <body>
-
-<div id="progress-bar"></div>
-
+<div class="progress" aria-hidden="true"></div>
 <nav>
   <a href="index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
   <div class="nav-right">
     <span class="nav-session">PROLOGUE</span>
-    <a href="sessions/session-01.html" class="nav-next">1회차 →</a>
+    <a href="index.html" class="nav-next nav-index">목차</a>
+    <a href="sessions/session-01.html" class="nav-next nav-forward">1회차 →</a>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
       <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
       <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
     </div>
   </div>
 </nav>
-
-<!-- ── HERO ── -->
 <section class="hero">
-  <div class="hero-eyebrow">무기견의 옵션 입문 · 프롤로그</div>
-  <h1>당신은 왜<br>옵션을<br><em>배우고 싶은가</em></h1>
-  <p class="hero-sub">옵션을 배우고 싶다는 마음은<br>보통 차분한 곳에서 시작하지 않습니다.</p>
-  <div class="hero-thesis">
-    <div class="label">THIS COURSE</div>
-    옵션은 시장이 불확실성을 얼마에 사고파는지 읽는 언어입니다. 이 강의는 그 언어를 처음부터 차근히 배웁니다.
-  </div>
-  <div class="scroll-hint">
-    <span>SCROLL</span>
-    <div class="scroll-dot"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">무기견의 옵션 입문 · Prologue · Level 0</div>
+    <h1>당신은 왜<br>옵션을 배우고<br><span class="hi">싶어하는가</span></h1>
+    <p class="hero-sub">옵션 공부의 첫 질문은 어떤 옵션을 살지가 아닙니다. 내가 왜 이 상품을 배우려 하는지, 그 마음이 어떤 리스크를 부를 수 있는지 먼저 확인합니다.</p>
+    <div class="thesis"><div class="thesis-label">프롤로그 중심 문장</div><div class="thesis-main">옵션은 큰돈을 빠르게 벌기 위한 지름길이 아니라,<br>미래의 불확실성에 가격을 매기는 계약입니다.</div></div>
   </div>
 </section>
-
-<hr class="section-divider">
-
-<!-- ── 00 들어가며 ── -->
-<div class="section reveal">
-  <div class="section-num">00 · 들어가며</div>
-  <h2>대부분은 강한 가격 움직임을 본<br>뒤에 시작합니다</h2>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">01 · COURSE ENTRY</div>
+  <h2>옵션 공부는 동기 점검에서 시작합니다</h2>
   <div class="prose">
-    <p>누군가는 작은 돈으로 몇 배를 벌었다는 이야기를 듣습니다. 누군가는 주식에서 큰 손실을 보고 빠르게 복구할 방법을 찾습니다. 또 누군가는 시장이 무너질 때 계좌를 지킬 방법이 없다는 무력감을 느낍니다.</p>
-    <p>저도 이 마음을 가볍게 보지 않습니다. 투자자는 손실 앞에서 조급해지고, 남들이 빠르게 버는 시장에서는 뒤처진 느낌을 받습니다. 옵션이라는 단어는 그럴 때 유난히 강하게 들립니다.</p>
-    <p>하지만 이 강의는 옵션을 대박의 도구로 포장하지 않겠습니다. 옵션은 미래의 불확실성에 가격을 매기는 계약입니다. 가격의 방향, 움직이는 속도, 남은 시간, 시장이 예상하는 변동성이 모두 한 상품 안에 들어갑니다.</p>
+<p>옵션을 배우고 싶다는 마음은 보통 차분한 곳에서 시작하지 않습니다.</p>
+<p>대부분은 강한 가격 움직임을 본 뒤에 시작합니다. 누군가는 작은 돈으로 몇 배를 벌었다는 이야기를 듣습니다. 누군가는 주식에서 큰 손실을 보고, 빠르게 복구할 방법을 찾습니다. 또 누군가는 시장이 무너질 때 내 계좌를 지킬 방법이 없다는 무력감을 느낍니다.</p>
+<p>저도 이 마음을 가볍게 보지 않습니다. 투자자는 손실 앞에서 조급해지고, 남들이 빠르게 버는 시장에서는 뒤처진 느낌을 받습니다. 옵션이라는 단어는 그럴 때 유난히 강하게 들립니다. 적은 돈으로 큰 수익을 낼 수 있을 것 같고, 시장이 내려도 돈을 벌 수 있을 것 같거든요.</p>
+<p>하지만 이 강의는 옵션을 대박의 도구로 포장하지 않겠습니다.</p>
   </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 01 네 가지 마음 ── -->
-<div class="section reveal">
-  <div class="section-num">01 · 네 가지 마음</div>
-  <h2>옵션을 배우려는 이유는<br>크게 네 가지로 나뉩니다</h2>
+</section>
+<hr class="divider">
+<section class="section-wide reveal" id="figure-01"><div class="fig"><div class="fig-label">Figure 01 — 네 가지 동기 카드</div><h2>내가 가진 마음을 먼저 분류합니다</h2><div class="motivation-grid"><div class="motive-card danger"><div class="mini-k">FAST MONEY</div><div class="mini-v">빠른 수익</div><p class="mini-p">작은 돈으로 큰 수익을 노리고 싶다. 짧은 만기와 외가격 옵션의 유혹이 커지는 출발점입니다.</p></div><div class="motive-card danger"><div class="mini-k">RECOVERY</div><div class="mini-v">손실 복구</div><p class="mini-p">무너진 계좌를 빨리 되돌리고 싶다. 포지션 크기와 만기 선택이 급해지기 쉽습니다.</p></div><div class="motive-card productive"><div class="mini-k">PROTECTION</div><div class="mini-v">포트폴리오 방어</div><p class="mini-p">급락장에서 계좌를 지킬 방법을 알고 싶다. 풋옵션과 보험료를 구조적으로 이해해야 합니다.</p></div><div class="motive-card productive"><div class="mini-k">RISK PRICING</div><div class="mini-v">리스크 가격 읽기</div><p class="mini-p">시장이 불확실성을 얼마에 사고파는지 알고 싶다. 옵션을 시장 해석 언어로 배우는 출발점입니다.</p></div></div><div class="fig-caption">앞의 두 마음을 비난하지 않습니다. 다만 그 마음이 만기, 레버리지, 포지션 크기를 어떻게 급하게 만드는지 먼저 봅니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">02 · FIRST QUESTION</div>
+  <h2>나는 배우려는 걸까, 복구 수단을 찾는 걸까</h2>
   <div class="prose">
-    <p>어떤 마음으로 시작하느냐가 어떤 행동으로 이어지는지를 결정합니다.</p>
+<p>프롤로그에서 먼저 던질 질문은 이것입니다.</p>
+<p>나는 지금 옵션을 배우려는 건가, 아니면 빠른 복구 수단을 찾고 있는 건가.</p>
+<p>두 마음은 겉으로는 비슷해 보입니다. 둘 다 옵션 검색창으로 이어질 수 있습니다. 하지만 실제 결과는 완전히 달라집니다. 첫 번째 마음은 구조를 보게 만들고, 두 번째 마음은 레버리지만 크게 만듭니다.</p>
+<p>옵션은 내가 가진 방향성 판단을 시간, 변동성, 레버리지와 함께 증폭합니다. 방향이 맞아도 시간이 너무 오래 걸리면 손실이 날 수 있습니다. 방향이 맞아도 이미 비싼 변동성을 주고 샀다면 손실이 날 수 있습니다. 행사가가 너무 멀면 기초자산이 올라도 내 옵션은 끝내 살아나지 못할 수 있습니다.</p>
+<p>그래서 옵션 공부의 출발점은 매수 버튼이 아니라 자기 동기 점검이어야 합니다.</p>
   </div>
-
-  <div class="fig">
-    <div class="fig-label">Figure 01 — 학습 동기 유형</div>
-    <div class="mot-grid">
-      <div class="mot-card d1">
-        <span class="mot-icon">⚡</span>
-        <div class="mot-label">빠른 수익</div>
-        <div class="mot-desc">작은 돈으로 큰 수익을 노리고 싶다. 외가격 콜옵션이 몇십 배 올랐다는 사례를 보고 흔들린다.</div>
-        <span class="mot-tag">RISKY START</span>
-      </div>
-      <div class="mot-card d2">
-        <span class="mot-icon">📉</span>
-        <div class="mot-label">손실 복구</div>
-        <div class="mot-desc">무너진 계좌를 빨리 되돌리고 싶다. 평범한 수익률이 답답하게 느껴지는 상태.</div>
-        <span class="mot-tag">RISKY START</span>
-      </div>
-      <div class="mot-card s1">
-        <span class="mot-icon">🛡️</span>
-        <div class="mot-label">포트폴리오 방어</div>
-        <div class="mot-desc">급락장에서 계좌를 지킬 방법을 알고 싶다. 보호적 풋, 포트폴리오 보험에 관심이 생겼다.</div>
-        <span class="mot-tag">PRODUCTIVE START</span>
-      </div>
-      <div class="mot-card s2">
-        <span class="mot-icon">📖</span>
-        <div class="mot-label">리스크 언어 습득</div>
-        <div class="mot-desc">VIX가 왜 오르는지, 시장이 어떤 위험을 두려워하는지 알고 싶다.</div>
-        <span class="mot-tag">PRODUCTIVE START</span>
-      </div>
-    </div>
-    <div class="fig-caption">앞의 두 동기는 위험합니다. 뒤의 두 동기는 더 생산적입니다. 다만 위험한 마음이라고 부끄러워할 필요는 없습니다.</div>
-  </div>
-
+</section>
+<hr class="divider">
+<section class="section-wide reveal" id="figure-02"><div class="fig"><div class="fig-label">Figure 02 — 위험한 출발점과 생산적인 출발점</div><h2>같은 옵션 공부라도 출발점이 행동을 바꿉니다</h2><div class="two"><div class="path-card danger"><div class="mini-k">DANGEROUS START</div><div class="mini-v">빨리 벌기와 복구 욕구</div><ul class="check-list"><li>몰빵</li><li>짧은 만기</li><li>먼 외가격 유혹</li><li>프리미엄만 보고 싸다고 판단</li></ul></div><div class="path-card productive"><div class="mini-k">PRODUCTIVE START</div><div class="mini-v">리스크 이해와 방어 목적</div><ul class="check-list"><li>보험료 확인</li><li>시간과 변동성 확인</li><li>포지션 크기 제한</li><li>계약 명세와 체크리스트</li></ul></div></div><div class="fig-caption">옵션을 배우는 이유가 명확해야 뒤에서 콜, 풋, 세타, 베가를 배울 때 매매 충동보다 구조를 먼저 볼 수 있습니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">03 · CENTRAL SENTENCE</div>
+  <h2>불확실성에 가격을 매기는 계약</h2>
   <div class="prose">
-    <p>개인투자자라면 누구나 빠르게 벌고 싶고, 손실을 회복하고 싶습니다. 중요한 건 그 마음을 부정하는 것이 아니라, 그 마음으로 어떤 상품을 만지고 있는지 정확히 아는 것입니다.</p>
+<p>이번 프롤로그의 기준 문장은 이렇게 잡겠습니다.</p>
+<p>옵션은 큰돈을 빠르게 벌기 위한 지름길이 아니라, 미래의 불확실성에 가격을 매기는 계약입니다.</p>
+<p>가격의 방향, 움직이는 속도, 남은 시간, 시장이 예상하는 변동성, 손실을 피하려는 보험 수요가 모두 한 상품 안에 들어갑니다. 그래서 옵션을 배우는 일은 단순히 콜과 풋을 고르는 일이 아닙니다. 시장이 불확실성을 얼마에 사고파는지 읽는 언어를 배우는 일에 가깝습니다.</p>
   </div>
-
-  <div class="fig">
-    <div class="fig-label">Figure 02 — 출발점에 따라 달라지는 길</div>
-    <div class="compare-wrap">
-      <div class="compare-col danger">
-        <div class="compare-col-label">위험한 출발점</div>
-        <ul class="compare-list">
-          <li>빨리 벌겠다는 조급함</li>
-          <li>손실 복구 강박</li>
-          <li>포지션 집중 (몰빵)</li>
-          <li>짧은 만기 외가격 선호</li>
-          <li>레버리지 과다 사용</li>
-        </ul>
-      </div>
-      <div class="compare-sep">→</div>
-      <div class="compare-col safe">
-        <div class="compare-col-label">생산적인 출발점</div>
-        <ul class="compare-list">
-          <li>리스크 가격 이해</li>
-          <li>시간가치·변동성 비용 인식</li>
-          <li>포지션 크기 관리</li>
-          <li>헷지 목적 명확화</li>
-          <li>시장 해석 언어 확보</li>
-        </ul>
-      </div>
-    </div>
-    <div class="compare-note">같은 옵션 공부라도 출발점에 따라 전혀 다른 행동으로 이어집니다.</div>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 02 욕망 증폭 ── -->
-<div class="section reveal">
-  <div class="section-num">02 · 옵션과 욕망</div>
-  <h2>옵션은 내 판단을<br>증폭합니다</h2>
+</section>
+<hr class="divider">
+<section class="section-wide reveal" id="figure-03"><div class="fig"><div class="fig-label">Figure 03 — 옵션 프리미엄 안의 네 가지 질문</div><h2>프리미엄은 방향 하나로 설명되지 않습니다</h2><div class="premium-map"><div class="premium-center"><span>OPTION<br>PREMIUM</span><small>권리의 가격</small></div><div class="premium-card"><b>방향</b><p>기초자산이 어디로 움직이는가</p><em>delta preview</em></div><div class="premium-card"><b>속도</b><p>얼마나 크게 흔들리는가</p><em>gamma preview</em></div><div class="premium-card"><b>시간</b><p>언제까지 움직여야 하는가</p><em>theta preview</em></div><div class="premium-card"><b>가격</b><p>시장은 그 가능성을 얼마에 반영했는가</p><em>vega preview</em></div></div><div class="fig-caption">프롤로그에서는 용어를 외우지 않습니다. 다만 옵션 가격이 방향, 속도, 시간, 시장 가격의 묶음이라는 감각만 잡습니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">04 · LEARNING MAP</div>
+  <h2>옵션을 배우는 네 가지 마음</h2>
   <div class="prose">
-    <p>옵션이 위험한 이유는 상품 자체가 나쁘기 때문이 아닙니다. 옵션은 내가 가진 방향성 판단을 시간, 변동성, 레버리지와 함께 증폭합니다.</p>
-    <p>주식을 사면 대체로 가격 방향이 가장 중요합니다. 옵션은 조금 다릅니다. 방향이 맞아도 시간이 너무 오래 걸리면 손실이 날 수 있습니다. 방향이 맞아도 이미 비싼 변동성을 주고 샀다면 손실이 날 수 있습니다.</p>
+<h3 class="subhead">옵션을 배우려는 네 가지 마음</h3>
+<p>옵션을 배우려는 이유는 크게 네 가지로 나눌 수 있습니다.</p>
+<p>첫 번째는 빨리 큰돈을 벌고 싶은 마음입니다. 외가격 콜옵션이 몇십 배 올랐다는 사례를 보면 누구나 흔들립니다. 특히 현물 주식으로는 계좌가 천천히 움직인다고 느낄 때, 옵션은 훨씬 빠른 길처럼 보입니다.</p>
+<p>두 번째는 손실을 복구하고 싶은 마음입니다. 이미 계좌가 많이 내려간 상태에서는 평범한 수익률이 답답하게 느껴집니다. 이때 옵션은 손실을 한 번에 되돌릴 수 있는 도구처럼 보입니다.</p>
+<p>세 번째는 포트폴리오를 방어하고 싶은 마음입니다. 시장이 급락할 때 주식만 들고 있으면 할 수 있는 일이 많지 않습니다. 풋옵션, 보호적 풋, 포트폴리오 보험이라는 개념은 이 불안을 다루는 언어가 됩니다.</p>
+<p>네 번째는 시장이 가격에 반영한 리스크를 읽고 싶은 마음입니다. VIX가 왜 오르는지, 실적 발표 전에 옵션이 왜 비싸지는지, 시장이 어떤 꼬리위험을 두려워하는지 알고 싶은 투자자에게 옵션은 강력한 해석 도구가 됩니다.</p>
+<p>앞의 두 마음은 위험합니다. 뒤의 두 마음은 더 생산적입니다.</p>
+<p>다만 위험한 마음이라고 해서 부끄러워할 필요는 없습니다. 개인투자자라면 누구나 빠르게 벌고 싶고, 손실을 회복하고 싶습니다. 중요한 건 그 마음을 부정하는 것이 아니라, 그 마음으로 어떤 상품을 만지고 있는지 정확히 아는 것입니다.</p>
+<h3 class="subhead">이 강의에서 옵션을 배우는 방식</h3>
+<p>우리는 옵션을 세 단계로 낮춰서 시작합니다.</p>
+<p>처음에는 계약으로 봅니다. 옵션은 미래의 특정 시점까지, 정해진 가격으로 사거나 팔 수 있는 권리입니다. 콜은 살 권리이고, 풋은 팔 권리입니다. 옵션 매수자는 프리미엄을 내고 권리를 얻으며, 옵션 매도자는 프리미엄을 받고 의무를 집니다.</p>
+<p>그다음에는 가격으로 봅니다. 옵션 가격은 프리미엄이라고 부릅니다. 프리미엄 안에는 지금 행사하면 얻을 수 있는 내재가치와, 만기까지 남은 불확실성의 가격인 시간가치가 들어 있습니다. 변동성이 커지면 그 가능성의 가격도 달라집니다.</p>
+<p>마지막에는 리스크 언어로 봅니다. 델타는 방향 민감도, 감마는 델타가 변하는 속도, 세타는 시간의 비용, 베가는 변동성의 가격입니다. 이 언어를 배우면 옵션을 살지 말지보다 먼저, 내가 어떤 리스크를 사고 어떤 리스크를 팔고 있는지 볼 수 있습니다.</p>
+<p>여기서 한 가지 범위를 미리 정하겠습니다. 강의의 숫자 예시는 주로 미국 상장 개별주 옵션을 기준으로 설명합니다. 표준 개별주 옵션은 보통 1계약이 주식 100주를 기준으로 하지만, 지수 옵션, 현금결제 옵션, 선물옵션, 국내 옵션은 계약 승수와 결제 방식이 다를 수 있습니다. 그래서 이 강의에서 배운 구조를 실제 상품에 적용할 때는 반드시 그 상품의 계약 명세, 증거금, 세금, 수수료, 결제 방식을 다시 확인해야 합니다.</p>
+<p>그리고 옵션을 실제로 거래하려는 사람이라면, 미국 시장 기준으로는 OCC의 <code>Characteristics and Risks of Standardized Options</code>, 흔히 ODD라고 부르는 문서를 먼저 읽는 것이 기본입니다. 이 강의는 그 문서를 대신하지 않습니다. 저는 여기서 옵션을 더 쉽게 이해하도록 돕지만, 실제 계좌에서 생기는 배정, 조기행사, 증거금, 유동성 문제는 결국 본인이 확인해야 합니다.</p>
+<h3 class="subhead">옵션을 배우면 시장이 다르게 보입니다</h3>
+<p>옵션을 반드시 직접 매매해야 한다는 뜻은 아닙니다. 오히려 옵션을 제대로 배우면, 아무 옵션도 사지 않는 선택이 더 또렷해질 때가 많습니다.</p>
+<p>대신 시장을 보는 해상도가 올라갑니다. VIX가 급등할 때 단순히 공포가 커졌다고만 보지 않게 됩니다. 시장이 단기 변동성에 더 높은 보험료를 매기고 있는지, 특정 이벤트를 앞두고 옵션 가격이 비싸졌는지, 하방 보호 수요가 몰리고 있는지 나눠서 볼 수 있습니다.</p>
+<p>실적 발표를 볼 때도 달라집니다. 좋은 실적이 나왔는데 주가가 크게 움직이지 않거나, 콜옵션 가격이 오히려 빠지는 상황을 이해할 수 있습니다. 이미 옵션시장이 큰 움직임을 가격에 반영해두었다면, 방향을 맞혔다는 사실만으로는 충분하지 않기 때문입니다.</p>
+<p>포트폴리오를 볼 때도 달라집니다. 내 계좌가 어떤 방향 리스크에 노출되어 있는지, 급락장에서 방어 수단이 있는지, 보험료를 낼 가치가 있는 구간인지 생각하게 됩니다. 리스크 관리는 종목을 많이 사는 일이 아니라, 계좌 전체가 어떤 공통 위험에 노출되어 있는지 이해하는 일입니다.</p>
+<h3 class="subhead">30회차의 큰 길</h3>
+<p>이 강의는 30회차로 구성됩니다.</p>
+<p>처음 5회차에서는 계약 구조를 배웁니다. 옵션이 무엇인지, 콜과 풋이 무엇인지, 옵션 매수자와 매도자가 어떤 관계인지, 만기 손익그래프가 왜 꺾인 선으로 그려지는지 봅니다.</p>
+<p>6회차부터 9회차까지는 가격 구조를 다룹니다. 프리미엄, 내재가치, 시간가치, 변동성, 방향을 맞혀도 손실이 나는 이유를 배웁니다.</p>
+<p>10회차부터 16회차까지는 그릭스를 다룹니다. 델타, 감마, 세타, 베가, 로를 공식 암기가 아니라 포지션 리스크를 읽는 언어로 익힙니다.</p>
+<p>17회차부터 25회차까지는 옵션 매수와 매도, 그리고 전략을 봅니다. 외가격 옵션의 유혹, 내가격 옵션의 주식 대체 효과, 커버드콜, 보호적 풋, 스프레드, 스트래들, 스트랭글을 리스크 조합으로 이해합니다.</p>
+<p>마지막 26회차부터 30회차까지는 헷지와 시장 구조로 올라갑니다. 델타헷지, 감마와 동적헷징, 마켓메이커, 감마 스퀴즈, VIX와 스큐, 개인투자자의 옵션 사용 체크리스트를 다룹니다.</p>
+<p>이 길을 끝까지 따라오면, 옵션을 “싸게 사서 크게 먹는 상품”으로만 보지 않게 됩니다. 시장이 두려워하는 리스크가 어디에 있고, 그 리스크가 가격에 어떻게 반영되는지 읽는 눈이 생깁니다.</p>
   </div>
-
-  <div class="warn-box">
-    <div class="warn-title">주의</div>
-    <p>"오를 것 같으면 콜, 내릴 것 같으면 풋"이라는 문장은 기억하기 쉽습니다. 하지만 그 문장만으로 옵션을 이해하면, 옵션 가격 안에 들어 있는 시간과 변동성의 비용을 놓치게 됩니다. 콜을 샀는데 주가가 올라도 손실이 나는 경험을 하고 나서야, 옵션이 방향만 맞히는 상품이 아니었다는 걸 깨닫습니다.</p>
-  </div>
-
+</section>
+<hr class="divider">
+<section class="section-wide reveal" id="figure-04"><div class="fig"><div class="fig-label">Figure 04 — 시장 언어 지도</div><h2>직접 매매하지 않아도 시장이 다르게 보입니다</h2><div class="language-map"><div class="language-core">시장이 두려움과 가능성을<br>가격화하는 언어</div><div class="language-node">VIX</div><div class="language-node">변동성</div><div class="language-node">보험료</div><div class="language-node">하방 보호 수요</div><div class="language-node">이벤트 리스크</div><div class="language-node">포지셔닝</div><div class="language-node">감마</div><div class="language-node">스큐</div><div class="language-node">포트폴리오 보험</div></div><div class="fig-caption">옵션을 배우면 VIX 급등, 실적 전 옵션 가격, 하방 보호 수요, 이벤트 프리미엄을 하나의 가격 언어로 읽을 수 있습니다.</div></div></section>
+<hr class="divider">
+<section class="section-wide reveal" id="figure-05"><div class="fig"><div class="fig-label">Figure 05 — 30회차 학습 로드맵</div><h2>계약에서 시작해 시장 구조까지 올라갑니다</h2><div class="roadmap-stack"><details open><summary><span>PROLOGUE</span> 지금 위치</summary><p>옵션을 배우려는 마음을 점검하고, 빠른 복구 욕구를 리스크 언어로 바꾸는 출발점입니다.</p></details><details><summary><span>01-05</span> 계약 구조</summary><p>옵션의 정의, 콜과 풋, 매수자와 매도자, 만기 손익그래프, ITM/ATM/OTM을 배웁니다.</p></details><details><summary><span>06-09</span> 가격 구조</summary><p>프리미엄, 내재가치, 시간가치, 변동성, 방향을 맞혀도 손실이 나는 이유를 다룹니다.</p></details><details><summary><span>10-16</span> 그릭스</summary><p>델타, 감마, 세타, 베가, 로를 공식 암기가 아니라 포지션 리스크 언어로 익힙니다.</p></details><details><summary><span>17-25</span> 매수, 매도, 전략</summary><p>외가격 옵션, 내가격 옵션, 커버드콜, 보호적 풋, 스프레드, 스트래들, 스트랭글을 리스크 조합으로 봅니다.</p></details><details><summary><span>26-29</span> 헷지와 시장 구조</summary><p>델타헷지, 감마와 동적헷징, 마켓메이커, 감마 스퀴즈, VIX와 스큐를 시장 구조로 연결합니다.</p></details><details><summary><span>30</span> 개인투자자의 사용법</summary><p>옵션을 쓸 때와 쓰지 않을 때, 포지션 크기와 손실 한도, 대체 수단을 체크리스트로 정리합니다.</p></details></div><div class="fig-caption">각 구간을 펼치면 이 과정이 어떤 질문으로 이어지는지 볼 수 있습니다. 인터랙션은 학습 경로 확인에만 쓰입니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">05 · MISUNDERSTANDING</div>
+  <h2>손실 복구용 가속 페달이라는 오해</h2>
   <div class="prose">
-    <p>이 강의는 그 시행착오를 줄이기 위해 만들어졌습니다.</p>
+<p>가장 위험한 오해는 옵션을 손실 복구용 가속 페달로 보는 것입니다.</p>
+<p>“오를 것 같으면 콜, 내릴 것 같으면 풋”이라는 문장은 기억하기 쉽습니다. 하지만 그 문장만으로 옵션을 이해하면, 옵션 가격 안에 들어 있는 시간과 변동성의 비용을 놓치게 됩니다. 콜을 샀는데 주가가 올라도 손실이 나는 경험을 하고 나서야, 옵션이 방향만 맞히는 상품이 아니었다는 걸 깨닫습니다.</p>
+<p>옵션이 위험한 이유는 상품 자체가 나쁘기 때문이 아닙니다. 좋은 보험이 필요할 때가 있고, 좋은 헤지 도구가 필요할 때도 있습니다. 문제는 보험료가 얼마인지 모른 채 보험을 사고, 내가 판 의무가 어디까지 커질 수 있는지 모른 채 프리미엄을 받는 데 있습니다.</p>
+<p>이 강의는 옵션을 쓰지 말라고 겁주는 강의가 아닙니다. 대신 어떤 상황에서 내가 권리를 사고 있는지, 어떤 상황에서 의무를 팔고 있는지, 그 대가가 가격에 어떻게 들어가 있는지 끝까지 확인하겠습니다.</p>
   </div>
+</section>
+<hr class="divider">
 
-  <div class="fig">
-    <div class="fig-label">Figure 03 — 옵션 가격 안에 들어 있는 네 가지 질문</div>
-    <div class="prem-diagram">
-      <div class="prem-inputs">
-        <div class="prem-input">
-          <div class="prem-icon">→</div>
-          <div class="prem-input-label">방향</div>
-          <div class="prem-input-desc">기초자산이 어디로 움직이는가</div>
-        </div>
-        <div class="prem-input">
-          <div class="prem-icon">↕</div>
-          <div class="prem-input-label">변동성</div>
-          <div class="prem-input-desc">얼마나 크게 흔들리는가</div>
-        </div>
-        <div class="prem-input">
-          <div class="prem-icon">⏱</div>
-          <div class="prem-input-label">시간</div>
-          <div class="prem-input-desc">언제까지 움직이는가</div>
-        </div>
-        <div class="prem-input">
-          <div class="prem-icon">💰</div>
-          <div class="prem-input-label">가격</div>
-          <div class="prem-input-desc">시장이 그 가능성을 얼마에 반영했는가</div>
-        </div>
-      </div>
-      <div class="prem-connector">↓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓</div>
-      <div class="prem-center">
-        <div class="prem-center-label">옵션 프리미엄</div>
-        <div class="prem-center-sub">내재가치 + 시간가치</div>
-      </div>
-      <div class="greek-badges">
-        <span class="greek-badge"><em>Δ</em> 델타 — 방향 민감도</span>
-        <span class="greek-badge"><em>Θ</em> 세타 — 시간 비용</span>
-        <span class="greek-badge"><em>V</em> 베가 — 변동성 가격</span>
-        <span class="greek-badge"><em>Γ</em> 감마 — 델타 변화속도</span>
-      </div>
-    </div>
-    <div class="fig-caption">그릭스는 3부(10~16회차)에서 다룹니다. 지금은 옵션 가격 안에 네 가지 변수가 함께 들어있다는 감각으로 충분합니다.</div>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 03 배우는 방식 ── -->
-<div class="section reveal">
-  <div class="section-num">03 · 학습 방식</div>
-  <h2>옵션을 세 단계로<br>낮춰서 시작합니다</h2>
+<hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">06 · SUMMARY</div>
+  <h2>오늘 정리할 기준</h2>
   <div class="prose">
-    <p>처음부터 전략이나 그릭스로 들어가지 않겠습니다. 구조가 잡힌 뒤에 가격이 보이고, 가격이 보인 뒤에 리스크 언어가 들립니다.</p>
+<p>옵션을 배우려는 마음에는 빠른 수익, 손실 복구, 포트폴리오 방어, 리스크 가격 읽기가 섞여 있습니다. 앞의 두 마음은 계좌를 쉽게 급하게 만들고, 뒤의 두 마음은 옵션을 구조적으로 보게 만듭니다.</p>
+<p>옵션은 미래의 불확실성에 가격을 매기는 계약입니다. 방향뿐 아니라 시간, 변동성, 행사가, 프리미엄이 함께 움직입니다.</p>
+<p>이 강의에서는 옵션을 계약 구조, 가격 구조, 리스크 언어 순서로 낮춰서 배웁니다. 목표는 옵션을 더 자주 매매하는 것이 아니라, 옵션을 만지기 전에 내가 사고파는 리스크를 알아보는 것입니다.</p>
   </div>
-
-  <div class="step-list">
-    <div class="step-item">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <strong>계약으로 봅니다</strong>
-        <p>옵션은 미래의 특정 시점까지, 정해진 가격으로 사거나 팔 수 있는 권리입니다. 콜은 살 권리이고, 풋은 팔 권리입니다. 옵션 매수자는 프리미엄을 내고 권리를 얻으며, 옵션 매도자는 프리미엄을 받고 의무를 집니다.</p>
-      </div>
-    </div>
-    <div class="step-item">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <strong>가격으로 봅니다</strong>
-        <p>옵션 가격은 프리미엄이라고 부릅니다. 프리미엄 안에는 지금 행사하면 얻을 수 있는 내재가치와, 만기까지 남은 불확실성의 가격인 시간가치가 들어 있습니다. 변동성이 커지면 그 가능성의 가격도 달라집니다.</p>
-      </div>
-    </div>
-    <div class="step-item">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <strong>리스크 언어로 봅니다</strong>
-        <p>델타는 방향 민감도, 감마는 델타가 변하는 속도, 세타는 시간의 비용, 베가는 변동성의 가격입니다. 이 언어를 배우면 옵션을 살지 말지보다 먼저, 내가 어떤 리스크를 사고 어떤 리스크를 팔고 있는지 볼 수 있습니다.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 04 시장 언어 ── -->
-<div class="section-wide reveal">
-  <div class="section-num">04 · 시장 해석</div>
-  <h2>옵션을 배우면<br>시장이 다르게 보입니다</h2>
+</section>
+<hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">07 · WORKSHEET</div>
+  <h2>내가 옵션을 배우려는 이유</h2>
   <div class="prose">
-    <p>옵션을 반드시 직접 매매해야 한다는 뜻은 아닙니다. 오히려 옵션을 제대로 배우면, 아무 옵션도 사지 않는 선택이 더 또렷해질 때가 많습니다.</p>
-    <p>대신 시장을 보는 해상도가 올라갑니다. VIX가 급등할 때 단순히 공포가 커졌다고만 보지 않게 됩니다. 실적 발표를 볼 때도, 포트폴리오를 볼 때도 달라집니다.</p>
+<p>강의를 시작하기 전에 한 문장만 적어보시면 좋겠습니다.</p>
+<p>“나는 옵션을 왜 배우고 싶은가?”</p>
+<p>답이 솔직할수록 좋습니다. 빨리 벌고 싶다는 답도 괜찮습니다. 손실을 복구하고 싶다는 답도 괜찮습니다. 다만 그 답을 적고 나면, 그 마음이 어떤 리스크를 감수하게 만들 수 있는지 한 번 더 생각해봐야 합니다.</p>
+<p>이 강의의 목표는 욕망을 없애는 것이 아닙니다. 욕망이 어떤 상품을 통해 어떤 위험으로 바뀌는지 보이게 만드는 것입니다.</p>
+<p>풀이 기준: 답의 좋고 나쁨을 가르지 않습니다. 다만 빠른 수익이나 손실 복구가 중심이라면, 이후 회차에서 포지션 크기와 만기 선택을 더 보수적으로 점검해야 합니다. 포트폴리오 방어나 리스크 가격 읽기가 중심이라면, 옵션을 매매 도구보다 시장 해석 도구로 먼저 익히는 편이 좋습니다.</p>
   </div>
-
-  <div class="fig">
-    <div class="fig-label">Figure 04 — 옵션을 배우면 읽을 수 있는 시장 언어</div>
-    <div class="lang-center-row">
-      <div class="lang-center">
-        <div class="lang-center-label">옵션 이해</div>
-        <div class="lang-center-sub">시장이 두려움과 가능성을 가격화하는 언어</div>
-      </div>
-    </div>
-    <div class="lang-nodes">
-      <div class="lang-node">
-        <div class="lang-node-icon">📊</div>
-        <div class="lang-node-label">VIX</div>
-        <div class="lang-node-desc">시장이 단기 변동성에 매기는 보험료</div>
-      </div>
-      <div class="lang-node">
-        <div class="lang-node-icon">📐</div>
-        <div class="lang-node-label">스큐</div>
-        <div class="lang-node-desc">하방 꼬리위험에 얼마나 더 비싼 가격을 매기는가</div>
-      </div>
-      <div class="lang-node">
-        <div class="lang-node-icon">🗓️</div>
-        <div class="lang-node-label">이벤트 리스크</div>
-        <div class="lang-node-desc">실적·FOMC 앞뒤 옵션 가격 변화</div>
-      </div>
-      <div class="lang-node">
-        <div class="lang-node-icon">🛡️</div>
-        <div class="lang-node-label">하방 보호 수요</div>
-        <div class="lang-node-desc">풋 매수가 몰리면 무엇이 보이는가</div>
-      </div>
-      <div class="lang-node">
-        <div class="lang-node-icon">⚡</div>
-        <div class="lang-node-label">감마 포지셔닝</div>
-        <div class="lang-node-desc">마켓메이커 헷지가 시장 움직임에 미치는 영향</div>
-      </div>
-      <div class="lang-node">
-        <div class="lang-node-icon">💼</div>
-        <div class="lang-node-label">포트폴리오 보험</div>
-        <div class="lang-node-desc">계좌 전체 리스크를 보는 눈</div>
-      </div>
-    </div>
-    <div class="fig-caption">이 개념들은 강의를 따라오면 하나씩 이해하게 됩니다. 지금은 옵션이 직접 매매 외에도 많은 것을 읽어낼 수 있게 해준다는 방향만으로 충분합니다.</div>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 05 30회차 ── -->
-<div class="section reveal">
-  <div class="section-num">05 · 학습 경로</div>
-  <h2>30회차의 큰 길</h2>
+</section>
+<hr class="divider">
+<section class="section reveal" id="figure-06"><div class="fig worksheet"><div class="fig-label">Figure 06 — 프롤로그 과제 카드</div><h2>나는 옵션을 왜 배우고 싶은가?</h2><div class="worksheet-prompts"><span>이 마음은 조급함에서 나왔는가?</span><span>포트폴리오를 지키기 위한 공부인가?</span><span>시장의 리스크 가격을 읽기 위한 공부인가?</span></div><textarea id="reasonNote" aria-label="내가 옵션을 배우려는 이유" placeholder="예: 급락장에서 내 포트폴리오를 어떻게 방어할 수 있는지 알고 싶다. 또는 실적 발표 전 옵션 가격이 왜 비싸지는지 이해하고 싶다."></textarea><div class="fig-caption">입력 내용은 브라우저 localStorage에만 임시 저장됩니다. 답의 좋고 나쁨을 가르지 않고, 이후 회차에서 스스로의 기준점으로 사용합니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">08 · NEXT</div>
+  <h2>다음 회차로 내려가기</h2>
   <div class="prose">
-    <p>이 강의는 30회차로 구성됩니다. 계단 구조입니다. 계약을 이해한 뒤에 가격이 보이고, 가격이 보인 뒤에 그릭스가 들립니다. 클릭하면 무엇을 배우는지 볼 수 있습니다.</p>
+<p>다음 회차에서는 옵션의 가장 낮은 출발점으로 내려갑니다. 옵션은 무엇을 사고파는 상품인지, 콜과 풋 이전에 권리와 의무가 무엇인지부터 보겠습니다.</p>
   </div>
-
-  <div class="fig">
-    <div class="fig-label">Figure 05 — 30회차 학습 로드맵</div>
-    <div class="roadmap-v" id="roadmap">
-
-      <div class="rm-item current open"
-           data-detail="강의의 출발점입니다. 옵션을 배우려는 동기를 네 가지로 나누고, 리스크 언어를 배우는 방향을 잡습니다.">
-        <div class="rm-left">
-          <div class="rm-dot"></div>
-          <div class="rm-line"></div>
-        </div>
-        <div class="rm-right">
-          <div class="rm-meta">
-            <span class="rm-part">프롤로그</span>
-            <span class="rm-now">지금 여기</span>
-          </div>
-          <div class="rm-title">당신은 왜 옵션을 배우고 싶어하는가?</div>
-          <div class="rm-detail"></div>
-        </div>
-      </div>
-
-      <div class="rm-item"
-           data-detail="옵션이 무엇인지, 콜과 풋의 구조, 매수자와 매도자의 관계, 만기 손익그래프가 왜 꺾인 선인지 봅니다.">
-        <div class="rm-left">
-          <div class="rm-dot"></div>
-          <div class="rm-line"></div>
-        </div>
-        <div class="rm-right">
-          <div class="rm-meta">
-            <span class="rm-part">1부</span>
-            <span class="rm-sessions">1~5회차</span>
-          </div>
-          <div class="rm-title">계약 구조</div>
-          <div class="rm-detail"></div>
-        </div>
-      </div>
-
-      <div class="rm-item"
-           data-detail="프리미엄, 내재가치, 시간가치, 변동성을 다룹니다. 방향을 맞혀도 손실이 나는 이유를 배웁니다.">
-        <div class="rm-left">
-          <div class="rm-dot"></div>
-          <div class="rm-line"></div>
-        </div>
-        <div class="rm-right">
-          <div class="rm-meta">
-            <span class="rm-part">2부</span>
-            <span class="rm-sessions">6~9회차</span>
-          </div>
-          <div class="rm-title">가격 구조</div>
-          <div class="rm-detail"></div>
-        </div>
-      </div>
-
-      <div class="rm-item"
-           data-detail="델타, 감마, 세타, 베가, 로를 공식 암기가 아니라 포지션 리스크를 읽는 언어로 익힙니다.">
-        <div class="rm-left">
-          <div class="rm-dot"></div>
-          <div class="rm-line"></div>
-        </div>
-        <div class="rm-right">
-          <div class="rm-meta">
-            <span class="rm-part">3부</span>
-            <span class="rm-sessions">10~16회차</span>
-          </div>
-          <div class="rm-title">그릭스</div>
-          <div class="rm-detail"></div>
-        </div>
-      </div>
-
-      <div class="rm-item"
-           data-detail="외가격 옵션의 유혹, 내가격 옵션의 주식 대체 효과, 커버드콜, 보호적 풋, 스프레드, 스트래들, 스트랭글을 리스크 조합으로 이해합니다.">
-        <div class="rm-left">
-          <div class="rm-dot"></div>
-          <div class="rm-line"></div>
-        </div>
-        <div class="rm-right">
-          <div class="rm-meta">
-            <span class="rm-part">4부</span>
-            <span class="rm-sessions">17~25회차</span>
-          </div>
-          <div class="rm-title">매수·매도·전략</div>
-          <div class="rm-detail"></div>
-        </div>
-      </div>
-
-      <div class="rm-item"
-           data-detail="델타헷지, 감마와 동적헷징, 마켓메이커, 감마 스퀴즈, VIX와 스큐를 다룹니다.">
-        <div class="rm-left">
-          <div class="rm-dot"></div>
-          <div class="rm-line"></div>
-        </div>
-        <div class="rm-right">
-          <div class="rm-meta">
-            <span class="rm-part">5부</span>
-            <span class="rm-sessions">26~29회차</span>
-          </div>
-          <div class="rm-title">헷지와 시장 구조</div>
-          <div class="rm-detail"></div>
-        </div>
-      </div>
-
-      <div class="rm-item"
-           data-detail="개인투자자의 옵션 사용 체크리스트를 다룹니다. 직접 매매 여부와 관계없이 시장을 읽는 방법을 정리합니다.">
-        <div class="rm-left">
-          <div class="rm-dot"></div>
-          <div class="rm-line"></div>
-        </div>
-        <div class="rm-right">
-          <div class="rm-meta">
-            <span class="rm-part">6부</span>
-            <span class="rm-sessions">30회차</span>
-          </div>
-          <div class="rm-title">개인투자자의 사용법</div>
-          <div class="rm-detail"></div>
-        </div>
-      </div>
-
-      <div class="rm-item"
-           data-detail="옵션을 이해한 투자자가 시장을 어떻게 더 잘 읽게 되는지 정리합니다. 옵션 매매 권유가 아니라 투자방향을 스스로 정리하는 자리입니다.">
-        <div class="rm-left">
-          <div class="rm-dot"></div>
-        </div>
-        <div class="rm-right">
-          <div class="rm-meta">
-            <span class="rm-part">에필로그</span>
-          </div>
-          <div class="rm-title">강의를 이해하고 나서의 투자방향</div>
-          <div class="rm-detail"></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="fig-caption">각 항목을 클릭하면 무엇을 배우는지 확인할 수 있습니다.</div>
-  </div>
-
-  <div class="prose" style="margin-top: 20px;">
-    <p>이 길을 끝까지 따라오면, 옵션을 "싸게 사서 크게 먹는 상품"으로만 보지 않게 됩니다. 시장이 두려워하는 리스크가 어디에 있고, 그 리스크가 가격에 어떻게 반영되는지 읽는 눈이 생깁니다.</p>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 06 과제 ── -->
-<div class="section reveal">
-  <div class="section-num">06 · 과제</div>
-  <h2>강의를 시작하기 전에<br>한 문장만 적어보세요</h2>
-  <div class="prose">
-    <p>답이 솔직할수록 좋습니다. 빨리 벌고 싶다는 답도 괜찮습니다. 손실을 복구하고 싶다는 답도 괜찮습니다. 다만 그 답을 적고 나면, 그 마음이 어떤 리스크를 감수하게 만들 수 있는지 한 번 더 생각해봐야 합니다.</p>
-    <p>이 강의의 목표는 욕망을 없애는 것이 아닙니다. 욕망이 어떤 상품을 통해 어떤 위험으로 바뀌는지 보이게 만드는 것입니다.</p>
-  </div>
-
-  <div class="fig">
-    <div class="fig-label">Figure 06 — 프롤로그 과제</div>
-    <div class="assignment">
-      <div class="assignment-header">ASSIGNMENT · 나는 옵션을 왜 배우고 싶은가?</div>
-      <div class="assignment-body">
-        <div class="assignment-q">나는 옵션을 왜 배우고 싶은가?</div>
-        <ul class="assignment-hints">
-          <li>이 마음은 조급함에서 나왔는가?</li>
-          <li>포트폴리오를 지키기 위한 공부인가?</li>
-          <li>시장의 리스크 가격을 읽기 위한 공부인가?</li>
-        </ul>
-        <textarea
-          class="assignment-textarea"
-          id="assignment-input"
-          placeholder="솔직하게 적어주세요. 이 내용은 브라우저에만 저장됩니다."
-          spellcheck="false"
-        ></textarea>
-        <div class="assignment-actions">
-          <button class="btn-save" onclick="saveAssignment()">저장</button>
-          <button class="btn-clear" onclick="clearAssignment()">지우기</button>
-          <span class="save-hint" id="save-hint"></span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 07 정리 ── -->
-<div class="section reveal">
-  <div class="section-num">07 · 정리</div>
-  <h2>프롤로그를 마치며</h2>
-
-  <div class="summary-grid">
-    <div class="summary-item">
-      <div class="summary-num">01</div>
-      <div class="summary-text">옵션을 배우려는 <strong>동기의 종류</strong>가 이후 행동 방식을 결정합니다.</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-num">02</div>
-      <div class="summary-text">옵션은 방향만 맞히는 상품이 아닙니다. <strong>시간, 변동성, 레버리지</strong>가 함께 작동합니다.</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-num">03</div>
-      <div class="summary-text">옵션을 배워도 <strong>반드시 매매할 필요는 없습니다</strong>. 시장 해석 도구로도 충분히 가치 있습니다.</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-num">04</div>
-      <div class="summary-text">이 강의는 <strong>계약 → 가격 → 리스크 언어</strong> 순서로 옵션을 쌓아 올립니다.</div>
-    </div>
-  </div>
-
-  <a href="sessions/session-01.html" class="next-card">
-    <div>
-      <div class="next-label">NEXT SESSION</div>
-      <div class="next-title">1회차 — 옵션은 무엇을 사고파는 상품인가</div>
-    </div>
-    <div class="next-arrow">→</div>
-  </a>
-</div>
-
-<footer>
-  <div class="footer-brand">무기견의 옵션 입문 · 프롤로그</div>
-  <div class="footer-page">PROLOGUE / 30</div>
-</footer>
-
+</section>
+<section class="section reveal"><a href="sessions/session-01.html" class="next-card"><div><div class="next-label">NEXT SESSION</div><div class="next-title">1회차 — 옵션은 무엇을 사고파는 상품인가?</div><div class="next-desc">옵션을 콜과 풋 이전에 권리와 의무의 계약으로 읽는 첫 번째 회차입니다.</div></div><div class="next-arrow">→</div></a></section>
+<footer><div>무기견의 옵션 입문 · Prologue</div><div>Why Learn Options</div></footer>
 <script>
-
   const THEME_KEY = 'mugigyeon-options-course-theme-v2';
-  const themeButtons = document.querySelectorAll('[data-theme-choice]');
-
-  function applyTheme(theme) {
-    const safeTheme = theme === 'olive' ? 'olive' : 'dark';
-    if (safeTheme === 'olive') {
-      document.documentElement.setAttribute('data-theme', 'olive');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    themeButtons.forEach(btn => {
-      const active = btn.dataset.themeChoice === safeTheme;
-      btn.classList.toggle('active', active);
-      btn.setAttribute('aria-pressed', String(active));
+  function applyTheme(t) {
+    const safe = t === 'olive' ? 'olive' : 'dark';
+    document.documentElement.dataset.theme = safe;
+    document.querySelectorAll('[data-theme-choice]').forEach(b => {
+      const on = b.dataset.themeChoice === safe;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
-    localStorage.setItem(THEME_KEY, safeTheme);
   }
-
   applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
-  themeButtons.forEach(btn => {
-    btn.addEventListener('click', () => applyTheme(btn.dataset.themeChoice));
-  });
-
-  /* ── Progress bar ── */
-  const bar = document.getElementById('progress-bar');
-  window.addEventListener('scroll', () => {
-    const h = document.documentElement;
-    bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100 + '%';
-  });
-
-  /* ── Reveal on scroll ── */
-  const reveals = document.querySelectorAll('.reveal');
-  const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.08 });
-  reveals.forEach(r => revealObs.observe(r));
-
-  /* ── Roadmap toggle ── */
-  (function () {
-    const items = document.querySelectorAll('#roadmap .rm-item');
-    items.forEach(function (item) {
-      const detail = item.querySelector('.rm-detail');
-      const text = item.getAttribute('data-detail');
-      if (detail && text) detail.textContent = text;
-
-      item.addEventListener('click', function () {
-        if (item.classList.contains('current') && item.classList.contains('open')) return;
-        item.classList.toggle('open');
-      });
+  document.querySelectorAll('[data-theme-choice]').forEach(b => {
+    b.addEventListener('click', () => {
+      localStorage.setItem(THEME_KEY, b.dataset.themeChoice);
+      applyTheme(b.dataset.themeChoice);
     });
-  })();
-
-  /* ── Assignment localStorage ── */
-  const STORAGE_KEY = 'prologue_assignment_v1';
-
-  (function loadAssignment() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      document.getElementById('assignment-input').value = saved;
-      document.getElementById('save-hint').textContent = '이전 내용을 불러왔습니다.';
-    }
-  })();
-
-  function saveAssignment() {
-    const val = document.getElementById('assignment-input').value.trim();
-    if (!val) { document.getElementById('save-hint').textContent = '내용을 입력해주세요.'; return; }
-    localStorage.setItem(STORAGE_KEY, val);
-    document.getElementById('save-hint').textContent = '저장되었습니다.';
-    setTimeout(() => { document.getElementById('save-hint').textContent = ''; }, 2500);
-  }
-
-  function clearAssignment() {
-    document.getElementById('assignment-input').value = '';
-    localStorage.removeItem(STORAGE_KEY);
-    document.getElementById('save-hint').textContent = '지웠습니다.';
-    setTimeout(() => { document.getElementById('save-hint').textContent = ''; }, 2000);
+  });
+  const progress = document.querySelector('.progress');
+  addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    progress.style.width = (h ? scrollY / h * 100 : 0) + '%';
+  }, { passive: true });
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(e => io.observe(e));
+  const note = document.getElementById('reasonNote');
+  const NOTE_KEY = 'mugigyeon-options-prologue-reason-v2';
+  if (note) {
+    note.value = localStorage.getItem(NOTE_KEY) || '';
+    note.addEventListener('input', () => localStorage.setItem(NOTE_KEY, note.value));
   }
 </script>
 </body>

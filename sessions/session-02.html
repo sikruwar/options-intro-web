@@ -1,1314 +1,541 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2회차 — 무기견의 옵션 입문</title>
+  <title>2회차 — 콜옵션과 풋옵션, 방향보다 먼저 권리로 이해하기</title>
+  <meta name="description" content="콜옵션과 풋옵션을 상승·하락 버튼이 아니라 살 권리와 팔 권리로 이해하고 만기 손익을 계산합니다.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0D0D0D; --bg-card: #161616; --bg-card2: #1E1E1E;
-      --text: #F0EBE1; --text-muted: #9A9080; --text-dim: #7A7670;
-      --call: #3B82F6; --call-dim: #1D3A6E;
-      --put: #EF4444;  --put-dim: #6E1D1D;
-      --amber: #F59E0B; --green: #22C55E; --orange: #F97316;
-      --border: #2A2520; --border-light: #3A3530;
-    }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
     html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 16px; line-height: 1.8;
-      -webkit-font-smoothing: antialiased;
-    }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
 
-    /* ── PROGRESS BAR ── */
-    #progress-bar {
-      position: fixed; top: 0; left: 0; height: 2px;
-      background: linear-gradient(90deg, var(--call), var(--amber));
-      width: 0%; z-index: 100; transition: width 0.1s linear;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
-      background: rgba(13,13,13,0.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 32px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-brand {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px; color: var(--text-muted);
-      letter-spacing: 0.08em; text-decoration: none;
-    }
-    .nav-brand span { color: var(--amber); }
-    .nav-brand:hover { color: var(--text); }
-    .nav-right { display: flex; align-items: center; gap: 16px; }
-    .nav-session { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim); }
-    .nav-prev, .nav-next {
-      font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      color: var(--text-muted); text-decoration: none;
-      display: flex; align-items: center; gap: 6px;
-      transition: color 0.15s;
-    }
-    .nav-prev:hover, .nav-next:hover { color: var(--amber); }
-    .nav-sep { color: var(--text-dim); font-size: 12px; }
-
-    /* ── HERO ── */
-    .hero {
-      min-height: 100vh; display: flex; flex-direction: column;
-      justify-content: center; align-items: flex-start;
-      padding: 120px 10vw 80px; position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: ''; position: absolute; top: -200px; right: -100px;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(239,68,68,0.05) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero::after {
-      content: ''; position: absolute; bottom: -100px; left: -50px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-eyebrow {
-      font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--amber);
-      letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 28px;
-    }
-    .hero h1 {
-      font-size: clamp(34px, 6.5vw, 70px); font-weight: 900;
-      line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 20px;
-    }
-    .hero h1 em { font-style: normal; color: var(--call); }
-    .hero h1 em.put { color: var(--put); }
-    .hero-sub {
-      font-size: clamp(15px, 2vw, 19px); color: var(--text-muted);
-      font-weight: 300; max-width: 520px; margin-bottom: 48px; line-height: 1.7;
-    }
-    .hero-thesis {
-      background: var(--bg-card); border: 1px solid var(--border-light);
-      border-left: 3px solid var(--amber);
-      padding: 20px 28px; max-width: 580px;
-      font-size: 17px; font-weight: 500; line-height: 1.6;
-      border-radius: 0 8px 8px 0;
-    }
-    .hero-thesis .label {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      color: var(--amber); letter-spacing: 0.15em; margin-bottom: 10px;
-    }
-    .scroll-hint {
-      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-    }
-    .scroll-hint span { font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; }
-    .scroll-dot {
-      width: 4px; height: 24px;
-      background: linear-gradient(var(--border-light), transparent);
-      border-radius: 2px; animation: scrollPulse 2s ease-in-out infinite;
-    }
-    @keyframes scrollPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-
-    /* ── LAYOUT ── */
-    .section { max-width: 760px; margin: 0 auto; padding: 80px 24px; }
-    .section-wide { max-width: 960px; margin: 0 auto; padding: 80px 24px; }
-    .section-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
-    .section-num {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 16px;
-    }
-    .section h2, .section-wide h2 {
-      font-size: clamp(22px, 4vw, 34px); font-weight: 700;
-      line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 32px;
-    }
-
-    /* ── PROSE ── */
-    .prose p { font-size: 16px; line-height: 1.85; color: #D4CFC8; margin-bottom: 20px; }
-    .prose p:last-child { margin-bottom: 0; }
-    .prose strong { color: var(--text); font-weight: 600; }
-
-    /* ── FIGURE BLOCK ── */
-    .fig {
-      background: var(--bg-card); border: 1px solid var(--border-light);
-      border-radius: 12px; padding: 28px; margin: 32px 0;
-    }
-    .fig-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber);
-      letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px;
-    }
-    .fig-caption {
-      margin-top: 18px; font-size: 13px; color: var(--text-muted);
-      line-height: 1.6; font-style: italic;
-    }
-
-    /* ── FIGURE 1: BRIDGE ── */
-    .bridge-wrap {
-      display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: center;
-    }
-    .bridge-col {
-      padding: 18px; border-radius: 8px;
-      border: 1px solid var(--border-light); background: var(--bg-card2);
-    }
-    .bridge-col-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px;
-    }
-    .bridge-col.s1 .bridge-col-label { color: var(--call); }
-    .bridge-col.s2 .bridge-col-label { color: var(--amber); }
-    .bridge-q { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.5; }
-    .bridge-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-    .bridge-tag {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      background: var(--bg); border: 1px solid var(--border);
-      padding: 2px 8px; border-radius: 4px; color: var(--text-dim);
-    }
-    .bridge-sep {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 6px; padding: 0 14px;
-    }
-    .bridge-arrow { font-size: 18px; color: var(--text-dim); }
-    .bridge-note { font-size: 11px; color: var(--text-dim); text-align: center; max-width: 80px; line-height: 1.5; }
-
-    /* ── SCENARIO CARDS ── */
-    .sc-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
-    .sc-card {
-      border-radius: 10px; padding: 16px 14px;
-      border: 1px solid; text-align: center;
-    }
-    .sc-card.loss { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
-    .sc-card.be   { background: rgba(90,82,72,0.15);  border-color: var(--border-light); }
-    .sc-card.win  { background: rgba(34,197,94,0.05); border-color: rgba(34,197,94,0.2); }
-    .sc-price {
-      font-family: 'JetBrains Mono', monospace; font-size: 17px;
-      font-weight: 700; margin-bottom: 6px;
-    }
-    .sc-card.loss .sc-price, .sc-card.be .sc-price { color: var(--put); }
-    .sc-card.win  .sc-price { color: var(--green); }
-    .sc-action { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; }
-    .sc-iv {
-      font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      color: var(--text-dim); margin-bottom: 4px;
-    }
-    .sc-pnl {
-      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
-    }
-    .sc-card.loss .sc-pnl { color: var(--put); }
-    .sc-card.be   .sc-pnl { color: var(--text-dim); }
-    .sc-card.win  .sc-pnl { color: var(--green); }
-    .sc-badge {
-      display: inline-block; margin-top: 8px;
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      padding: 2px 8px; border-radius: 4px;
-    }
-    .sc-card.loss .sc-badge, .sc-card.be .sc-badge {
-      background: rgba(239,68,68,0.12); color: var(--put);
-    }
-    .sc-card.win .sc-badge { background: rgba(34,197,94,0.12); color: var(--green); }
-
-    /* ── PAYOFF CHARTS ── */
-    .charts-row { display: grid; grid-template-columns: 1fr; gap: 0; }
-    .chart-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      margin-bottom: 12px; letter-spacing: 0.08em;
-    }
-    .chart-label.call { color: var(--call); }
-    .chart-label.put  { color: var(--put); }
-    svg.payoff { width: 100%; height: auto; overflow: visible; }
-    .chart-note {
-      margin-top: 12px; font-size: 12px; color: var(--text-dim);
-      text-align: center; font-style: italic;
-    }
-
-    /* ── INTERACTIVE SLIDER ── */
-    .slider-wrap {
-      background: var(--bg-card2); border-radius: 10px; padding: 22px;
-    }
-    .slider-conds {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px;
-    }
-    .slider-field {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 6px; padding: 10px 12px;
-    }
-    .slider-field-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      color: var(--text-dim); margin-bottom: 3px;
-    }
-    .slider-field-val {
-      font-family: 'JetBrains Mono', monospace; font-size: 17px;
-      font-weight: 600; color: var(--amber);
-    }
-    .slider-row-label {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 10px;
-    }
-    .slider-row-title {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      color: var(--text-dim); letter-spacing: 0.08em;
-    }
-    .slider-row-val {
-      font-family: 'JetBrains Mono', monospace; font-size: 15px;
-      font-weight: 600; color: var(--text);
-    }
-    input[type="range"] {
-      width: 100%; height: 4px; border-radius: 2px;
-      background: var(--border-light); outline: none;
-      -webkit-appearance: none; cursor: pointer;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-      background: var(--amber); border: 2px solid var(--bg-card);
-      box-shadow: 0 0 8px rgba(245,158,11,0.4);
-    }
-    .slider-results {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 16px;
-    }
-    .slider-result {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 6px; padding: 12px; text-align: center;
-    }
-    .slider-result-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      color: var(--text-dim); margin-bottom: 5px;
-    }
-    .slider-result-val {
-      font-family: 'JetBrains Mono', monospace; font-size: 19px; font-weight: 700;
-      transition: color 0.2s;
-    }
-    .slider-result-val.pos  { color: var(--green); }
-    .slider-result-val.neg  { color: var(--put); }
-    .slider-result-val.zero { color: var(--text-dim); }
-    .be-bar {
-      display: flex; align-items: center; gap: 10px;
-      margin-top: 14px; padding: 10px 14px;
-      background: rgba(245,158,11,0.07);
-      border: 1px solid rgba(245,158,11,0.2); border-radius: 6px;
-      font-size: 13px; color: var(--text-muted);
-    }
-    .be-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--amber); }
-    .be-sub { font-size: 12px; color: var(--text-dim); margin-left: 4px; }
-
-    /* ── FIGURE 6: PROTECTION ── */
-    .protection-wrap {
-      display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: stretch;
-    }
-    .prot-col {
-      background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
-      padding: 18px; display: flex; flex-direction: column;
-    }
-    .prot-col-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px;
-    }
-    .prot-col.naked .prot-col-label { color: var(--put); }
-    .prot-col.hedged .prot-col-label { color: var(--green); }
-    .prot-bar-wrap {
-      flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px;
-    }
-    .prot-bar {
-      border-radius: 4px; display: flex; align-items: center; padding: 0 10px;
-      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
-    }
-    .prot-bar.stock  { background: rgba(245,158,11,0.2); height: 60px; color: var(--amber); }
-    .prot-bar.put    { background: rgba(59,130,246,0.15); height: 22px; color: var(--call); font-size: 10px; }
-    .prot-floor {
-      border-top: 2px dashed var(--green); padding-top: 6px;
-      font-size: 11px; color: var(--green);
-    }
-    .prot-loss-unlimited {
-      font-size: 11px; color: var(--put); margin-top: 8px;
-    }
-    .prot-sep {
-      display: flex; align-items: center; padding: 0 14px;
-      font-size: 20px; color: var(--text-dim);
-    }
-    .prot-note {
-      margin-top: 14px; padding: 10px 14px;
-      background: rgba(249,115,22,0.06);
-      border-left: 2px solid var(--orange);
-      border-radius: 0 6px 6px 0;
-      font-size: 12px; color: var(--text-muted); line-height: 1.6;
-    }
-
-    /* ── FIGURE 7: 2×2 MATRIX ── */
-    .matrix-table { width: 100%; border-collapse: collapse; }
-    .matrix-table th {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      letter-spacing: 0.08em; padding: 12px 16px; text-align: center;
-      border: 1px solid var(--border);
-    }
-    .matrix-table th.up   { color: var(--green);  background: rgba(34,197,94,0.06); }
-    .matrix-table th.down { color: var(--put);    background: rgba(239,68,68,0.06); }
-    .matrix-table th:first-child { background: var(--bg-card2); color: var(--text-dim); }
-    .matrix-table td {
-      padding: 18px 16px; border: 1px solid var(--border);
-      text-align: center; vertical-align: middle;
-    }
-    .matrix-table td:first-child {
-      background: var(--bg-card2);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px; color: var(--text-muted); font-weight: 600;
-    }
-    .matrix-cell-main { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-    .matrix-cell-sub  { font-size: 11px; color: var(--text-muted); }
-    .cell-win  { background: rgba(34,197,94,0.05); }
-    .cell-lose { background: rgba(239,68,68,0.05); }
-    .cell-win  .matrix-cell-main { color: var(--green); }
-    .cell-lose .matrix-cell-main { color: var(--put); }
-
-    /* ── FIGURE 8: DECISION TREE ── */
-    .dtree {
-      display: flex; flex-direction: column; align-items: center; gap: 0;
-    }
-    .dtree-top {
-      background: var(--bg-card2); border: 1px solid var(--border-light);
-      border-radius: 8px; padding: 14px 24px; text-align: center;
-      font-size: 14px; font-weight: 700; color: var(--text); max-width: 360px;
-    }
-    .dtree-connector { font-size: 20px; color: var(--text-dim); padding: 4px 0; }
-    .dtree-row {
-      display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
-      width: 100%; max-width: 560px;
-    }
-    .dtree-branch {
-      background: var(--bg-card2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 14px 16px; text-align: center;
-    }
-    .dtree-branch-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      letter-spacing: 0.1em; margin-bottom: 6px;
-    }
-    .dtree-branch.call .dtree-branch-label { color: var(--call); }
-    .dtree-branch.put  .dtree-branch-label { color: var(--put);  }
-    .dtree-branch-q { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-    .dtree-mid { display: flex; align-items: center; padding: 0 10px; color: var(--text-dim); font-size: 14px; }
-    .dtree-results { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; max-width: 560px; }
-    .dtree-result {
-      border-radius: 8px; padding: 12px 16px; text-align: center; border: 1px solid;
-    }
-    .dtree-result.yes { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.25); }
-    .dtree-result.no  { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.25); }
-    .dtree-result-main { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
-    .dtree-result.yes .dtree-result-main { color: var(--green); }
-    .dtree-result.no  .dtree-result-main { color: var(--put); }
-    .dtree-result-sub { font-size: 11px; color: var(--text-muted); }
-    .dtree-footer {
-      margin-top: 4px; padding: 10px 20px;
-      background: rgba(245,158,11,0.07);
-      border: 1px solid rgba(245,158,11,0.2); border-radius: 6px;
-      font-size: 12px; color: var(--text-muted); text-align: center;
-      max-width: 560px; width: 100%;
-    }
-
-    /* ── SUMMARY GRID ── */
-    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 28px 0; }
-    .summary-item {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 10px; padding: 22px 20px;
-    }
-    .summary-num {
-      font-family: 'JetBrains Mono', monospace; font-size: 26px;
-      font-weight: 600; color: var(--amber); margin-bottom: 8px;
-    }
-    .summary-text { font-size: 14px; line-height: 1.65; color: var(--text-muted); }
-    .summary-text strong { color: var(--text); }
-
-    /* ── QUIZ ── */
-    .quiz-list { display: flex; flex-direction: column; }
-    .quiz-item {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 16px 0; border-bottom: 1px solid var(--border);
-    }
-    .quiz-item:last-child { border-bottom: none; }
-    .quiz-num {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      color: var(--text-dim); flex-shrink: 0; width: 24px; padding-top: 2px;
-    }
-    .quiz-text { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
-    .quiz-cond {
-      display: inline-block; font-family: 'JetBrains Mono', monospace;
-      font-size: 12px; color: var(--amber);
-      background: rgba(245,158,11,0.1); padding: 1px 7px; border-radius: 4px; margin: 2px 0;
-    }
-    .quiz-btn {
-      display: block; width: 100%; margin-top: 18px;
-      background: none; border: 1px solid var(--border-light); border-radius: 6px;
-      padding: 10px; font-family: 'Noto Sans KR', sans-serif; font-size: 13px;
-      color: var(--text-muted); cursor: pointer; transition: border-color 0.15s, color 0.15s;
-    }
-    .quiz-btn:hover { border-color: var(--amber); color: var(--amber); }
-    .quiz-answers { display: none; margin-top: 14px; }
-    .quiz-answers.visible { display: block; }
-    .quiz-answer-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 0; border-bottom: 1px solid var(--border);
-    }
-    .quiz-answer-row:last-child { border-bottom: none; }
-    .qa-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); width: 24px; }
-    .qa-text { font-size: 13px; color: var(--text-muted); flex: 1; }
-    .qa-val {
-      font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
-    }
-    .qa-val.pos { color: var(--green); }
-    .qa-val.neg { color: var(--put); }
-
-    /* ── NEXT CARD ── */
-    .next-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 28px 32px; margin-top: 40px;
-      display: flex; align-items: center; justify-content: space-between; gap: 24px;
-      text-decoration: none; color: inherit; transition: border-color 0.2s;
-    }
-    .next-card:hover { border-color: var(--border-light); }
-    .next-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.12em; margin-bottom: 8px; }
-    .next-title { font-size: 17px; font-weight: 600; color: var(--text); }
-    .next-arrow {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: var(--bg-card2); border: 1px solid var(--border-light);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: var(--amber); flex-shrink: 0;
-    }
-
-    /* ── WARN BOX ── */
-    .warn-box {
-      background: rgba(249,115,22,0.06); border-left: 3px solid var(--orange);
-      border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 22px 0;
-    }
-    .warn-title {
-      font-family: 'JetBrains Mono', monospace; font-size: 10px;
-      color: var(--orange); letter-spacing: 0.12em; margin-bottom: 8px;
-    }
-    .warn-box p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border); padding: 32px 10vw;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .footer-brand { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-dim); }
-    .footer-page  { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); }
-
-    /* ── REVEAL ── */
-    .reveal {
-      opacity: 0; transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    .reveal.visible { opacity: 1; transform: none; }
-
-    /* ── 본문 폰트 통일: figure 내부 레이블 ── */
-    .bridge-col-label, .bridge-tag, .bridge-note,
-    .sc-action, .sc-badge,
-    .chart-label,
-    .slider-field-label, .slider-row-title, .slider-result-label,
-    .be-bar,
-    .prot-col-label,
-    .dtree-branch-label, .dtree-result-sub,
-    .quiz-num, .qa-num, .quiz-btn,
-    .summary-num, .warn-title, .next-label {
-      font-family: 'Noto Sans KR', sans-serif;
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 680px) {
-      nav { padding: 12px 20px; }
-      .hero { padding: 100px 24px 60px; }
-      .section, .section-wide { padding: 60px 20px; }
-      .bridge-wrap { grid-template-columns: 1fr; gap: 10px; }
-      .bridge-sep { flex-direction: row; padding: 8px 0; }
-      .bridge-note { max-width: none; }
-      .sc-grid { grid-template-columns: 1fr 1fr; }
-      .slider-conds { grid-template-columns: 1fr; }
-      .slider-results { grid-template-columns: 1fr; }
-      .protection-wrap { grid-template-columns: 1fr; }
-      .prot-sep { justify-content: center; padding: 10px 0; }
-      .dtree-row { grid-template-columns: 1fr; gap: 8px; }
-      .dtree-mid { display: none; }
-      .dtree-results { grid-template-columns: 1fr; }
-      .summary-grid { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 8px; text-align: center; }
-      .next-card { flex-direction: column; align-items: flex-start; }
-    }
-    @media print {
-      nav, #progress-bar, .scroll-hint { display: none; }
-      .hero { min-height: auto; padding: 40px 0 20px; }
-      .quiz-answers { display: block !important; }
-    }
-
-
-    /* ── THEME MODE: dark base + optional olive ── */
-    :root {
-      color-scheme: dark;
-      --nav-bg: rgba(13,13,13,0.92);
-      --hero-glow-warm: rgba(245,158,11,0.05);
-      --hero-glow-cool: rgba(59,130,246,0.04);
-      --prose-text: #D4CFC8;
-      --row-hover: rgba(255,255,255,0.02);
-      --pending-bg: rgba(90,82,72,0.3);
-      --open-bg: rgba(34,197,94,0.12);
-      --cta-text: #0D0D0D;
-    }
-    :root[data-theme="olive"] {
-      color-scheme: light;
-      --bg: #FAFAF2;
-      --bg-card: #FFFFFF;
-      --bg-card2: #F4F5E9;
-      --text: #1C2418;
-      --text-muted: #5E684F;
-      --text-dim: #8A927A;
-      --call: #2F6FB2;
-      --call-dim: #DCE8EF;
-      --put: #B94A48;
-      --put-dim: #F3DDDA;
-      --amber: #7D8F3A;
-      --green: #4F7A35;
-      --red: #B94A48;
-      --orange: #B66C25;
-      --border: #E4E7D5;
-      --border-light: #D5DBC1;
-      --nav-bg: rgba(250,250,242,0.92);
-      --hero-glow-warm: rgba(125,143,58,0.12);
-      --hero-glow-cool: rgba(96,117,63,0.08);
-      --prose-text: #34402D;
-      --row-hover: rgba(93,113,49,0.05);
-      --pending-bg: rgba(138,146,122,0.14);
-      --open-bg: rgba(79,122,53,0.12);
-      --cta-text: #FFFFFF;
-    }
-    body { transition: background 0.25s ease, color 0.25s ease; }
-    nav { background: var(--nav-bg) !important; }
-    .hero::before { background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%) !important; }
-    .hero::after { background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%) !important; }
-    .prose p { color: var(--prose-text) !important; }
-    .theme-toggle {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 3px;
-      border: 1px solid var(--border-light);
-      border-radius: 999px;
-      background: var(--bg-card);
-      flex-shrink: 0;
-    }
-    .theme-btn {
-      border: 0;
-      min-width: 44px; min-height: 32px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: transparent;
-      color: var(--text-dim);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 600;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
-    .theme-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-    @media (max-width: 680px) {
-      .nav-right { gap: 8px; }
-      .nav-session, .nav-sep { display: none; }
-      .theme-btn { min-width: 42px; min-height: 30px; padding: 5px 8px; }
-    }
+    .payoff-chart { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px; }
+    .payoff-chart svg { width:100%; height:auto; display:block; }
+    .payoff-chart text { font-family:'JetBrains Mono', monospace; fill:var(--text-muted); font-size:11px; }
+    .chart-axis { stroke:var(--border-light); stroke-width:1; }
+    .chart-line { stroke:var(--amber); stroke-width:4; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .chart-loss { fill:rgba(239,68,68,.12); }
+    .chart-profit { fill:rgba(53,208,127,.12); }
+    .chart-strike { stroke:var(--blue); stroke-width:1.5; stroke-dasharray:5 5; }
+    .chart-breakeven { stroke:var(--green); stroke-width:1.5; stroke-dasharray:4 4; }
+    .decision-tree { display:grid; gap:12px; }
+    .decision-node { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+    .decision-branches { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .protection-line { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .floor-mark { min-width:90px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:12px; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.12),rgba(53,208,127,.06)); }
+    .matrix-card { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .matrix-cell.good { border-color:rgba(53,208,127,.36); }
+    .matrix-cell.bad { border-color:rgba(239,68,68,.32); }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.decision-branches,.protection-line,.matrix-card { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
   </style>
 </head>
 <body>
 
-<div id="progress-bar"></div>
-
+<div class="progress" aria-hidden="true"></div>
 <nav>
   <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
   <div class="nav-right">
-    <a href="session-01.html" class="nav-prev">← 1회차</a>
-    <span class="nav-sep">/</span>
+    <a href="session-01.html" class="nav-prev">1회차</a>
     <span class="nav-session">SESSION 02</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-03.html" class="nav-next nav-forward">3회차 →</a>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
       <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
       <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
     </div>
   </div>
 </nav>
-
-<!-- ── HERO ── -->
-<section class="hero">
-  <div class="hero-eyebrow">무기견의 옵션 입문 · 2회차</div>
-  <h1><em>콜</em>과 <em class="put">풋</em>,<br>방향보다<br>권리로 이해하기</h1>
-  <p class="hero-sub">계약 구조 · Level 1 · 읽기 약 15분</p>
-  <div class="hero-thesis">
-    <div class="label">2회차 핵심 문장</div>
-    콜과 풋은 방향 버튼이 아니라 권리의 종류입니다.
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 02 · Level 1</div>
+    <h1>콜옵션과 풋옵션,<br>방향보다 먼저<br><span class="hi">권리로 이해하기</span></h1>
+    <p class="hero-sub">콜은 상승, 풋은 하락으로 외우는 순간 옵션은 너무 납작해집니다. 이번 회차에서는 가격 방향이 아니라 권리의 종류에서 콜과 풋을 다시 봅니다.</p>
+    <div class="thesis"><div class="thesis-label">2회차 중심 문장</div><div class="thesis-main">콜은 살 권리이고, 풋은 팔 권리입니다. 방향성은 그 권리에서 따라 나옵니다.</div></div>
   </div>
-  <div class="scroll-hint"><span>SCROLL</span><div class="scroll-dot"></div></div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">01 · PRIOR SESSION BRIDGE</div>
+  <h2>네 요소를 알았다면, 이제 권리가 살아나는 순간을 봅니다</h2>
+  <div class="prose">
+    <p>1회차에서는 옵션을 미래의 선택권을 사고파는 계약으로 봤습니다.</p>
+    <p>옵션 계약을 볼 때는 기초자산, 행사가, 만기, 프리미엄을 먼저 확인한다고 했습니다. 그리고 콜옵션은 살 권리, 풋옵션은 팔 권리라는 문장도 잡았습니다.</p>
+    <p>이번 회차에서는 이 두 권리를 조금 더 천천히 나눠보겠습니다.</p>
+  </div>
 </section>
-
-<hr class="section-divider">
-
-<!-- ── 00 브리지 ── -->
-<div class="section reveal">
-  <div class="section-num">00 · 1회차에서 이어집니다</div>
-  <h2>계약 조건을 알았다면<br>이제 권리가 언제 살아나는지 봅니다</h2>
-
+<section class="section-wide reveal" id="figure-01">
   <div class="fig">
-    <div class="fig-label">Figure 01 — 1회차 → 2회차 브리지</div>
-    <div class="bridge-wrap">
-      <div class="bridge-col s1">
-        <div class="bridge-col-label">1회차</div>
-        <div class="bridge-q">옵션 계약의 네 요소</div>
-        <div class="bridge-tags">
-          <span class="bridge-tag">기초자산</span>
-          <span class="bridge-tag">행사가</span>
-          <span class="bridge-tag">만기</span>
-          <span class="bridge-tag">프리미엄</span>
-        </div>
-      </div>
-      <div class="bridge-sep">
-        <div class="bridge-arrow">→</div>
-        <div class="bridge-note">계약 조건을 알았다면, 이제 권리가 언제 살아나는지 봅니다</div>
-      </div>
-      <div class="bridge-col s2">
-        <div class="bridge-col-label">2회차</div>
-        <div class="bridge-q">콜과 풋의 권리 구분</div>
-        <div class="bridge-tags">
-          <span class="bridge-tag">살 권리</span>
-          <span class="bridge-tag">팔 권리</span>
-          <span class="bridge-tag">행사 / 포기</span>
-        </div>
-      </div>
+    <div class="fig-label">Figure 01 — 1회차에서 2회차로 이어지는 브리지 카드</div>
+    <h3>계약 조건 다음에는 권리의 작동 방식을 봅니다</h3>
+    <div class="bridge-grid">
+      <div class="mini-card"><div class="mini-k">SESSION 01</div><div class="mini-v">옵션 계약의 네 요소</div><p class="mini-p">기초자산, 행사가, 만기, 프리미엄을 먼저 확인했습니다.</p></div>
+      <div class="bridge-arrow">→<br>권리 작동</div>
+      <div class="mini-card"><div class="mini-k">SESSION 02</div><div class="mini-v">콜과 풋의 권리 구분</div><p class="mini-p">콜은 살 권리, 풋은 팔 권리입니다. 이제 권리가 언제 살아나는지 봅니다.</p></div>
     </div>
-    <div class="fig-caption">많은 분들이 콜은 상승, 풋은 하락으로 기억합니다. 틀린 말은 아니지만, 그 문장만 붙잡으면 옵션을 너무 납작하게 보게 됩니다.</div>
+    <div class="fig-caption">계약 조건을 알았다면, 이제 권리가 언제 살아나는지 봅니다.</div>
   </div>
-
+</section>
+<hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">02 · TODAY'S DISCOMFORT</div>
+  <h2>콜과 풋은 방향 버튼이 아닙니다</h2>
   <div class="prose">
-    <p>1회차에서는 옵션을 미래의 선택권을 사고파는 계약으로 봤습니다. 기초자산, 행사가, 만기, 프리미엄을 먼저 확인한다고 했고, 콜옵션은 살 권리, 풋옵션은 팔 권리라는 문장도 잡았습니다.</p>
-    <p>이번 회차에서는 이 두 권리를 조금 더 천천히 나눠보겠습니다. 가격이 움직일 때 그 권리가 언제 살아나고, 언제 버려지는지 봐야 합니다.</p>
+    <p>많은 분들이 옵션을 처음 배울 때 콜은 상승, 풋은 하락으로 기억합니다. 실전에서 빠르게 떠올리기에는 편한 문장입니다. 다만 그 문장만 붙잡으면 옵션을 너무 납작하게 보게 됩니다. 콜과 풋은 방향 버튼이 아니라 권리의 종류입니다.</p>
+    <p><strong>가격이 움직일 때 그 권리가 언제 살아나고, 언제 버려지는지 봐야 합니다.</strong></p>
   </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 01 콜옵션 ── -->
-<div class="section reveal">
-  <div class="section-num">01 · 콜옵션</div>
-  <h2>콜옵션은<br>살 수 있는 선택권입니다</h2>
+</section>
+<section class="section reveal" id="section-03">
+  <div class="section-num">03 · CENTRAL SENTENCE</div>
+  <h2>방향성은 권리에서 따라 나옵니다</h2>
   <div class="prose">
-    <p>현재 주가 100달러인 주식을 한 달 뒤까지 110달러에 살 수 있는 콜옵션을 3달러에 샀습니다. 행사가 110달러는 내가 미래에 살 수 있는 기준 가격입니다. 만기 주가에 따라 이 권리는 살아나거나 버려집니다.</p>
+    <p>이번 회차의 기준 문장은 이렇게 잡겠습니다.</p>
+    <p><strong>콜은 살 권리이고, 풋은 팔 권리입니다. 방향성은 그 권리에서 따라 나옵니다.</strong></p>
   </div>
-
-  <div class="fig">
-    <div class="fig-label">Figure 02 — 콜옵션 시나리오</div>
-    <div style="margin-bottom:14px; font-size:13px; color:var(--text-dim); font-family:'JetBrains Mono',monospace;">
-      행사가 $110 · 프리미엄 $3 · 손익분기점 <span style="color:var(--amber)">$113</span>
-    </div>
-    <div class="sc-grid">
-      <div class="sc-card loss">
-        <div class="sc-price">$90</div>
-        <div class="sc-action">$110에 살 이유 없음</div>
-        <div class="sc-iv">권리가치 $0</div>
-        <div class="sc-pnl">−$3</div>
-        <span class="sc-badge">권리 포기</span>
-      </div>
-      <div class="sc-card loss">
-        <div class="sc-price">$110</div>
-        <div class="sc-action">행사해도 이익 없음</div>
-        <div class="sc-iv">권리가치 $0</div>
-        <div class="sc-pnl">−$3</div>
-        <span class="sc-badge">손익분기 미달</span>
-      </div>
-      <div class="sc-card be">
-        <div class="sc-price">$112</div>
-        <div class="sc-action">방향은 맞았지만</div>
-        <div class="sc-iv">권리가치 $2</div>
-        <div class="sc-pnl">−$1</div>
-        <span class="sc-badge">아직 손실</span>
-      </div>
-      <div class="sc-card win">
-        <div class="sc-price">$120</div>
-        <div class="sc-action">$110에 살 수 있으니 유리</div>
-        <div class="sc-iv">권리가치 $10</div>
-        <div class="sc-pnl">+$7</div>
-        <span class="sc-badge">권리 행사</span>
-      </div>
-    </div>
-    <div class="fig-caption">112달러에서는 방향을 맞혔지만 아직 손실입니다. 옵션에서 방향과 수익은 같은 말이 아닙니다.</div>
-  </div>
-
-  <div class="warn-box">
-    <div class="warn-title">주의</div>
-    <p>주식이라면 100달러에서 112달러로 오른 것만으로 수익입니다. 하지만 110달러 콜옵션을 3달러에 샀다면, 112달러는 손익분기점 아래입니다. 행사가와 프리미엄이 그 사이에 끼어 있습니다.</p>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 02 콜 손익선 + 슬라이더 ── -->
-<div class="section reveal">
-  <div class="section-num">02 · 콜옵션 손익선</div>
-  <h2>손익분기점은<br>행사가 + 프리미엄입니다</h2>
-
-  <div class="fig">
-    <div class="fig-label">Figure 03 — 콜옵션 손익 그래프 · 행사가 $110 · 프리미엄 $3</div>
-    <div class="chart-label call">CALL OPTION · 매수 만기 손익</div>
-    <svg class="payoff" viewBox="0 0 280 170" id="callChart">
-      <defs>
-        <linearGradient id="callProfitGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#22C55E" stop-opacity="0.25"/>
-          <stop offset="100%" stop-color="#22C55E" stop-opacity="0"/>
-        </linearGradient>
-        <linearGradient id="callLossGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#EF4444" stop-opacity="0"/>
-          <stop offset="100%" stop-color="#EF4444" stop-opacity="0.18"/>
-        </linearGradient>
-      </defs>
-      <!-- grid lines -->
-      <line x1="40" y1="15" x2="40" y2="145" stroke="#2A2520" stroke-width="1"/>
-      <line x1="40" y1="100" x2="270" y2="100" stroke="#2A2520" stroke-width="1"/>
-      <!-- loss fill -->
-      <polygon points="40,100 40,112 178,112 192,100" fill="url(#callLossGrad)"/>
-      <!-- profit fill -->
-      <polygon points="192,100 270,36 270,100" fill="url(#callProfitGrad)"/>
-      <!-- strike dashed line -->
-      <line x1="178" y1="15" x2="178" y2="145" stroke="#3A3530" stroke-width="1" stroke-dasharray="3,3"/>
-      <!-- breakeven dashed line -->
-      <line x1="192" y1="15" x2="192" y2="145" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
-      <!-- zero label -->
-      <text x="33" y="103" fill="#5A5248" font-size="9" text-anchor="end" font-family="JetBrains Mono">0</text>
-      <!-- x axis labels -->
-      <text x="40"  y="158" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">80</text>
-      <text x="101" y="158" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">93</text>
-      <text x="178" y="158" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">110</text>
-      <text x="192" y="158" fill="#F59E0B" font-size="8" text-anchor="middle" font-family="JetBrains Mono">113</text>
-      <text x="270" y="158" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">130</text>
-      <text x="155" y="168" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">만기 주가</text>
-      <!-- y labels -->
-      <text x="33" y="40"  fill="#22C55E" font-size="8" text-anchor="end" font-family="JetBrains Mono">+17</text>
-      <text x="33" y="115" fill="#EF4444" font-size="8" text-anchor="end" font-family="JetBrains Mono">−3</text>
-      <!-- annotations -->
-      <text x="182" y="26" fill="#5A5248" font-size="8" font-family="JetBrains Mono">행사가</text>
-      <text x="196" y="94" fill="#F59E0B" font-size="8" font-family="JetBrains Mono">손익분기</text>
-      <text x="240" y="55" fill="#22C55E" font-size="9" font-family="JetBrains Mono">이익↗</text>
-      <text x="85"  y="125" fill="#EF4444" font-size="9" font-family="JetBrains Mono">−3달러</text>
-      <!-- payoff line -->
-      <polyline points="40,112 178,112 270,36"
-        fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <div class="chart-note">손익분기점 113달러 = 행사가 110달러 + 프리미엄 3달러</div>
-  </div>
-
-  <div class="fig">
-    <div class="fig-label">콜옵션 시나리오 슬라이더</div>
-    <div class="slider-wrap">
-      <div class="slider-conds">
-        <div class="slider-field">
-          <div class="slider-field-label">행사가</div>
-          <div class="slider-field-val">$110</div>
-        </div>
-        <div class="slider-field">
-          <div class="slider-field-label">프리미엄</div>
-          <div class="slider-field-val">$3</div>
-        </div>
-        <div class="slider-field">
-          <div class="slider-field-label">손익분기점</div>
-          <div class="slider-field-val" style="color:var(--amber)">$113</div>
-        </div>
-      </div>
-      <div class="slider-row-label">
-        <span class="slider-row-title">만기 주가</span>
-        <span class="slider-row-val" id="callSliderVal">$100</span>
-      </div>
-      <input type="range" id="callSlider" min="80" max="130" value="100" step="1">
-      <div class="slider-results">
-        <div class="slider-result">
-          <div class="slider-result-label">권리 가치</div>
-          <div class="slider-result-val zero" id="callIV">$0</div>
-        </div>
-        <div class="slider-result">
-          <div class="slider-result-label">프리미엄</div>
-          <div class="slider-result-val" style="color:var(--put)">−$3</div>
-        </div>
-        <div class="slider-result">
-          <div class="slider-result-label">순손익</div>
-          <div class="slider-result-val neg" id="callPnl">−$3</div>
-        </div>
-      </div>
-      <div class="be-bar">
-        <span>손익분기점</span>
-        <span class="be-val">$113</span>
-        <span class="be-sub">= 행사가 $110 + 프리미엄 $3</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 03 풋옵션 ── -->
-<div class="section reveal">
-  <div class="section-num">03 · 풋옵션</div>
-  <h2>풋옵션은<br>팔 수 있는 선택권입니다</h2>
+</section>
+<hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">04 · CALL OPTION</div>
+  <h2>콜옵션은 살 수 있는 선택권입니다</h2>
   <div class="prose">
-    <p>현재 주가 100달러인 주식을 한 달 뒤까지 90달러에 팔 수 있는 풋옵션을 2달러에 샀습니다. 행사가 90달러는 내가 미래에 팔 수 있는 기준 가격입니다. 풋옵션의 손익분기점은 행사가에서 프리미엄을 뺀 가격입니다.</p>
+    <p>콜옵션은 정해진 가격에 살 수 있는 권리입니다.</p>
+    <p>현재 주가가 100달러인 주식이 있습니다. 나는 이 주식을 한 달 뒤까지 110달러에 살 수 있는 콜옵션을 3달러에 샀습니다. 이 계약에서 행사가 110달러는 내가 미래에 살 수 있는 기준 가격입니다.</p>
+    <p>만기 때 주가가 90달러라면 콜옵션은 행사할 이유가 없습니다. 시장에서 90달러에 살 수 있는 주식을 110달러에 살 필요가 없기 때문입니다. 이때 옵션 매수자는 권리를 포기합니다. 손실은 처음에 낸 프리미엄 3달러입니다.</p>
+    <p>만기 때 주가가 110달러라면 어떨까요? 110달러에 살 수 있는 권리이지만, 시장 가격도 110달러입니다. 굳이 권리를 행사해도 이익이 생기지 않습니다. 프리미엄 3달러를 냈기 때문에 전체 거래는 여전히 손실입니다.</p>
+    <p>만기 때 주가가 120달러라면 권리가 살아납니다. 시장에서 120달러인 주식을 110달러에 살 수 있습니다. 권리 자체의 가치는 10달러입니다. 처음 낸 프리미엄 3달러를 빼면 순이익은 7달러입니다.</p>
+    <p>이 흐름을 보면 콜옵션의 본질이 조금 더 선명해집니다. 콜옵션은 주가가 오른다고 무조건 돈을 버는 계약이 아닙니다. 주가가 행사가와 프리미엄을 넘어설 만큼 올라야 전체 거래가 이익이 됩니다.</p>
   </div>
-
+</section>
+<section class="section-wide reveal" id="figure-02">
   <div class="fig">
-    <div class="fig-label">Figure 04 — 풋옵션 시나리오</div>
-    <div style="margin-bottom:14px; font-size:13px; color:var(--text-dim); font-family:'JetBrains Mono',monospace;">
-      행사가 $90 · 프리미엄 $2 · 손익분기점 <span style="color:var(--amber)">$88</span>
+    <div class="fig-label">Figure 02 — 콜옵션 시나리오 카드</div>
+    <h3>콜 110, 프리미엄 3은 113을 넘어야 이익입니다</h3>
+    <div class="four">
+      <div class="scenario-card bad"><strong>만기 주가 90달러</strong><p class="mini-p">권리 포기<br>순손익 -3달러</p></div>
+      <div class="scenario-card bad"><strong>만기 주가 110달러</strong><p class="mini-p">권리 가치 0<br>순손익 -3달러</p></div>
+      <div class="scenario-card bad"><strong>만기 주가 112달러</strong><p class="mini-p">권리 가치 2달러<br>순손익 -1달러</p></div>
+      <div class="scenario-card good"><strong>만기 주가 120달러</strong><p class="mini-p">권리 가치 10달러<br>순손익 +7달러</p></div>
     </div>
-    <div class="sc-grid">
-      <div class="sc-card win">
-        <div class="sc-price">$70</div>
-        <div class="sc-action">$90에 팔 수 있으니 유리</div>
-        <div class="sc-iv">권리가치 $20</div>
-        <div class="sc-pnl">+$18</div>
-        <span class="sc-badge">권리 행사</span>
-      </div>
-      <div class="sc-card be">
-        <div class="sc-price">$89</div>
-        <div class="sc-action">방향은 맞았지만</div>
-        <div class="sc-iv">권리가치 $1</div>
-        <div class="sc-pnl">−$1</div>
-        <span class="sc-badge">아직 손실</span>
-      </div>
-      <div class="sc-card loss">
-        <div class="sc-price">$90</div>
-        <div class="sc-action">행사해도 이익 없음</div>
-        <div class="sc-iv">권리가치 $0</div>
-        <div class="sc-pnl">−$2</div>
-        <span class="sc-badge">손익분기 미달</span>
-      </div>
-      <div class="sc-card loss">
-        <div class="sc-price">$120</div>
-        <div class="sc-action">$90에 팔 이유 없음</div>
-        <div class="sc-iv">권리가치 $0</div>
-        <div class="sc-pnl">−$2</div>
-        <span class="sc-badge">권리 포기</span>
-      </div>
-    </div>
-    <div class="fig-caption">89달러에서는 방향을 맞혔지만 아직 손실입니다. 풋도 마찬가지로, 행사가와 프리미엄이 손익분기점을 만듭니다.</div>
+    <div class="fig-caption">현재 주가 100달러, 행사가 110달러, 프리미엄 3달러. 손익분기점은 113달러입니다.</div>
   </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 04 풋 손익선 + 슬라이더 ── -->
-<div class="section reveal">
-  <div class="section-num">04 · 풋옵션 손익선</div>
-  <h2>풋의 손익분기점은<br>행사가 − 프리미엄입니다</h2>
-
-  <div class="fig">
-    <div class="fig-label">Figure 05 — 풋옵션 손익 그래프 · 행사가 $90 · 프리미엄 $2</div>
-    <div class="chart-label put">PUT OPTION · 매수 만기 손익</div>
-    <svg class="payoff" viewBox="0 0 280 170" id="putChart">
-      <defs>
-        <linearGradient id="putProfitGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#22C55E" stop-opacity="0.2"/>
-          <stop offset="100%" stop-color="#22C55E" stop-opacity="0"/>
-        </linearGradient>
-        <linearGradient id="putLossGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#EF4444" stop-opacity="0"/>
-          <stop offset="100%" stop-color="#EF4444" stop-opacity="0.18"/>
-        </linearGradient>
-      </defs>
-      <!-- axes -->
-      <line x1="40" y1="15" x2="40" y2="145" stroke="#2A2520" stroke-width="1"/>
-      <line x1="40" y1="100" x2="270" y2="100" stroke="#2A2520" stroke-width="1"/>
-      <!-- profit fill (left of breakeven) -->
-      <polygon points="53,15 53,100 147,100" fill="url(#putProfitGrad)"/>
-      <!-- loss fill (right of breakeven) -->
-      <polygon points="147,100 155,108 270,108 270,100" fill="url(#putLossGrad)"/>
-      <!-- strike dashed -->
-      <line x1="155" y1="15" x2="155" y2="145" stroke="#3A3530" stroke-width="1" stroke-dasharray="3,3"/>
-      <!-- breakeven dashed -->
-      <line x1="147" y1="15" x2="147" y2="145" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
-      <!-- zero label -->
-      <text x="33" y="103" fill="#5A5248" font-size="9" text-anchor="end" font-family="JetBrains Mono">0</text>
-      <!-- x axis labels -->
-      <text x="40"  y="158" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">60</text>
-      <text x="147" y="158" fill="#F59E0B" font-size="8" text-anchor="middle" font-family="JetBrains Mono">88</text>
-      <text x="155" y="158" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">90</text>
-      <text x="270" y="158" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">120</text>
-      <text x="155" y="168" fill="#5A5248" font-size="8" text-anchor="middle" font-family="JetBrains Mono">만기 주가</text>
-      <!-- y labels -->
-      <text x="33" y="26"  fill="#22C55E" font-size="8" text-anchor="end" font-family="JetBrains Mono">+26</text>
-      <text x="33" y="112" fill="#EF4444" font-size="8" text-anchor="end" font-family="JetBrains Mono">−2</text>
-      <!-- annotations -->
-      <text x="160" y="26" fill="#5A5248" font-size="8" font-family="JetBrains Mono">행사가</text>
-      <text x="105" y="94" fill="#F59E0B" font-size="8" font-family="JetBrains Mono">손익분기</text>
-      <text x="50"  y="55" fill="#22C55E" font-size="9" font-family="JetBrains Mono">이익↗</text>
-      <text x="185" y="122" fill="#EF4444" font-size="9" font-family="JetBrains Mono">−2달러</text>
-      <!-- payoff line (clipped at top: price=60 → pnl=28 → y=-12 → clip to 15) -->
-      <polyline points="53,15 147,100 155,108 270,108"
-        fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <div class="chart-note">손익분기점 88달러 = 행사가 90달러 − 프리미엄 2달러</div>
+</section>
+<section class="section reveal" id="call-breakeven">
+  <div class="prose">
+    <h3 class="subhead">콜옵션의 손익은 행사가와 프리미엄이 함께 정합니다</h3>
+    <p>콜옵션 매수자의 손익분기점은 행사가에 프리미엄을 더한 가격입니다.</p>
+    <p>행사가 110달러, 프리미엄 3달러인 콜옵션이라면 손익분기점은 113달러입니다. 만기 주가가 112달러라면 방향은 맞았습니다. 현재가 100달러에서 112달러까지 올랐으니까요. 하지만 옵션 거래 기준으로는 아직 1달러 손실입니다.</p>
+    <p>권리 가치는 2달러인데, 프리미엄으로 3달러를 냈기 때문입니다.</p>
+    <p>여기서 초보자가 가장 많이 헷갈립니다. 주식을 샀다면 100달러에서 112달러로 오른 것만으로 수익입니다. 하지만 110달러 콜옵션을 3달러에 샀다면, 112달러는 손익분기점 아래입니다.</p>
+    <p>옵션에서는 방향과 수익이 같은 말이 아닙니다. 행사가와 프리미엄이 그 사이에 끼어 있습니다.</p>
   </div>
-
+</section>
+<section class="section-wide reveal" id="figure-03">
   <div class="fig">
-    <div class="fig-label">풋옵션 시나리오 슬라이더</div>
-    <div class="slider-wrap">
-      <div class="slider-conds">
-        <div class="slider-field">
-          <div class="slider-field-label">행사가</div>
-          <div class="slider-field-val">$90</div>
+    <div class="fig-label">Figure 03 — 콜옵션 손익선</div>
+    <h3>콜 손익선은 행사가 이후 꺾이고, 손익분기점 이후 이익으로 바뀝니다</h3>
+    <div class="calc">
+      <div class="calc-panel">
+        <div class="payoff-chart">
+          <svg viewBox="0 0 520 260" role="img" aria-label="콜옵션 손익선: 행사가 110달러, 손익분기점 113달러">
+            <rect class="chart-loss" x="40" y="176" width="290" height="34"></rect>
+            <polygon class="chart-profit" points="330,176 480,60 480,176"></polygon>
+            <line class="chart-axis" x1="40" y1="176" x2="480" y2="176"></line><line class="chart-axis" x1="40" y1="40" x2="40" y2="210"></line>
+            <line class="chart-strike" x1="304" y1="42" x2="304" y2="210"></line><line class="chart-breakeven" x1="330" y1="42" x2="330" y2="210"></line>
+            <path class="chart-line" d="M40 196 L304 196 L480 60"></path>
+            <text x="34" y="230">80</text><text x="294" y="230">110</text><text x="318" y="230">113</text><text x="468" y="230">130</text>
+            <text x="286" y="34">행사가 110</text><text x="336" y="54">손익분기점 113</text><text x="52" y="194">손실</text><text x="428" y="72">이익</text>
+          </svg>
         </div>
-        <div class="slider-field">
-          <div class="slider-field-label">프리미엄</div>
-          <div class="slider-field-val">$2</div>
-        </div>
-        <div class="slider-field">
-          <div class="slider-field-label">손익분기점</div>
-          <div class="slider-field-val" style="color:var(--amber)">$88</div>
-        </div>
+        <div class="slider-head"><div class="slider-title">만기 주가</div><div id="callPriceVal" class="slider-val">$100</div></div>
+        <input id="callPrice" type="range" min="80" max="130" value="100" step="1" aria-label="콜옵션 만기 주가">
       </div>
-      <div class="slider-row-label">
-        <span class="slider-row-title">만기 주가</span>
-        <span class="slider-row-val" id="putSliderVal">$100</span>
-      </div>
-      <input type="range" id="putSlider" min="60" max="120" value="100" step="1">
-      <div class="slider-results">
-        <div class="slider-result">
-          <div class="slider-result-label">권리 가치</div>
-          <div class="slider-result-val zero" id="putIV">$0</div>
-        </div>
-        <div class="slider-result">
-          <div class="slider-result-label">프리미엄</div>
-          <div class="slider-result-val" style="color:var(--put)">−$2</div>
-        </div>
-        <div class="slider-result">
-          <div class="slider-result-label">순손익</div>
-          <div class="slider-result-val neg" id="putPnl">−$2</div>
-        </div>
-      </div>
-      <div class="be-bar">
-        <span>손익분기점</span>
-        <span class="be-val">$88</span>
-        <span class="be-sub">= 행사가 $90 − 프리미엄 $2</span>
+      <div class="calc-panel calc-results">
+        <div class="result"><span>행사가</span><strong>$110</strong></div>
+        <div class="result"><span>프리미엄</span><strong>$3</strong></div>
+        <div id="callIntrinsicBox" class="result zero"><span>권리 가치</span><strong id="callIntrinsicVal">$0</strong></div>
+        <div id="callPnlBox" class="result neg"><span>순손익</span><strong id="callPnlVal">-$3</strong></div>
+        <div class="result"><span>손익분기점</span><strong>$113</strong></div>
       </div>
     </div>
+    <div class="fig-caption">권리 가치는 <code>max(S-110,0)</code>, 순손익은 권리 가치에서 프리미엄 3달러를 뺀 값입니다.</div>
   </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 05 풋 보호 기능 ── -->
-<div class="section reveal">
-  <div class="section-num">05 · 풋옵션의 다른 쓰임</div>
-  <h2>풋옵션은 하락 베팅뿐<br>아니라 보호가 됩니다</h2>
+</section>
+<hr class="divider">
+<section class="section reveal" id="put-explanation">
+  <div class="section-num">05 · PUT OPTION</div>
+  <h2>풋옵션은 팔 수 있는 선택권입니다</h2>
+  <div class="prose">
+    <p>풋옵션은 정해진 가격에 팔 수 있는 권리입니다.</p>
+    <p>현재 주가가 100달러인 주식이 있습니다. 나는 이 주식을 한 달 뒤까지 90달러에 팔 수 있는 풋옵션을 2달러에 샀습니다. 이 계약에서 행사가 90달러는 내가 미래에 팔 수 있는 기준 가격입니다.</p>
+    <p>만기 때 주가가 120달러라면 풋옵션은 행사할 이유가 없습니다. 시장에서 120달러에 팔 수 있는 주식을 90달러에 팔 필요가 없기 때문입니다. 이때 옵션 매수자는 권리를 포기합니다. 손실은 처음에 낸 프리미엄 2달러입니다.</p>
+    <p>만기 때 주가가 90달러라면 권리 자체의 이익은 없습니다. 90달러에 팔 수 있지만 시장 가격도 90달러입니다. 프리미엄 2달러를 냈기 때문에 전체 거래는 손실입니다.</p>
+    <p>만기 때 주가가 70달러라면 권리가 살아납니다. 시장에서는 70달러인 주식을 90달러에 팔 수 있기 때문입니다. 권리 자체의 가치는 20달러입니다. 처음 낸 프리미엄 2달러를 빼면 순이익은 18달러입니다.</p>
+    <p>풋옵션의 손익분기점은 행사가에서 프리미엄을 뺀 가격입니다. 행사가 90달러, 프리미엄 2달러라면 손익분기점은 88달러입니다. 만기 주가가 88달러보다 낮아져야 전체 거래가 이익으로 바뀝니다.</p>
+    <p>여기까지의 계산은 모두 만기 기준입니다. 실제 거래 중간에는 남은 시간가치와 변동성이 옵션 가격에 남아 있기 때문에, 만기 손익표와 현재 시장가격이 딱 맞지 않을 수 있습니다. 입문 단계에서는 먼저 만기 기준 구조를 잡고, 6회차 이후에 시간가치와 변동성을 붙이겠습니다.</p>
+  </div>
+</section>
+<section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 풋옵션 시나리오 카드</div>
+    <h3>풋 90, 프리미엄 2는 88 아래로 내려가야 이익입니다</h3>
+    <div class="four">
+      <div class="scenario-card bad"><strong>만기 주가 120달러</strong><p class="mini-p">권리 포기<br>순손익 -2달러</p></div>
+      <div class="scenario-card bad"><strong>만기 주가 90달러</strong><p class="mini-p">권리 가치 0<br>순손익 -2달러</p></div>
+      <div class="scenario-card bad"><strong>만기 주가 89달러</strong><p class="mini-p">권리 가치 1달러<br>순손익 -1달러</p></div>
+      <div class="scenario-card good"><strong>만기 주가 70달러</strong><p class="mini-p">권리 가치 20달러<br>순손익 +18달러</p></div>
+    </div>
+    <div class="fig-caption">현재 주가 100달러, 행사가 90달러, 프리미엄 2달러. 손익분기점은 88달러입니다.</div>
+  </div>
+</section>
+<section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 풋옵션 손익선</div>
+    <h3>풋 손익선은 행사가 아래에서 살아나고, 88 아래에서 이익으로 바뀝니다</h3>
+    <div class="calc">
+      <div class="calc-panel">
+        <div class="payoff-chart">
+          <svg viewBox="0 0 520 260" role="img" aria-label="풋옵션 손익선: 행사가 90달러, 손익분기점 88달러">
+            <polygon class="chart-profit" points="40,40 245,176 40,176"></polygon><rect class="chart-loss" x="245" y="176" width="235" height="34"></rect>
+            <line class="chart-axis" x1="40" y1="176" x2="480" y2="176"></line><line class="chart-axis" x1="40" y1="40" x2="40" y2="210"></line>
+            <line class="chart-strike" x1="260" y1="42" x2="260" y2="210"></line><line class="chart-breakeven" x1="245" y1="42" x2="245" y2="210"></line>
+            <path class="chart-line" d="M40 40 L260 195 L480 195"></path>
+            <text x="34" y="230">60</text><text x="234" y="230">88</text><text x="250" y="230">90</text><text x="464" y="230">120</text>
+            <text x="260" y="36">행사가 90</text><text x="130" y="54">손익분기점 88</text><text x="58" y="72">이익</text><text x="420" y="194">손실</text>
+          </svg>
+        </div>
+        <div class="slider-head"><div class="slider-title">만기 주가</div><div id="putPriceVal" class="slider-val">$100</div></div>
+        <input id="putPrice" type="range" min="60" max="120" value="100" step="1" aria-label="풋옵션 만기 주가">
+      </div>
+      <div class="calc-panel calc-results">
+        <div class="result"><span>행사가</span><strong>$90</strong></div>
+        <div class="result"><span>프리미엄</span><strong>$2</strong></div>
+        <div id="putIntrinsicBox" class="result zero"><span>권리 가치</span><strong id="putIntrinsicVal">$0</strong></div>
+        <div id="putPnlBox" class="result neg"><span>순손익</span><strong id="putPnlVal">-$2</strong></div>
+        <div class="result"><span>손익분기점</span><strong>$88</strong></div>
+      </div>
+    </div>
+    <div class="fig-caption">권리 가치는 <code>max(90-S,0)</code>, 순손익은 권리 가치에서 프리미엄 2달러를 뺀 값입니다.</div>
+  </div>
+</section>
+<hr class="divider">
+<section class="section reveal" id="protection-text">
+  <div class="section-num">06 · PROTECTION AND DIRECTION</div>
+  <h2>풋옵션은 하락장에서만 쓰는 상품이 아닙니다</h2>
   <div class="prose">
     <p>풋옵션을 배우면 많은 분들이 바로 하락 베팅을 떠올립니다. 물론 풋옵션 매수는 기초자산 하락에 유리합니다. 하지만 풋옵션의 더 중요한 쓰임은 보호입니다.</p>
+    <p>주식을 보유한 투자자가 풋옵션을 사면, 일정 가격 아래의 손실을 줄이는 구조를 만들 수 있습니다. 자동차 보험을 든다고 해서 사고가 나기를 바라는 것은 아니죠. 풋옵션도 비슷합니다. 포트폴리오를 가진 투자자는 하락을 바라서 풋을 사는 것이 아니라, 큰 하락이 왔을 때 계좌가 무너지는 폭을 줄이기 위해 풋을 살 수 있습니다.</p>
+    <p>이 비유는 여기까지만 쓰겠습니다. 실제 옵션은 보험과 완전히 같지는 않습니다. 보험료인 프리미엄이 시장 상황에 따라 계속 변하고, 만기와 행사가도 직접 선택해야 하기 때문입니다. 다만 풋옵션을 단순한 하락 베팅으로만 보지 않는 데에는 도움이 됩니다.</p>
   </div>
-
+</section>
+<section class="section-wide reveal" id="figure-06">
   <div class="fig">
-    <div class="fig-label">Figure 06 — 풋옵션을 보호 장치로 보기</div>
-    <div class="protection-wrap">
-      <div class="prot-col naked">
-        <div class="prot-col-label">주식만 보유</div>
-        <div class="prot-bar-wrap">
-          <div class="prot-bar stock">주식 포지션</div>
-        </div>
-        <div class="prot-loss-unlimited" style="margin-top:12px; font-size:12px;">
-          ↓ 하락 시 손실 제한 없음
-        </div>
-      </div>
-      <div class="prot-sep">+</div>
-      <div class="prot-col hedged">
-        <div class="prot-col-label">주식 + 풋옵션</div>
-        <div class="prot-bar-wrap">
-          <div class="prot-bar stock">주식 포지션</div>
-          <div class="prot-bar put">풋옵션 (프리미엄 비용)</div>
-          <div class="prot-floor">─── 손실 바닥선 (행사가 기준)</div>
-        </div>
-      </div>
+    <div class="fig-label">Figure 06 — 풋옵션을 보험처럼 보는 미니 도식</div>
+    <h3>보호에는 항상 프리미엄과 만기 조건이 붙습니다</h3>
+    <div class="protection-line">
+      <div class="mini-card"><div class="mini-k">STOCK POSITION</div><div class="mini-v">하락에 노출된 주식 포지션</div><p class="mini-p">주식만 보유하면 큰 하락이 계좌에 직접 반영됩니다.</p></div>
+      <div class="floor-mark">PUT<br>FLOOR</div>
+      <div class="mini-card"><div class="mini-k">PROTECTION COST</div><div class="mini-v">일정 가격 아래 손실 완화</div><p class="mini-p">풋옵션은 보호 장치가 될 수 있지만, 프리미엄·만기·행사가를 직접 선택해야 합니다.</p></div>
     </div>
-    <div class="prot-note">
-      보호에는 비용이 있습니다. 프리미엄은 시장 상황에 따라 변하고, 만기와 행사가도 직접 선택해야 합니다. 보험 비유는 여기까지만 씁니다.
-    </div>
-    <div class="fig-caption">자동차 보험을 든다고 사고가 나기를 바라는 것은 아닙니다. 풋옵션도 하락을 바라서가 아니라, 큰 하락이 왔을 때 계좌가 무너지는 폭을 줄이기 위해 살 수 있습니다.</div>
+    <div class="fig-caption">풋을 산다는 것은 하락을 바라는 행위만은 아닙니다. 다만 보호는 공짜가 아니며, 옵션은 보험과 완전히 같은 상품도 아닙니다.</div>
   </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 06 방향 반응 매트릭스 ── -->
-<div class="section reveal">
-  <div class="section-num">06 · 방향과 권리</div>
-  <h2>같은 주가 움직임도<br>콜과 풋에는 반대로 작동합니다</h2>
+</section>
+<section class="section reveal" id="direction-text">
   <div class="prose">
-    <p>콜은 살 권리이기 때문에 상승에 유리합니다. 풋은 팔 권리이기 때문에 하락에 유리합니다. 방향성은 권리의 성격에서 나오는 결과입니다.</p>
+    <h3 class="subhead">같은 주가 움직임도 콜과 풋에는 반대로 작동합니다</h3>
+    <p>콜옵션과 풋옵션은 같은 기초자산을 보더라도 가격 움직임을 다르게 받아들입니다.</p>
+    <p>주가가 오르면 콜옵션의 권리는 살아날 가능성이 커집니다. 정해진 가격에 살 수 있는 권리가 더 유리해지기 때문입니다. 반대로 풋옵션은 불리해집니다. 정해진 가격에 팔 수 있는 권리의 매력이 줄어들기 때문입니다.</p>
+    <p>주가가 내리면 반대입니다. 콜옵션은 불리해지고, 풋옵션은 유리해집니다. 이 때문에 콜은 상승에 유리하고 풋은 하락에 유리하다는 말이 나옵니다.</p>
+    <p>다만 이제 우리는 그 문장을 조금 더 정확하게 이해할 수 있습니다. 콜은 살 권리이기 때문에 상승에 유리합니다. 풋은 팔 권리이기 때문에 하락에 유리합니다. 방향성은 권리의 성격에서 나오는 결과입니다.</p>
   </div>
-
+</section>
+<section class="section-wide reveal" id="figure-07">
   <div class="fig">
     <div class="fig-label">Figure 07 — 콜과 풋의 방향 반응 매트릭스</div>
-    <table class="matrix-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th class="up">주가 상승 ↑</th>
-          <th class="down">주가 하락 ↓</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>콜옵션</td>
-          <td class="cell-win">
-            <div class="matrix-cell-main">살 권리 유리</div>
-            <div class="matrix-cell-sub">행사가 넘으면 권리 살아남</div>
-          </td>
-          <td class="cell-lose">
-            <div class="matrix-cell-main">살 권리 불리</div>
-            <div class="matrix-cell-sub">행사 이유 없음 → 포기</div>
-          </td>
-        </tr>
-        <tr>
-          <td>풋옵션</td>
-          <td class="cell-lose">
-            <div class="matrix-cell-main">팔 권리 불리</div>
-            <div class="matrix-cell-sub">시장가 높으면 팔 이유 없음</div>
-          </td>
-          <td class="cell-win">
-            <div class="matrix-cell-main">팔 권리 유리</div>
-            <div class="matrix-cell-sub">행사가 아래면 권리 살아남</div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="fig-caption">방향을 먼저 외우지 말고, 권리가 먼저입니다. 권리를 알면 방향은 따라옵니다.</div>
+    <h3>방향성은 권리 구조에서 따라오는 결과입니다</h3>
+    <div class="matrix-card">
+      <div class="mini-card good"><div class="mini-k">CALL + 상승</div><div class="mini-v">살 권리 유리</div><p class="mini-p">정해진 가격에 살 수 있는 권리가 더 가치 있어집니다.</p></div>
+      <div class="mini-card bad"><div class="mini-k">CALL + 하락</div><div class="mini-v">살 권리 불리</div><p class="mini-p">시장 가격이 낮아지면 비싼 가격에 살 이유가 줄어듭니다.</p></div>
+      <div class="mini-card bad"><div class="mini-k">PUT + 상승</div><div class="mini-v">팔 권리 불리</div><p class="mini-p">시장 가격이 높아지면 낮은 행사가에 팔 이유가 줄어듭니다.</p></div>
+      <div class="mini-card good"><div class="mini-k">PUT + 하락</div><div class="mini-v">팔 권리 유리</div><p class="mini-p">시장 가격보다 높은 가격에 팔 수 있는 권리가 살아납니다.</p></div>
+    </div>
   </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 07 행사와 포기 ── -->
-<div class="section reveal">
-  <div class="section-num">07 · 행사와 포기</div>
-  <h2>매수자는 유리하면 행사하고<br>불리하면 포기합니다</h2>
+</section>
+<section class="section reveal" id="exercise-text">
   <div class="prose">
-    <p>이 선택권이 프리미엄의 근거입니다. 공짜로 선택권을 얻을 수는 없습니다. 옵션 매수자는 프리미엄을 내고, 옵션 매도자는 그 대신 의무를 집니다.</p>
+    <h3 class="subhead">권리 행사와 포기를 구분해야 합니다</h3>
+    <p>옵션 매수자는 권리를 가졌기 때문에 선택할 수 있습니다. 유리하면 행사하고, 불리하면 포기합니다.</p>
+    <p>이 선택권이 프리미엄의 근거입니다. 공짜로 선택권을 얻을 수는 없습니다. 콜옵션 매수자는 살 수 있는 권리를 얻기 위해 프리미엄을 냅니다. 풋옵션 매수자는 팔 수 있는 권리를 얻기 위해 프리미엄을 냅니다.</p>
+    <p>옵션 매도자는 반대편에 있습니다. 콜옵션 매도자는 상대가 행사하면 팔아야 합니다. 풋옵션 매도자는 상대가 행사하면 사야 합니다. 그래서 매도자는 프리미엄을 받지만 의무를 집니다.</p>
+    <p>이번 회차에서는 매도자의 위험을 깊게 다루지 않겠습니다. 3회차에서 옵션 매수자와 매도자의 손익 비대칭을 따로 보겠습니다. 지금은 매수자는 선택권을 가지고, 매도자는 의무를 진다는 정도만 분명히 잡으면 됩니다.</p>
   </div>
-
+</section>
+<section class="section-wide reveal" id="figure-08">
   <div class="fig">
-    <div class="fig-label">Figure 08 — 행사와 포기 결정 구조</div>
-    <div class="dtree">
-      <div class="dtree-top">만기 때 권리를 행사할까?</div>
-      <div class="dtree-connector">↓</div>
-      <div class="dtree-row">
-        <div class="dtree-branch call">
-          <div class="dtree-branch-label">콜옵션</div>
-          <div class="dtree-branch-q">만기 주가 &gt; 행사가?</div>
-        </div>
-        <div class="dtree-mid">vs</div>
-        <div class="dtree-branch put">
-          <div class="dtree-branch-label">풋옵션</div>
-          <div class="dtree-branch-q">만기 주가 &lt; 행사가?</div>
-        </div>
-      </div>
-      <div class="dtree-connector">↓</div>
-      <div class="dtree-results">
-        <div class="dtree-result yes">
-          <div class="dtree-result-main">YES → 행사 고려</div>
-          <div class="dtree-result-sub">권리 가치가 있음<br>순이익 = 권리가치 − 프리미엄</div>
-        </div>
-        <div class="dtree-result no">
-          <div class="dtree-result-main">NO → 포기</div>
-          <div class="dtree-result-sub">권리를 버림<br>손실 = 프리미엄만</div>
-        </div>
-      </div>
-      <div class="dtree-connector" style="font-size:14px;color:var(--text-dim)">↓</div>
-      <div class="dtree-footer">
-        선택권은 공짜가 아닙니다. 프리미엄은 이 선택권을 오늘 미리 냅니다.
+    <div class="fig-label">Figure 08 — 행사와 포기 결정 트리</div>
+    <h3>옵션 매수자는 유리하면 행사하고, 불리하면 포기합니다</h3>
+    <div class="decision-tree">
+      <div class="decision-node"><div class="mini-k">QUESTION</div><div class="mini-v">권리를 행사하면 유리한가?</div><p class="mini-p">콜은 만기 주가가 행사가보다 높은가, 풋은 만기 주가가 행사가보다 낮은가를 먼저 봅니다.</p></div>
+      <div class="decision-branches">
+        <div class="decision-node"><span class="badge good">YES</span><div class="mini-v">행사 고려</div><p class="mini-p">권리 자체에 가치가 있습니다. 다만 프리미엄까지 고려해야 전체 손익이 보입니다.</p></div>
+        <div class="decision-node"><span class="badge bad">NO</span><div class="mini-v">권리 포기</div><p class="mini-p">불리하면 행사하지 않습니다. 손실은 처음 낸 프리미엄으로 남습니다.</p></div>
       </div>
     </div>
-    <div class="fig-caption">매도자는 반대편입니다. 상대가 행사하면 반드시 따라야 합니다. 3회차에서 이 손익 비대칭을 자세히 봅니다.</div>
+    <div class="fig-caption">선택권은 공짜가 아니므로 프리미엄을 먼저 냅니다.</div>
   </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 08 정리 ── -->
-<div class="section reveal">
-  <div class="section-num">08 · 정리</div>
-  <h2>2회차를 마치며</h2>
-
-  <div class="summary-grid">
-    <div class="summary-item">
-      <div class="summary-num">콜</div>
-      <div class="summary-text"><strong>살 권리</strong>. 손익분기점 = <strong>행사가 + 프리미엄</strong>. 기초자산이 이를 충분히 넘어야 이익.</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-num">풋</div>
-      <div class="summary-text"><strong>팔 권리</strong>. 손익분기점 = <strong>행사가 − 프리미엄</strong>. 기초자산이 이를 충분히 밑돌아야 이익.</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-num">방향</div>
-      <div class="summary-text">방향성은 권리 구조에서 따라옵니다. 콜은 <strong>살 권리라서</strong> 상승에 유리, 풋은 <strong>팔 권리라서</strong> 하락에 유리.</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-num">선택</div>
-      <div class="summary-text">매수자는 <strong>유리하면 행사, 불리하면 포기</strong>. 이 선택권을 얻기 위해 프리미엄을 먼저 냅니다.</div>
-    </div>
-  </div>
-</div>
-
-<hr class="section-divider">
-
-<!-- ── 09 과제 ── -->
-<div class="section reveal">
-  <div class="section-num">09 · 과제</div>
-  <h2>2회차 과제</h2>
+</section>
+<hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">07 · MISUNDERSTANDING CORRECTION</div>
+  <h2>방향이 맞아도 손익분기점 전이면 손실입니다</h2>
   <div class="prose">
-    <p>아래 네 시나리오를 직접 계산해보세요. 슬라이더로 확인하고 나서 손으로도 계산해보면 더 잘 굳습니다.</p>
+    <p>위험한 오해는 콜은 오르면 무조건 이익, 풋은 내리면 무조건 이익이라고 생각하는 것입니다.</p>
+    <p>콜옵션은 주가가 올라도 손익분기점까지 가지 못하면 손실일 수 있습니다. 행사가 110달러, 프리미엄 3달러인 콜옵션은 만기 주가가 112달러여도 손실입니다. 방향은 맞았지만, 권리 가치가 프리미엄을 넘지 못했기 때문입니다.</p>
+    <p>풋옵션도 마찬가지입니다. 행사가 90달러, 프리미엄 2달러인 풋옵션은 만기 주가가 89달러여도 아직 1달러 손실입니다. 하락 방향은 맞았지만 손익분기점 88달러를 넘지 못했습니다.</p>
+    <p>그래서 콜과 풋을 방향으로만 외우면 안 됩니다. 권리의 종류, 행사가, 프리미엄, 만기가 함께 손익을 정합니다.</p>
+    <p>또 하나는 행사와 매매를 섞어 생각하는 것입니다. 옵션 매수자는 유리하면 권리를 행사할 수 있지만, 실제 시장에서는 만기 전에 옵션 자체를 되팔아 포지션을 정리하는 경우도 많습니다. 이 강의의 초반 예시는 권리 구조를 이해하기 위해 만기 행사 기준으로 단순화합니다.</p>
+    <p>미국 개별주 옵션은 보통 만기 전에도 행사할 수 있는 미국식 옵션입니다. 반대로 일부 지수 옵션은 만기일에만 행사되는 유럽식 구조를 가집니다. 이 차이는 조기행사, 배당, 배정 리스크에서 중요해집니다. 지금은 콜과 풋의 권리부터 잡고, 뒤 회차에서 현실 조건을 하나씩 붙이겠습니다.</p>
   </div>
-
-  <div class="fig">
+</section>
+<hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">08 · TODAY'S SUMMARY</div>
+  <h2>오래 버티는 이해는 권리에서 시작합니다</h2>
+  <div class="prose">
+    <p>콜옵션은 정해진 가격에 살 수 있는 권리입니다. 행사가보다 기초자산 가격이 충분히 높아질수록 유리해집니다. 하지만 프리미엄을 냈기 때문에 손익분기점은 행사가보다 높습니다.</p>
+    <p>풋옵션은 정해진 가격에 팔 수 있는 권리입니다. 행사가보다 기초자산 가격이 충분히 낮아질수록 유리해집니다. 풋옵션의 손익분기점은 행사가에서 프리미엄을 뺀 가격입니다.</p>
+    <p>콜과 풋을 방향으로 외우는 것은 빠릅니다. 하지만 오래 버티는 이해는 권리에서 시작합니다. 콜은 살 권리라서 상승에 유리하고, 풋은 팔 권리라서 하락에 유리합니다.</p>
+  </div>
+</section>
+<section class="section-wide reveal" id="figure-09">
+  <div class="fig worksheet">
     <div class="fig-label">Figure 09 — 2회차 과제 카드</div>
-    <div class="quiz-list">
-      <div class="quiz-item">
-        <div class="quiz-num">01</div>
-        <div class="quiz-text">
-          <span class="quiz-cond">콜 · 행사가 $110 · 프리미엄 $3</span><br>
-          만기 주가 $112라면 전체 거래는 이익일까요, 손실일까요?
-        </div>
-      </div>
-      <div class="quiz-item">
-        <div class="quiz-num">02</div>
-        <div class="quiz-text">
-          <span class="quiz-cond">콜 · 행사가 $110 · 프리미엄 $3</span><br>
-          만기 주가 $120이라면 순손익은 얼마인가요?
-        </div>
-      </div>
-      <div class="quiz-item">
-        <div class="quiz-num">03</div>
-        <div class="quiz-text">
-          <span class="quiz-cond">풋 · 행사가 $90 · 프리미엄 $2</span><br>
-          만기 주가 $89라면 전체 거래는 이익일까요, 손실일까요?
-        </div>
-      </div>
-      <div class="quiz-item">
-        <div class="quiz-num">04</div>
-        <div class="quiz-text">
-          <span class="quiz-cond">풋 · 행사가 $90 · 프리미엄 $2</span><br>
-          만기 주가 $70이라면 순손익은 얼마인가요?
-        </div>
-      </div>
+    <h3>콜과 풋 시나리오를 직접 계산합니다</h3>
+    <div class="worksheet-lines">
+      <div>1. 콜 110, 프리미엄 3, 만기 112 → 손익?</div>
+      <div>2. 콜 110, 프리미엄 3, 만기 120 → 손익?</div>
+      <div>3. 풋 90, 프리미엄 2, 만기 89 → 손익?</div>
+      <div>4. 풋 90, 프리미엄 2, 만기 70 → 손익?</div>
     </div>
-    <button class="quiz-btn" id="quizBtn" onclick="toggleQuiz()">정답 보기</button>
-    <div class="quiz-answers" id="quizAnswers">
-      <div class="quiz-answer-row">
-        <div class="qa-num">01</div>
-        <div class="qa-text">권리 가치 $2 − 프리미엄 $3 =</div>
-        <div class="qa-val neg">−$1 (손실)</div>
-      </div>
-      <div class="quiz-answer-row">
-        <div class="qa-num">02</div>
-        <div class="qa-text">권리 가치 $10 − 프리미엄 $3 =</div>
-        <div class="qa-val pos">+$7 (이익)</div>
-      </div>
-      <div class="quiz-answer-row">
-        <div class="qa-num">03</div>
-        <div class="qa-text">권리 가치 $1 − 프리미엄 $2 =</div>
-        <div class="qa-val neg">−$1 (손실)</div>
-      </div>
-      <div class="quiz-answer-row">
-        <div class="qa-num">04</div>
-        <div class="qa-text">권리 가치 $20 − 프리미엄 $2 =</div>
-        <div class="qa-val pos">+$18 (이익)</div>
-      </div>
+    <button class="answer-btn" type="button" id="answerToggle" aria-expanded="false" aria-controls="answers">정답 보기</button>
+    <div class="answers" id="answers">
+      <div class="answer-row"><strong>-1달러</strong><p>콜 110의 권리 가치는 2달러입니다. 프리미엄 3달러를 빼면 순손익은 -1달러입니다.</p></div>
+      <div class="answer-row"><strong>+7달러</strong><p>콜 110의 권리 가치는 10달러입니다. 프리미엄 3달러를 빼면 순손익은 +7달러입니다.</p></div>
+      <div class="answer-row"><strong>-1달러</strong><p>풋 90의 권리 가치는 1달러입니다. 프리미엄 2달러를 빼면 순손익은 -1달러입니다.</p></div>
+      <div class="answer-row"><strong>+18달러</strong><p>풋 90의 권리 가치는 20달러입니다. 프리미엄 2달러를 빼면 순손익은 +18달러입니다.</p></div>
     </div>
+    <div class="fig-caption">풀이 기준: 순서대로 손실 1달러, 이익 7달러, 손실 1달러, 이익 18달러입니다.</div>
   </div>
-
-  <a href="session-03.html" class="next-card">
-    <div>
-      <div class="next-label">NEXT SESSION</div>
-      <div class="next-title">3회차 — 옵션 매수자와 매도자: 손익 비대칭이란 무엇인가</div>
-    </div>
+</section>
+<hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">09 · NEXT SESSION BRIDGE</div>
+  <h2>다음 회차에서는 매수자와 매도자를 정면으로 봅니다</h2>
+  <div class="prose">
+    <p>다음 회차에서는 옵션 매수자와 매도자를 더 정면으로 보겠습니다. 매수자는 권리를 사고, 매도자는 의무를 집니다. 이 차이가 왜 손실 제한과 손실 확대라는 완전히 다른 손익구조로 이어지는지 보겠습니다.</p>
+  </div>
+  <a class="next-card" href="session-03.html">
+    <div><div class="next-label">NEXT SESSION</div><div class="next-title">3회차 · 옵션 매수자와 매도자의 손익 비대칭</div><p class="next-desc">권리와 의무가 어떻게 손실 제한과 손실 확대 구조로 갈라지는지 봅니다.</p></div>
     <div class="next-arrow">→</div>
   </a>
-</div>
-
+</section>
 <footer>
-  <div class="footer-brand">무기견의 옵션 입문 · 2회차</div>
-  <div class="footer-page">SESSION 02 / 30</div>
+  <div>© 무기견의 옵션 입문</div>
+  <div>Session 02 · 콜과 풋의 권리</div>
 </footer>
 
 <script>
 
-  const THEME_KEY = 'mugigyeon-options-course-theme-v2';
-  const themeButtons = document.querySelectorAll('[data-theme-choice]');
-
-  function applyTheme(theme) {
-    const safeTheme = theme === 'olive' ? 'olive' : 'dark';
-    if (safeTheme === 'olive') {
-      document.documentElement.setAttribute('data-theme', 'olive');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    themeButtons.forEach(btn => {
-      const active = btn.dataset.themeChoice === safeTheme;
-      btn.classList.toggle('active', active);
-      btn.setAttribute('aria-pressed', String(active));
-    });
-    localStorage.setItem(THEME_KEY, safeTheme);
-  }
-
-  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
-  themeButtons.forEach(btn => {
-    btn.addEventListener('click', () => applyTheme(btn.dataset.themeChoice));
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
   });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+function money(value) {
+  const n = Math.round(value * 100) / 100;
+  if (n === 0) return '$0';
+  return (n > 0 ? '+$' : '-$') + Math.abs(n);
+}
+function plainMoney(value) { return '$' + (Math.round(value * 100) / 100); }
+function resultClass(value) { return value > 0 ? 'pos' : value < 0 ? 'neg' : 'zero'; }
+function setBox(id, value) {
+  const box = document.getElementById(id);
+  if (!box) return;
+  box.classList.remove('pos','neg','zero');
+  box.classList.add(resultClass(value));
+}
+function updateCall() {
+  const input = document.getElementById('callPrice');
+  if (!input) return;
+  const price = Number(input.value);
+  const intrinsic = Math.max(price - 110, 0);
+  const pnl = intrinsic - 3;
+  document.getElementById('callPriceVal').textContent = plainMoney(price);
+  document.getElementById('callIntrinsicVal').textContent = plainMoney(intrinsic);
+  document.getElementById('callPnlVal').textContent = money(pnl);
+  setBox('callIntrinsicBox', intrinsic);
+  setBox('callPnlBox', pnl);
+}
+function updatePut() {
+  const input = document.getElementById('putPrice');
+  if (!input) return;
+  const price = Number(input.value);
+  const intrinsic = Math.max(90 - price, 0);
+  const pnl = intrinsic - 2;
+  document.getElementById('putPriceVal').textContent = plainMoney(price);
+  document.getElementById('putIntrinsicVal').textContent = plainMoney(intrinsic);
+  document.getElementById('putPnlVal').textContent = money(pnl);
+  setBox('putIntrinsicBox', intrinsic);
+  setBox('putPnlBox', pnl);
+}
+document.getElementById('callPrice')?.addEventListener('input', updateCall);
+document.getElementById('putPrice')?.addEventListener('input', updatePut);
+updateCall();
+updatePut();
+const answerToggle = document.getElementById('answerToggle');
+const answers = document.getElementById('answers');
+answerToggle?.addEventListener('click', () => {
+  const open = answers?.classList.toggle('open') || false;
+  answerToggle.setAttribute('aria-expanded', String(open));
+  answerToggle.textContent = open ? '정답 닫기' : '정답 보기';
+});
 
-  /* ── Progress bar ── */
-  const bar = document.getElementById('progress-bar');
-  window.addEventListener('scroll', () => {
-    const h = document.documentElement;
-    bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100 + '%';
-  });
-
-  /* ── Reveal ── */
-  const reveals = document.querySelectorAll('.reveal');
-  new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.08 }).observe ? reveals.forEach(r => {
-    new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.08 }).observe(r);
-  }) : reveals.forEach(r => r.classList.add('visible'));
-
-  /* ── Call slider ── */
-  function updateCall(val) {
-    const iv  = Math.max(0, val - 110);
-    const pnl = iv - 3;
-    document.getElementById('callSliderVal').textContent = '$' + val;
-    document.getElementById('callIV').textContent = '$' + iv;
-    const pnlEl = document.getElementById('callPnl');
-    pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + pnl;
-    pnlEl.className = 'slider-result-val ' + (pnl > 0 ? 'pos' : pnl < 0 ? 'neg' : 'zero');
-    document.getElementById('callIV').className = 'slider-result-val ' + (iv > 0 ? 'pos' : 'zero');
-  }
-  const callSlider = document.getElementById('callSlider');
-  callSlider.addEventListener('input', () => updateCall(+callSlider.value));
-  updateCall(100);
-
-  /* ── Put slider ── */
-  function updatePut(val) {
-    const iv  = Math.max(0, 90 - val);
-    const pnl = iv - 2;
-    document.getElementById('putSliderVal').textContent = '$' + val;
-    document.getElementById('putIV').textContent = '$' + iv;
-    const pnlEl = document.getElementById('putPnl');
-    pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + pnl;
-    pnlEl.className = 'slider-result-val ' + (pnl > 0 ? 'pos' : pnl < 0 ? 'neg' : 'zero');
-    document.getElementById('putIV').className = 'slider-result-val ' + (iv > 0 ? 'pos' : 'zero');
-  }
-  const putSlider = document.getElementById('putSlider');
-  putSlider.addEventListener('input', () => updatePut(+putSlider.value));
-  updatePut(100);
-
-  /* ── Quiz toggle ── */
-  function toggleQuiz() {
-    const answers = document.getElementById('quizAnswers');
-    const btn = document.getElementById('quizBtn');
-    const visible = answers.classList.toggle('visible');
-    btn.textContent = visible ? '정답 닫기' : '정답 보기';
-  }
 </script>
 </body>
 </html>

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>8회차 — 변동성, 옵션 가격을 비싸게 만드는 흔들림의 가격</title>
+  <meta name="description" content="변동성을 방향 예측이 아니라 만기까지 움직일 수 있는 범위의 가격으로 이해하는 옵션 입문 8회차입니다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d0c;
+      --bg-card: #151715;
+      --bg-card2: #1d211d;
+      --text: #f1eee5;
+      --text-muted: #a49b8b;
+      --text-dim: #746f65;
+      --amber: #f5b14c;
+      --green: #35d07f;
+      --blue: #7dd3fc;
+      --red: #ef4444;
+      --violet: #a78bfa;
+      --border: #2d302a;
+      --border-light: #44483d;
+      --nav-bg: rgba(11,13,12,.91);
+      --hero-glow-warm: rgba(245,177,76,.08);
+      --hero-glow-cool: rgba(125,211,252,.05);
+      --prose-text: #d8d1c3;
+      --cta-text: #11130f;
+      --shadow: 0 18px 60px rgba(0,0,0,.28);
+    }
+
+    :root[data-theme="olive"] {
+      color-scheme: light;
+      --bg: #fafaf2;
+      --bg-card: #fff;
+      --bg-card2: #f1f3e7;
+      --text: #1b2518;
+      --text-muted: #5d684f;
+      --text-dim: #889078;
+      --amber: #7d8f3a;
+      --green: #4f7a35;
+      --blue: #3d7796;
+      --red: #b94a48;
+      --violet: #7561a8;
+      --border: #e3e7d4;
+      --border-light: #d1d9bb;
+      --nav-bg: rgba(250,250,242,.92);
+      --hero-glow-warm: rgba(125,143,58,.12);
+      --hero-glow-cool: rgba(61,119,150,.08);
+      --prose-text: #35402f;
+      --cta-text: #fff;
+      --shadow: 0 18px 60px rgba(82,91,56,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      line-height: 1.82;
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s, color .25s;
+    }
+
+    /* ── PROGRESS ── */
+    .progress {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--amber), var(--green));
+      z-index: 100;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--text-muted);
+      letter-spacing: .08em; text-decoration: none;
+    }
+    .nav-brand span { color: var(--amber); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-prev, .nav-next, .nav-session {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text-dim); text-decoration: none;
+    }
+    .nav-prev:hover, .nav-next:hover { color: var(--amber); }
+    .theme-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: var(--bg-card);
+    }
+    .theme-btn {
+      border: 0; min-width: 44px; min-height: 32px;
+      padding: 6px 10px; border-radius: 999px;
+      background: transparent; color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: .04em; cursor: pointer;
+    }
+    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 94vh; display: flex; align-items: center;
+      padding: 122px 10vw 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: -220px -160px auto auto;
+      width: 760px; height: 760px;
+      background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; left: -120px; bottom: -180px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 900px; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 26px;
+    }
+    .hero h1 {
+      font-size: clamp(38px, 7vw, 84px);
+      font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px;
+    }
+    .hero h1 .hi { color: var(--blue); }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px); color: var(--text-muted);
+      font-weight: 300; max-width: 680px; line-height: 1.72; margin-bottom: 38px;
+    }
+    .thesis {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--blue);
+      padding: 21px 28px; border-radius: 0 12px 12px 0;
+      box-shadow: var(--shadow); max-width: 710px;
+    }
+    .thesis-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--blue); letter-spacing: .15em; margin-bottom: 9px;
+    }
+    .thesis-main { font-size: 18px; font-weight: 700; line-height: 1.62; }
+
+    /* ── LAYOUT ── */
+    .divider { border: 0; border-top: 1px solid var(--border); }
+    .section { max-width: 810px; margin: 0 auto; padding: 78px 24px; }
+    .section-wide { max-width: 1080px; margin: 0 auto; padding: 78px 24px; }
+    .section-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .15em; margin-bottom: 16px;
+    }
+    .section h2, .section-wide h2 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800; line-height: 1.24; letter-spacing: 0; margin-bottom: 28px;
+    }
+    .prose p {
+      font-size: 16px; line-height: 1.86; color: var(--prose-text); margin-bottom: 19px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 700; }
+
+    /* ── FIGURE ── */
+    .fig {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: 16px; padding: 28px; margin: 32px 0;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .fig::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), var(--amber), transparent);
+      opacity: .48;
+    }
+    .fig-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .fig-caption {
+      margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.65;
+    }
+
+    /* ── GRID CARDS ── */
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .mini-card {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .mini-k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .08em; margin-bottom: 10px;
+    }
+    .mini-v { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.35; }
+    .mini-p { font-size: 13px; color: var(--text-muted); line-height: 1.58; margin-top: 8px; }
+
+    /* ── MATURITY BARS ── */
+    .maturity-row {
+      display: grid; grid-template-columns: 88px 1fr 72px;
+      gap: 14px; align-items: center; margin: 15px 0;
+    }
+    .dte {
+      font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-muted);
+    }
+    .bar {
+      height: 38px; border-radius: 999px;
+      background: var(--bg-card2); border: 1px solid var(--border); overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; display: flex; align-items: center; justify-content: center;
+      color: #101208; font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; font-weight: 800;
+      background: linear-gradient(90deg, var(--blue), var(--amber));
+    }
+    .price-tag {
+      font-family: 'JetBrains Mono', monospace; color: var(--text); font-size: 14px;
+    }
+
+    /* ── DTE CALCULATOR ── */
+    .calc { display: grid; grid-template-columns: 1fr 1.16fr; gap: 24px; align-items: center; }
+    .calc-panel {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+    }
+    .slider-head {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+    }
+    .slider-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .08em;
+    }
+    .slider-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px; font-weight: 800; color: var(--amber);
+    }
+    input[type="range"] {
+      width: 100%; height: 5px; border-radius: 999px;
+      background: var(--border-light); outline: none; -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+      box-shadow: 0 0 0 4px rgba(245,177,76,.18);
+    }
+    .calc-results {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px;
+    }
+    .result {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; text-align: center;
+    }
+    .result span {
+      display: block; font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-dim); margin-bottom: 5px;
+    }
+    .result b { font-family: 'JetBrains Mono', monospace; font-size: 22px; color: var(--text); }
+    svg { width: 100%; height: auto; display: block; }
+
+    /* ── HEAT STRIP ── */
+    .heat {
+      display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px;
+    }
+    .heat-cell {
+      height: 54px; border-radius: 6px;
+      background: var(--bg-card2); border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .heat-cell::after {
+      content: ''; position: absolute; inset: auto 0 0;
+      height: var(--h);
+      background: linear-gradient(180deg, var(--amber), var(--red));
+      opacity: .86;
+    }
+    .heat-labels {
+      display: flex; justify-content: space-between; margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim);
+    }
+
+    /* ── MONEYNESS TABS ── */
+    .tab-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tab-btn {
+      min-height: 42px; padding: 8px 16px; border-radius: 999px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; cursor: pointer;
+    }
+    .tab-btn.active {
+      border-color: var(--amber); color: var(--amber);
+      background: rgba(245,177,76,.08);
+    }
+
+    /* ── BALANCE ── */
+    .balance { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: stretch; }
+    .balance-mid {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    }
+
+    /* ── SCENARIO LANE ── */
+    .lane { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .time-lane {
+      height: 9px; border-radius: 999px;
+      background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+      margin: 20px 0; position: relative;
+    }
+    .pin {
+      position: absolute; top: -8px; width: 3px; height: 25px;
+      border-radius: 2px; background: var(--text);
+    }
+    .pin.p1 { left: 18%; }
+    .pin.p2 { left: 52%; }
+    .pin.p3 { left: 86%; }
+
+    /* ── QUIZ ── */
+    .quiz-btn {
+      width: 100%; margin-top: 18px;
+      background: transparent; border: 1px solid var(--border-light);
+      border-radius: 10px; padding: 12px; color: var(--text-muted);
+      font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+    }
+    .quiz-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .answers {
+      display: none; margin-top: 14px;
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+    }
+    .answers.visible { display: block; }
+    .answer-row {
+      display: flex; justify-content: space-between; gap: 12px;
+      border-bottom: 1px solid var(--border); padding: 10px 0;
+      font-size: 14px; color: var(--text-muted);
+    }
+    .answer-row:last-child { border-bottom: 0; }
+    .answer-row b { color: var(--amber); font-family: 'JetBrains Mono', monospace; }
+
+    /* ── NEXT CARD ── */
+    .next-card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 26px 30px; margin-top: 34px;
+      display: flex; justify-content: space-between; gap: 20px;
+      text-decoration: none; color: inherit;
+    }
+    .next-card:hover { border-color: var(--amber); }
+    .next-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-dim); letter-spacing: .12em; margin-bottom: 7px;
+    }
+    .next-title { font-size: 17px; font-weight: 800; }
+    .next-arrow { font-size: 24px; color: var(--amber); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 30px 10vw;
+      display: flex; justify-content: space-between;
+      color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+
+    .hero h1 .hi { color: var(--amber); }
+    .thesis { border-left-color: var(--amber); }
+    .thesis-label { color: var(--amber); }
+    .prose h3 { font-size: 21px; font-weight: 800; margin: 34px 0 14px; color: var(--text); }
+    .prose code, code { font-family: 'JetBrains Mono', monospace; color: var(--amber); font-size: .92em; }
+    .layer-stack { display: grid; gap: 10px; }
+    .layer-row { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: center; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+    .layer-row b { font-family: 'JetBrains Mono', monospace; color: var(--amber); font-size: 12px; letter-spacing: .08em; }
+    .layer-row span { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+    .svg-card { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; overflow: hidden; }
+    .svg-card svg { width: 100%; height: auto; display: block; }
+    svg text { font-family: 'JetBrains Mono', monospace; fill: var(--text-muted); font-size: 11px; }
+    .axis-line { stroke: var(--border-light); stroke-width: 1; }
+    .strike-line { stroke: var(--amber); stroke-width: 1.5; stroke-dasharray: 5 5; }
+    .low-line { stroke: var(--blue); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .high-line { stroke: var(--amber); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .dist-fill { fill: rgba(245,177,76,.16); }
+    .dist-line { stroke: var(--amber); stroke-width: 3; fill: none; }
+    .muted-dist { stroke: var(--blue); stroke-width: 2; fill: rgba(125,211,252,.08); opacity: .9; }
+    .controls { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-top: 16px; }
+    .control-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .control-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: .08em; }
+    .control-value { font-family: 'JetBrains Mono', monospace; font-size: 20px; color: var(--amber); font-weight: 800; }
+    .segmented { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .segmented button, .answer-btn { min-height: 44px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-muted); border-radius: 999px; padding: 9px 13px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .segmented button.active, .answer-btn.active { background: var(--amber); border-color: var(--amber); color: var(--cta-text); }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .metric { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .metric span { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 5px; }
+    .metric strong { color: var(--text); font-size: 19px; }
+    .bar-chart { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end; min-height: 250px; }
+    .bar-cell { display: grid; grid-template-rows: 1fr auto; gap: 8px; height: 230px; }
+    .bar-shell { display: flex; align-items: end; justify-content: center; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 8px; }
+    .bar-fill-v { width: 100%; border-radius: 8px; background: linear-gradient(180deg, var(--amber), var(--blue)); display: flex; align-items: flex-start; justify-content: center; color: var(--cta-text); font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 11px; padding-top: 8px; }
+    .bar-label { text-align: center; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); font-size: 11px; }
+    .flow-steps { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: stretch; }
+    .flow-arrow { display: grid; place-items: center; color: var(--amber); font-family: 'JetBrains Mono', monospace; }
+    .event-grid, .sensitivity-grid, .worksheet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .event-card.hidden-detail .detail-only { display: none; }
+    .event-card.revealed .direction-only { opacity: .55; }
+    .worksheet-field { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .worksheet-field label { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 7px; }
+    .worksheet-field input { width: 100%; min-height: 44px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text); padding: 10px 12px; font: inherit; }
+    .answers { display: none; margin-top: 14px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .answers.open { display: block; }
+    .answers p { color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
+    .answers p:last-child { margin-bottom: 0; }
+    .note-strip { margin-top: 14px; border-left: 3px solid var(--amber); padding: 12px 14px; background: linear-gradient(90deg, rgba(245,177,76,.08), transparent); color: var(--text-muted); font-size: 13px; line-height: 1.65; }
+    .next-card { background: linear-gradient(135deg, var(--bg-card), var(--bg-card2)); border: 1px solid var(--border); border-radius: 16px; padding: 26px 30px; margin-top: 34px; display: flex; justify-content: space-between; gap: 20px; color: inherit; text-decoration: none; }
+    .next-card:hover { border-color: var(--amber); }
+    .next-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: .12em; margin-bottom: 7px; }
+    .next-title { font-size: 17px; font-weight: 800; }
+    .next-desc { margin-top: 8px; color: var(--text-muted); font-size: 14px; line-height: 1.65; }
+    .next-arrow { font-size: 24px; color: var(--amber); }
+    footer { border-top: 1px solid var(--border); padding: 30px 10vw; display: flex; justify-content: space-between; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    @media (max-width: 760px) {
+      body { overflow-x: hidden; }
+      nav { padding: 11px 16px; width: 100vw; max-width: 100vw; overflow: hidden; }
+      .nav-session, .nav-prev, .nav-index, .nav-forward { display: none; }
+      .nav-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); gap: 0; }
+      .nav-brand { font-size: 12px; max-width: 190px; overflow: hidden; white-space: nowrap; }
+      .theme-toggle { transform: scale(.78); transform-origin: right center; }
+      .theme-btn { min-width: 42px; min-height: 30px; }
+      .hero { padding: 104px 24px 62px; min-height: 88vh; width: 100vw; max-width: 100vw; }
+      .hero-inner { max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .hero h1 { font-size: clamp(38px, 12vw, 52px); line-height: 1.12; word-break: keep-all; overflow-wrap: anywhere; }
+      .hero-sub, .thesis-main { word-break: keep-all; overflow-wrap: anywhere; }
+      .thesis { padding: 20px 22px; max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .section, .section-wide { padding: 58px 20px; max-width: 100vw; overflow: hidden; }
+      .fig { padding: 20px; max-width: calc(100vw - 40px); }
+      .two, .three, .metric-grid, .event-grid, .sensitivity-grid, .worksheet-grid, .bar-chart { grid-template-columns: 1fr; }
+      .flow-steps { grid-template-columns: 1fr; }
+      .flow-arrow { min-height: 32px; }
+      .layer-row { grid-template-columns: 1fr; }
+      .bar-cell { height: 170px; }
+      .next-card { flex-direction: column; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media print {
+      nav, .progress, .theme-toggle { display: none !important; }
+      body { background: #fff; color: #111; }
+      .hero { min-height: auto; padding: 40px 24px; }
+      .reveal { opacity: 1; transform: none; }
+      .fig, .mini-card, .controls, .metric, .worksheet-field { box-shadow: none; break-inside: avoid; background: #fff; color: #111; border-color: #bbb; }
+      .answers { display: block !important; }
+    }
+
+    @media (max-width: 760px) {
+      nav { padding: 11px 18px; }
+      .nav-session { display: none; }
+      .nav-right { gap: 8px; }
+      .hero { padding: 104px 24px 62px; min-height: 88vh; }
+      .section, .section-wide { padding: 58px 20px; }
+      .two, .three, .calc, .balance, .lane { grid-template-columns: 1fr; }
+      .balance-mid { font-size: 18px; }
+      .maturity-row { grid-template-columns: 68px 1fr 52px; gap: 8px; }
+      .fig { padding: 20px; }
+      .theme-btn { min-width: 42px; min-height: 30px; }
+      .heat { grid-template-columns: repeat(15, 1fr); }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
+  <div class="nav-right">
+    <a href="session-07.html" class="nav-prev">7회차</a>
+    <span class="nav-session">SESSION 08</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <span class="nav-next nav-forward">9회차 준비중</span>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 08 · Level 2</div>
+    <h1>변동성,<br>옵션 가격을 비싸게 만드는<br><span class="hi">흔들림의 가격</span></h1>
+    <p class="hero-sub">방향을 모르는데도 왜 옵션 가격이 올라갈 수 있을까요? 이번 회차에서는 옵션 가격에 붙는 움직임의 폭, 즉 변동성을 봅니다.</p>
+    <div class="thesis"><div class="thesis-label">8회차 중심 문장</div><div class="thesis-main">변동성은 방향의 확신이 아니라, 만기까지 가격이 움직일 수 있는 범위에 붙는 가격입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section-wide reveal" id="intro-flow">
+  <div class="section-num">01 · FROM TIME TO VOLATILITY</div>
+  <h2>시간가치에서 가능성의 폭으로 넘어갑니다</h2>
+  <div class="prose">
+    <p>7회차에서는 시간가치를 봤습니다. 같은 주식, 같은 행사가라면 만기가 긴 옵션이 더 비싼 이유는 만기까지 남은 가능성이 더 많기 때문이었습니다.</p>
+    <p>이번 회차에서는 그 가능성의 크기를 다룹니다. 시간은 가능성이 살아 있는 기간이고, 변동성은 그 기간 동안 가격이 얼마나 넓게 흔들릴 수 있는지에 대한 감각입니다.</p>
+    <p>현재 주가가 100달러인 주식을 생각해보겠습니다. 30일 동안 99~101달러 사이에서만 움직일 것 같은 주식과, 30일 안에 85달러나 115달러도 갈 수 있을 것 같은 주식은 같은 옵션 가격을 가질 수 없습니다. 행사가 105달러 콜을 산 사람에게는 두 번째 주식이 훨씬 더 많은 가능성을 줍니다.</p>
+    <p>옵션 가격은 여기서 달라집니다.</p>
+  </div>
+  <div class="fig" id="figure-01">
+    <div class="fig-label">Figure 01 — 시간가치에서 변동성으로 넘어가는 브리지</div>
+    <h2>프리미엄은 가능성의 기간과 폭을 함께 담습니다</h2>
+    <div class="layer-stack">
+      <div class="layer-row"><b>시간</b><span>만기 30일은 권리가 살아 있을 수 있는 기간입니다.</span></div>
+      <div class="layer-row"><b>변동성</b><span>그 30일 동안 가격이 얼마나 넓게 흔들릴 수 있는지에 붙는 가격입니다.</span></div>
+      <div class="layer-row"><b>105콜</b><span>현재가 100, 행사가 105인 콜은 움직임의 폭이 넓어질수록 살아날 가능성이 커집니다.</span></div>
+    </div>
+    <div class="fig-caption">시간은 가능성의 기간, 변동성은 가능성의 폭입니다. 프리미엄은 이 둘을 함께 담은 선택권의 가격입니다.</div>
+  </div>
+  <div class="prose intro-interpretation">
+    <p>여기서 첫 번째 벽이 나옵니다. <strong>방향을 모르는데도 왜 옵션 가격이 올라갈 수 있을까요?</strong></p>
+    <p>주식투자자는 대개 방향을 먼저 봅니다. 오르면 좋고, 내리면 나쁘다는 감각이 익숙하죠. 그런데 옵션은 방향만 보지 않습니다. 가격이 정해진 행사가 근처까지 도달할 수 있는 폭, 그 폭이 나타날 속도, 만기까지 남은 시간을 함께 봅니다.</p>
+    <p>그래서 실적 발표 전에는 콜과 풋이 동시에 비싸질 수 있습니다. 시장이 어느 방향인지 확신해서가 아닙니다. 위든 아래든 크게 움직일 가능성을 프리미엄에 반영하기 때문입니다.</p>
+  </div>
+  <div class="fig" id="figure-02">
+    <div class="fig-label">Figure 02 — 낮은 변동성 경로와 높은 변동성 경로 비교</div>
+    <h2>같은 시작점 100이어도 흔들림의 폭이 다르면 105콜의 의미가 달라집니다</h2>
+    <div class="two">
+      <div class="svg-card"><svg viewBox="0 0 520 260" role="img" aria-label="낮은 변동성 경로는 98에서 102 사이에서 움직입니다"><line class="axis-line" x1="45" y1="210" x2="485" y2="210"/><line class="axis-line" x1="45" y1="40" x2="45" y2="210"/><line class="strike-line" x1="45" y1="72" x2="485" y2="72"/><text x="52" y="64">K 105</text><path class="low-line" d="M55 132 C95 118 125 145 165 128 S245 135 285 122 S365 146 410 129 S460 126 480 136"/><text x="58" y="232">day 0</text><text x="428" y="232">day 30</text><text x="288" y="154">98~102</text></svg><div class="fig-caption">낮은 변동성: 30일 동안 98~102 근처에서만 움직인다고 보는 환경입니다.</div></div>
+      <div class="svg-card"><svg viewBox="0 0 520 260" role="img" aria-label="높은 변동성 경로는 88에서 116 사이에서 움직이며 행사가 105를 여러 번 건드립니다"><line class="axis-line" x1="45" y1="210" x2="485" y2="210"/><line class="axis-line" x1="45" y1="40" x2="45" y2="210"/><line class="strike-line" x1="45" y1="72" x2="485" y2="72"/><text x="52" y="64">K 105</text><path class="high-line" d="M55 132 C88 188 122 58 162 86 S226 220 270 76 S344 42 382 96 S450 178 480 58"/><text x="58" y="232">day 0</text><text x="428" y="232">day 30</text><text x="285" y="154">88~116</text></svg><div class="fig-caption">높은 변동성: 방향은 몰라도 105를 건드릴 가능성이 훨씬 커집니다.</div></div>
+    </div>
+    <div class="note-strip">이 그림에서 중요한 것은 어느 쪽으로 간다는 예측이 아닙니다. 같은 105콜이라도 흔들림의 폭이 넓어지면 권리가 살아날 가능성이 달라진다는 점입니다.</div>
+  </div>
+</section>
+<hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">02 · CENTRAL SENTENCE</div>
+  <h2>변동성은 방향의 확신이 아니라 움직일 수 있는 범위의 가격입니다</h2>
+  <div class="prose">
+    <p>이번 회차의 기준 문장은 이렇게 잡겠습니다.</p>
+    <p><strong>변동성은 방향의 확신이 아니라, 만기까지 가격이 움직일 수 있는 범위에 붙는 가격입니다.</strong></p>
+    <p>이 문장을 분포로 바꿔보면 더 분명해집니다. 평균을 100으로 두었을 때 가격이 좁게 모일지, 넓게 퍼질지가 옵션 프리미엄에 영향을 줍니다.</p>
+  </div>
+</section>
+<section class="section-wide reveal" id="figure-03"><div class="fig"><div class="fig-label">Figure 03 — 예상분포 폭과 행사가 도달 가능성</div><h2>분포의 폭이 넓어질수록 105 위쪽 꼬리가 두꺼워집니다</h2><div class="svg-card"><svg viewBox="0 0 620 300" role="img" aria-label="변동성 슬라이더에 따라 예상분포 폭과 105 초과 영역이 바뀝니다"><line class="axis-line" x1="60" y1="240" x2="560" y2="240"/><line class="strike-line" x1="360" y1="44" x2="360" y2="246"/><text x="348" y="34">K 105</text><path class="muted-dist" d="M120 238 C190 230 230 126 310 92 C390 126 430 230 500 238 L500 240 L120 240 Z"/><path id="distPath" class="dist-line" d="M92 238 C180 230 210 92 310 68 C410 92 440 230 528 238"/><path id="tailArea" class="dist-fill" d="M360 156 C410 112 455 230 528 238 L528 240 L360 240 Z"/><text x="103" y="262">80</text><text x="300" y="262">100</text><text x="523" y="262">120</text><text id="distSigmaLabel" x="78" y="54">IV 30% · 교육용 분포</text></svg></div><div class="controls"><div class="control-head"><div class="control-title">ANNUAL VOLATILITY</div><div class="control-value" id="volSliderVal">30%</div></div><input id="volSlider" type="range" min="10" max="50" value="30" step="1" aria-label="연간 변동성"><div class="metric-grid"><div class="metric"><span>교육용 σ</span><strong id="sigmaVal">9.0</strong></div><div class="metric"><span>105 초과 감각</span><strong id="tailVal">보통</strong></div><div class="metric"><span>해석</span><strong id="distMood">폭 확대</strong></div></div></div><div class="fig-caption">숫자는 교육용 가정입니다. 68%와 95% 감각은 정규분포에 가까운 단순화이며, 실제 시장에는 두꺼운 꼬리와 갭이 있습니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">04 · CONCEPT EXPLANATION</div>
+  <h2>변동성은 시장의 속도이자 가격 분포의 폭입니다</h2>
+  <div class="prose"><p>변동성을 가장 쉽게 잡는 방법은 시장의 속도라고 보는 것입니다. 천천히 움직이는 시장은 낮은 변동성 시장이고, 빠르게 넓게 움직이는 시장은 높은 변동성 시장입니다.</p>
+<p>현재가 100달러인 A주식과 B주식이 있습니다. A주식은 최근 하루 변동이 대체로 0.5달러 안팎입니다. B주식은 하루에 3달러씩 위아래로 흔들립니다. 같은 30일 만기 105콜이라면 B주식 옵션이 더 비쌉니다.</p>
+<p>여기서 고정한 것은 현재가 100달러, 행사가 105달러, 만기 30일, 금리와 배당 없음입니다. 바뀐 것은 가격이 흔들릴 수 있는 폭입니다. 이 폭이 커지면 105달러에 도달하거나 넘을 가능성이 커지고, 그 가능성이 시간가치에 붙습니다.</p>
+<p>변동성은 표준편차의 언어로도 표현됩니다. 예를 들어 선도 가격을 단순히 100으로 두고, 1년 변동성이 20%라고 해보겠습니다. 아주 거칠게는 1년 뒤 가격이 80~120 사이에 있을 가능성이 약 68%라고 말할 수 있습니다. 60~140 사이에 있을 가능성은 약 95%로 넓어집니다.</p>
+<p>이 숫자는 방향 예측이 아닙니다. 평균을 100으로 두고, 가격이 평균 주변에서 어느 정도 넓게 퍼질 수 있는지를 보여주는 좌표입니다. 옵션 매수자는 이 분포의 꼬리와 폭에 민감합니다.</p>
+<p>단, 이 68%와 95% 감각은 정규분포에 가까운 단순 교육용 설명입니다. 실제 자산 수익률은 꼬리가 두껍고, 급락이나 갭처럼 표준편차만으로 설명하기 어려운 움직임이 나올 수 있습니다. 옵션에서 변동성을 배울 때는 “대략적인 폭을 잡는 도구”와 “실제 시장이 그대로 따라주는 약속”을 구분해야 합니다.</p>
+<p>만기가 짧아지면 연간 변동성을 기간에 맞춰 줄여서 생각해야 합니다. 실무적으로는 시간의 제곱근을 사용합니다. 1년 변동성이 20%라면 30일 변동 폭은 대략 20% × √(30/365), 약 5.7%입니다. 현재가 100달러 기준으로 30일 한 표준편차 범위가 대략 94.3~105.7달러라는 뜻입니다.</p>
+<p>여기서 고정한 것은 연간 변동성 20%, 현재가 100달러입니다. 바뀐 것은 관찰 기간입니다. 같은 연간 변동성이라도 1년 전체의 흔들림과 30일의 흔들림은 같지 않습니다.</p>
+<p>이제 행사가 105달러 콜을 다시 봅니다. 30일 한 표준편차 상단이 105.7달러 근처라면, 105콜은 완전히 허무한 권리가 아닙니다. 반대로 30일 예상 변동 폭이 2%에 그친다면 상단은 102달러 근처입니다. 같은 105콜이라도 시간가치가 훨씬 작아집니다.</p>
+<p>옵션 가격 모델에서 변동성은 직접 관찰하기 어려운 입력값입니다. 현재 주가, 행사가, 만기, 금리, 배당은 비교적 명확합니다. 하지만 앞으로 얼마나 흔들릴지는 아직 일어나지 않았습니다.</p>
+<p>그래서 변동성에는 두 가지 언어가 필요합니다. 하나는 실현변동성입니다. 실제로 과거 또는 미래에 가격이 얼마나 움직였는지를 계산한 값입니다. 다른 하나는 내재변동성입니다. 시장에서 거래되는 옵션 가격을 보고, 그 가격이 어떤 변동성 가정을 품고 있는지 거꾸로 계산한 값입니다.</p>
+<p>예를 들어 현재 주가 100달러, 행사가 105달러, 만기 30일인 콜옵션이 있습니다. 모델의 다른 입력을 고정했을 때 연간 변동성 20%를 넣으면 옵션 가치가 1.80달러라고 하겠습니다. 그런데 시장에서는 이 옵션이 2.60달러에 거래됩니다.</p>
+<p>이 차이를 설명하려면 변동성 입력을 올려야 할 수 있습니다. 다른 조건을 그대로 둔 채 변동성을 28%로 높였더니 모델 가격이 2.60달러가 되었다면, 시장은 이 옵션을 대략 28% 내재변동성으로 거래하고 있는 셈입니다.</p>
+<p>이 예시에서 고정한 것은 현재가, 행사가, 만기, 금리, 배당입니다. 바뀐 것은 변동성 입력 하나입니다. 옵션 가격이 더 비싸다는 말은 시장이 더 넓은 가격 분포를 프리미엄에 반영하고 있다는 뜻으로 읽을 수 있습니다.</p>
+<p>실적 발표 전 옵션이 비싸지는 이유도 이 구조로 보면 됩니다. 시장은 실적 방향을 완전히 알지 못합니다. 대신 발표 직후 가격이 크게 튈 수 있다는 사실을 압니다. 그래서 콜과 풋의 시간가치가 같이 올라갑니다.</p>
+<p>이때 콜이 비싸졌다고 시장이 무조건 상승을 본다는 뜻은 아닙니다. 풋도 함께 비싸질 수 있습니다. 옵션 시장이 가격에 반영하는 것은 방향의 확신보다 움직임의 크기일 때가 많습니다.</p>
+<p>변동성이 높아질 때 모든 옵션이 똑같이 반응하지는 않습니다. 등가격 옵션은 총 금액 기준으로 변동성 변화에 민감한 경우가 많습니다. 외가격 옵션은 가격 자체가 작기 때문에 백분율 변화가 크게 보일 수 있습니다.</p>
+<p>현재가 100달러인 주식에서 100콜이 4.00달러에서 5.20달러가 되면 1.20달러 상승입니다. 115콜이 0.40달러에서 0.90달러가 되면 총액은 0.50달러 상승에 그칩니다. 하지만 수익률로 보면 115콜은 125% 상승입니다.</p>
+<p>여기서 고정한 것은 같은 기초자산과 같은 만기입니다. 바뀐 것은 행사가 위치입니다. 등가격은 변동성 변화의 달러 영향이 잘 보이고, 외가격은 작은 프리미엄 때문에 퍼센트 변화가 크게 보입니다.</p>
+<p>만기도 중요합니다. 같은 변동성 변화라면 7일 만기보다 90일 만기 옵션이 더 많이 반응할 수 있습니다. 변동성이 적용될 시간이 더 길기 때문입니다.</p>
+<p>다만 이 말이 긴 만기 옵션이 항상 좋은 선택이라는 뜻은 아닙니다. 긴 만기는 더 많은 가능성을 담지만, 그 가능성의 가격도 더 비쌉니다. 옵션 매수자는 “크게 움직일 것인가”와 함께 “이미 그 움직임이 비싸게 반영됐는가”를 같이 물어야 합니다.</p></div>
+</section>
+<section class="section-wide reveal" id="figure-04"><div class="fig"><div class="fig-label">Figure 04 — 연간 변동성을 30일 변동 폭으로 바꾸기</div><h2>연간 변동성은 만기 일수에 맞춰 줄여서 봅니다</h2><div class="controls"><div class="control-head"><div class="control-title">VOL × √(DTE/365)</div><div class="control-value" id="rangeFormula">20% × √(30/365)</div></div><div class="segmented" id="volButtons"><button type="button" data-vol="10">10%</button><button type="button" class="active" data-vol="20">20%</button><button type="button" data-vol="30">30%</button><button type="button" data-vol="40">40%</button></div><div class="segmented" id="dteButtons"><button type="button" data-dte="7">7일</button><button type="button" class="active" data-dte="30">30일</button><button type="button" data-dte="90">90일</button></div><div class="metric-grid"><div class="metric"><span>기간 변동 폭</span><strong id="periodMove">5.7%</strong></div><div class="metric"><span>하단</span><strong id="lowerRange">94.3</strong></div><div class="metric"><span>상단</span><strong id="upperRange">105.7</strong></div></div></div><div class="note-strip">현재가 100 기준입니다. 20%와 30일을 선택하면 20% × √(30/365) ≈ 5.7%, 범위는 대략 94.3~105.7달러입니다. 40%와 30일이면 약 11.5%, 범위는 대략 88.5~111.5달러입니다.</div></div></section>
+<section class="section-wide reveal" id="figure-05"><div class="fig"><div class="fig-label">Figure 05 — IV별 옵션 프리미엄 막대</div><h2>다른 조건을 고정하고 변동성만 올리면 프리미엄이 올라갑니다</h2><div class="bar-chart"><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:20%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 15%">$1.00</div></div><div class="bar-label">IV 15%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:44%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 25%">$2.20</div></div><div class="bar-label">IV 25%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:72%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 35%">$3.55</div></div><div class="bar-label">IV 35%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:100%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 45%">$4.95</div></div><div class="bar-label">IV 45%</div></div></div><div class="fig-caption">S=100, K=105, 30D, 금리와 배당 0을 고정한 교육용 단순 예시입니다. 실제 모델값이 아니라 변동성 입력의 역할을 보기 위한 숫자입니다.</div></div></section>
+<section class="section-wide reveal" id="figure-06"><div class="fig"><div class="fig-label">Figure 06 — 실현변동성과 내재변동성 비교 카드</div><h2>지나간 움직임과 시장이 매긴 보험료를 구분합니다</h2><div class="two"><div class="mini-card"><div class="mini-k">REALIZED VOLATILITY</div><div class="mini-v">실현변동성 18%</div><p class="mini-p">실제로 과거 또는 미래에 가격이 얼마나 움직였는지를 계산한 값입니다. 18%는 지나간 길입니다.</p></div><div class="mini-card"><div class="mini-k">IMPLIED VOLATILITY</div><div class="mini-v">내재변동성 28%</div><p class="mini-p">옵션 가격에서 역산한 시장의 변동성 가정입니다. 28%는 시장이 지금 매긴 보험료입니다.</p></div></div><div class="fig-caption">실현변동성은 실제 움직임의 기록이고, 내재변동성은 현재 옵션 프리미엄 안에 들어 있는 시장의 가정입니다.</div></div></section>
+<section class="section-wide reveal" id="figure-07"><div class="fig"><div class="fig-label">Figure 07 — 옵션 가격에서 내재변동성을 역산하는 흐름</div><h2>옵션 가격이 비싸다는 말을 IV 언어로 번역합니다</h2><div class="flow-steps"><div class="mini-card"><div class="mini-k">MARKET PRICE</div><div class="mini-v" id="marketPriceLabel">$2.60</div><p class="mini-p">시장에서 거래되는 105콜 가격</p></div><div class="flow-arrow">→</div><div class="mini-card"><div class="mini-k">FIXED INPUTS</div><div class="mini-v">S=100 · K=105 · 30D</div><p class="mini-p">금리와 배당은 0으로 고정</p></div><div class="flow-arrow">→</div><div class="mini-card"><div class="mini-k">IMPLIED VOL</div><div class="mini-v" id="ivEstimate">28%</div><p class="mini-p">변동성만 조정해 시장가를 설명</p></div></div><div class="controls"><div class="control-head"><div class="control-title">MARKET OPTION PRICE</div><div class="control-value" id="marketSliderVal">$2.60</div></div><input id="marketSlider" type="range" min="1.5" max="4" value="2.6" step="0.1" aria-label="시장 옵션가격"></div><div class="fig-caption">20% 변동성을 넣으면 모델 가격이 1.80달러, 시장가가 2.60달러라면 변동성 입력을 약 28%로 올려야 설명된다는 교육용 단순 mapping입니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">05 · MISUNDERSTANDING CORRECTION</div>
+  <h2>변동성이 높으면 옵션 매수자에게 항상 좋은 것은 아닙니다</h2>
+  <div class="prose"><p>위험한 오해는 변동성이 높으면 옵션 매수자에게 항상 좋다고 생각하는 것입니다.</p>
+<p>옵션을 이미 들고 있는 사람에게 내재변동성 상승은 대체로 유리하게 작용할 수 있습니다. 특히 롱옵션은 베가가 양수인 경우가 많아서, 시장이 더 큰 움직임을 가격에 반영하면 프리미엄이 올라갈 수 있습니다.</p>
+<p>하지만 높은 변동성에서 새로 옵션을 사는 사람은 비싼 보험료를 내고 들어갑니다. 이후 실제 움직임이 그 가격을 정당화하지 못하거나, 이벤트가 끝난 뒤 내재변동성이 빠지면 방향을 맞혀도 손실이 날 수 있습니다.</p>
+<p>예를 들어 실적 전 100달러 주식의 105콜을 4달러에 샀다고 해보겠습니다. 실적 후 주가가 103달러로 올랐습니다. 방향은 맞았습니다. 그러나 만기가 짧아졌고, 이벤트가 끝나며 내재변동성이 낮아졌고, 105콜은 여전히 외가격입니다. 옵션 가격이 4달러에서 2달러로 떨어질 수 있습니다.</p>
+<p>이 예시에서 주가 방향은 매수자에게 유리하게 변했습니다. 반대로 시간과 변동성은 불리하게 변했습니다. 옵션 손익은 이 세 변수가 합쳐진 결과입니다.</p>
+<p>그래서 변동성은 “높다/낮다”보다 “내가 지불한 변동성보다 실제로 더 크게 움직일 것인가”로 봐야 합니다. 이 질문이 들어오면 옵션은 복권처럼 보이지 않고, 보험료와 실제 사고 빈도를 비교하는 문제로 바뀝니다.</p>
+<p>사족이지만, VIX를 공포지수라고만 외우면 이 감각을 놓치기 쉽습니다. VIX는 시장이 S&amp;P 500 옵션에 반영한 단기 변동성 가격에 가깝습니다. 공포가 오르면 보통 올라가지만, 더 정확히는 보험료가 비싸진 상태를 보여줍니다.</p></div>
+</section>
+<section class="section-wide reveal" id="figure-08"><div class="fig"><div class="fig-label">Figure 08 — 이벤트 전후 옵션가격: 방향은 맞았지만 IV가 빠진 경우</div><h2>방향은 유리했지만 시간과 변동성이 불리하면 옵션은 손실일 수 있습니다</h2><div class="segmented" id="eventToggle"><button type="button" class="active" data-event="direction">방향만 보기</button><button type="button" data-event="full">방향+시간+IV 보기</button></div><div class="event-grid" style="margin-top:14px"><div class="mini-card event-card direction-only"><div class="mini-k">STOCK</div><div class="mini-v">100 → 103</div><p class="mini-p">주가 방향은 콜옵션 매수자에게 유리했습니다.</p></div><div class="mini-card event-card detail-only"><div class="mini-k">OPTION</div><div class="mini-v">$4 → $2</div><p class="mini-p">만기가 하루 줄고, 이벤트 종료 후 IV가 55%에서 28%로 낮아졌고, 105콜은 여전히 외가격입니다.</p></div><div class="mini-card event-card detail-only"><div class="mini-k">TIME</div><div class="mini-v">-1 day</div><p class="mini-p">시간은 불리하게 작용했습니다.</p></div><div class="mini-card event-card detail-only"><div class="mini-k">IV</div><div class="mini-v">55% → 28%</div><p class="mini-p">변동성은 불리하게 작용했습니다.</p></div></div><div class="fig-caption">실적 전후 교육용 시나리오입니다. 방향은 맞았지만 옵션 손익은 방향, 시간, 변동성이 합쳐진 결과입니다.</div></div></section>
+<section class="section-wide reveal" id="figure-09"><div class="fig"><div class="fig-label">Figure 09 — ATM/OTM/만기별 변동성 민감도 미리보기</div><h2>변동성 변화는 위치와 만기에 따라 다르게 보입니다</h2><div class="sensitivity-grid"><div class="mini-card"><div class="mini-k">ATM 총액 민감도</div><div class="mini-v">100콜 $4.00 → $5.20</div><p class="mini-p">총액 기준 +$1.20. 등가격은 달러 영향이 잘 보입니다.</p></div><div class="mini-card"><div class="mini-k">OTM 퍼센트 민감도</div><div class="mini-v">115콜 $0.40 → $0.90</div><p class="mini-p">총액은 +$0.50이지만 퍼센트로는 +125%처럼 크게 보입니다.</p></div><div class="mini-card"><div class="mini-k">단기 옵션</div><div class="mini-v">30D</div><p class="mini-p">남은 시간이 짧으면 변동성이 적용될 시간이 제한됩니다.</p></div><div class="mini-card"><div class="mini-k">장기 옵션</div><div class="mini-v">90D</div><p class="mini-p">같은 변동성 변화라도 적용될 시간이 길어 총액 반응이 커질 수 있습니다.</p></div></div><div class="fig-caption">여기서는 베가를 공식화하지 않습니다. 변동성 민감도는 15회차에서 베가로 다시 정리합니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">06 · TODAY'S SUMMARY</div>
+  <h2>변동성은 가능성의 폭입니다</h2>
+  <div class="prose"><p>변동성은 가격이 오를지 내릴지를 말하는 단어가 아닙니다. 가격이 만기까지 얼마나 넓게 움직일 수 있는지를 나타내는 입력값입니다.</p>
+<p>옵션의 시간가치는 시간이 길수록 커질 수 있고, 변동성이 높을수록 커질 수 있습니다. 시간은 가능성이 살아 있는 기간이고, 변동성은 그 가능성의 폭입니다.</p>
+<p>실현변동성은 실제로 움직인 폭입니다. 내재변동성은 옵션 가격에 들어 있는 시장의 변동성 가정입니다. 옵션을 산다는 것은 방향과 함께 이 내재변동성을 어떤 가격에 사는 일이기도 합니다.</p>
+<p>이번 회차의 체크포인트는 세 가지입니다. 첫째, 같은 행사가와 만기라면 변동성이 높을수록 옵션은 비싸집니다. 둘째, 높은 변동성은 기존 옵션 보유자에게는 유리할 수 있지만 신규 매수자에게는 비싼 진입 가격입니다. 셋째, 다음 회차에서 볼 손실 구조는 방향, 시간, 변동성의 조합으로 설명됩니다.</p></div>
+</section>
+<hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">07 · WORKSHEET</div>
+  <h2>내가 지불하는 변동성이 싼지 비싼지 묻습니다</h2>
+  <div class="prose"><p>현재 주가가 100달러인 주식을 가정합니다. 행사가 105달러 콜옵션, 만기 30일, 금리와 배당은 없다고 둡니다.</p>
+<h3>Worksheet A. 변동성 범위 감각</h3>
+<p>1. 연간 변동성이 20%일 때, 30일 변동 폭을 √(30/365)로 줄이면 대략 몇 %입니까? 2. 현재가 100달러 기준으로 한 표준편차 상단과 하단은 어디쯤입니까? 3. 같은 조건에서 연간 변동성이 40%라면 30일 변동 폭은 대략 몇 %입니까? 4. 행사가 105달러 콜은 20% 변동성 환경과 40% 변동성 환경 중 어디서 더 비싸질 가능성이 큽니까?</p>
+<p>풀이 기준: 20% × √(30/365) ≈ 5.7%, 범위는 대략 94.3~105.7달러입니다. 40%라면 약 11.5%, 범위는 대략 88.5~111.5달러입니다. 다른 조건이 같다면 40% 변동성 환경에서 105콜의 시간가치가 더 큽니다.</p>
+<h3>Worksheet B. 실적 이벤트 판단</h3>
+<p>실적 전 100달러 주식의 105콜이 4달러입니다. 실적 후 주가는 103달러로 상승했지만 옵션 가격은 2달러로 하락했습니다.</p>
+<p>아래 세 변수에 대해 유리/불리를 표시해보세요.</p>
+<ul><li>방향: 주가 100 → 103</li><li>시간: 실적 발표 후 하루 경과, 만기 가까워짐</li><li>변동성: 이벤트 종료 후 내재변동성 하락</li></ul>
+<p>풀이 기준: 방향은 유리, 시간은 불리, 변동성은 불리입니다. 옵션 손익은 방향만으로 결정되지 않습니다.</p>
+<h3>Worksheet C. 나의 한 문장</h3>
+<p>오늘 배운 내용을 바탕으로 아래 문장을 완성해보세요.</p>
+<p>“옵션을 살 때 변동성을 본다는 것은, 내가 맞히려는 방향보다 먼저 ________가 이미 프리미엄에 얼마나 반영됐는지 확인하는 일이다.”</p>
+<p>예시 답안: “만기까지 필요한 움직임의 폭.”</p></div>
+</section>
+<section class="section-wide reveal" id="figure-10"><div class="fig"><div class="fig-label">Figure 10 — 변동성 판단 워크시트</div><h2>고정 변수와 변화 변수를 분리해서 적어봅니다</h2><div class="worksheet-grid"><div class="worksheet-field"><label>현재가</label><input value="100달러"></div><div class="worksheet-field"><label>행사가</label><input value="105달러 콜"></div><div class="worksheet-field"><label>만기</label><input value="30일"></div><div class="worksheet-field"><label>IV</label><input placeholder="예: 20% 또는 40%"></div><div class="worksheet-field"><label>예상 실현변동성</label><input placeholder="내가 보는 실제 움직임의 폭"></div><div class="worksheet-field"><label>이벤트 여부</label><input placeholder="실적, FOMC, CPI 등"></div><div class="worksheet-field"><label>내가 지불하는 프리미엄</label><input placeholder="예: 4달러"></div><div class="worksheet-field"><label>옵션 영향</label><input placeholder="비싼가, 싼가, 충분히 움직여야 하는가"></div></div><button class="answer-btn" type="button" id="answerToggle" aria-expanded="false" aria-controls="answers08">정답 보기</button><div class="answers" id="answers08"><p><strong>Worksheet A.</strong> 20% × √(30/365) ≈ 5.7%, 범위는 대략 94.3~105.7달러입니다. 40%라면 약 11.5%, 범위는 대략 88.5~111.5달러입니다. 다른 조건이 같다면 40% 변동성 환경에서 105콜의 시간가치가 더 큽니다.</p><p><strong>Worksheet B.</strong> 방향은 유리, 시간은 불리, 변동성은 불리입니다. 옵션 손익은 방향만으로 결정되지 않습니다.</p><p><strong>Worksheet C.</strong> 예시 답안: 만기까지 필요한 움직임의 폭.</p></div><div class="fig-caption">입력칸은 기록용입니다. 실제 주문 전에는 옵션 체인의 만기, 행사가, 프리미엄, IV, 이벤트 일정을 함께 확인해야 합니다.</div></div></section>
+<hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">08 · NEXT SESSION BRIDGE</div>
+  <h2>다음 회차에서는 방향을 맞혀도 손실이 나는 이유를 봅니다</h2>
+  <div class="prose"><p>다음 회차에서는 이 질문을 정면으로 다루겠습니다.</p>
+<p>주가 방향을 맞혔는데도 옵션에서 손실이 나는 이유는 무엇일까요?</p>
+<p>오늘 배운 변동성이 그 답의 절반입니다. 나머지는 시간가치 감소와 행사가 위치입니다. 9회차에서는 방향, 시간, 변동성 3축을 한 장의 손익 지도에 올려놓겠습니다.</p></div>
+</section>
+<section class="section reveal" id="next"><div class="next-card" aria-disabled="true"><div><div class="next-label">NEXT SESSION</div><div class="next-title">9회차 · 준비중</div><p class="next-desc">방향, 시간, 변동성 3축을 한 장의 손익 지도에 올려놓는 다음 회차는 아직 공개하지 않습니다.</p></div><div class="next-arrow">…</div></div></section>
+<footer><div>© 무기견의 옵션 입문</div><div>Session 08 · Volatility</div></footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+const volSlider = document.getElementById('volSlider');
+function updateDistribution() {
+  if (!volSlider) return;
+  const vol = Number(volSlider.value);
+  const sigma = Math.round(vol * 0.3 * 10) / 10;
+  document.getElementById('volSliderVal').textContent = vol + '%';
+  document.getElementById('sigmaVal').textContent = sigma.toFixed(1);
+  document.getElementById('tailVal').textContent = vol < 20 ? '얇음' : vol < 36 ? '보통' : '두꺼움';
+  document.getElementById('distMood').textContent = vol < 20 ? '좁은 폭' : vol < 36 ? '폭 확대' : '넓은 폭';
+  document.getElementById('distSigmaLabel').textContent = 'IV ' + vol + '% · 교육용 분포';
+  const spread = Math.min(190, 70 + vol * 2.2);
+  const left = 310 - spread;
+  const right = 310 + spread;
+  const top = Math.max(48, 112 - vol * 1.1);
+  document.getElementById('distPath').setAttribute('d', `M${left} 238 C${left+70} 230 ${310-spread*.45} ${top+28} 310 ${top} C${310+spread*.45} ${top+28} ${right-70} 230 ${right} 238`);
+  document.getElementById('tailArea').setAttribute('d', `M360 ${top+88} C${410} ${top+44} ${right-65} 230 ${right} 238 L${right} 240 L360 240 Z`);
+}
+volSlider?.addEventListener('input', updateDistribution);
+updateDistribution();
+let selectedVol = 20;
+let selectedDte = 30;
+function setActive(group, attr, value) {
+  document.querySelectorAll(group + ' button').forEach((button) => button.classList.toggle('active', Number(button.dataset[attr]) === value));
+}
+function updateRange() {
+  const move = selectedVol * Math.sqrt(selectedDte / 365);
+  const rounded = Math.round(move * 10) / 10;
+  document.getElementById('rangeFormula').textContent = selectedVol + '% × √(' + selectedDte + '/365)';
+  document.getElementById('periodMove').textContent = rounded.toFixed(1) + '%';
+  document.getElementById('lowerRange').textContent = (100 - rounded).toFixed(1);
+  document.getElementById('upperRange').textContent = (100 + rounded).toFixed(1);
+}
+document.querySelectorAll('#volButtons button').forEach((button) => button.addEventListener('click', () => {
+  selectedVol = Number(button.dataset.vol);
+  setActive('#volButtons', 'vol', selectedVol);
+  updateRange();
+}));
+document.querySelectorAll('#dteButtons button').forEach((button) => button.addEventListener('click', () => {
+  selectedDte = Number(button.dataset.dte);
+  setActive('#dteButtons', 'dte', selectedDte);
+  updateRange();
+}));
+updateRange();
+const marketSlider = document.getElementById('marketSlider');
+function updateMarketIv() {
+  if (!marketSlider) return;
+  const price = Number(marketSlider.value);
+  const iv = Math.round(20 + (price - 1.8) * 10);
+  const label = '$' + price.toFixed(2);
+  document.getElementById('marketSliderVal').textContent = label;
+  document.getElementById('marketPriceLabel').textContent = label;
+  document.getElementById('ivEstimate').textContent = Math.max(12, iv) + '%';
+}
+marketSlider?.addEventListener('input', updateMarketIv);
+updateMarketIv();
+function setEventMode(mode) {
+  document.querySelectorAll('#eventToggle button').forEach((button) => button.classList.toggle('active', button.dataset.event === mode));
+  document.querySelectorAll('.detail-only').forEach((card) => { card.style.display = mode === 'full' ? '' : 'none'; });
+}
+document.querySelectorAll('#eventToggle button').forEach((button) => button.addEventListener('click', () => setEventMode(button.dataset.event)));
+setEventMode('direction');
+const answerToggle = document.getElementById('answerToggle');
+const answers = document.getElementById('answers08');
+answerToggle?.addEventListener('click', () => {
+  const open = answers?.classList.toggle('open') || false;
+  answerToggle.classList.toggle('active', open);
+  answerToggle.setAttribute('aria-expanded', String(open));
+  answerToggle.textContent = open ? '정답 닫기' : '정답 보기';
+});
+
+</script>
+</body>
+</html>
