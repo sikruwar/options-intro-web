@@ -31,3 +31,11 @@ def test_admin_page_loads_admin_script():
     assert 'assets/auth-admin.js' in html
     assert 'access_requests' in html
     assert 'approved_users' in html
+
+
+def test_approved_user_identity_badge_exists():
+    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
+    assert 'renderApprovedBadge' in js
+    assert '승인 계정' in js
+    assert 'x_handle' in js
+    assert 'hi-approved-sign-out' in js

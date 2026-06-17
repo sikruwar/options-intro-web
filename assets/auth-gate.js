@@ -34,7 +34,12 @@
       .hi-auth-message { border:1px solid #2d302a; border-radius:12px; padding:12px 14px; background:#0b0d0c; color:#d8d1c3 !important; margin-top:14px !important; }
       .hi-auth-row { display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:12px; }
       .hi-auth-link { color:#f5b14c; background:none; border:0; width:auto; min-height:0; padding:0; margin:0; font:inherit; cursor:pointer; }
-      @media (max-width:640px){ .hi-auth-card { padding:24px 20px; border-radius:16px; } .hi-auth-card h2 { font-size:21px; } }
+      .hi-approved-badge { position:fixed; right:18px; bottom:18px; z-index:80; display:flex; align-items:center; gap:10px; max-width:min(420px,calc(100vw - 32px)); padding:10px 13px; border:1px solid rgba(245,177,76,.35); border-radius:999px; background:rgba(11,13,12,.86); color:#f1eee5; box-shadow:0 12px 32px rgba(0,0,0,.24); backdrop-filter:blur(12px); font-family:'Noto Sans KR',system-ui,sans-serif; }
+      .hi-approved-badge span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#a49b8b; font-size:12px; }
+      .hi-approved-badge strong { color:#f5b14c; font-weight:800; }
+      .hi-approved-badge button { width:auto; min-height:0; margin:0; padding:0; border:0; background:transparent; color:#746f65; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
+      .hi-approved-badge button:hover { color:#f5b14c; }
+      @media (max-width:640px){ .hi-auth-card { padding:24px 20px; border-radius:16px; } .hi-auth-card h2 { font-size:21px; } .hi-approved-badge { left:12px; right:12px; bottom:12px; border-radius:16px; justify-content:space-between; } }
     `;
     document.head.appendChild(style);
   }
@@ -52,10 +57,11 @@
     document.documentElement.style.overflow = 'hidden';
   }
 
-  function unlock() {
+  function unlock(approval) {
     const root = document.getElementById('hi-auth-lock');
     if (root) root.remove();
     document.documentElement.style.overflow = '';
+    renderApprovedBadge(approval);
   }
 
   function normalizeEmail(email) {
@@ -66,6 +72,12 @@
     const raw = String(handle || '').trim();
     if (!raw) return '';
     return raw.startsWith('@') ? raw : `@${raw}`;
+  }
+
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>'"]/g, (char) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
   }
 
   function statusMessage(text) {
@@ -117,16 +129,36 @@
     if (error && error.code !== '23505') throw error;
   }
 
-  async function isApproved(email) {
+  async function getApproval(email) {
     const supabase = await getClient();
     const { data, error } = await supabase
       .from('approved_users')
-      .select('email, active')
+      .select('email, x_handle, active')
       .eq('email', normalizeEmail(email))
       .eq('active', true)
       .maybeSingle();
     if (error) throw error;
-    return Boolean(data?.active);
+    return data?.active ? data : null;
+  }
+
+  function renderApprovedBadge(approval) {
+    if (!approval?.email) return;
+    css();
+    const existing = document.getElementById('hi-approved-badge');
+    if (existing) existing.remove();
+    const root = document.createElement('div');
+    root.id = 'hi-approved-badge';
+    root.className = 'hi-approved-badge';
+    const email = escapeHtml(approval.email);
+    const handle = approval.x_handle ? ` · ${escapeHtml(approval.x_handle)}` : '';
+    root.innerHTML = `<span>승인 계정 <strong>${email}</strong>${handle}</span><button type="button" id="hi-approved-sign-out">로그아웃</button>`;
+    document.body.appendChild(root);
+    document.getElementById('hi-approved-sign-out')?.addEventListener('click', async () => {
+      const supabase = await getClient();
+      await supabase.auth.signOut();
+      root.remove();
+      renderLogin();
+    });
   }
 
   async function renderPending(user) {
@@ -214,7 +246,8 @@
       state.session = data?.session || null;
       const user = state.session?.user;
       if (!user?.email) return renderLogin();
-      if (await isApproved(user.email)) return unlock();
+      const approval = await getApproval(user.email);
+      if (approval) return unlock(approval);
       return renderPending(user);
     } catch (error) {
       overlay(`
