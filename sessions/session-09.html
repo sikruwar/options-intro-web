@@ -4,197 +4,368 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>9회차 — 방향을 맞혀도 손실이 나는 이유</title>
-  <meta name="description" content="방향을 맞혀도 손실이 나는 이유">
+  <meta name="description" content="주가 방향을 맞혀도 옵션에서 손실이 날 수 있는 이유를 방향, 시간, 변동성, 손익분기점의 합산으로 분해하는 옵션 입문 9회차입니다.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
-    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d0c;
+      --bg-card: #151715;
+      --bg-card2: #1d211d;
+      --text: #f1eee5;
+      --text-muted: #a49b8b;
+      --text-dim: #746f65;
+      --amber: #f5b14c;
+      --green: #35d07f;
+      --blue: #7dd3fc;
+      --red: #ef4444;
+      --violet: #a78bfa;
+      --border: #2d302a;
+      --border-light: #44483d;
+      --nav-bg: rgba(11,13,12,.91);
+      --hero-glow-warm: rgba(245,177,76,.08);
+      --hero-glow-cool: rgba(125,211,252,.05);
+      --prose-text: #d8d1c3;
+      --cta-text: #11130f;
+      --shadow: 0 18px 60px rgba(0,0,0,.28);
+    }
+
+    :root[data-theme="olive"] {
+      color-scheme: light;
+      --bg: #fafaf2;
+      --bg-card: #fff;
+      --bg-card2: #f1f3e7;
+      --text: #1b2518;
+      --text-muted: #5d684f;
+      --text-dim: #889078;
+      --amber: #7d8f3a;
+      --green: #4f7a35;
+      --blue: #3d7796;
+      --red: #b94a48;
+      --violet: #7561a8;
+      --border: #e3e7d4;
+      --border-light: #d1d9bb;
+      --nav-bg: rgba(250,250,242,.92);
+      --hero-glow-warm: rgba(125,143,58,.12);
+      --hero-glow-cool: rgba(61,119,150,.08);
+      --prose-text: #35402f;
+      --cta-text: #fff;
+      --shadow: 0 18px 60px rgba(82,91,56,.12);
+    }
+
     html { scroll-behavior: smooth; }
-    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
-    a { color:inherit; text-decoration:none; }
-    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
-    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
-    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
-    .nav-right { display:flex; align-items:center; gap:14px; }
-    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
-    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
-    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
-    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
-    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
-    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
-    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
-    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
-    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
-    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
-    .hero h1 .hi { color:var(--amber); }
-    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
-    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
-    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
-    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
-    .divider { border:0; border-top:1px solid var(--border); }
-    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
-    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
-    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
-    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
-    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
-    .prose p:last-child { margin-bottom:0; }
-    .prose strong { color:var(--text); font-weight:700; }
-    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
-    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
-    .prose li { margin:7px 0; overflow-wrap:anywhere; }
-    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
-    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
-    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
-    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
-    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
-    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
-    .two,.three,.four { display:grid; gap:14px; }
-    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
-    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
-    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
-    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
-    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
-    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
-    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
-    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
-    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
-    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
-    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
-    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
-    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
-    .rail-step.done { border-color:rgba(53,208,127,.36); }
-    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
-    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
-    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
-    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
-    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
-    .contract-main .right-word { color:var(--amber); font-weight:900; }
-    .contract-meta { display:grid; gap:10px; }
-    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
-    .meta-row:last-child { border-bottom:0; }
-    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
-    .meta-row strong { color:var(--text); text-align:right; }
-    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
-    .scenario-card.good { border-color:rgba(53,208,127,.36); }
-    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
-    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
-    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
-    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
-    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
-    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
-    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
-    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
-    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
-    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
-    .slider-title { font-weight:800; color:var(--text); }
-    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
-    input[type="range"] { width:100%; accent-color:var(--amber); }
-    .calc-results { display:grid; gap:10px; }
-    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
-    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
-    .result strong { font-size:22px; color:var(--text); }
-    .result.pos strong { color:var(--green); }
-    .result.neg strong { color:var(--red); }
-    .result.zero strong { color:var(--text-muted); }
-    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
-    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
-    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
-    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
-    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
-    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
-    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
-    .answer-btn:hover { border-color:var(--amber); }
-    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
-    .answers.open { display:block; }
-    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
-    .answer-row:first-child { border-top:0; }
-    .answer-row strong { color:var(--amber); }
-    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
-    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
-    .next-card:hover { border-color:var(--amber); }
-    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
-    .next-title { font-size:17px; font-weight:800; }
-    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
-    .next-arrow { font-size:24px; color:var(--amber); }
-    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
-    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
-    .reveal.visible { opacity:1; transform:none; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      line-height: 1.82;
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s, color .25s;
+    }
 
+    /* ── PROGRESS ── */
+    .progress {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--amber), var(--green));
+      z-index: 100;
+    }
 
-    .viz-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
-    .viz-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:18px; min-width:0; }
-    .viz-panel.accent { background:linear-gradient(135deg,rgba(245,177,76,.11),rgba(125,211,252,.06)),var(--bg-card2); border-color:var(--border-light); }
-    .viz-panel h4 { font-size:15px; line-height:1.42; color:var(--text); margin:0 0 12px; }
-    .viz-copy { color:var(--text-muted); font-size:13px; line-height:1.62; margin:8px 0 0; overflow-wrap:anywhere; }
-    .viz-svg { width:100%; min-height:238px; display:block; overflow:visible; }
-    .viz-axis { stroke:var(--border-light); stroke-width:1; }
-    .viz-gridline { stroke:var(--border); stroke-width:1; opacity:.72; }
-    .viz-line { fill:none; stroke:var(--amber); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
-    .viz-line.blue { stroke:var(--blue); }
-    .viz-line.green { stroke:var(--green); }
-    .viz-line.red { stroke:var(--red); }
-    .viz-area { fill:rgba(245,177,76,.13); }
-    .viz-label { font-family:'JetBrains Mono', monospace; font-size:10px; fill:var(--text-muted); }
-    .viz-number { font-family:'JetBrains Mono', monospace; font-size:13px; fill:var(--text); font-weight:700; }
-    .viz-dot { fill:var(--amber); stroke:var(--bg-card); stroke-width:3; }
-    .viz-dot.blue { fill:var(--blue); }
-    .viz-dot.green { fill:var(--green); }
-    .viz-dot.red { fill:var(--red); }
-    .viz-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
-    .viz-metric { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:13px; min-width:0; }
-    .viz-metric span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:6px; text-transform:uppercase; }
-    .viz-metric strong { display:block; color:var(--text); font-size:17px; line-height:1.3; overflow-wrap:anywhere; }
-    .viz-metric small { display:block; margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
-    .viz-range { margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); }
-    .viz-range label { display:flex; align-items:baseline; justify-content:space-between; gap:12px; color:var(--text); font-weight:800; font-size:14px; }
-    .viz-range output { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:18px; }
-    .viz-range input[type="range"] { width:100%; margin-top:12px; accent-color:var(--amber); }
-    .viz-bars { display:grid; gap:10px; margin-top:12px; }
-    .viz-bar { display:grid; grid-template-columns:128px 1fr 62px; gap:10px; align-items:center; }
-    .viz-bar span { color:var(--text-muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
-    .viz-bar b { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text); text-align:right; }
-    .viz-track { height:14px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; }
-    .viz-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--amber)); }
-    .viz-fill.good { background:linear-gradient(90deg,var(--green),var(--blue)); }
-    .viz-fill.bad { background:linear-gradient(90deg,var(--amber),var(--red)); }
-    .viz-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; margin-top:14px; }
-    .viz-step { border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); padding:14px; min-height:116px; position:relative; }
-    .viz-step::after { content:'→'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--amber); font-family:'JetBrains Mono', monospace; }
-    .viz-step:last-child::after { content:''; }
-    .viz-step span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
-    .viz-step strong { display:block; color:var(--text); font-size:15px; line-height:1.4; }
-    .viz-step p { margin:8px 0 0; color:var(--text-muted); font-size:12px; line-height:1.5; }
-    .viz-timeline { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
-    .viz-time { border:1px solid var(--border); background:var(--bg-card2); border-radius:12px; padding:14px; min-height:120px; }
-    .viz-time span { display:block; font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:11px; margin-bottom:8px; }
-    .viz-time strong { color:var(--text); font-size:15px; line-height:1.35; }
-    .viz-time p { color:var(--text-muted); font-size:12px; line-height:1.5; margin-top:8px; }
-    .viz-matrix { width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--border); font-size:13px; }
-    .viz-matrix th,.viz-matrix td { border-bottom:1px solid var(--border); padding:12px; text-align:left; color:var(--text-muted); vertical-align:top; }
-    .viz-matrix th { background:var(--bg-card2); color:var(--text); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
-    .viz-matrix tr:last-child td { border-bottom:0; }
-    .viz-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
-    .viz-check { display:flex; gap:10px; align-items:flex-start; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-muted); font-size:13px; line-height:1.45; }
-    .viz-check input { margin-top:3px; accent-color:var(--amber); }
-    .viz-toggle { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
-    .viz-toggle button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 12px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
-    .viz-toggle button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
-    .viz-note { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
-    .viz-pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
-    .viz-pill { border:1px solid var(--border-light); border-radius:999px; padding:6px 10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
-    @media (max-width:760px) { .viz-grid,.viz-flow,.viz-timeline,.viz-checklist { grid-template-columns:1fr; } .viz-metrics { grid-template-columns:1fr; } .viz-step::after { display:none; } .viz-bar { grid-template-columns:1fr; } .viz-bar b { text-align:left; } .viz-svg { min-height:200px; } }
-    .worksheet-answer { display:none; margin-top:14px; }
-    .worksheet-answer.open { display:block; }
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--text-muted);
+      letter-spacing: .08em; text-decoration: none;
+    }
+    .nav-brand span { color: var(--amber); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-prev, .nav-next, .nav-session {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text-dim); text-decoration: none;
+    }
+    .nav-prev:hover, .nav-next:hover { color: var(--amber); }
+    .theme-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: var(--bg-card);
+    }
+    .theme-btn {
+      border: 0; min-width: 44px; min-height: 32px;
+      padding: 6px 10px; border-radius: 999px;
+      background: transparent; color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: .04em; cursor: pointer;
+    }
+    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
 
-    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
-    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+    /* ── HERO ── */
+    .hero {
+      min-height: 94vh; display: flex; align-items: center;
+      padding: 122px 10vw 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: -220px -160px auto auto;
+      width: 760px; height: 760px;
+      background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; left: -120px; bottom: -180px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 26px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 84px);
+      font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px;
+      word-break: keep-all; overflow-wrap: normal;
+    }
+    .hero h1 .hi { color: var(--blue); }
+    .mobile-break { display: none; }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px); color: var(--text-muted);
+      font-weight: 300; max-width: 740px; line-height: 1.72; margin-bottom: 38px;
+      word-break: keep-all; overflow-wrap: anywhere;
+    }
+    .thesis {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--blue);
+      padding: 21px 28px; border-radius: 0 12px 12px 0;
+      box-shadow: var(--shadow); max-width: 760px;
+    }
+    .thesis-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--blue); letter-spacing: .15em; margin-bottom: 9px;
+    }
+    .thesis-main { font-size: 18px; font-weight: 700; line-height: 1.62; word-break: keep-all; overflow-wrap: anywhere; }
+
+    /* ── LAYOUT ── */
+    .divider { border: 0; border-top: 1px solid var(--border); }
+    .section { max-width: 810px; margin: 0 auto; padding: 78px 24px; }
+    .section-wide { max-width: 1080px; margin: 0 auto; padding: 78px 24px; }
+    .section-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .15em; margin-bottom: 16px;
+    }
+    .section h2, .section-wide h2 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800; line-height: 1.24; letter-spacing: 0; margin-bottom: 28px;
+    }
+    .prose p {
+      font-size: 16px; line-height: 1.86; color: var(--prose-text); margin-bottom: 19px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 700; }
+
+    /* ── FIGURE ── */
+    .fig {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: 16px; padding: 28px; margin: 32px 0;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .fig::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), var(--amber), transparent);
+      opacity: .48;
+    }
+    .fig-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .fig h2 { font-size: clamp(19px, 2.6vw, 24px); font-weight: 800; line-height: 1.3; margin-bottom: 20px; }
+    .fig-caption {
+      margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.65;
+    }
+
+    /* ── GRID CARDS ── */
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .mini-card {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .mini-k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .08em; margin-bottom: 10px;
+    }
+    .mini-v { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.35; }
+    .mini-p { font-size: 13px; color: var(--text-muted); line-height: 1.58; margin-top: 8px; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+
+    input[type="range"] {
+      width: 100%; height: 5px; border-radius: 999px;
+      background: var(--border-light); outline: none; -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+      box-shadow: 0 0 0 4px rgba(245,177,76,.18);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+    }
+    svg { width: 100%; height: auto; display: block; }
+
+    /* ── NEXT CARD ── */
+    .next-card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 26px 30px; margin-top: 34px;
+      display: flex; justify-content: space-between; gap: 20px;
+      text-decoration: none; color: inherit;
+    }
+    .next-card:hover { border-color: var(--amber); }
+    .next-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-dim); letter-spacing: .12em; margin-bottom: 7px;
+    }
+    .next-title { font-size: 17px; font-weight: 800; }
+    .next-desc { margin-top: 8px; color: var(--text-muted); font-size: 14px; line-height: 1.65; }
+    .next-arrow { font-size: 24px; color: var(--amber); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 30px 10vw;
+      display: flex; justify-content: space-between;
+      color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    .hero h1 .hi { color: var(--amber); }
+    .thesis { border-left-color: var(--amber); }
+    .thesis-label { color: var(--amber); }
+    .prose h3 { font-size: 21px; font-weight: 800; margin: 34px 0 14px; color: var(--text); }
+    .prose ol, .prose ul { margin: 0 0 19px 20px; color: var(--prose-text); line-height: 1.86; }
+    .prose li { margin-bottom: 6px; }
+    .prose code, code { font-family: 'JetBrains Mono', monospace; color: var(--amber); font-size: .92em; }
+
+    .svg-card { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; overflow: hidden; }
+    .svg-card svg { width: 100%; height: auto; display: block; }
+    svg text { font-family: 'JetBrains Mono', monospace; fill: var(--text-muted); font-size: 11px; }
+    .axis-line { stroke: var(--border-light); stroke-width: 1; }
+    .strike-line { stroke: var(--amber); stroke-width: 1.5; stroke-dasharray: 5 5; }
+    .be-line { stroke: var(--blue); stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .payoff-line { stroke: var(--amber); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .zero-line { stroke: var(--border-light); stroke-width: 1; stroke-dasharray: 2 4; }
+
+    .controls { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-top: 16px; }
+    .control-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .control-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: .08em; }
+    .control-value { font-family: 'JetBrains Mono', monospace; font-size: 20px; color: var(--amber); font-weight: 800; }
+    .segmented { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .segmented button, .answer-btn { min-height: 44px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-muted); border-radius: 999px; padding: 9px 13px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .segmented button.active, .answer-btn.active { background: var(--amber); border-color: var(--amber); color: var(--cta-text); }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .metric { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .metric span { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 5px; }
+    .metric strong { color: var(--text); font-size: 19px; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── FLOW / GATES ── */
+    .flow-steps { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: 8px; align-items: stretch; }
+    .flow-arrow { display: grid; place-items: center; color: var(--amber); font-family: 'JetBrains Mono', monospace; }
+    .gate { background: var(--bg-card2); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px 14px; cursor: pointer; text-align: center; transition: border-color .2s, background .2s; }
+    .gate:hover { border-color: var(--amber); }
+    .gate.active { border-color: var(--amber); background: rgba(245,177,76,.08); }
+    .gate-k { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: .08em; margin-bottom: 8px; }
+    .gate-v { font-size: 15px; font-weight: 800; color: var(--text); line-height: 1.4; }
+    .gate-detail { display: none; margin-top: 14px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: var(--text-muted); font-size: 14px; line-height: 1.7; }
+    .gate-detail.visible { display: block; }
+
+    /* ── WATERFALL ── */
+    .badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; letter-spacing: .04em; }
+    .badge-good { color: var(--green); border: 1px solid var(--green); background: rgba(53,208,127,.08); }
+    .badge-bad { color: var(--red); border: 1px solid var(--red); background: rgba(239,68,68,.08); }
+    .badge-neutral { color: var(--text-muted); border: 1px solid var(--border-light); }
+
+    /* ── EVENT TOGGLE GRID ── */
+    .event-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+    /* ── WORKSHEET ── */
+    .worksheet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .worksheet-field { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .worksheet-field label { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 7px; }
+    .worksheet-field input { width: 100%; min-height: 44px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text); padding: 10px 12px; font: inherit; }
+    .worksheet-field output { display: block; min-height: 44px; border-radius: 10px; border: 1px dashed var(--border-light); background: var(--bg-card); color: var(--amber); padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; }
+    .radio-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .radio-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border-light); border-radius: 999px; background: var(--bg-card); color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; }
+    .radio-chip input { width: auto; min-height: auto; }
+    .answers { display: none; margin-top: 14px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .answers.open { display: block; }
+    .answers p { color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
+    .answers p:last-child { margin-bottom: 0; }
+    .answers strong { color: var(--amber); }
+
+    .note-strip { margin-top: 14px; border-left: 3px solid var(--amber); padding: 12px 14px; background: linear-gradient(90deg, rgba(245,177,76,.08), transparent); color: var(--text-muted); font-size: 13px; line-height: 1.65; }
+
+    /* ── GAUGE ── */
+    .gauge-shell { position: relative; height: 56px; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--border); overflow: hidden; }
+    .gauge-expected { position: absolute; top: 0; bottom: 0; background: rgba(125,211,252,.16); border-right: 2px dashed var(--blue); }
+    .gauge-actual { position: absolute; top: 0; bottom: 0; left: 0; background: linear-gradient(90deg, rgba(245,177,76,.35), rgba(245,177,76,.6)); }
+    .gauge-labels { display: flex; justify-content: space-between; margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); }
+
+    @media (max-width: 760px) {
+      body { overflow-x: hidden; }
+      nav { padding: 11px 16px; width: 100vw; max-width: 100vw; overflow: hidden; }
+      .nav-session, .nav-prev, .nav-index, .nav-forward { display: none; }
+      .nav-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); gap: 0; }
+      .nav-brand { font-size: 12px; max-width: 190px; overflow: hidden; white-space: nowrap; }
+      .theme-toggle { transform: scale(.78); transform-origin: right center; }
+      .theme-btn { min-width: 42px; min-height: 30px; }
+      .hero { padding: 104px 24px 62px; min-height: 88vh; width: 100vw; max-width: 100vw; }
+      .hero-inner { max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .mobile-break { display: block; }
+      .hero h1 { font-size: clamp(34px, 10vw, 44px); line-height: 1.14; word-break: keep-all; overflow-wrap: anywhere; }
+      .hero-sub, .thesis-main, .section h2, .section-wide h2 { word-break: break-all; overflow-wrap: anywhere; }
+      .section h2, .section-wide h2 { font-size: 24px; line-height: 1.28; max-width: 13em; }
+      .thesis { padding: 20px 22px; max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .section, .section-wide { padding: 58px 20px; max-width: 100vw; overflow: hidden; }
+      .fig { padding: 20px; max-width: calc(100vw - 40px); }
+      .two, .three, .metric-grid, .event-grid, .worksheet-grid { grid-template-columns: 1fr; }
+      .flow-steps { grid-template-columns: 1fr; }
+      .flow-arrow { min-height: 32px; transform: rotate(90deg); }
+      .next-card { flex-direction: column; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media print {
+      nav, .progress, .theme-toggle { display: none !important; }
+      body { background: #fff; color: #111; }
+      .hero { min-height: auto; padding: 40px 24px; }
+      .reveal { opacity: 1; transform: none; }
+      .fig, .mini-card, .controls, .metric, .worksheet-field, .gate { box-shadow: none; break-inside: avoid; background: #fff; color: #111; border-color: #bbb; }
+      .answers, .gate-detail { display: block !important; }
+    }
   </style>
 </head>
 <body>
-
 <div class="progress" aria-hidden="true"></div>
 <nav>
   <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
@@ -212,271 +383,486 @@
 <header class="hero">
   <div class="hero-inner reveal">
     <div class="eyebrow">무기견의 옵션 입문 · Session 09 · Level 2</div>
-    <h1>방향을 맞혀도 손실이 나는 이유</h1>
-    <p class="hero-sub">이 회차에서 붙잡을 질문은 짧습니다.</p>
-    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">옵션 매수자는 방향을 맞히는 동시에, 충분한 폭과 충분한 속도와 적절한 변동성 가격을 통과해야 합니다.</div></div>
+    <h1>방향을 맞혀도 <br class="mobile-break"><span class="hi">손실</span>이 나는 이유</h1>
+    <p class="hero-sub">콜을 샀는데 주가가 올랐습니다.<br class="mobile-break">그런데 옵션 계좌는 손실입니다.<br class="mobile-break">이번 회차에서는 그 불편한 경험을<br class="mobile-break">방향, 시간, 변동성, 손익분기점의 합산으로 분해합니다.</p>
+    <div class="thesis"><div class="thesis-label">9회차 중심 문장</div><div class="thesis-main">옵션 매수자는 방향을 맞히는 동시에, <br class="mobile-break">충분한 폭과 충분한 속도와 <br class="mobile-break">적절한 변동성 가격을 통과해야 합니다.</div></div>
   </div>
 </header>
 <hr class="divider">
-<section class="section reveal" id="section-01">
-  <div class="section-num">00</div>
+
+<!-- ===== 00 · prior-session bridge ===== -->
+<section class="section reveal" id="section-00">
+  <div class="section-num">00 · 변동성에서 방향, 시간, 가격의 조합으로</div>
   <h2>변동성에서 방향, 시간, 가격의 조합으로 넘어갑니다</h2>
   <div class="prose">
-<p>8회차에서는 변동성을 배웠습니다. 같은 현재가, 같은 행사가, 같은 만기라면 가격이 더 크게 흔들릴 수 있는 자산의 옵션이 더 비싸질 수 있었습니다.</p>
-<p>이제 한 단계 더 불편한 지점으로 들어가겠습니다. 옵션을 산 뒤에는 방향만 맞으면 된다고 생각하기 쉽습니다. 주식투자 경험이 있는 사람에게는 자연스러운 감각이죠.</p>
-<p>그런데 옵션은 매수 시점에 이미 프리미엄을 냅니다. 그 프리미엄 안에는 방향, 시간, 변동성, 행사가까지 같이 들어 있습니다. 주가가 내 예상 방향으로 움직여도 그 움직임이 충분하지 않거나, 너무 늦게 오거나, 시장이 붙여놨던 변동성 가격이 빠지면 손익은 다르게 나옵니다.</p>
-<p>오늘은 이 구조를 숫자로 확인합니다.</p>
+    <p>8회차에서는 변동성을 배웠습니다. 같은 현재가, 같은 행사가, 같은 만기라면 가격이 더 크게 흔들릴 수 있는 자산의 옵션이 더 비싸질 수 있었습니다.</p>
+    <p>이제 한 단계 더 불편한 지점으로 들어가겠습니다. 옵션을 산 뒤에는 방향만 맞으면 된다고 생각하기 쉽습니다. 주식투자 경험이 있는 사람에게는 자연스러운 감각이죠.</p>
+    <p>그런데 옵션은 매수 시점에 이미 프리미엄을 냅니다. 그 프리미엄 안에는 방향, 시간, 변동성, 행사가까지 같이 들어 있습니다. 주가가 내 예상 방향으로 움직여도 그 움직임이 충분하지 않거나, 너무 늦게 오거나, 시장이 붙여놨던 변동성 가격이 빠지면 손익은 다르게 나옵니다.</p>
+    <p>오늘은 이 구조를 숫자로 확인합니다.</p>
   </div>
-</section><section class="section-wide reveal" id="figure-01">
-  <div class="fig">
-    <div class="fig-label">Figure 01 — 방향은 맞았지만 손익이 갈리는 첫 장면</div>
-    <h3>방향은 맞았지만 손익이 갈리는 첫 장면</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
-      <div class="viz-panel"><h4>방향은 맞았지만 손익이 갈리는 첫 장면</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>S 100→103, K 105, premium 4.00, option mark 1.80.</strong></div><div class="viz-metric"><span>판정</span><strong>“유리한 방향 하나만으로 프리미엄 전체를 설명하지 못한다.”</strong></div><div class="viz-metric"><span>주의</span><strong>주식만 보기 / 옵션까지 보기 토글. 처음에는 주식 이익만 보이고, 토글 후 옵션 손실 원인 3개가 펼쳐진다.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
-    </div>
+</section>
+<hr class="divider">
 
-    <div class="viz-note">주가 상승과 콜옵션 손실이 동시에 가능하다는 불편함을 즉시 보여준다.</div>
-  </div>
-</section><hr class="divider">
-<section class="section reveal" id="section-02">
-  <div class="section-num">01</div>
+<!-- ===== 01 · discomfort + Figure 1 ===== -->
+<section class="section-wide reveal" id="section-01">
+  <div class="section-num">01 · 오늘의 불편함</div>
   <h2>주가가 올랐는데 콜옵션이 손실일 수 있습니다</h2>
   <div class="prose">
-<p>이 회차에서 붙잡을 질문은 짧습니다.</p>
-<p>주가가 올랐는데 콜옵션이 왜 손실일 수 있을까요?</p>
-<p>예를 들어 현재가 100달러인 주식의 105콜을 4달러에 샀다고 해보겠습니다. 며칠 뒤 주가가 103달러가 됐습니다. 방향만 보면 맞았습니다. 그래도 이 콜옵션은 여전히 외가격입니다.</p>
-<p>여기서 이 예시에서 그대로 둔 조건은 행사가 105달러이고, 움직인 쪽은 주가가 100에서 103으로 올랐다는 점, 시간이 지나 만기가 짧아졌다는 점, 이벤트가 끝나며 내재변동성이 낮아졌다는 점입니다. 세 변수가 같은 방향으로 움직이지 않으면 옵션 가격은 직관과 다르게 보일 수 있습니다.</p>
-<p>개인적으로는 이 회차가 옵션 입문에서 손실을 줄여주는 첫 번째 안전장치라고 봅니다. 콜을 샀는데 주가가 올랐으니 내가 맞았다고 생각하는 순간, 실제 손익표는 전혀 다른 말을 할 수 있거든요.</p>
+    <p>이 회차에서 붙잡을 질문은 짧습니다.</p>
+    <p><strong>주가가 올랐는데 콜옵션이 왜 손실일 수 있을까요?</strong></p>
+    <p>예를 들어 현재가 100달러인 주식의 105콜을 4달러에 샀다고 해보겠습니다. 며칠 뒤 주가가 103달러가 됐습니다. 방향만 보면 맞았습니다. 그래도 이 콜옵션은 여전히 외가격입니다.</p>
+    <p>여기서 이 예시에서 그대로 둔 조건은 행사가 105달러이고, 움직인 쪽은 주가가 100에서 103으로 올랐다는 점, 시간이 지나 만기가 짧아졌다는 점, 이벤트가 끝나며 내재변동성이 낮아졌다는 점입니다. 세 변수가 같은 방향으로 움직이지 않으면 옵션 가격은 직관과 다르게 보일 수 있습니다.</p>
+    <p>개인적으로는 이 회차가 옵션 입문에서 손실을 줄여주는 첫 번째 안전장치라고 봅니다. 콜을 샀는데 주가가 올랐으니 내가 맞았다고 생각하는 순간, 실제 손익표는 전혀 다른 말을 할 수 있거든요.</p>
   </div>
-</section><hr class="divider">
-<section class="section reveal" id="section-03">
-  <div class="section-num">02</div>
+
+  <div class="fig" id="figure-01">
+    <div class="fig-label">Figure 01 — 방향은 맞았지만 손익이 갈리는 첫 장면</div>
+    <h2>주가는 +3, 그런데 콜옵션은 -2.20</h2>
+    <div class="segmented" id="f1Toggle">
+      <button type="button" class="active" data-f1="stock">주식만 보기</button>
+      <button type="button" data-f1="option">옵션까지 보기</button>
+    </div>
+    <div class="two" style="margin-top:14px">
+      <div class="mini-card">
+        <div class="mini-k">STOCK · 1주</div>
+        <div class="mini-v">100 → 103 <span class="pos">+$3.00</span></div>
+        <p class="mini-p">주식 1주를 100달러에 사서 103달러가 됐습니다. 방향이 맞으면 손익은 그대로 직선으로 따라옵니다.</p>
+      </div>
+      <div class="mini-card f1-option" id="f1OptionCard">
+        <div class="mini-k">105 CALL · 프리미엄 $4.00</div>
+        <div class="mini-v">$4.00 → $1.80 <span class="neg">-$2.20</span></div>
+        <p class="mini-p">같은 기간, 같은 방향. 그런데 105콜은 가격이 절반 아래로 내려왔습니다.</p>
+      </div>
+    </div>
+    <div class="three f1-causes" id="f1Causes" style="margin-top:12px; display:none">
+      <div class="mini-card"><div class="mini-k">시간</div><div class="mini-v">만기 짧아짐</div><p class="mini-p">권리가 살아 있는 기간이 줄었습니다.</p></div>
+      <div class="mini-card"><div class="mini-k">IV</div><div class="mini-v">변동성 하락</div><p class="mini-p">이벤트가 끝나며 시장이 매겼던 변동성 가격이 빠졌습니다.</p></div>
+      <div class="mini-card"><div class="mini-k">행사가 위치</div><div class="mini-v">여전히 외가격</div><p class="mini-p">103은 행사가 105에 닿지 못했습니다.</p></div>
+    </div>
+    <div class="note-strip">유리한 방향 하나만으로 프리미엄 전체를 설명하지 못합니다. S 100→103, K 105, 매수가 4.00달러, 현재 옵션가 1.80달러 (교육용 시나리오).</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 02 · central sentence + Figure 2 ===== -->
+<section class="section-wide reveal" id="section-02">
+  <div class="section-num">02 · 오늘의 중심 문장</div>
   <h2>옵션 매수는 방향과 속도와 가격을 함께 통과해야 합니다</h2>
   <div class="prose">
-<p>오늘의 중심 문장은 이렇습니다.</p>
-<p>옵션 매수자는 방향을 맞히는 동시에, 충분한 폭과 충분한 속도와 적절한 변동성 가격을 통과해야 합니다.</p>
+    <p>오늘의 중심 문장은 이렇습니다.</p>
+    <p><strong>옵션 매수자는 방향을 맞히는 동시에, 충분한 폭과 충분한 속도와 적절한 변동성 가격을 통과해야 합니다.</strong></p>
   </div>
-</section><hr class="divider">
-<section class="section reveal" id="section-04">
-  <div class="section-num">03</div>
+
+  <div class="fig" id="figure-02">
+    <div class="fig-label">Figure 02 — 옵션 매수자의 4문 통과 구조</div>
+    <h2>네 개의 문을 모두 통과해야 가설이 살아 있습니다</h2>
+    <div class="flow-steps">
+      <div class="gate active" data-gate="dir"><div class="gate-k">GATE 1</div><div class="gate-v">방향 ✓</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="gate" data-gate="width"><div class="gate-k">GATE 2</div><div class="gate-v">손익분기점까지 폭</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="gate" data-gate="speed"><div class="gate-k">GATE 3</div><div class="gate-v">만기 전 속도</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="gate" data-gate="iv"><div class="gate-k">GATE 4</div><div class="gate-v">IV 하락 방어</div></div>
+    </div>
+    <div class="gate-detail visible" id="gateDetail">
+      <strong>방향 ✓</strong> — 콜이라면 주가가 위로 움직여야 합니다. 하지만 방향이 맞아도 이것은 첫 번째 문일 뿐입니다. 예시: 105콜, 프리미엄 3달러, 손익분기점 108달러.
+    </div>
+    <div class="note-strip">각 게이트를 클릭하면 설명이 바뀝니다. 105콜, 프리미엄 3, 손익분기점 108 기준입니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 03 · concept + Figures 3,4,5,6,7,8,9 ===== -->
+<section class="section reveal" id="section-03">
+  <div class="section-num">03 · 개념</div>
   <h2>주식의 직선 손익과 옵션의 조건부 손익을 나눠봅니다</h2>
   <div class="prose">
-<p>옵션 손익을 볼 때는 먼저 주식 손익의 직선 감각을 내려놓아야 합니다. 주식 1주를 100달러에 사서 103달러가 되면 3달러 이익입니다. 중간에 시간이 며칠 지났는지는 손익 계산에서 직접 차감되지 않습니다.</p>
-<p>콜옵션은 다릅니다. 105콜을 4달러에 샀다면 만기 손익분기점은 109달러입니다. 만기 때 주가가 103달러라면 권리를 행사할 이유가 없고, 옵션 매수자는 4달러 프리미엄을 잃습니다.</p>
-<p>여기서 조건을 행사가 105달러와 지불 프리미엄 4달러로 묶어두면, 결과를 흔드는 변수는 만기 주가입니다. 100에서 103으로 오른 움직임은 방향상 유리하지만, 손익분기점 109에는 닿지 못했습니다.</p>
-<p>이 감각을 현재 시점의 옵션가격으로 옮겨보겠습니다. 만기 전이라면 103달러의 105콜에도 아직 시간가치가 남을 수 있습니다. 하지만 그 시간가치는 남은 시간과 내재변동성에 따라 달라집니다.</p>
-<p>실적 전날 105콜을 4달러에 샀다고 가정해보겠습니다. 당시 조건은 현재가 100달러, 행사가 105달러, 만기 14일, 내재변동성 70%였습니다. 시장은 실적 발표 이후 큰 움직임을 가격에 반영하고 있었습니다.</p>
-<p>실적 다음 날 주가는 103달러가 됐습니다. 방향은 매수자에게 유리했습니다. 그런데 만기는 13일로 줄었고, 실적 이벤트가 끝나며 내재변동성은 70%에서 35%로 낮아졌습니다. 이때 옵션 가격이 4달러에서 1.80달러로 떨어지는 시나리오는 충분히 가능합니다.</p>
-<p>같은 105콜을 놓고 보면, 매수자에게 유리했던 것은 주가 방향 하나였습니다. 반대로 시간과 내재변동성은 불리하게 움직였습니다. 옵션 가격은 이 세 입력을 동시에 반영합니다.</p>
-<p>두 번째 예시는 속도입니다. 현재가 100달러, 행사가 105달러, 프리미엄 3달러, 만기 30일인 콜을 샀다고 해보겠습니다. 손익분기점은 108달러입니다.</p>
-<p>시나리오 A에서는 주가가 5일 만에 108달러로 올라갑니다. 만기까지 25일이 남았고, 옵션은 내가격 3달러를 갖습니다. 여기에 시간가치도 남아 있을 수 있습니다.</p>
-<p>시나리오 B에서는 주가가 만기 당일 108달러가 됩니다. 만기 손익은 0입니다. 방향과 목표가 모두 맞았지만, 프리미엄 3달러를 넘는 추가 움직임이 없었습니다.</p>
-<p>여기서 시작 가격 100달러, 행사가 105달러, 프리미엄 3달러은 그대로 놓고 도달 시점을 따로 움직여 보면 구조가 더 선명해집니다. 같은 108달러라도 5일 뒤의 108과 만기 당일의 108은 옵션 매수자에게 같은 사건이 아닙니다.</p>
-<p>세 번째 예시는 행사가 위치입니다. 현재가 100달러에서 102.5콜을 3.20달러에 사는 경우와 110콜을 0.80달러에 사는 경우를 비교해보겠습니다. 두 옵션 모두 같은 30일 만기라고 둡니다.</p>
-<p>주가가 106달러까지 오르면 102.5콜은 내가격 3.5달러가 됩니다. 지불한 3.20달러를 고려하면 만기 기준으로는 0.30달러 이익입니다. 반면 110콜은 여전히 외가격입니다. 만기까지 시간이 남아 있으면 가격이 남을 수 있지만, 만기 기준으로는 0.80달러 손실입니다.</p>
-<p>현재가와 만기를 같게 두고 행사가와 프리미엄을 비교하면, 더 싼 옵션의 조건이 보입니다. 작은 돈으로 큰 배수를 줄 수 있지만, 필요한 주가 이동 폭도 더 큽니다.</p>
-<p>네 번째 예시는 내재변동성 하락입니다. 실적 발표 전 100달러 주식의 100콜을 5.50달러에 샀습니다. 만기 21일, 내재변동성 65%라는 조건입니다.</p>
-<p>실적 후 주가가 104달러가 됐습니다. 방향은 맞았습니다. 그러나 내재변동성이 65%에서 32%로 빠지고 만기가 20일로 줄면서 옵션 가격은 4.80달러가 될 수 있습니다. 콜옵션은 4달러의 내재가치를 갖지만, 지불한 가격 5.50달러보다 낮게 거래되는 겁니다.</p>
-<p>이 예시에서 그대로 둔 조건은 같은 100콜 계약이고, 움직인 쪽은 주가 +4달러, 시간 -1일, IV -33%포인트입니다. 주가 상승이 만든 가치보다 변동성 하락이 제거한 시간가치가 더 컸다고 해석하면 됩니다.</p>
-<p>이 현상을 흔히 IV crush라고 부릅니다. 실적, FDA 발표, CPI, FOMC 같은 이벤트 전에는 시장이 큰 움직임을 미리 가격에 넣습니다. 이벤트가 지나면 불확실성 한 덩어리가 사라집니다. 그때 방향이 맞아도 옵션 가격이 눌릴 수 있습니다.</p>
-<p>이 말은 이벤트 옵션 매수가 항상 나쁘다는 뜻이 아닙니다. 다만 이벤트 전 옵션을 산 사람은 방향뿐 아니라 이벤트 이후 실제 움직임이 시장이 미리 가격에 넣은 움직임보다 컸는지까지 확인해야 합니다.</p>
-<p>간단한 체크 방식은 예상 이동폭을 보는 것입니다. 예를 들어 실적 전 ATM 스트래들 가격이 8달러라면 시장은 대략 위아래 8달러 안팎의 움직임을 프리미엄에 반영한다고 볼 수 있습니다. 현재가 100달러 기준으로 약 8% 움직임입니다.</p>
-<p>이것도 정확한 예언식은 아닙니다. 스트래들 가격에는 방향 중립의 예상 이동폭뿐 아니라 호가 스프레드, 수급, 금리와 배당, 이벤트 후 남을 시간가치가 같이 들어 있습니다. 그래도 입문자에게는 “시장이 이미 어느 정도 움직임을 가격에 넣었는가”를 확인하는 빠른 눈금으로 쓸 수 있습니다.</p>
-<p>콜만 산 사람도 이 숫자를 무시하면 안 됩니다. 주가가 4% 올라도 시장이 8% 움직임을 가격에 넣어둔 상태였다면, 옵션 가격은 실망할 수 있습니다. 조건을 이벤트와 만기로 묶어두면, 결과를 흔드는 변수는 실제 주가 이동폭과 이벤트 후 내재변동성입니다.</p>
-<p>여기서 방향, 시간, 변동성을 한 장으로 묶어보겠습니다. 옵션 매수자에게 방향은 델타의 언어입니다. 기초자산이 유리한 쪽으로 움직이면 옵션 가격에 플러스 압력을 줍니다.</p>
-<p>시간은 세타의 언어입니다. 시간이 지나면 권리가 살아 있는 기간이 줄어듭니다. 특히 외가격 옵션은 시간이 지나도 행사가에 가까워지지 못하면 가격이 빠르게 약해질 수 있습니다.</p>
-<p>변동성은 베가의 언어입니다. 시장이 앞으로 더 큰 움직임을 가격에 반영하면 옵션은 비싸질 수 있고, 반대로 이벤트가 끝나거나 공포가 식으면 옵션 가격은 내려갈 수 있습니다.</p>
-<p>아직 그릭스를 본격적으로 배우기 전이니 이름을 외우는 데 힘을 줄 필요는 없습니다. 오늘은 세 문장만 가져가면 됩니다. 주가가 움직이면 델타가 작동합니다. 시간이 지나면 세타가 작동합니다. 내재변동성이 바뀌면 베가가 작동합니다.</p>
-<p>옵션 매수 손익은 이 세 힘의 합산입니다.</p>
+    <p>옵션 손익을 볼 때는 먼저 주식 손익의 직선 감각을 내려놓아야 합니다. 주식 1주를 100달러에 사서 103달러가 되면 3달러 이익입니다. 중간에 시간이 며칠 지났는지는 손익 계산에서 직접 차감되지 않습니다.</p>
+    <p>콜옵션은 다릅니다. 105콜을 4달러에 샀다면 만기 손익분기점은 109달러입니다. 만기 때 주가가 103달러라면 권리를 행사할 이유가 없고, 옵션 매수자는 4달러 프리미엄을 잃습니다.</p>
+    <p>여기서 조건을 행사가 105달러와 지불 프리미엄 4달러로 묶어두면, 결과를 흔드는 변수는 만기 주가입니다. 100에서 103으로 오른 움직임은 방향상 유리하지만, 손익분기점 109에는 닿지 못했습니다.</p>
   </div>
-</section><section class="section-wide reveal" id="figure-02">
-  <div class="fig">
-    <div class="fig-label">Figure 02 — 옵션 매수자의 3문 통과 구조</div>
-    <h3>옵션 매수자의 3문 통과 구조</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
-      <div class="viz-panel"><h4>옵션 매수자의 3문 통과 구조</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>105콜, premium 3, breakeven 108 예시.</strong></div><div class="viz-metric"><span>판정</span><strong>“각 문을 통과해야 옵션 매수 가설이 살아 있다.”</strong></div><div class="viz-metric"><span>주의</span><strong>각 게이트 클릭 시 짧은 설명 카드 표시.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
-    </div>
+</section>
 
-    <div class="viz-note">방향, 폭, 속도, IV 가격을 하나의 체크 게이트로 만든다.</div>
-  </div>
-</section><section class="section-wide reveal" id="figure-03">
-  <div class="fig">
+<section class="section-wide reveal" id="figure-03-wrap">
+  <div class="fig" id="figure-03">
     <div class="fig-label">Figure 03 — 만기 손익분기점 계산기</div>
-    <h3>만기 손익분기점 계산기</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
-      <div class="viz-panel"><h4>만기 손익분기점 계산기</h4><p class="viz-copy">방향과 손익분기점을 분리해서 이해하게 한다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>현재가 100, 행사가 105, 프리미엄 3, 손익분기점 108. 만기 주가 슬라이더 95~115.</strong></div><div class="viz-metric"><span>판정</span><strong>주가 106에서는 내가격 1, 순손익 -2를 표시.</strong></div><div class="viz-metric"><span>주의</span><strong>만기 주가 slider. 내재가치, 순손익, 방향 판정이 실시간 변경된다.</strong></div></div></div>
+    <h2>방향과 손익분기점은 다른 좌표입니다</h2>
+    <div class="svg-card">
+      <svg viewBox="0 0 620 320" role="img" aria-label="105콜 만기 손익 그래프. 행사가 105, 손익분기점 108.">
+        <line class="axis-line" x1="55" y1="40" x2="55" y2="270"/>
+        <line class="axis-line" x1="55" y1="160" x2="590" y2="160"/>
+        <line class="zero-line" x1="55" y1="160" x2="590" y2="160"/>
+        <!-- payoff line: flat at -3 until K=105, then rises. x maps 95..115 -> 80..575 -->
+        <path class="payoff-line" id="payoffPath" d="M80 220 L327 220 L575 60"/>
+        <line class="strike-line" x1="327" y1="40" x2="327" y2="270"/>
+        <text x="305" y="288">K 105</text>
+        <line class="be-line" id="beLine" x1="401" y1="40" x2="401" y2="270"/>
+        <text x="375" y="34">BE 108</text>
+        <!-- marker dot -->
+        <circle id="payoffDot" cx="376" cy="195" r="6" fill="var(--amber)" stroke="var(--bg-card)" stroke-width="2"/>
+        <text x="80" y="288">95</text>
+        <text x="300" y="306">만기 주가 $</text>
+        <text x="555" y="288">115</text>
+        <text x="20" y="80">+이익</text>
+        <text x="20" y="250">-손실</text>
+      </svg>
     </div>
-    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>103</output></label><input type="range" min="80" max="130" value="103" aria-label="만기 주가 조정"></div>
-
-    <div class="viz-note">방향과 손익분기점을 분리해서 이해하게 한다.</div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">만기 주가</div>
+        <div class="control-value" id="f3Price">$106</div>
+      </div>
+      <input id="f3Slider" type="range" min="95" max="115" value="106" step="1" aria-label="만기 주가">
+      <div class="metric-grid">
+        <div class="metric"><span>내재가치</span><strong id="f3Intrinsic">$1</strong></div>
+        <div class="metric"><span>순손익</span><strong id="f3Pnl">-$2</strong></div>
+        <div class="metric"><span>방향 판정</span><strong id="f3Verdict">상승·미달</strong></div>
+      </div>
+    </div>
+    <div class="fig-caption">현재가 100, 행사가 105, 프리미엄 3, 손익분기점 108. 내재가치 = max(0, 만기주가 − 105), 순손익 = 내재가치 − 3. 주가 106에서는 내가격 1달러, 순손익 −2달러입니다. 방향이 맞아도 손익분기점을 넘어야 이익입니다.</div>
   </div>
-</section><section class="section-wide reveal" id="figure-04">
-  <div class="fig">
+</section>
+
+<section class="section reveal" id="section-03b">
+  <div class="prose">
+    <p>이 감각을 현재 시점의 옵션가격으로 옮겨보겠습니다. 만기 전이라면 103달러의 105콜에도 아직 시간가치가 남을 수 있습니다. 하지만 그 시간가치는 남은 시간과 내재변동성에 따라 달라집니다.</p>
+    <p>실적 전날 105콜을 4달러에 샀다고 가정해보겠습니다. 당시 조건은 현재가 100달러, 행사가 105달러, 만기 14일, 내재변동성 70%였습니다. 시장은 실적 발표 이후 큰 움직임을 가격에 반영하고 있었습니다.</p>
+    <p>실적 다음 날 주가는 103달러가 됐습니다. 방향은 매수자에게 유리했습니다. 그런데 만기는 13일로 줄었고, 실적 이벤트가 끝나며 내재변동성은 70%에서 35%로 낮아졌습니다. 이때 옵션 가격이 4달러에서 1.80달러로 떨어지는 시나리오는 충분히 가능합니다.</p>
+    <p>같은 105콜을 놓고 보면, 매수자에게 유리했던 것은 주가 방향 하나였습니다. 반대로 시간과 내재변동성은 불리하게 움직였습니다. 옵션 가격은 이 세 입력을 동시에 반영합니다.</p>
+    <p>두 번째 예시는 속도입니다. 현재가 100달러, 행사가 105달러, 프리미엄 3달러, 만기 30일인 콜을 샀다고 해보겠습니다. 손익분기점은 108달러입니다.</p>
+    <p>시나리오 A에서는 주가가 5일 만에 108달러로 올라갑니다. 만기까지 25일이 남았고, 옵션은 내가격 3달러를 갖습니다. 여기에 시간가치도 남아 있을 수 있습니다.</p>
+    <p>시나리오 B에서는 주가가 만기 당일 108달러가 됩니다. 만기 손익은 0입니다. 방향과 목표가 모두 맞았지만, 프리미엄 3달러를 넘는 추가 움직임이 없었습니다.</p>
+    <p>여기서 시작 가격 100달러, 행사가 105달러, 프리미엄 3달러은 그대로 놓고 도달 시점을 따로 움직여 보면 구조가 더 선명해집니다. 같은 108달러라도 5일 뒤의 108과 만기 당일의 108은 옵션 매수자에게 같은 사건이 아닙니다.</p>
+  </div>
+</section>
+
+<section class="section-wide reveal" id="figure-04-wrap">
+  <div class="fig" id="figure-04">
     <div class="fig-label">Figure 04 — 5일 뒤 108과 만기 당일 108 비교</div>
-    <h3>5일 뒤 108과 만기 당일 108 비교</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line red curve" d="M70 70 C170 72, 270 92, 350 140 S500 196, 560 214"/><path class="viz-line blue" d="M70 190 L220 150 L380 108 L560 72" opacity=".8"/><text class="viz-label" x="62" y="34">timeline curve</text><text class="viz-label" x="70" y="238">오늘</text><text class="viz-label" x="500" y="238">만기</text></svg></div>
-      <div class="viz-panel"><h4>5일 뒤 108과 만기 당일 108 비교</h4><div class="viz-timeline timeline"><div class="viz-time"><span>TODAY</span><strong>프리미엄 지불</strong><p>S0 100, K 105, premium 3, DTE 30.</p></div><div class="viz-time"><span>MID</span><strong>시간가치 변화</strong><p>“같은 가격, 다른 남은 시간.”</p></div><div class="viz-time"><span>EXP</span><strong>만기 정산</strong><p>없음. 모바일에서는 두 카드가 세로로 쌓인다.</p></div></div></div>
+    <h2>같은 가격, 다른 남은 시간</h2>
+    <div class="two">
+      <div class="mini-card">
+        <div class="mini-k">SCENARIO A · 5일 뒤 108</div>
+        <div class="mini-v">남은 만기 25일</div>
+        <p class="mini-p">내재가치 <strong class="pos">$3</strong> + 남은 시간가치. 도달이 빠르면 시간가치가 살아 있어 옵션은 프리미엄 3달러 이상이 될 수 있습니다.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">SCENARIO B · 만기 당일 108</div>
+        <div class="mini-v">남은 만기 0일</div>
+        <p class="mini-p">내재가치 <strong>$3</strong>, 시간가치 <strong>$0</strong>. 프리미엄 3달러를 그대로 회수해 만기 순손익은 <strong>$0</strong>입니다.</p>
+      </div>
     </div>
-
-    <div class="viz-note">같은 목표가라도 도달 시점이 옵션 가치에 다르게 작용한다는 점을 보여준다.</div>
+    <div class="note-strip">S0 100, K 105, 프리미엄 3, 만기 30일. 같은 108달러라도 도달 시점이 다르면 옵션 매수자에게 같은 사건이 아닙니다.</div>
   </div>
-</section><section class="section-wide reveal" id="figure-05">
-  <div class="fig">
-    <div class="fig-label">Figure 05 — 방향, 시간, IV 3축 손익 분해 카드</div>
-    <h3>방향, 시간, IV 3축 손익 분해 카드</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line red curve" d="M70 70 C170 72, 270 92, 350 140 S500 196, 560 214"/><path class="viz-line blue" d="M70 190 L220 150 L380 108 L560 72" opacity=".8"/><text class="viz-label" x="62" y="34">timeline curve</text><text class="viz-label" x="70" y="238">오늘</text><text class="viz-label" x="500" y="238">만기</text></svg></div>
-      <div class="viz-panel"><h4>방향, 시간, IV 3축 손익 분해 카드</h4><div class="viz-timeline timeline"><div class="viz-time"><span>TODAY</span><strong>프리미엄 지불</strong><p>교육용 단순화. 수치는 실제 모델값이 아니라 분해 감각을 위한 예시로 표기.</p></div><div class="viz-time"><span>MID</span><strong>시간가치 변화</strong><p>“고정: 같은 105콜. 변화: 주가, 시간, IV.”</p></div><div class="viz-time"><span>EXP</span><strong>만기 정산</strong><p>각 막대 hover 시 유리/불리 설명.</p></div></div></div>
+</section>
+
+<section class="section-wide reveal" id="figure-05-wrap">
+  <div class="fig" id="figure-05">
+    <div class="fig-label">Figure 05 — 방향, 시간, IV 3축 손익 분해</div>
+    <h2>옵션 가격 변화는 세 힘의 합산입니다</h2>
+    <div class="svg-card">
+      <svg viewBox="0 0 640 300" role="img" aria-label="워터폴 차트. 시작 4.00, 방향 +1.20, 시간 -0.40, IV -3.00, 최종 1.80.">
+        <!-- baseline. value scale: $0 at y=260, $5 at y=40. 44px per $1 -->
+        <line class="axis-line" x1="50" y1="260" x2="620" y2="260"/>
+        <text x="20" y="264">0</text>
+        <text x="14" y="48">$5</text>
+        <!-- Start 4.00: 4*44=176 -> y from 260 up to 84 -->
+        <rect x="70" y="84" width="80" height="176" rx="4" fill="var(--blue)" opacity="0.85"/>
+        <text x="80" y="78">$4.00</text>
+        <text x="78" y="280">시작</text>
+        <!-- Direction +1.20 from 4.00 to 5.20: top 5.2 -> y=31, bottom 4.0 -> y=84 -->
+        <rect x="190" y="31" width="80" height="53" rx="4" fill="var(--green)" opacity="0.9"/>
+        <text x="200" y="25">+1.20</text>
+        <text x="195" y="280">방향</text>
+        <!-- connector -->
+        <line x1="150" y1="84" x2="190" y2="84" class="zero-line"/>
+        <!-- Time -0.40 from 5.20 to 4.80: top 5.2 -> y=31, bottom 4.8 -> y=49 -->
+        <rect x="310" y="31" width="80" height="18" rx="4" fill="var(--red)" opacity="0.9"/>
+        <text x="322" y="25">-0.40</text>
+        <text x="316" y="280">시간</text>
+        <line x1="270" y1="31" x2="310" y2="31" class="zero-line"/>
+        <!-- IV -3.00 from 4.80 to 1.80: top 4.8 -> y=49, bottom 1.8 -> y=181 -->
+        <rect x="430" y="49" width="80" height="132" rx="4" fill="var(--red)" opacity="0.9"/>
+        <text x="442" y="43">-3.00</text>
+        <text x="450" y="280">IV</text>
+        <line x1="390" y1="49" x2="430" y2="49" class="zero-line"/>
+        <!-- End 1.80: 1.8*44=79 -> y from 260 to 181 -->
+        <rect x="550" y="181" width="80" height="79" rx="4" fill="var(--amber)" opacity="0.95"/>
+        <text x="560" y="175">$1.80</text>
+        <text x="558" y="280">최종</text>
+        <line x1="510" y1="181" x2="550" y2="181" class="zero-line"/>
+      </svg>
     </div>
-
-    <div class="viz-note">옵션 가격 변화가 단일 원인이 아니라 세 힘의 합산임을 보여준다.</div>
+    <div class="three" style="margin-top:14px">
+      <div class="mini-card"><div class="mini-k">방향 효과</div><div class="mini-v"><span class="pos">+$1.20</span></div><span class="badge badge-good">유리</span><p class="mini-p">주가 100→103. 콜 매수자에게 플러스 압력.</p></div>
+      <div class="mini-card"><div class="mini-k">시간 효과</div><div class="mini-v"><span class="neg">-$0.40</span></div><span class="badge badge-bad">불리</span><p class="mini-p">하루 경과로 권리 기간이 줄었습니다.</p></div>
+      <div class="mini-card"><div class="mini-k">IV 효과</div><div class="mini-v"><span class="neg">-$3.00</span></div><span class="badge badge-bad">불리</span><p class="mini-p">이벤트 종료로 변동성 가격이 빠졌습니다.</p></div>
+    </div>
+    <div class="fig-caption">고정: 같은 105콜. 변화: 주가, 시간, IV. 시작 4.00 → +1.20 → −0.40 → −3.00 = 최종 1.80달러. 수치는 실제 모델값이 아니라 분해 감각을 위한 교육용 단순화입니다.</div>
   </div>
-</section><section class="section-wide reveal" id="figure-06">
-  <div class="fig">
+</section>
+
+<section class="section-wide reveal" id="figure-06-wrap">
+  <div class="fig" id="figure-06">
     <div class="fig-label">Figure 06 — 이벤트 전후 IV crush 시나리오</div>
-    <h3>이벤트 전후 IV crush 시나리오</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="92" y="86" width="144" height="102" rx="14" fill="rgba(125,211,252,.16)" stroke="var(--blue)"/><rect x="384" y="122" width="144" height="66" rx="14" fill="rgba(239,68,68,.14)" stroke="var(--red)"/><path class="viz-line" d="M250 138 L360 138"/><text class="viz-number" x="120" y="130">전</text><text class="viz-number" x="414" y="156">후</text><text class="viz-label" x="62" y="34">before / after panel</text></svg></div>
-      <div class="viz-panel"><h4>이벤트 전후 IV crush 시나리오</h4><div class="viz-toggle" data-viz-toggle><button type="button" class="active">전</button><button type="button">후</button><button type="button">차이</button></div><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>실적 이벤트 교육용 시나리오.</strong></div><div class="viz-metric"><span>판정</span><strong>“불확실성 제거가 시간가치를 압축했다.”</strong></div><div class="viz-metric"><span>주의</span><strong>전과 후 버튼으로 카드가 전환된다.</strong></div></div></div>
+    <h2>방향은 맞았는데 불확실성 제거가 시간가치를 압축합니다</h2>
+    <div class="segmented" id="f6Toggle">
+      <button type="button" class="active" data-f6="before">실적 전</button>
+      <button type="button" data-f6="after">실적 후</button>
     </div>
-
-    <div class="viz-note">실적 후 방향이 맞아도 옵션 가격이 내려갈 수 있는 구조를 시각화한다.</div>
+    <div class="metric-grid" style="margin-top:14px">
+      <div class="metric"><span>주가</span><strong id="f6Stock">$100</strong></div>
+      <div class="metric"><span>IV</span><strong id="f6Iv">70%</strong></div>
+      <div class="metric"><span>잔존 만기</span><strong id="f6Dte">14일</strong></div>
+    </div>
+    <div class="metric-grid" style="grid-template-columns:1fr">
+      <div class="metric"><span>105콜 가격</span><strong id="f6Opt" style="font-size:26px">$4.00</strong></div>
+    </div>
+    <div class="segmented" id="f6Badges" style="margin-top:6px">
+      <span class="badge badge-good">방향 유리</span>
+      <span class="badge badge-bad">시간 불리</span>
+      <span class="badge badge-bad">IV 불리</span>
+    </div>
+    <div class="fig-caption">전: S=100, IV=70%, DTE=14, 옵션 4.00달러. 후: S=103, IV=35%, DTE=13, 옵션 1.80달러. 방향은 유리했지만 시간과 IV가 동시에 불리하게 작용했습니다. 실적 이벤트 교육용 시나리오입니다.</div>
   </div>
-</section><section class="section-wide reveal" id="figure-07">
-  <div class="fig">
+</section>
+
+<section class="section reveal" id="section-03c">
+  <div class="prose">
+    <p>세 번째 예시는 행사가 위치입니다. 현재가 100달러에서 102.5콜을 3.20달러에 사는 경우와 110콜을 0.80달러에 사는 경우를 비교해보겠습니다. 두 옵션 모두 같은 30일 만기라고 둡니다.</p>
+    <p>주가가 106달러까지 오르면 102.5콜은 내가격 3.5달러가 됩니다. 지불한 3.20달러를 고려하면 만기 기준으로는 0.30달러 이익입니다. 반면 110콜은 여전히 외가격입니다. 만기까지 시간이 남아 있으면 가격이 남을 수 있지만, 만기 기준으로는 0.80달러 손실입니다.</p>
+    <p>현재가와 만기를 같게 두고 행사가와 프리미엄을 비교하면, 더 싼 옵션의 조건이 보입니다. 작은 돈으로 큰 배수를 줄 수 있지만, 필요한 주가 이동 폭도 더 큽니다.</p>
+  </div>
+</section>
+
+<section class="section-wide reveal" id="figure-07-wrap">
+  <div class="fig" id="figure-07">
     <div class="fig-label">Figure 07 — 행사가 위치별 필요한 이동 폭 비교</div>
-    <h3>행사가 위치별 필요한 이동 폭 비교</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="110" y="117" width="70" height="93" rx="8" fill="var(--blue)"/><text class="viz-label" x="118" y="234">A</text><rect x="240" y="93" width="70" height="117" rx="8" fill="var(--amber)"/><text class="viz-label" x="248" y="234">B</text><rect x="370" y="124" width="70" height="86" rx="8" fill="var(--red)"/><text class="viz-label" x="378" y="234">C</text><text class="viz-label" x="62" y="34">bar chart</text></svg></div>
-      <div class="viz-panel"><h4>행사가 위치별 필요한 이동 폭 비교</h4><div class="viz-bars"><div class="viz-bar"><span>기준</span><div class="viz-track"><div class="viz-fill " style="width:58%"></div></div><b>58%</b></div><div class="viz-bar"><span>비교</span><div class="viz-track"><div class="viz-fill good" style="width:73%"></div></div><b>73%</b></div><div class="viz-bar"><span>위험</span><div class="viz-track"><div class="viz-fill bad" style="width:54%"></div></div><b>54%</b></div></div><p class="viz-copy">현재가 100, 102.5콜 premium 3.20, 110콜 premium 0.80, 만기 주가 106.</p></div>
+    <h2>싼 외가격 옵션은 더 큰 이동 폭을 요구합니다</h2>
+    <div class="two">
+      <div class="mini-card">
+        <div class="mini-k">102.5 CALL · 프리미엄 $3.20</div>
+        <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr; margin-top:8px">
+          <div class="metric"><span>내재가치</span><strong id="f7aIntrinsic">$3.50</strong></div>
+          <div class="metric"><span>순손익</span><strong id="f7aPnl">+$0.30</strong></div>
+          <div class="metric"><span>판정</span><strong id="f7aVerdict">이익</strong></div>
+        </div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">110 CALL · 프리미엄 $0.80</div>
+        <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr; margin-top:8px">
+          <div class="metric"><span>내재가치</span><strong id="f7bIntrinsic">$0.00</strong></div>
+          <div class="metric"><span>순손익</span><strong id="f7bPnl">-$0.80</strong></div>
+          <div class="metric"><span>판정</span><strong id="f7bVerdict">손실</strong></div>
+        </div>
+      </div>
     </div>
-    <div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>현재가 100, 102.5콜 premium 3.20, 110콜 premium 0.80, 만기 주가 106.</strong></div><div class="viz-metric"><span>판정</span><strong>102.5콜은 만기 기준 +0.30, 110콜은 -0.80.</strong></div><div class="viz-metric"><span>주의</span><strong>만기 주가 100~115 slider. 두 옵션의 순손익을 동시에 표시.</strong></div></div>
-
-    <div class="viz-note">싼 외가격 옵션이 더 큰 이동 폭을 요구한다는 점을 보여준다.</div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">만기 주가</div>
+        <div class="control-value" id="f7Price">$106</div>
+      </div>
+      <input id="f7Slider" type="range" min="100" max="115" value="106" step="0.5" aria-label="만기 주가">
+    </div>
+    <div class="fig-caption">현재가 100, 만기 30일 동일. 만기 주가 106에서 102.5콜은 +0.30달러, 110콜은 −0.80달러입니다. 같은 상승이라도 먼 외가격은 손익분기점이 더 멀어 더 큰 이동을 요구합니다.</div>
   </div>
-</section><section class="section-wide reveal" id="figure-08">
-  <div class="fig">
+</section>
+
+<section class="section reveal" id="section-03d">
+  <div class="prose">
+    <p>네 번째 예시는 내재변동성 하락입니다. 실적 발표 전 100달러 주식의 100콜을 5.50달러에 샀습니다. 만기 21일, 내재변동성 65%라는 조건입니다.</p>
+    <p>실적 후 주가가 104달러가 됐습니다. 방향은 맞았습니다. 그러나 내재변동성이 65%에서 32%로 빠지고 만기가 20일로 줄면서 옵션 가격은 4.80달러가 될 수 있습니다. 콜옵션은 4달러의 내재가치를 갖지만, 지불한 가격 5.50달러보다 낮게 거래되는 겁니다.</p>
+    <p>이 예시에서 그대로 둔 조건은 같은 100콜 계약이고, 움직인 쪽은 주가 +4달러, 시간 -1일, IV -33%포인트입니다. 주가 상승이 만든 가치보다 변동성 하락이 제거한 시간가치가 더 컸다고 해석하면 됩니다.</p>
+    <p>이 현상을 흔히 IV crush라고 부릅니다. 실적, FDA 발표, CPI, FOMC 같은 이벤트 전에는 시장이 큰 움직임을 미리 가격에 넣습니다. 이벤트가 지나면 불확실성 한 덩어리가 사라집니다. 그때 방향이 맞아도 옵션 가격이 눌릴 수 있습니다.</p>
+    <p>이 말은 이벤트 옵션 매수가 항상 나쁘다는 뜻이 아닙니다. 다만 이벤트 전 옵션을 산 사람은 방향뿐 아니라 이벤트 이후 실제 움직임이 시장이 미리 가격에 넣은 움직임보다 컸는지까지 확인해야 합니다.</p>
+    <p>간단한 체크 방식은 예상 이동폭을 보는 것입니다. 예를 들어 실적 전 ATM 스트래들 가격이 8달러라면 시장은 대략 위아래 8달러 안팎의 움직임을 프리미엄에 반영한다고 볼 수 있습니다. 현재가 100달러 기준으로 약 8% 움직임입니다.</p>
+    <p>이것도 정확한 예언식은 아닙니다. 스트래들 가격에는 방향 중립의 예상 이동폭뿐 아니라 호가 스프레드, 수급, 금리와 배당, 이벤트 후 남을 시간가치가 같이 들어 있습니다. 그래도 입문자에게는 “시장이 이미 어느 정도 움직임을 가격에 넣었는가”를 확인하는 빠른 눈금으로 쓸 수 있습니다.</p>
+    <p>콜만 산 사람도 이 숫자를 무시하면 안 됩니다. 주가가 4% 올라도 시장이 8% 움직임을 가격에 넣어둔 상태였다면, 옵션 가격은 실망할 수 있습니다. 조건을 이벤트와 만기로 묶어두면, 결과를 흔드는 변수는 실제 주가 이동폭과 이벤트 후 내재변동성입니다.</p>
+  </div>
+</section>
+
+<section class="section-wide reveal" id="figure-08-wrap">
+  <div class="fig" id="figure-08">
     <div class="fig-label">Figure 08 — 예상 이동폭과 실제 이동폭 비교</div>
-    <h3>예상 이동폭과 실제 이동폭 비교</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="110" y="111" width="70" height="99" rx="8" fill="var(--blue)"/><text class="viz-label" x="118" y="234">A</text><rect x="240" y="88" width="70" height="122" rx="8" fill="var(--amber)"/><text class="viz-label" x="248" y="234">B</text><rect x="370" y="127" width="70" height="83" rx="8" fill="var(--red)"/><text class="viz-label" x="378" y="234">C</text><text class="viz-label" x="62" y="34">bar chart</text></svg></div>
-      <div class="viz-panel"><h4>예상 이동폭과 실제 이동폭 비교</h4><div class="viz-bars"><div class="viz-bar"><span>기준</span><div class="viz-track"><div class="viz-fill " style="width:62%"></div></div><b>62%</b></div><div class="viz-bar"><span>비교</span><div class="viz-track"><div class="viz-fill good" style="width:76%"></div></div><b>76%</b></div><div class="viz-bar"><span>위험</span><div class="viz-track"><div class="viz-fill bad" style="width:52%"></div></div><b>52%</b></div></div><p class="viz-copy">교육용 단순화. 스트래들 가격으로 근사한 expected move라는 캡션 포함.</p></div>
+    <h2>실제 이동이 플러스여도 가격에 반영된 기대보다 작을 수 있습니다</h2>
+    <div class="gauge-shell">
+      <div class="gauge-expected" id="f8Expected" style="left:0; width:53.3%"></div>
+      <div class="gauge-actual" id="f8Actual" style="width:26.7%"></div>
     </div>
-    <div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>교육용 단순화. 스트래들 가격으로 근사한 expected move라는 캡션 포함.</strong></div><div class="viz-metric"><span>판정</span><strong>“실제 이동이 플러스여도 가격에 반영된 기대보다 작을 수 있다.”</strong></div><div class="viz-metric"><span>주의</span><strong>실제 이동폭 slider 0~15%. 충분/부족 판정 표시.</strong></div></div>
-
-    <div class="viz-note">이벤트 옵션 매수에서 시장이 이미 가격에 넣은 움직임을 비교하게 한다.</div>
+    <div class="gauge-labels"><span>0%</span><span id="f8ExpLabel">기대 ±8%</span><span>15%</span></div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">실제 이동폭</div>
+        <div class="control-value" id="f8Move">+4.0%</div>
+      </div>
+      <input id="f8Slider" type="range" min="0" max="15" value="4" step="0.5" aria-label="실제 이동폭">
+      <div class="metric-grid" style="grid-template-columns:1fr 1fr">
+        <div class="metric"><span>시장 기대 이동폭</span><strong>±8%</strong></div>
+        <div class="metric"><span>판정</span><strong id="f8Verdict">부족</strong></div>
+      </div>
+    </div>
+    <div class="fig-caption">현재가 100, ATM 스트래들 8달러 → 시장 기대 이동폭 ±8% (스트래들 가격으로 근사한 expected move). 실제 이동이 기대보다 작으면 “부족”, 크면 “충분”입니다. 교육용 단순화이며 정확한 예언식이 아닙니다.</div>
   </div>
-</section><section class="section-wide reveal" id="figure-09">
-  <div class="fig">
+</section>
+
+<section class="section reveal" id="section-03e">
+  <div class="prose">
+    <p>여기서 방향, 시간, 변동성을 한 장으로 묶어보겠습니다. 옵션 매수자에게 방향은 델타의 언어입니다. 기초자산이 유리한 쪽으로 움직이면 옵션 가격에 플러스 압력을 줍니다.</p>
+    <p>시간은 세타의 언어입니다. 시간이 지나면 권리가 살아 있는 기간이 줄어듭니다. 특히 외가격 옵션은 시간이 지나도 행사가에 가까워지지 못하면 가격이 빠르게 약해질 수 있습니다.</p>
+    <p>변동성은 베가의 언어입니다. 시장이 앞으로 더 큰 움직임을 가격에 반영하면 옵션은 비싸질 수 있고, 반대로 이벤트가 끝나거나 공포가 식으면 옵션 가격은 내려갈 수 있습니다.</p>
+    <p>아직 그릭스를 본격적으로 배우기 전이니 이름을 외우는 데 힘을 줄 필요는 없습니다. 오늘은 세 문장만 가져가면 됩니다. 주가가 움직이면 델타가 작동합니다. 시간이 지나면 세타가 작동합니다. 내재변동성이 바뀌면 베가가 작동합니다.</p>
+    <p><strong>옵션 매수 손익은 이 세 힘의 합산입니다.</strong></p>
+  </div>
+</section>
+
+<section class="section-wide reveal" id="figure-09-wrap">
+  <div class="fig" id="figure-09">
     <div class="fig-label">Figure 09 — 델타, 세타, 베가 미리보기 지도</div>
-    <h3>델타, 세타, 베가 미리보기 지도</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
-      <div class="viz-panel"><h4>델타, 세타, 베가 미리보기 지도</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:54%"></div></div><b>54%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:67%"></div></div><b>67%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:43%"></div></div><b>43%</b></div></div><p class="viz-copy">“오늘의 세 힘이 다음 회차부터 그릭스라는 이름을 갖는다.”</p></div>
+    <h2>오늘의 세 힘이 다음 회차부터 그릭스라는 이름을 갖습니다</h2>
+    <div class="three">
+      <div class="mini-card">
+        <div class="mini-k">델타 · DELTA</div>
+        <div class="mini-v">주가 변화 → 방향 힘 <span class="pos">(+)</span></div>
+        <p class="mini-p">기초자산이 유리하게 움직이면 옵션 가격에 플러스 압력을 줍니다.</p>
+        <span class="badge badge-neutral">11회차 예고</span>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">세타 · THETA</div>
+        <div class="mini-v">시간 경과 → 시간 비용 <span class="neg">(−)</span></div>
+        <p class="mini-p">시간이 지나면 권리 기간이 줄어 외가격 옵션은 빠르게 약해질 수 있습니다.</p>
+        <span class="badge badge-neutral">14회차 예고</span>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">베가 · VEGA</div>
+        <div class="mini-v">IV 변화 → 변동성 힘 <span class="neg">(−)</span></div>
+        <p class="mini-p">이벤트가 끝나며 변동성 가격이 빠지면 옵션 가격은 내려갈 수 있습니다.</p>
+        <span class="badge badge-neutral">15회차 예고</span>
+      </div>
     </div>
-    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>45</output></label><input type="range" min="0" max="100" value="45" aria-label="곡선 입력 변화"></div>
-
-    <div class="viz-note">10회차 그릭스 진입을 위한 orientation map을 제공한다.</div>
+    <div class="fig-caption">그릭스 용어는 여기서 외우지 않아도 됩니다. 오늘의 세 힘에 이름을 붙이는 예고일 뿐이며, 다음 그릭스 회차에서 하나씩 정리합니다.</div>
   </div>
-</section><hr class="divider">
-<section class="section reveal" id="section-05">
-  <div class="section-num">04</div>
+</section>
+<hr class="divider">
+
+<!-- ===== 04 · misunderstanding ===== -->
+<section class="section reveal" id="section-04">
+  <div class="section-num">04 · 위험한 오해</div>
   <h2>방향만 맞으면 결국 수익이라는 믿음은 위험합니다</h2>
   <div class="prose">
-<p>이 회차에서 꼭 내려놓아야 할 생각은 “방향만 맞으면 결국 수익이 난다”는 생각입니다.</p>
-<p>주식에서는 이 생각이 어느 정도 통합니다. 좋은 기업을 싸게 샀고 시간이 내 편이라면, 단기 등락을 버티는 전략이 가능합니다. 옵션 매수에서는 시간이 자동으로 내 편이 아닙니다.</p>
-<p>콜옵션 매수자는 상승 방향을 원합니다. 하지만 더 정확히는 행사가와 프리미엄을 넘어설 만큼의 상승, 만기 전에 도달하는 상승, 매수 당시 지불한 변동성 가격을 정당화하는 상승을 원합니다.</p>
-<p>예를 들어 105콜을 4달러에 샀다면 만기 손익분기점은 109달러입니다. 주가가 100에서 106으로 오르면 방향은 맞았지만 만기 기준 손실은 3달러입니다. 내가격 1달러를 얻었지만 프리미엄 4달러를 지불했기 때문입니다.</p>
-<p>이 숫자에서 행사가 105와 프리미엄 4은 그대로 놓고 만기 주가 106을 따로 움직여 보면 구조가 더 선명해집니다. 상승 자체보다 손익분기점과 남은 시간, IV 변화가 같이 봐야 할 좌표입니다.</p>
-<p>옵션 매수자가 자주 겪는 실수는 수익률만 보는 것입니다. 0.50달러짜리 외가격 콜이 1.00달러가 되면 100% 수익입니다. 듣기엔 좋아 보입니다. 하지만 그 옵션이 0이 되는 경로도 훨씬 짧을 수 있습니다.</p>
-<p>그래서 입문 단계에서는 매수 전에 세 질문을 적어야 합니다. 첫째, 손익분기점은 어디인가. 둘째, 그 가격에 언제까지 도달해야 하는가. 셋째, 지금 프리미엄이 어떤 이벤트와 변동성 가격을 이미 담고 있는가.</p>
-<p>이 세 질문에 답하지 못하면 방향 전망이 맞아도 거래는 흔들립니다.</p>
+    <p>이 회차에서 꼭 내려놓아야 할 생각은 “방향만 맞으면 결국 수익이 난다”는 생각입니다.</p>
+    <p>주식에서는 이 생각이 어느 정도 통합니다. 좋은 기업을 싸게 샀고 시간이 내 편이라면, 단기 등락을 버티는 전략이 가능합니다. 옵션 매수에서는 시간이 자동으로 내 편이 아닙니다.</p>
+    <p>콜옵션 매수자는 상승 방향을 원합니다. 하지만 더 정확히는 행사가와 프리미엄을 넘어설 만큼의 상승, 만기 전에 도달하는 상승, 매수 당시 지불한 변동성 가격을 정당화하는 상승을 원합니다.</p>
+    <p>예를 들어 105콜을 4달러에 샀다면 만기 손익분기점은 109달러입니다. 주가가 100에서 106으로 오르면 방향은 맞았지만 만기 기준 손실은 3달러입니다. 내가격 1달러를 얻었지만 프리미엄 4달러를 지불했기 때문입니다.</p>
+    <p>이 숫자에서 행사가 105와 프리미엄 4은 그대로 놓고 만기 주가 106을 따로 움직여 보면 구조가 더 선명해집니다. 상승 자체보다 손익분기점과 남은 시간, IV 변화가 같이 봐야 할 좌표입니다.</p>
+    <p>옵션 매수자가 자주 겪는 실수는 수익률만 보는 것입니다. 0.50달러짜리 외가격 콜이 1.00달러가 되면 100% 수익입니다. 듣기엔 좋아 보입니다. 하지만 그 옵션이 0이 되는 경로도 훨씬 짧을 수 있습니다.</p>
+    <p>그래서 입문 단계에서는 매수 전에 세 질문을 적어야 합니다. 첫째, 손익분기점은 어디인가. 둘째, 그 가격에 언제까지 도달해야 하는가. 셋째, 지금 프리미엄이 어떤 이벤트와 변동성 가격을 이미 담고 있는가.</p>
+    <p>이 세 질문에 답하지 못하면 방향 전망이 맞아도 거래는 흔들립니다.</p>
   </div>
-</section><hr class="divider">
-<section class="section reveal" id="section-06">
-  <div class="section-num">05</div>
+</section>
+<hr class="divider">
+
+<!-- ===== 05 · summary ===== -->
+<section class="section reveal" id="section-05">
+  <div class="section-num">05 · 오늘의 정리</div>
   <h2>옵션 손익은 프리미엄, 시간, IV가 함께 결정합니다</h2>
   <div class="prose">
-<p>옵션 매수는 방향 하나로 끝나지 않습니다. 프리미엄을 먼저 지불하기 때문에 손익분기점이 생기고, 만기가 있기 때문에 속도가 필요하며, 시간가치와 내재변동성이 계속 바뀝니다.</p>
-<p>콜옵션을 샀을 때 주가 상승은 유리한 입력입니다. 그러나 상승 폭이 작거나 도달 시점이 늦거나, 이벤트 후 IV가 크게 빠지면 옵션 가격은 하락할 수 있습니다.</p>
-<p>오늘 배운 구조는 앞으로 그릭스를 이해하는 입구입니다. 델타는 방향, 세타는 시간, 베가는 변동성입니다. 다음 회차부터는 이 민감도들을 하나씩 이름 붙여 읽기 시작하겠습니다.</p>
-<p>제 계좌라면 옵션 매수 전에는 최소한 손익분기점, 남은 일수, IV 하락 가능성 세 가지를 숫자로 적을 것 같습니다. 머릿속 확신보다 종이에 적힌 조건이 손실을 더 잘 막아줍니다.</p>
+    <p>옵션 매수는 방향 하나로 끝나지 않습니다. 프리미엄을 먼저 지불하기 때문에 손익분기점이 생기고, 만기가 있기 때문에 속도가 필요하며, 시간가치와 내재변동성이 계속 바뀝니다.</p>
+    <p>콜옵션을 샀을 때 주가 상승은 유리한 입력입니다. 그러나 상승 폭이 작거나 도달 시점이 늦거나, 이벤트 후 IV가 크게 빠지면 옵션 가격은 하락할 수 있습니다.</p>
+    <p>오늘 배운 구조는 앞으로 그릭스를 이해하는 입구입니다. 델타는 방향, 세타는 시간, 베가는 변동성입니다. 다음 회차부터는 이 민감도들을 하나씩 이름 붙여 읽기 시작하겠습니다.</p>
+    <p>제 계좌라면 옵션 매수 전에는 최소한 손익분기점, 남은 일수, IV 하락 가능성 세 가지를 숫자로 적을 것 같습니다. 머릿속 확신보다 종이에 적힌 조건이 손실을 더 잘 막아줍니다.</p>
   </div>
-</section><hr class="divider">
-<section class="section reveal" id="section-07">
-  <div class="section-num">06</div>
+</section>
+<hr class="divider">
+
+<!-- ===== 06 · worksheet + Figure 10 ===== -->
+<section class="section reveal" id="section-06">
+  <div class="section-num">06 · 워크시트</div>
   <h2>방향, 시간, 변동성으로 손익을 분해합니다</h2>
   <div class="prose">
-<p>현재 주가가 100달러인 주식을 가정합니다. 금리와 배당은 없고, 모든 숫자는 교육용 단순화입니다.</p>
-<h3 class="subhead">Worksheet A. 만기 손익분기점 계산</h3>
-<p>행사가 105달러 콜을 3달러에 샀습니다.</p>
-<ol>
-<li>만기 손익분기점은 얼마입니까?</li>
-<li>만기 주가가 106달러라면 옵션의 내재가치는 얼마입니까?</li>
-<li>이때 순손익은 얼마입니까?</li>
-<li>주가 방향은 맞았는데 왜 수익이 아닐 수 있는지 한 문장으로 적어보세요.</li>
-</ol>
-<p>점검 기준: 손익분기점은 108달러입니다. 만기 주가 106달러면 내재가치는 1달러입니다. 프리미엄 3달러를 뺐을 때 순손익은 -2달러입니다. 상승 폭이 프리미엄을 보상하기에 부족했습니다.</p>
-<h3 class="subhead">Worksheet B. 방향, 시간, 변동성 분해</h3>
-<p>실적 전 100달러 주식의 105콜을 4달러에 샀습니다. 실적 후 주가는 103달러로 올랐고, 만기는 하루 줄었으며, IV는 70%에서 35%로 낮아졌습니다. 옵션 가격은 1.80달러가 됐습니다.</p>
-<p>아래 항목을 유리/불리/중립으로 표시해보세요.</p>
-<ul>
-<li>방향: 100 → 103</li>
-<li>행사가 위치: 105콜 기준 103달러</li>
-<li>시간: 만기 하루 감소</li>
-<li>변동성: IV 70% → 35%</li>
-<li>최종 옵션 가격: 4.00 → 1.80</li>
-</ul>
-<p>확인 기준: 방향은 유리, 행사가 위치는 아직 불리, 시간은 불리, 변동성은 불리입니다. 최종 가격은 손실입니다.</p>
-<h3 class="subhead">Worksheet C. 매수 전 체크 문장</h3>
-<p>아래 문장을 직접 완성해보세요.</p>
-<p>“이 옵션 매수는 주가가 ________까지, ________ 안에 움직이고, 이벤트 후 IV가 ________ 이상 유지될 때 내 가설이 살아 있다.”</p>
-<p>예시 답안: “109달러까지, 만기 14일 안에 움직이고, 이벤트 후 IV가 40% 이상 유지될 때.”</p>
-<h3 class="subhead">Worksheet D. 거래 일지용 세 줄</h3>
-<p>실제 옵션을 보지 않더라도 아래 세 줄을 빈칸으로 남겨두고 연습해보세요.</p>
-<ul>
-<li>손익분기점:</li>
-<li>필요한 이동 폭과 기간:</li>
-<li>내가 가장 두려워해야 할 변수: 방향 / 시간 / IV / 유동성 중 하나</li>
-</ul>
+    <p>현재 주가가 100달러인 주식을 가정합니다. 금리와 배당은 없고, 모든 숫자는 교육용 단순화입니다.</p>
+    <h3>Worksheet A. 만기 손익분기점 계산</h3>
+    <p>행사가 105달러 콜을 3달러에 샀습니다.</p>
+    <ol>
+      <li>만기 손익분기점은 얼마입니까?</li>
+      <li>만기 주가가 106달러라면 옵션의 내재가치는 얼마입니까?</li>
+      <li>이때 순손익은 얼마입니까?</li>
+      <li>주가 방향은 맞았는데 왜 수익이 아닐 수 있는지 한 문장으로 적어보세요.</li>
+    </ol>
+    <p>점검 기준: 손익분기점은 108달러입니다. 만기 주가 106달러면 내재가치는 1달러입니다. 프리미엄 3달러를 뺐을 때 순손익은 -2달러입니다. 상승 폭이 프리미엄을 보상하기에 부족했습니다.</p>
+    <h3>Worksheet B. 방향, 시간, 변동성 분해</h3>
+    <p>실적 전 100달러 주식의 105콜을 4달러에 샀습니다. 실적 후 주가는 103달러로 올랐고, 만기는 하루 줄었으며, IV는 70%에서 35%로 낮아졌습니다. 옵션 가격은 1.80달러가 됐습니다.</p>
+    <p>아래 항목을 유리/불리/중립으로 표시해보세요.</p>
+    <ul>
+      <li>방향: 100 → 103</li>
+      <li>행사가 위치: 105콜 기준 103달러</li>
+      <li>시간: 만기 하루 감소</li>
+      <li>변동성: IV 70% → 35%</li>
+      <li>최종 옵션 가격: 4.00 → 1.80</li>
+    </ul>
+    <p>확인 기준: 방향은 유리, 행사가 위치는 아직 불리, 시간은 불리, 변동성은 불리입니다. 최종 가격은 손실입니다.</p>
+    <h3>Worksheet C. 매수 전 체크 문장</h3>
+    <p>아래 문장을 직접 완성해보세요.</p>
+    <p>“이 옵션 매수는 주가가 ________까지, ________ 안에 움직이고, 이벤트 후 IV가 ________ 이상 유지될 때 내 가설이 살아 있다.”</p>
+    <p>예시 답안: “109달러까지, 만기 14일 안에 움직이고, 이벤트 후 IV가 40% 이상 유지될 때.”</p>
+    <h3>Worksheet D. 거래 일지용 세 줄</h3>
+    <p>실제 옵션을 보지 않더라도 아래 세 줄을 빈칸으로 남겨두고 연습해보세요.</p>
+    <ul>
+      <li>손익분기점:</li>
+      <li>필요한 이동 폭과 기간:</li>
+      <li>내가 가장 두려워해야 할 변수: 방향 / 시간 / IV / 유동성 중 하나</li>
+    </ul>
   </div>
-</section><section class="section-wide reveal" id="figure-10">
-  <div class="fig">
-    <div class="fig-label">Figure 10 — 매수 전 3줄 체크 워크시트</div>
-    <h3>매수 전 3줄 체크 워크시트</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><h4>매수 전 3줄 체크 워크시트</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
-      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>기본값 S=100, K=105, premium=3.</span></label><label class="viz-check"><input type="checkbox"><span>설명할 수 없는 포지션은 보류합니다.</span></label><label class="viz-check"><input type="checkbox"><span>Worksheet A/B의 풀이 기준 제공.</span></label><label class="viz-check"><input type="checkbox"><span>학습자가 실제 거래 전 손익분기점, 기간, IV 조건을 적게 한다.</span></label></div></div>
-    </div>
+</section>
 
-    <div class="viz-note">학습자가 실제 거래 전 손익분기점, 기간, IV 조건을 적게 한다.</div>
+<section class="section-wide reveal" id="figure-10-wrap">
+  <div class="fig" id="figure-10">
+    <div class="fig-label">Figure 10 — 매수 전 3줄 체크 워크시트</div>
+    <h2>손익분기점은 자동, 나머지는 직접 적어봅니다</h2>
+    <div class="worksheet-grid">
+      <div class="worksheet-field"><label>현재가</label><input id="wsSpot" type="text" inputmode="decimal" value="100"></div>
+      <div class="worksheet-field"><label>행사가</label><input id="wsStrike" type="text" inputmode="decimal" value="105"></div>
+      <div class="worksheet-field"><label>프리미엄</label><input id="wsPrem" type="text" inputmode="decimal" value="3"></div>
+      <div class="worksheet-field"><label>손익분기점 (자동)</label><output id="wsBreakeven">108</output></div>
+      <div class="worksheet-field"><label>필요한 기간</label><input id="wsTime" type="text" placeholder="예: 만기 14일 안"></div>
+      <div class="worksheet-field"><label>IV 하락 허용선</label><input id="wsIv" type="text" placeholder="예: 40% 이상 유지"></div>
+    </div>
+    <div class="worksheet-field" style="margin-top:12px">
+      <label>가장 두려운 변수</label>
+      <div class="radio-row">
+        <label class="radio-chip"><input type="radio" name="wsFear" value="dir"> 방향</label>
+        <label class="radio-chip"><input type="radio" name="wsFear" value="time"> 시간</label>
+        <label class="radio-chip"><input type="radio" name="wsFear" value="iv" checked> IV</label>
+        <label class="radio-chip"><input type="radio" name="wsFear" value="liq"> 유동성</label>
+      </div>
+    </div>
+    <button class="answer-btn" type="button" id="wsAnswerToggle" aria-expanded="false" aria-controls="wsAnswers" style="margin-top:14px; width:100%">정답 보기</button>
+    <div class="answers" id="wsAnswers">
+      <p><strong>Worksheet A.</strong> 손익분기점은 108달러입니다. 만기 주가 106달러면 내재가치는 1달러, 프리미엄 3달러를 빼면 순손익은 −2달러입니다. 상승 폭이 프리미엄을 보상하기에 부족했습니다.</p>
+      <p><strong>Worksheet B.</strong> 방향은 유리, 행사가 위치는 아직 불리, 시간은 불리, 변동성은 불리입니다. 최종 가격은 손실입니다.</p>
+    </div>
+    <div class="fig-caption">기본값 S=100, K=105, 프리미엄=3. 손익분기점 = 행사가 + 프리미엄으로 자동 계산됩니다. 입력칸은 기록용이며 실제 거래 기록으로 저장되지 않습니다. 인쇄하면 빈칸이 그대로 보입니다.</div>
   </div>
-</section><hr class="divider">
-<section class="section reveal" id="section-08">
-  <div class="section-num">07</div>
+</section>
+<hr class="divider">
+
+<!-- ===== 07 · next-session bridge ===== -->
+<section class="section reveal" id="section-07">
+  <div class="section-num">07 · 다음 회차</div>
   <h2>다음 회차부터 그릭스라는 리스크 언어로 들어갑니다</h2>
   <div class="prose">
-<p>다음 회차부터 그릭스에 들어갑니다.</p>
-<p>오늘은 방향, 시간, 변동성이 옵션 가격을 동시에 흔든다는 감각을 만들었습니다. 10회차에서는 이 감각에 이름을 붙입니다. 델타, 감마, 세타, 베가, 로가 각각 어떤 질문에 답하는지 큰 지도를 먼저 보겠습니다.</p>
-<p>그릭스는 수학자들의 장식이 아닙니다. 내가 들고 있는 포지션이 무엇에 취약한지 읽는 언어입니다.</p>
+    <p>다음 회차부터 그릭스에 들어갑니다.</p>
+    <p>오늘은 방향, 시간, 변동성이 옵션 가격을 동시에 흔든다는 감각을 만들었습니다. 10회차에서는 이 감각에 이름을 붙입니다. 델타, 감마, 세타, 베가, 로가 각각 어떤 질문에 답하는지 큰 지도를 먼저 보겠습니다.</p>
+    <p>그릭스는 수학자들의 장식이 아닙니다. 내가 들고 있는 포지션이 무엇에 취약한지 읽는 언어입니다.</p>
   </div>
 </section>
-<section class="section reveal" id="next">
-  <a class="next-card" href="session-10.html">
-    <div><div class="next-label">다음 회차</div><div class="next-title">10회차 — 그릭스란 무엇인가</div><p class="next-desc">다음 회차부터 그릭스에 들어갑니다.</p></div>
+<section class="section reveal" id="next"><a class="next-card" href="session-10.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">10회차 — 그릭스, 포지션의 리스크 언어</div><p class="next-desc">방향, 시간, 변동성에 델타, 세타, 베가라는 이름을 붙입니다.</p></div>
     <div class="next-arrow">→</div>
-  </a>
-</section>
-<footer>
-  <div>© 무기견의 옵션 입문</div>
-  <div>SESSION 09 · 방향을 맞혀도 손실이 나는 이유</div>
-</footer>
-<script>
+  </a></section>
+<footer><div>© 무기견의 옵션 입문</div><div>Session 09 · Direction vs P&amp;L</div></footer>
 
+<script>
 const THEME_KEY = 'mugigyeon-options-course-theme-v2';
 const root = document.documentElement;
 const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
@@ -492,6 +878,7 @@ function applyTheme(theme) {
 }
 try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
 themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+
 const progress = document.querySelector('.progress');
 function updateProgress() {
   const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -501,26 +888,154 @@ function updateProgress() {
 }
 window.addEventListener('scroll', updateProgress, { passive: true });
 updateProgress();
+
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-document.querySelectorAll('[data-viz-range]').forEach((box) => {
-  const input = box.querySelector('input[type="range"]');
-  const output = box.querySelector('[data-range-out]');
-  if (input && output) {
-    const render = () => { output.textContent = input.value; };
-    input.addEventListener('input', render);
-    render();
+
+function fmtMoney(v) {
+  const sign = v < 0 ? '-' : '+';
+  return sign + '$' + Math.abs(v).toFixed(2).replace(/\.00$/, '');
+}
+
+// ── Figure 1: stock / option toggle ──
+const f1Causes = document.getElementById('f1Causes');
+const f1OptionCard = document.getElementById('f1OptionCard');
+function setF1(mode) {
+  document.querySelectorAll('#f1Toggle button').forEach((b) => b.classList.toggle('active', b.dataset.f1 === mode));
+  const showOption = mode === 'option';
+  if (f1OptionCard) f1OptionCard.style.opacity = showOption ? '1' : '.32';
+  if (f1Causes) f1Causes.style.display = showOption ? 'grid' : 'none';
+}
+document.querySelectorAll('#f1Toggle button').forEach((b) => b.addEventListener('click', () => setF1(b.dataset.f1)));
+setF1('stock');
+
+// ── Figure 2: gates ──
+const gateText = {
+  dir: '<strong>방향 ✓</strong> — 콜이라면 주가가 위로 움직여야 합니다. 하지만 방향이 맞아도 이것은 첫 번째 문일 뿐입니다. 예시: 105콜, 프리미엄 3달러, 손익분기점 108달러.',
+  width: '<strong>손익분기점까지 폭</strong> — 105콜을 3달러에 샀다면 손익분기점은 108달러입니다. 주가가 106까지만 올라도 손익분기점에 닿지 못해 만기 손실이 납니다.',
+  speed: '<strong>만기 전 속도</strong> — 같은 108달러라도 5일 뒤 도달과 만기 당일 도달은 다릅니다. 만기 당일 108은 내재가치 3달러만 남아 순손익이 0입니다.',
+  iv: '<strong>IV 하락 방어</strong> — 이벤트 전에 비싸게 산 변동성이 이벤트 후 빠지면, 방향이 맞아도 옵션 가격이 눌립니다. 매수 시점의 IV 수준을 확인해야 합니다.'
+};
+const gateDetail = document.getElementById('gateDetail');
+document.querySelectorAll('.gate').forEach((gate) => gate.addEventListener('click', () => {
+  document.querySelectorAll('.gate').forEach((g) => g.classList.toggle('active', g === gate));
+  if (gateDetail) { gateDetail.innerHTML = gateText[gate.dataset.gate]; gateDetail.classList.add('visible'); }
+}));
+
+// ── Figure 3: breakeven calculator ──
+const f3Slider = document.getElementById('f3Slider');
+const F3K = 105, F3PREM = 3, F3BE = 108;
+function f3MapX(price) { return 80 + ((price - 95) / 20) * 495; }
+function f3PayoffY(price) {
+  // value scale: $0 -> y 160, +1 -> -22px, intrinsic-prem range roughly -3..+10
+  const pnl = Math.max(0, price - F3K) - F3PREM;
+  return 160 - pnl * 22;
+}
+function updateF3() {
+  if (!f3Slider) return;
+  const price = Number(f3Slider.value);
+  const intrinsic = Math.max(0, price - F3K);
+  const pnl = intrinsic - F3PREM;
+  document.getElementById('f3Price').textContent = '$' + price;
+  document.getElementById('f3Intrinsic').textContent = '$' + intrinsic;
+  const pnlEl = document.getElementById('f3Pnl');
+  pnlEl.textContent = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl);
+  pnlEl.style.color = pnl > 0 ? 'var(--green)' : pnl < 0 ? 'var(--red)' : 'var(--text)';
+  let verdict;
+  if (price <= 100) verdict = '하락·손실';
+  else if (pnl < 0) verdict = '상승·미달';
+  else if (pnl === 0) verdict = '손익분기';
+  else verdict = '상승·이익';
+  document.getElementById('f3Verdict').textContent = verdict;
+  const dot = document.getElementById('payoffDot');
+  dot.setAttribute('cx', f3MapX(price).toFixed(1));
+  dot.setAttribute('cy', f3PayoffY(price).toFixed(1));
+}
+f3Slider?.addEventListener('input', updateF3);
+updateF3();
+
+// ── Figure 6: IV crush before/after ──
+const f6States = {
+  before: { stock: '$100', iv: '70%', dte: '14일', opt: '$4.00' },
+  after: { stock: '$103', iv: '35%', dte: '13일', opt: '$1.80' }
+};
+function setF6(mode) {
+  document.querySelectorAll('#f6Toggle button').forEach((b) => b.classList.toggle('active', b.dataset.f6 === mode));
+  const s = f6States[mode];
+  document.getElementById('f6Stock').textContent = s.stock;
+  document.getElementById('f6Iv').textContent = s.iv;
+  document.getElementById('f6Dte').textContent = s.dte;
+  const opt = document.getElementById('f6Opt');
+  opt.textContent = s.opt;
+  opt.style.color = mode === 'after' ? 'var(--red)' : 'var(--text)';
+}
+document.querySelectorAll('#f6Toggle button').forEach((b) => b.addEventListener('click', () => setF6(b.dataset.f6)));
+setF6('before');
+
+// ── Figure 7: strike comparison ──
+const f7Slider = document.getElementById('f7Slider');
+function setF7Result(prefix, strike, prem, price) {
+  const intrinsic = Math.max(0, price - strike);
+  const pnl = intrinsic - prem;
+  document.getElementById(prefix + 'Intrinsic').textContent = '$' + intrinsic.toFixed(2);
+  const pnlEl = document.getElementById(prefix + 'Pnl');
+  pnlEl.textContent = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toFixed(2);
+  pnlEl.style.color = pnl > 0 ? 'var(--green)' : pnl < 0 ? 'var(--red)' : 'var(--text)';
+  document.getElementById(prefix + 'Verdict').textContent = pnl > 0 ? '이익' : pnl < 0 ? '손실' : '본전';
+}
+function updateF7() {
+  if (!f7Slider) return;
+  const price = Number(f7Slider.value);
+  document.getElementById('f7Price').textContent = '$' + price;
+  setF7Result('f7a', 102.5, 3.20, price);
+  setF7Result('f7b', 110, 0.80, price);
+}
+f7Slider?.addEventListener('input', updateF7);
+updateF7();
+
+// ── Figure 8: expected vs actual move ──
+const f8Slider = document.getElementById('f8Slider');
+const F8_EXPECTED = 8;
+function updateF8() {
+  if (!f8Slider) return;
+  const move = Number(f8Slider.value);
+  document.getElementById('f8Move').textContent = '+' + move.toFixed(1) + '%';
+  document.getElementById('f8Actual').style.width = (move / 15 * 100).toFixed(1) + '%';
+  const verdict = move >= F8_EXPECTED ? '충분' : '부족';
+  const vEl = document.getElementById('f8Verdict');
+  vEl.textContent = verdict;
+  vEl.style.color = move >= F8_EXPECTED ? 'var(--green)' : 'var(--red)';
+}
+f8Slider?.addEventListener('input', updateF8);
+updateF8();
+
+// ── Figure 10: worksheet breakeven ──
+const wsStrike = document.getElementById('wsStrike');
+const wsPrem = document.getElementById('wsPrem');
+const wsBreakeven = document.getElementById('wsBreakeven');
+function updateWorksheet() {
+  const k = parseFloat(wsStrike.value);
+  const p = parseFloat(wsPrem.value);
+  if (!isNaN(k) && !isNaN(p)) {
+    const be = k + p;
+    wsBreakeven.textContent = Number.isInteger(be) ? String(be) : be.toFixed(2);
+  } else {
+    wsBreakeven.textContent = '—';
   }
-});
-document.querySelectorAll('[data-viz-toggle]').forEach((group) => {
-  group.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
-    group.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
-  }));
-});
+}
+[wsStrike, wsPrem].forEach((el) => el?.addEventListener('input', updateWorksheet));
+updateWorksheet();
 
-
+const wsAnswerToggle = document.getElementById('wsAnswerToggle');
+const wsAnswers = document.getElementById('wsAnswers');
+wsAnswerToggle?.addEventListener('click', () => {
+  const open = wsAnswers?.classList.toggle('open') || false;
+  wsAnswerToggle.classList.toggle('active', open);
+  wsAnswerToggle.setAttribute('aria-expanded', String(open));
+  wsAnswerToggle.textContent = open ? '정답 닫기' : '정답 보기';
+});
 </script>
 </body>
 </html>

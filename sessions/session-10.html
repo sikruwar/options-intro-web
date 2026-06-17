@@ -27,12 +27,13 @@
     .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
     .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
     .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
-    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; word-break:keep-all; overflow-wrap:normal; }
     .hero h1 .hi { color:var(--amber); }
-    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .mobile-break { display:none; }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; word-break:keep-all; overflow-wrap:anywhere; }
     .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
     .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
-    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; word-break:keep-all; overflow-wrap:anywhere; }
     .divider { border:0; border-top:1px solid var(--border); }
     .section { max-width:810px; margin:0 auto; padding:78px 24px; }
     .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
@@ -189,7 +190,7 @@
     .worksheet-answer { display:none; margin-top:14px; }
     .worksheet-answer.open { display:block; }
 
-    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .mobile-break { display:block; } .hero h1 { font-size:clamp(34px,10vw,44px); line-height:1.14; overflow-wrap:anywhere; word-break:keep-all; } .hero-sub { word-break:break-all; overflow-wrap:anywhere; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; overflow-wrap:anywhere; } .section h2,.section-wide h2 { word-break:break-all; overflow-wrap:anywhere; font-size:24px; line-height:1.28; max-width:13em; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
     @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
   </style>
 </head>
@@ -212,9 +213,9 @@
 <header class="hero">
   <div class="hero-inner reveal">
     <div class="eyebrow">무기견의 옵션 입문 · Session 10 · Level 3</div>
-    <h1>그릭스란 무엇인가</h1>
+    <h1>그릭스란 <br class="mobile-break">무엇인가</h1>
     <p class="hero-sub">가격표만 보면 놓치는 질문이 있습니다.</p>
-    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">그릭스는 옵션 포지션이 주가, 속도, 시간, 변동성, 금리 변화에 어떻게 반응하는지 쪼개서 보는 리스크 언어입니다.</div></div>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">그릭스는 옵션 포지션이 <br class="mobile-break">주가, 속도, 시간, 변동성, <br class="mobile-break">금리 변화에 어떻게 반응하는지 <br class="mobile-break">쪼개서 보는 리스크 언어입니다.</div></div>
   </div>
 </header>
 <hr class="divider">
@@ -232,7 +233,7 @@
     <h3>그릭스 계기판 오프닝</h3>
     <div class="viz-grid">
       <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
-      <div class="viz-panel"><h4>그릭스 계기판 오프닝</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>105콜, premium 3.00, delta 0.35, gamma 0.04, theta -0.05, vega 0.08, rho 0.01.</strong></div><div class="viz-metric"><span>판정</span><strong>“가격은 결과값이고, 그릭스는 결과값이 흔들리는 방향을 보여준다.”</strong></div><div class="viz-metric"><span>주의</span><strong>각 카드 클릭 시 해당 그릭스가 답하는 질문이 펼쳐진다.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+      <div class="viz-panel"><h4>그릭스 계기판 오프닝</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>105콜, premium 3.00, delta 0.35, gamma 0.04, theta -0.05, vega 0.08, rho 0.01.</strong></div><div class="viz-metric"><span>판정</span><strong>"가격은 결과값이고, 그릭스는 결과값이 흔들리는 방향을 보여준다."</strong></div><div class="viz-metric"><span>주의</span><strong>각 카드 클릭 시 해당 그릭스가 답하는 질문이 펼쳐진다.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
     </div>
 
     <div class="viz-note">옵션 가격 하나만 보는 습관에서 벗어나 다섯 민감도 계기판으로 시선을 넓힌다.</div>
@@ -261,7 +262,7 @@
   <div class="section-num">03</div>
   <h2>델타, 감마, 세타, 베가, 로는 서로 다른 질문에 답합니다</h2>
   <div class="prose">
-<p>그릭스를 배우는 첫 단계는 “민감도”라는 단어에 익숙해지는 것입니다. 민감도는 입력값 하나가 조금 바뀔 때 결과값이 얼마나 바뀌는지를 보는 숫자입니다. 옵션에서는 결과값이 옵션 가격이고, 입력값은 기초자산 가격, 시간, 내재변동성, 금리 같은 변수입니다.</p>
+<p>그릭스를 배우는 첫 단계는 "민감도"라는 단어에 익숙해지는 것입니다. 민감도는 입력값 하나가 조금 바뀔 때 결과값이 얼마나 바뀌는지를 보는 숫자입니다. 옵션에서는 결과값이 옵션 가격이고, 입력값은 기초자산 가격, 시간, 내재변동성, 금리 같은 변수입니다.</p>
 <p>주식은 상대적으로 단순합니다. 주식 1주를 들고 있으면 주가가 1달러 오를 때 내 포지션도 1달러 오릅니다. 100주를 들고 있으면 100달러 움직입니다. 방향 노출이 거의 직선입니다.</p>
 <p>옵션은 곡선입니다. 같은 콜옵션이라도 외가격일 때와 등가격일 때, 내가격일 때 반응 속도가 다릅니다. 만기가 3일 남았는지 90일 남았는지에 따라서도 성격이 바뀝니다. 그래서 옵션은 가격표만 보면 포지션을 오해하기 쉽습니다.</p>
 <p>첫 번째 계기판은 델타입니다. 델타는 기초자산 가격이 1달러 움직일 때 옵션 가격이 대략 얼마나 움직이는지를 보여줍니다. 콜옵션 델타는 보통 0과 1 사이, 풋옵션 델타는 보통 -1과 0 사이에서 움직입니다.</p>
@@ -270,20 +271,20 @@
 <p>두 번째 계기판은 감마입니다. 감마는 델타가 얼마나 빨리 바뀌는지를 보여줍니다. 델타가 방향 민감도라면, 감마는 그 방향 민감도 자체의 변화 속도입니다.</p>
 <p>위의 105콜 델타가 0.35이고 감마가 0.04라고 가정하겠습니다. 주가가 100에서 101달러로 오르면 델타는 대략 0.35에서 0.39로 올라갈 수 있습니다. 한 번 더 1달러 오르면 델타는 다시 높아질 수 있습니다. 여기서 조건을 만기와 IV로 묶어두면, 결과를 흔드는 변수는 주가와 그에 따라 변한 델타입니다.</p>
 <p>이 구조 때문에 옵션은 비선형입니다. 콜옵션 매수자는 주가가 유리한 방향으로 움직일수록 델타가 커질 수 있습니다. 반대로 불리한 방향으로 멀어지면 델타가 작아지고, 옵션 가격은 점점 둔하게 반응할 수 있습니다.</p>
-<p>감마는 나중에 훨씬 중요해집니다. 옵션 매수자는 보통 양의 감마를 갖고, 큰 움직임에서 포지션 성격이 유리하게 바뀔 수 있습니다. 옵션 매도자는 보통 음의 감마를 갖고, 큰 움직임에서 델타가 불리한 쪽으로 바뀔 수 있습니다. 오늘은 “감마가 크면 델타가 빨리 변한다” 정도만 잡아도 충분합니다.</p>
+<p>감마는 나중에 훨씬 중요해집니다. 옵션 매수자는 보통 양의 감마를 갖고, 큰 움직임에서 포지션 성격이 유리하게 바뀔 수 있습니다. 옵션 매도자는 보통 음의 감마를 갖고, 큰 움직임에서 델타가 불리한 쪽으로 바뀔 수 있습니다. 오늘은 "감마가 크면 델타가 빨리 변한다" 정도만 잡아도 충분합니다.</p>
 <p>세 번째 계기판은 세타입니다. 세타는 시간이 하루 지날 때 옵션 가격이 대략 얼마나 변하는지를 보여줍니다. 옵션 매수자는 보통 음의 세타를 갖습니다. 아무 일도 일어나지 않으면 시간이 지나면서 권리의 기회가 줄어들기 때문입니다.</p>
-<p>예를 들어 105콜 가격이 3.00달러이고 세타가 -0.05라고 해보겠습니다. 주가, IV, 금리, 배당이 그대로라면 하루 뒤 옵션 가격은 대략 2.95달러로 낮아질 수 있습니다. 이때 움직인 변수는 시간 하루뿐입니다. 이 숫자는 “하루에 5센트씩 반드시 줄어든다”는 약속이 아니라 현재 조건 근처에서의 추정치입니다.</p>
+<p>예를 들어 105콜 가격이 3.00달러이고 세타가 -0.05라고 해보겠습니다. 주가, IV, 금리, 배당이 그대로라면 하루 뒤 옵션 가격은 대략 2.95달러로 낮아질 수 있습니다. 이때 움직인 변수는 시간 하루뿐입니다. 이 숫자는 "하루에 5센트씩 반드시 줄어든다"는 약속이 아니라 현재 조건 근처에서의 추정치입니다.</p>
 <p>세타를 볼 때는 만기와 행사가 위치를 같이 봐야 합니다. 등가격 옵션은 시간가치가 많이 들어 있는 경우가 많아 세타가 크게 보일 수 있습니다. 만기가 가까워질수록 외가격 옵션의 시간가치도 빠르게 약해질 수 있습니다. 같은 프리미엄 3달러라도 90일짜리와 7일짜리는 시간의 압박이 다릅니다.</p>
 <p>네 번째 계기판은 베가입니다. 베가는 내재변동성이 1%포인트 변할 때 옵션 가격이 대략 얼마나 바뀌는지를 보여줍니다. 옵션 매수자는 보통 양의 베가를 갖습니다. 시장이 더 큰 움직임을 가격에 반영하면 옵션의 시간가치가 높아질 수 있기 때문입니다.</p>
 <p>105콜 가격이 3.00달러이고 베가가 0.08이라고 해보겠습니다. IV가 40%에서 41%로 오르면, 다른 조건이 그대로라는 가정 아래 옵션 가격은 대략 3.08달러가 될 수 있습니다. 반대로 IV가 40%에서 35%로 5%포인트 내려가면 베가 효과만으로 약 0.40달러가 빠질 수 있습니다. 주가, 시간, 금리, 배당은 그대로 놓고 IV만 따로 움직여 보면 구조가 더 선명해집니다.</p>
-<p>9회차의 IV crush가 여기서 연결됩니다. 실적 전에는 베가가 옵션 가격에 붙어 있던 이벤트 프리미엄을 크게 보여줍니다. 실적 후 IV가 내려가면 방향이 맞아도 베가 효과가 손익을 눌렀습니다. 베가는 “변동성 가격이 내 편인가”를 묻는 숫자입니다.</p>
+<p>9회차의 IV crush가 여기서 연결됩니다. 실적 전에는 베가가 옵션 가격에 붙어 있던 이벤트 프리미엄을 크게 보여줍니다. 실적 후 IV가 내려가면 방향이 맞아도 베가 효과가 손익을 눌렀습니다. 베가는 "변동성 가격이 내 편인가"를 묻는 숫자입니다.</p>
 <p>다섯 번째 계기판은 로입니다. 로는 금리가 1%포인트 바뀔 때 옵션 가격이 어떻게 변하는지를 보여줍니다. 주식 단기 옵션을 처음 배우는 단계에서는 델타, 감마, 세타, 베가보다 체감이 작을 때가 많습니다.</p>
 <p>그래도 로를 지워버리면 안 됩니다. 만기가 긴 옵션, 금리 변화가 큰 시기, 배당이 있는 주식, 지수와 선물 옵션을 볼 때는 금리와 선도가격의 영향이 들어옵니다. 일반적으로 주식 콜옵션은 금리 상승에 유리한 방향으로, 주식 풋옵션은 금리 상승에 불리한 방향으로 반응할 수 있습니다. 다만 실제 영향은 배당, 만기, 결제 방식과 함께 봐야 합니다.</p>
 <p>예를 들어 1년 만기 콜옵션의 로가 0.12라고 해보겠습니다. 금리가 4%에서 5%로 1%포인트 오르면, 다른 조건이 그대로일 때 옵션 가격은 약 0.12달러 오를 수 있습니다. 주가, IV, 시간, 배당은 그대로 두고 금리만 1%포인트 움직인 예시입니다. 단기 주식 옵션에서는 이 0.12보다 델타나 베가 효과가 훨씬 클 수 있습니다.</p>
 <p>이제 다섯 숫자를 하나의 포지션 카드로 묶어보겠습니다. 현재가 100달러, 105콜, 만기 30일, 가격 3.00달러, 델타 0.35, 감마 0.04, 세타 -0.05, 베가 0.08, 로 0.01입니다.</p>
 <p>주가가 1달러 오르면 델타 효과로 약 +0.35달러가 붙을 수 있습니다. 동시에 감마 때문에 다음 1달러 움직임에 대한 델타가 0.39 근처로 바뀔 수 있습니다. 하루가 지나면 세타 효과로 약 -0.05달러가 빠질 수 있고, IV가 2%포인트 오르면 베가 효과로 약 +0.16달러가 붙을 수 있습니다.</p>
 <p>이 예시의 비교 대상은 같은 옵션 계약입니다. 변화는 주가 +1달러, 시간 +1일 경과, IV +2%포인트입니다. 단순 합산하면 +0.35 -0.05 +0.16 = +0.46달러 정도의 방향성을 생각할 수 있습니다. 실제 시장에서는 감마, 베가, 세타가 동시에 새 조건으로 다시 계산되므로 정확한 가격표는 모델과 체결가가 결정합니다.</p>
-<p>여기서 중요한 감각은 “대충 더해보는 훈련”입니다. 입문자는 완벽한 옵션 평가 모델을 만들 필요가 없습니다. 대신 내가 들고 있는 포지션이 주가 상승을 원하는지, 큰 움직임을 원하는지, 시간이 지나면 불리한지, IV 상승을 원하는지 정도는 말할 수 있어야 합니다.</p>
+<p>여기서 중요한 감각은 "대충 더해보는 훈련"입니다. 입문자는 완벽한 옵션 평가 모델을 만들 필요가 없습니다. 대신 내가 들고 있는 포지션이 주가 상승을 원하는지, 큰 움직임을 원하는지, 시간이 지나면 불리한지, IV 상승을 원하는지 정도는 말할 수 있어야 합니다.</p>
 <p>그릭스는 가산적입니다. 옵션을 여러 개 섞거나 주식과 함께 들고 있으면 각 포지션의 그릭스를 수량과 방향에 맞춰 더합니다. 매수한 옵션의 그릭스는 더하고, 매도한 옵션의 그릭스는 부호를 반대로 보면 됩니다.</p>
 <p>예를 들어 델타 0.35인 콜옵션 1계약은 주식 35주 정도의 방향 노출처럼 볼 수 있습니다. 옵션 1계약이 주식 100주를 기준으로 한다는 단순 가정입니다. 같은 콜을 2계약 사면 델타는 70주 정도가 됩니다. 여기에 주식 50주를 같이 보유하면 총 델타는 약 120주가 됩니다.</p>
 <p>계산의 기준점은 계약 승수 100과 델타 0.35입니다. 움직이는 쪽은 계약 수와 주식 보유량입니다. 이렇게 합산하면 포지션 이름보다 전체 노출이 먼저 보입니다.</p>
@@ -297,100 +298,461 @@
   <div class="fig">
     <div class="fig-label">Figure 02 — 입력값과 옵션가격 연결 지도</div>
     <h3>입력값과 옵션가격 연결 지도</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
-      <div class="viz-panel"><h4>입력값과 옵션가격 연결 지도</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>주가→델타/감마, 시간→세타, IV→베가, 금리→로, 배당→선도가격 영향.</strong></div><div class="viz-metric"><span>판정</span><strong>“하나의 가격 뒤에 여러 입력값이 동시에 숨어 있다.”</strong></div><div class="viz-metric"><span>주의</span><strong>입력 노드 hover 시 관련 그릭스만 강조.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
-    </div>
-
-    <div class="viz-note">옵션 가격이 여러 입력값의 함수라는 구조를 한 장으로 보여준다.</div>
+    <svg class="viz-svg" viewBox="0 0 720 320" role="img" aria-label="입력값 흐름도">
+      <rect x="20" y="30" width="130" height="48" rx="10" fill="rgba(125,211,252,.14)" stroke="var(--blue)"/>
+      <text class="viz-number" x="85" y="60" text-anchor="middle">기초자산 가격</text>
+      <rect x="20" y="100" width="130" height="48" rx="10" fill="rgba(125,211,252,.14)" stroke="var(--blue)"/>
+      <text class="viz-number" x="85" y="130" text-anchor="middle">시간(만기)</text>
+      <rect x="20" y="170" width="130" height="48" rx="10" fill="rgba(125,211,252,.14)" stroke="var(--blue)"/>
+      <text class="viz-number" x="85" y="200" text-anchor="middle">내재변동성</text>
+      <rect x="20" y="240" width="130" height="48" rx="10" fill="rgba(125,211,252,.14)" stroke="var(--blue)"/>
+      <text class="viz-number" x="85" y="270" text-anchor="middle">금리 / 배당</text>
+      <rect x="290" y="110" width="160" height="80" rx="16" fill="rgba(245,177,76,.18)" stroke="var(--amber)" stroke-width="2"/>
+      <text class="viz-number" x="370" y="148" text-anchor="middle" style="font-size:15px">옵션 가격</text>
+      <text class="viz-label" x="370" y="172" text-anchor="middle">Option Premium</text>
+      <line x1="150" y1="54" x2="290" y2="135" stroke="var(--border-light)" stroke-width="1.5" marker-end="url(#fig02arrow)"/>
+      <line x1="150" y1="124" x2="290" y2="145" stroke="var(--border-light)" stroke-width="1.5" marker-end="url(#fig02arrow)"/>
+      <line x1="150" y1="194" x2="290" y2="155" stroke="var(--border-light)" stroke-width="1.5" marker-end="url(#fig02arrow)"/>
+      <line x1="150" y1="264" x2="290" y2="170" stroke="var(--border-light)" stroke-width="1.5" marker-end="url(#fig02arrow)"/>
+      <defs><marker id="fig02arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/></marker></defs>
+      <rect x="510" y="24" width="190" height="44" rx="10" fill="rgba(53,208,127,.12)" stroke="var(--green)"/>
+      <text class="viz-number" x="605" y="42" text-anchor="middle" style="font-size:11px">Δ Delta · Γ Gamma</text>
+      <text class="viz-label" x="605" y="58" text-anchor="middle">기초자산 → 가격 민감도</text>
+      <rect x="510" y="82" width="190" height="44" rx="10" fill="rgba(239,68,68,.10)" stroke="var(--red)"/>
+      <text class="viz-number" x="605" y="100" text-anchor="middle" style="font-size:11px">Θ Theta</text>
+      <text class="viz-label" x="605" y="116" text-anchor="middle">시간 경과 → 가격 감소</text>
+      <rect x="510" y="140" width="190" height="44" rx="10" fill="rgba(167,139,250,.12)" stroke="var(--violet)"/>
+      <text class="viz-number" x="605" y="158" text-anchor="middle" style="font-size:11px">ν Vega</text>
+      <text class="viz-label" x="605" y="174" text-anchor="middle">IV 변화 → 가격 민감도</text>
+      <rect x="510" y="198" width="190" height="44" rx="10" fill="rgba(125,211,252,.10)" stroke="var(--blue)"/>
+      <text class="viz-number" x="605" y="216" text-anchor="middle" style="font-size:11px">ρ Rho</text>
+      <text class="viz-label" x="605" y="232" text-anchor="middle">금리 변화 → 가격 민감도</text>
+      <line x1="450" y1="135" x2="510" y2="46" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="450" y1="145" x2="510" y2="104" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="450" y1="155" x2="510" y2="162" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="450" y1="170" x2="510" y2="220" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="4,3"/>
+    </svg>
+    <div class="viz-note">하나의 옵션 가격 뒤에 네 가지 입력값과 다섯 가지 민감도가 동시에 숨어 있다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-03">
   <div class="fig">
     <div class="fig-label">Figure 03 — 델타 미니 계산기</div>
     <h3>델타 미니 계산기</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
-      <div class="viz-panel"><h4>델타 미니 계산기</h4><p class="viz-copy">주가 1달러 변화가 옵션 가격에 어떻게 전달되는지 직관화한다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>기본값 delta 0.35, option price 3.00. ΔOption ≈ Delta × ΔStock.</strong></div><div class="viz-metric"><span>판정</span><strong>“고정: IV, 시간, 금리. 변화: 주가.”</strong></div><div class="viz-metric"><span>주의</span><strong>주가 변화 slider. +1달러에서 +0.35달러 표시.</strong></div></div></div>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">고정: IV, 시간, 금리. 변화: 주가. 델타 0.35, 옵션 가격 3.00달러 기준.</p>
+    <div class="viz-grid" id="fig03-calc">
+      <div class="viz-panel accent">
+        <div class="viz-range" style="border:0;padding:0;background:none;">
+          <label>주가 변화 (달러) <output id="fig03-move">0</output></label>
+          <input type="range" min="-5" max="5" value="0" step="1" id="fig03-slider" aria-label="주가 변화">
+        </div>
+        <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="result" id="fig03-opt"><span>옵션 가격 변화</span><strong>$0.00</strong></div>
+          <div class="result" id="fig03-con"><span>1계약 손익 (×100)</span><strong>$0</strong></div>
+        </div>
+        <p class="viz-copy" style="margin-top:14px;">ΔOption ≈ Delta × ΔStock = <code id="fig03-formula">0.35 × 0 = 0.00</code></p>
+      </div>
+      <div class="viz-panel">
+        <h4>읽는 법</h4>
+        <div class="viz-metrics">
+          <div class="viz-metric"><span>DELTA</span><strong>0.35</strong><small>주가 $1 변화당 옵션 약 $0.35 변화</small></div>
+          <div class="viz-metric"><span>기준 가격</span><strong>$3.00</strong><small>105콜, 만기 30일</small></div>
+          <div class="viz-metric"><span>1계약</span><strong>×100</strong><small>옵션 1계약 = 주식 100주 기준</small></div>
+        </div>
+      </div>
     </div>
-    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>103</output></label><input type="range" min="80" max="130" value="103" aria-label="만기 주가 조정"></div>
-
-    <div class="viz-note">주가 1달러 변화가 옵션 가격에 어떻게 전달되는지 직관화한다.</div>
+    <div class="viz-note">슬라이더를 움직여 주가 변화가 옵션 가격에 어떻게 전달되는지 확인한다.</div>
   </div>
+  <script>
+  (function(){
+    var s=document.getElementById('fig03-slider'),mo=document.getElementById('fig03-move'),
+        op=document.getElementById('fig03-opt'),co=document.getElementById('fig03-con'),
+        fm=document.getElementById('fig03-formula');
+    var delta=0.35;
+    function u(){
+      var mv=Number(s.value),ch=(delta*mv),con=ch*100;
+      mo.textContent=mv;
+      op.querySelector('strong').textContent=(ch>=0?'+':'')+ch.toFixed(2)+'달러';
+      op.className='result '+(ch>0?'pos':ch<0?'neg':'zero');
+      co.querySelector('strong').textContent=(con>=0?'+$':'-$')+Math.abs(con).toFixed(0);
+      co.className='result '+(con>0?'pos':con<0?'neg':'zero');
+      fm.textContent='0.35 × '+(mv>=0?'+':'')+mv+' = '+(ch>=0?'+':'')+ch.toFixed(2);
+    }
+    s.addEventListener('input',u);u();
+  })();
+  </script>
 </section><section class="section-wide reveal" id="figure-04">
   <div class="fig">
-    <div class="fig-label">Figure 04 — 감마가 델타를 바꾸는 곡선</div>
-    <h3>감마가 델타를 바꾸는 곡선</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
-      <div class="viz-panel"><h4>감마가 델타를 바꾸는 곡선</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:49%"></div></div><b>49%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:62%"></div></div><b>62%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:38%"></div></div><b>38%</b></div></div><p class="viz-copy">“감마는 다음 1달러 움직임에 대한 델타를 바꾼다.”</p></div>
+    <div class="fig-label">Figure 04 — 델타 곡선: 주가별 델타 변화</div>
+    <h3>델타 곡선: 주가별 델타 변화</h3>
+    <div class="viz-grid" id="fig04-wrap">
+      <div class="viz-panel accent">
+        <svg id="fig04-svg" class="viz-svg" viewBox="0 0 520 280" role="img" aria-label="델타 곡선">
+          <line class="viz-axis" x1="50" y1="30" x2="50" y2="240"/>
+          <line class="viz-axis" x1="50" y1="240" x2="500" y2="240"/>
+          <text class="viz-label" x="24" y="38">1.0</text>
+          <text class="viz-label" x="24" y="138">0.5</text>
+          <text class="viz-label" x="24" y="238">0.0</text>
+          <line class="viz-gridline" x1="50" y1="135" x2="500" y2="135" stroke-dasharray="4,4"/>
+          <text class="viz-label" x="50" y="258">95</text>
+          <text class="viz-label" x="200" y="258">100</text>
+          <text class="viz-label" x="350" y="258">105</text>
+          <text class="viz-label" x="470" y="258">110</text>
+          <polyline id="fig04-curve" fill="none" stroke="var(--amber)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+            points="50,222 80,218 110,212 140,204 170,193 200,179 230,162 260,143 290,124 320,106 350,91 380,78 410,68 440,61 470,56 500,53"/>
+          <circle id="fig04-dot" cx="200" cy="179" r="7" class="viz-dot"/>
+          <text id="fig04-lbl" class="viz-number" x="214" y="174" style="font-size:12px">δ 0.29</text>
+        </svg>
+        <div class="viz-range" style="border:0;padding:0;background:none;margin-top:8px;">
+          <label>주가 <output id="fig04-price">100</output></label>
+          <input type="range" min="95" max="110" value="100" step="0.5" id="fig04-slider" aria-label="주가 조정">
+        </div>
+      </div>
+      <div class="viz-panel">
+        <h4>읽는 법</h4>
+        <p class="viz-copy">x축은 주가(95~110), y축은 콜 델타(0~1). 행사가 105 기준. 주가가 오를수록 델타가 1에 가까워진다.</p>
+        <div class="viz-metrics" style="margin-top:14px;">
+          <div class="viz-metric"><span>현재 주가</span><strong id="fig04-sp">$100</strong></div>
+          <div class="viz-metric"><span>델타</span><strong id="fig04-dv">0.29</strong></div>
+          <div class="viz-metric"><span>행사가</span><strong>$105</strong></div>
+        </div>
+      </div>
     </div>
-    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>20</output></label><input type="range" min="0" max="100" value="20" aria-label="곡선 입력 변화"></div>
-
-    <div class="viz-note">델타가 고정된 숫자가 아니라 주가 위치에 따라 바뀐다는 점을 보여준다.</div>
+    <div class="viz-note">델타는 고정 숫자가 아니라 주가 위치에 따라 S자 곡선을 그린다.</div>
   </div>
+  <script>
+  (function(){
+    var sl=document.getElementById('fig04-slider'),out=document.getElementById('fig04-price'),
+        dot=document.getElementById('fig04-dot'),lbl=document.getElementById('fig04-lbl'),
+        sp=document.getElementById('fig04-sp'),dv=document.getElementById('fig04-dv');
+    var prices=[95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110];
+    var deltas=[0.09,0.11,0.14,0.17,0.22,0.29,0.35,0.41,0.48,0.55,0.62,0.68,0.74,0.79,0.83,0.87];
+    var xs=[50,80,110,140,170,200,230,260,290,320,350,380,410,440,470,500];
+    function dToY(d){return 240-d*210;}
+    function u(){
+      var v=Number(sl.value),idx=Math.round((v-95)*2)/2;
+      var i0=Math.floor((v-95)),i1=Math.min(i0+1,15);
+      var frac=v-95-i0;
+      var d=deltas[i0]+(deltas[i1]-deltas[i0])*frac;
+      var x=xs[i0]+(xs[i1]-xs[i0])*frac;
+      var y=dToY(d);
+      out.textContent=v;
+      dot.setAttribute('cx',x);dot.setAttribute('cy',y);
+      lbl.setAttribute('x',x+14);lbl.setAttribute('y',y-4);
+      lbl.textContent='δ '+d.toFixed(2);
+      sp.textContent='$'+v;dv.textContent=d.toFixed(2);
+    }
+    sl.addEventListener('input',u);u();
+  })();
+  </script>
 </section><section class="section-wide reveal" id="figure-05">
   <div class="fig">
-    <div class="fig-label">Figure 05 — 세타 하루 비용 카드</div>
-    <h3>세타 하루 비용 카드</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
-      <div class="viz-panel"><h4>세타 하루 비용 카드</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:50%"></div></div><b>50%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:63%"></div></div><b>63%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:39%"></div></div><b>39%</b></div></div><p class="viz-copy">“고정: 주가와 IV. 변화: 시간.”</p></div>
+    <div class="fig-label">Figure 05 — 세타 시간 감소 계산기</div>
+    <h3>세타 시간 감소 계산기</h3>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">고정: 주가, IV, 금리. 변화: 시간. 세타 -0.05, 옵션 가격 3.00달러, 1계약 기준.</p>
+    <div class="viz-grid" id="fig05-wrap">
+      <div class="viz-panel accent">
+        <div class="viz-range" style="border:0;padding:0;background:none;">
+          <label>경과 일수 <output id="fig05-days">0</output></label>
+          <input type="range" min="0" max="10" value="0" step="1" id="fig05-slider" aria-label="경과 일수">
+        </div>
+        <div style="margin-top:18px;">
+          <svg id="fig05-svg" viewBox="0 0 460 120" style="width:100%;display:block;" role="img" aria-label="세타 감소 막대">
+            <rect x="0" y="10" width="400" height="36" rx="8" fill="var(--bg-card)" stroke="var(--border)"/>
+            <rect id="fig05-bar" x="0" y="10" width="400" height="36" rx="8" fill="rgba(245,177,76,.28)"/>
+            <text id="fig05-bartext" class="viz-number" x="200" y="34" text-anchor="middle" style="font-size:13px">$3.00</text>
+            <text class="viz-label" x="0" y="72">0일</text>
+            <text class="viz-label" x="380" y="72" text-anchor="end">10일</text>
+          </svg>
+        </div>
+        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="result" id="fig05-cum"><span>누적 감소</span><strong>$0.00</strong></div>
+          <div class="result" id="fig05-con"><span>1계약 비용 (×100)</span><strong>$0</strong></div>
+        </div>
+      </div>
+      <div class="viz-panel">
+        <h4>읽는 법</h4>
+        <p class="viz-copy">세타 -0.05는 하루에 약 5센트씩 옵션 가격이 줄어든다는 뜻입니다. 10일이면 약 0.50달러, 1계약 기준 50달러입니다.</p>
+        <div class="viz-metrics" style="margin-top:14px;">
+          <div class="viz-metric"><span>THETA</span><strong>−0.05</strong><small>하루당 옵션 가격 감소</small></div>
+          <div class="viz-metric"><span>기준 가격</span><strong>$3.00</strong></div>
+          <div class="viz-metric"><span>잔존 가격</span><strong id="fig05-remain">$3.00</strong></div>
+        </div>
+      </div>
     </div>
-    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>25</output></label><input type="range" min="0" max="100" value="25" aria-label="곡선 입력 변화"></div>
-
-    <div class="viz-note">시간 경과가 옵션 매수자에게 어떤 숫자로 보이는지 보여준다.</div>
+    <div class="viz-note">시간은 옵션 매수자에게 매일 비용을 청구한다. 슬라이더로 누적 비용을 확인한다.</div>
   </div>
+  <script>
+  (function(){
+    var sl=document.getElementById('fig05-slider'),out=document.getElementById('fig05-days'),
+        bar=document.getElementById('fig05-bar'),bt=document.getElementById('fig05-bartext'),
+        cum=document.getElementById('fig05-cum'),con=document.getElementById('fig05-con'),
+        rem=document.getElementById('fig05-remain');
+    var theta=-0.05,base=3.00;
+    function u(){
+      var d=Number(sl.value);out.textContent=d;
+      var loss=theta*d,remain=base+loss,w=Math.max(0,remain/base)*400;
+      bar.setAttribute('width',w);
+      bt.textContent='$'+remain.toFixed(2);bt.setAttribute('x',Math.max(40,w/2));
+      cum.querySelector('strong').textContent=loss.toFixed(2)+'달러';
+      cum.className='result '+(loss<0?'neg':'zero');
+      var cc=loss*100;
+      con.querySelector('strong').textContent=(cc<0?'-$':'+$')+Math.abs(cc).toFixed(0);
+      con.className='result '+(cc<0?'neg':'zero');
+      rem.textContent='$'+remain.toFixed(2);
+    }
+    sl.addEventListener('input',u);u();
+  })();
+  </script>
 </section><section class="section-wide reveal" id="figure-06">
   <div class="fig">
-    <div class="fig-label">Figure 06 — 베가와 IV 변화 카드</div>
-    <h3>베가와 IV 변화 카드</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><polyline class="viz-line blue curve" points="70,190 140,170 210,145 280,104 350,82 420,95 490,136 560,168"/><circle class="viz-dot blue" cx="280" cy="104" r="7"/><circle class="viz-dot" cx="420" cy="95" r="7"/><text class="viz-label" x="62" y="34">curve</text><text class="viz-number" x="292" y="98">민감도 집중</text><text class="viz-label" x="70" y="238">낮음</text><text class="viz-label" x="510" y="238">높음</text></svg></div>
-      <div class="viz-panel"><h4>베가와 IV 변화 카드</h4><div class="viz-bars"><div class="viz-bar"><span>기준 노출</span><div class="viz-track"><div class="viz-fill" style="width:51%"></div></div><b>51%</b></div><div class="viz-bar"><span>변화 민감도</span><div class="viz-track"><div class="viz-fill good" style="width:64%"></div></div><b>64%</b></div><div class="viz-bar"><span>주의 구간</span><div class="viz-track"><div class="viz-fill bad" style="width:40%"></div></div><b>40%</b></div></div><p class="viz-copy">“베가는 이벤트 프리미엄과 연결된다.”</p></div>
+    <div class="fig-label">Figure 06 — 베가와 IV 변화 막대 차트</div>
+    <h3>베가와 IV 변화 막대 차트</h3>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">고정: 주가, 시간, 금리. 변화: IV. 베가 0.08, 옵션 가격 3.00달러 기준.</p>
+    <div class="viz-grid" id="fig06-wrap">
+      <div class="viz-panel accent">
+        <div class="viz-range" style="border:0;padding:0;background:none;">
+          <label>IV 변화 (%p) <output id="fig06-iv">0</output></label>
+          <input type="range" min="-10" max="10" value="0" step="1" id="fig06-slider" aria-label="IV 변화">
+        </div>
+        <svg id="fig06-svg" viewBox="0 0 460 180" style="width:100%;display:block;margin-top:16px;" role="img" aria-label="베가 막대 차트">
+          <line class="viz-gridline" x1="230" y1="10" x2="230" y2="140"/>
+          <text class="viz-label" x="230" y="158" text-anchor="middle">0</text>
+          <text class="viz-label" x="10" y="32">옵션 가격 변화</text>
+          <rect id="fig06-optbar" x="230" y="20" width="0" height="30" rx="4" fill="var(--amber)"/>
+          <text id="fig06-optval" class="viz-number" x="234" y="42" style="font-size:12px">$0.00</text>
+          <text class="viz-label" x="10" y="82">1계약 손익</text>
+          <rect id="fig06-conbar" x="230" y="70" width="0" height="30" rx="4" fill="var(--blue)"/>
+          <text id="fig06-conval" class="viz-number" x="234" y="92" style="font-size:12px">$0</text>
+          <text class="viz-label" x="30" y="158">-10%p</text>
+          <text class="viz-label" x="400" y="158" text-anchor="end">+10%p</text>
+        </svg>
+      </div>
+      <div class="viz-panel">
+        <h4>읽는 법</h4>
+        <p class="viz-copy">베가 0.08은 IV 1%포인트당 옵션 가격이 약 8센트 변한다는 뜻입니다. IV가 5%p 하락하면 0.40달러, 1계약 기준 40달러 손실.</p>
+        <div class="viz-metrics" style="margin-top:14px;">
+          <div class="viz-metric"><span>VEGA</span><strong>0.08</strong><small>IV 1%p당 가격 변화</small></div>
+          <div class="viz-metric"><span>IV CRUSH 예시</span><strong>−5%p → −$0.40</strong><small>실적 후 IV 급락 시나리오</small></div>
+          <div class="viz-metric"><span>IV 상승 예시</span><strong>+3%p → +$0.24</strong><small>공포 확산 시나리오</small></div>
+        </div>
+      </div>
     </div>
-    <div class="viz-range curve" data-viz-range><label>입력 변화 <output data-range-out>30</output></label><input type="range" min="0" max="100" value="30" aria-label="곡선 입력 변화"></div>
-
-    <div class="viz-note">IV 1%포인트 변화가 옵션 가격에 미치는 영향을 수치화한다.</div>
+    <div class="viz-note">IV 1%포인트 변화가 옵션 가격에 미치는 영향을 막대로 확인한다.</div>
   </div>
+  <script>
+  (function(){
+    var sl=document.getElementById('fig06-slider'),out=document.getElementById('fig06-iv'),
+        ob=document.getElementById('fig06-optbar'),ov=document.getElementById('fig06-optval'),
+        cb=document.getElementById('fig06-conbar'),cv=document.getElementById('fig06-conval');
+    var vega=0.08,scale=20;
+    function u(){
+      var iv=Number(sl.value);out.textContent=(iv>=0?'+':'')+iv;
+      var ch=vega*iv,con=ch*100;
+      var w=Math.abs(iv)*scale,x=iv>=0?230:230-w;
+      ob.setAttribute('x',x);ob.setAttribute('width',w);
+      ob.setAttribute('fill',iv>=0?'var(--green)':'var(--red)');
+      ov.textContent=(ch>=0?'+':'')+ch.toFixed(2)+'달러';
+      ov.setAttribute('x',iv>=0?234+w:x-4);
+      ov.setAttribute('text-anchor',iv>=0?'start':'end');
+      var cw=Math.abs(iv)*scale,cx=iv>=0?230:230-cw;
+      cb.setAttribute('x',cx);cb.setAttribute('width',cw);
+      cb.setAttribute('fill',iv>=0?'var(--green)':'var(--red)');
+      cv.textContent=(con>=0?'+$':'-$')+Math.abs(con).toFixed(0);
+      cv.setAttribute('x',iv>=0?234+cw:cx-4);
+      cv.setAttribute('text-anchor',iv>=0?'start':'end');
+    }
+    sl.addEventListener('input',u);u();
+  })();
+  </script>
 </section><section class="section-wide reveal" id="figure-07">
   <div class="fig">
-    <div class="fig-label">Figure 07 — 로와 금리의 작은 칸</div>
-    <h3>로와 금리의 작은 칸</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
-      <div class="viz-panel"><h4>로와 금리의 작은 칸</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>금리 +1%p 시 30일 옵션 +0.01, 1년 옵션 +0.12 교육용 예시.</strong></div><div class="viz-metric"><span>판정</span><strong>“단기 주식 옵션에서는 작을 수 있지만, 긴 만기에서는 무시하기 어렵다.”</strong></div><div class="viz-metric"><span>주의</span><strong>없음.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    <div class="fig-label">Figure 07 — 로 비교: 단기 vs 장기</div>
+    <h3>로 비교: 단기 vs 장기</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="mini-card" style="border-left:3px solid var(--blue);">
+        <div class="mini-k">30일 만기 콜옵션</div>
+        <div class="mini-v" style="color:var(--blue);">ρ = 0.01</div>
+        <div class="mini-p">금리 +1%p → 옵션 가격 약 <strong>+$0.01</strong></div>
+        <div class="mini-p">1계약 기준 약 <strong>+$1</strong></div>
+        <div style="margin-top:12px;"><span class="badge">체감 미미</span></div>
+      </div>
+      <div class="mini-card" style="border-left:3px solid var(--amber);">
+        <div class="mini-k">1년 만기 콜옵션</div>
+        <div class="mini-v" style="color:var(--amber);">ρ = 0.12</div>
+        <div class="mini-p">금리 +1%p → 옵션 가격 약 <strong>+$0.12</strong></div>
+        <div class="mini-p">1계약 기준 약 <strong>+$12</strong></div>
+        <div style="margin-top:12px;"><span class="badge warn">무시 불가</span></div>
+      </div>
     </div>
-
-    <div class="viz-note">로가 초반에는 작게 보일 수 있지만 긴 만기와 금리 환경에서 의미가 생긴다는 점을 차분하게 다룬다.</div>
+    <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+      <div class="viz-metric"><span>배율 차이</span><strong>12×</strong><small>만기가 길수록 로 영향 확대</small></div>
+      <div class="viz-metric"><span>콜옵션</span><strong>금리↑ = 유리</strong><small>일반적으로 양의 로</small></div>
+      <div class="viz-metric"><span>풋옵션</span><strong>금리↑ = 불리</strong><small>일반적으로 음의 로</small></div>
+    </div>
+    <div class="viz-note">단기 옵션에서는 작게 보이지만, 만기가 길어지면 로를 무시하기 어렵다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-08">
   <div class="fig">
-    <div class="fig-label">Figure 08 — 단순 합산 시나리오 패널</div>
-    <h3>단순 합산 시나리오 패널</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="92" y="86" width="144" height="102" rx="14" fill="rgba(125,211,252,.16)" stroke="var(--blue)"/><rect x="384" y="122" width="144" height="66" rx="14" fill="rgba(239,68,68,.14)" stroke="var(--red)"/><path class="viz-line" d="M250 138 L360 138"/><text class="viz-number" x="120" y="130">전</text><text class="viz-number" x="414" y="156">후</text><text class="viz-label" x="62" y="34">before / after panel</text></svg></div>
-      <div class="viz-panel"><h4>단순 합산 시나리오 패널</h4><div class="viz-toggle" data-viz-toggle><button type="button" class="active">전</button><button type="button">후</button><button type="button">차이</button></div><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>S +1달러, 하루 경과, IV +2%p. 감마는 다음 단계 설명으로 보조 표시.</strong></div><div class="viz-metric"><span>판정</span><strong>“정확한 가격 예측이 아니라 민감도 방향 점검이다.”</strong></div><div class="viz-metric"><span>주의</span><strong>scenario preset 상승+IV상승, 상승+IV하락, 횡보+시간경과 버튼.</strong></div></div></div>
+    <div class="fig-label">Figure 08 — 그릭스 단순 합산 워터폴</div>
+    <h3>그릭스 단순 합산 워터폴</h3>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:6px;">시나리오: 주가 +1달러, 하루 경과, IV +2%p</p>
+    <div id="fig08-wrap">
+      <div class="viz-toggle" id="fig08-btns">
+        <button type="button" class="active" data-scenario="base">기본 시나리오</button>
+        <button type="button" data-scenario="ivdown">상승 + IV 하락</button>
+        <button type="button" data-scenario="flat">횡보 + 시간경과</button>
+      </div>
+      <svg id="fig08-svg" viewBox="0 0 620 260" style="width:100%;display:block;margin-top:14px;" role="img" aria-label="워터폴 차트">
+        <line class="viz-gridline" x1="60" y1="130" x2="580" y2="130" stroke-dasharray="4,4"/>
+        <text class="viz-label" x="56" y="134" text-anchor="end">0</text>
+        <line class="viz-axis" x1="60" y1="20" x2="60" y2="240"/>
+        <line class="viz-axis" x1="60" y1="240" x2="580" y2="240"/>
+      </svg>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px;" id="fig08-cards"></div>
     </div>
-
-    <div class="viz-note">델타, 세타, 베가 효과를 한 번에 더해보는 훈련을 만든다.</div>
+    <div class="viz-note">각 그릭스 효과를 순서대로 더해 최종 변화를 확인하는 훈련이다.</div>
   </div>
+  <script>
+  (function(){
+    var scenarios={
+      base:{label:'기본',items:[{name:'Δ 델타',val:0.35,color:'var(--green)'},{name:'Θ 세타',val:-0.05,color:'var(--red)'},{name:'ν 베가',val:0.16,color:'var(--blue)'}]},
+      ivdown:{label:'상승+IV하락',items:[{name:'Δ 델타',val:0.35,color:'var(--green)'},{name:'Θ 세타',val:-0.05,color:'var(--red)'},{name:'ν 베가',val:-0.40,color:'var(--red)'}]},
+      flat:{label:'횡보+시간',items:[{name:'Δ 델타',val:0,color:'var(--text-dim)'},{name:'Θ 세타',val:-0.05,color:'var(--red)'},{name:'ν 베가',val:0,color:'var(--text-dim)'}]}
+    };
+    var svg=document.getElementById('fig08-svg'),cards=document.getElementById('fig08-cards'),
+        btns=document.getElementById('fig08-btns').querySelectorAll('button');
+    function draw(key){
+      var sc=scenarios[key],items=sc.items;
+      var net=0;items.forEach(function(it){net+=it.val;});
+      var all=items.concat([{name:'합계',val:net,color:net>=0?'var(--green)':'var(--red)'}]);
+      var maxAbs=Math.max(0.6,Math.abs(net));
+      items.forEach(function(it){maxAbs=Math.max(maxAbs,Math.abs(it.val));});
+      var scale=100/maxAbs,mid=130,bw=100,gap=30,startX=90;
+      while(svg.childElementCount>4)svg.removeChild(svg.lastChild);
+      var cum=0;
+      for(var i=0;i<items.length;i++){
+        var it=items[i],x=startX+i*(bw+gap);
+        var y0=mid-cum*scale,h=Math.abs(it.val)*scale;
+        var ry=it.val>=0?y0-h:y0;
+        var r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+        r.setAttribute('x',x);r.setAttribute('y',ry);r.setAttribute('width',bw);r.setAttribute('height',Math.max(h,2));
+        r.setAttribute('rx','6');r.setAttribute('fill',it.color);r.setAttribute('opacity','0.7');
+        svg.appendChild(r);
+        var t=document.createElementNS('http://www.w3.org/2000/svg','text');
+        t.setAttribute('class','viz-number');t.setAttribute('x',x+bw/2);
+        t.setAttribute('y',it.val>=0?ry-6:ry+h+16);t.setAttribute('text-anchor','middle');
+        t.setAttribute('style','font-size:12px');t.textContent=(it.val>=0?'+':'')+it.val.toFixed(2);
+        svg.appendChild(t);
+        var lb=document.createElementNS('http://www.w3.org/2000/svg','text');
+        lb.setAttribute('class','viz-label');lb.setAttribute('x',x+bw/2);lb.setAttribute('y',252);lb.setAttribute('text-anchor','middle');
+        lb.textContent=it.name;svg.appendChild(lb);
+        if(i<items.length-1){
+          var ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+          var ny=mid-(cum+it.val)*scale;
+          ln.setAttribute('x1',x+bw);ln.setAttribute('x2',x+bw+gap);
+          ln.setAttribute('y1',ny);ln.setAttribute('y2',ny);
+          ln.setAttribute('stroke','var(--border-light)');ln.setAttribute('stroke-width','1');ln.setAttribute('stroke-dasharray','4,3');
+          svg.appendChild(ln);
+        }
+        cum+=it.val;
+      }
+      var nx=startX+items.length*(bw+gap),ny0=mid,nh=Math.abs(net)*scale;
+      var nry=net>=0?ny0-nh:ny0;
+      var nr=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      nr.setAttribute('x',nx);nr.setAttribute('y',nry);nr.setAttribute('width',bw);nr.setAttribute('height',Math.max(nh,2));
+      nr.setAttribute('rx','6');nr.setAttribute('fill',net>=0?'var(--green)':'var(--red)');nr.setAttribute('stroke',net>=0?'var(--green)':'var(--red)');nr.setAttribute('stroke-width','2');
+      svg.appendChild(nr);
+      var nt=document.createElementNS('http://www.w3.org/2000/svg','text');
+      nt.setAttribute('class','viz-number');nt.setAttribute('x',nx+bw/2);
+      nt.setAttribute('y',net>=0?nry-6:nry+nh+16);nt.setAttribute('text-anchor','middle');
+      nt.setAttribute('style','font-size:13px;font-weight:900');nt.textContent=(net>=0?'+':'')+net.toFixed(2);
+      svg.appendChild(nt);
+      var nlb=document.createElementNS('http://www.w3.org/2000/svg','text');
+      nlb.setAttribute('class','viz-label');nlb.setAttribute('x',nx+bw/2);nlb.setAttribute('y',252);nlb.setAttribute('text-anchor','middle');
+      nlb.textContent='합계';svg.appendChild(nlb);
+      cards.innerHTML='';
+      all.forEach(function(it){
+        var d=document.createElement('div');d.className='result '+(it.val>0?'pos':it.val<0?'neg':'zero');
+        d.innerHTML='<span>'+it.name+'</span><strong>'+(it.val>=0?'+':'')+it.val.toFixed(2)+'달러</strong>';
+        cards.appendChild(d);
+      });
+    }
+    btns.forEach(function(b){b.addEventListener('click',function(){
+      btns.forEach(function(x){x.classList.remove('active');});b.classList.add('active');
+      draw(b.dataset.scenario);
+    });});
+    draw('base');
+  })();
+  </script>
 </section><section class="section-wide reveal" id="figure-09">
   <div class="fig">
-    <div class="fig-label">Figure 09 — 총 델타 합산 워크시트</div>
-    <h3>총 델타 합산 워크시트</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><h4>총 델타 합산 워크시트</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
-      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>delta 0.35, contracts 2, multiplier 100, stock shares 50 → total delta 120.</span></label><label class="viz-check"><input type="checkbox"><span>“전략 이름보다 전체 방향 노출을 먼저 확인한다.”</span></label><label class="viz-check"><input type="checkbox"><span>입력값 변경, 정답보기 토글.</span></label><label class="viz-check"><input type="checkbox"><span>그릭스가 포지션 단위로 합산된다는 점을 보여준다.</span></label></div></div>
+    <div class="fig-label">Figure 09 — 총 델타 계산기</div>
+    <h3>총 델타 계산기</h3>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">옵션과 주식의 방향 노출을 합산해 총 델타를 계산합니다.</p>
+    <div id="fig09-wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="viz-panel">
+        <h4 style="margin-bottom:14px;">입력</h4>
+        <div style="display:grid;gap:14px;">
+          <div class="viz-range" style="border:0;padding:0;background:none;">
+            <label>콜 델타 <output id="fig09-d">0.35</output></label>
+            <input type="range" min="0.05" max="0.95" value="0.35" step="0.05" id="fig09-delta" aria-label="콜 델타">
+          </div>
+          <div class="viz-range" style="border:0;padding:0;background:none;">
+            <label>계약 수 <output id="fig09-c">2</output></label>
+            <input type="range" min="1" max="10" value="2" step="1" id="fig09-contracts" aria-label="계약 수">
+          </div>
+          <div class="viz-range" style="border:0;padding:0;background:none;">
+            <label>주식 보유 (주) <output id="fig09-s">50</output></label>
+            <input type="range" min="0" max="200" value="50" step="10" id="fig09-shares" aria-label="주식 보유">
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card2);">
+          <span style="color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;">승수(MULTIPLIER)</span>
+          <strong style="display:block;font-size:20px;color:var(--amber);">×100</strong>
+        </div>
+      </div>
+      <div class="viz-panel accent">
+        <h4 style="margin-bottom:14px;">결과</h4>
+        <div style="display:grid;gap:12px;">
+          <div class="result"><span>옵션 델타 (주 환산)</span><strong id="fig09-optd">70주</strong></div>
+          <div class="result"><span>주식 델타</span><strong id="fig09-stod">50주</strong></div>
+          <div class="result pos"><span>총 델타</span><strong id="fig09-total" style="font-size:28px;">120주</strong></div>
+        </div>
+        <p id="fig09-direction" class="viz-copy" style="margin-top:14px;font-weight:700;color:var(--green);">↑ 상승 방향 노출</p>
+        <p class="viz-copy" id="fig09-formula" style="margin-top:6px;"><code>0.35 × 100 × 2 + 50 = 120</code></p>
+      </div>
     </div>
-
-    <div class="viz-note">그릭스가 포지션 단위로 합산된다는 점을 보여준다.</div>
+    <div class="viz-note">전략 이름보다 총 델타가 먼저 보이면 포지션을 더 정확하게 이해할 수 있다.</div>
   </div>
+  <script>
+  (function(){
+    var sd=document.getElementById('fig09-delta'),sc=document.getElementById('fig09-contracts'),
+        ss=document.getElementById('fig09-shares'),od=document.getElementById('fig09-d'),
+        oc=document.getElementById('fig09-c'),os=document.getElementById('fig09-s'),
+        optd=document.getElementById('fig09-optd'),stod=document.getElementById('fig09-stod'),
+        total=document.getElementById('fig09-total'),dir=document.getElementById('fig09-direction'),
+        fm=document.getElementById('fig09-formula');
+    function u(){
+      var d=Number(sd.value),c=Number(sc.value),s=Number(ss.value);
+      od.textContent=d.toFixed(2);oc.textContent=c;os.textContent=s;
+      var od_v=d*100*c,tot=od_v+s;
+      optd.textContent=od_v.toFixed(0)+'주';
+      stod.textContent=s+'주';
+      total.textContent=tot.toFixed(0)+'주';
+      total.parentElement.className='result '+(tot>0?'pos':tot<0?'neg':'zero');
+      dir.textContent=tot>0?'↑ 상승 방향 노출':tot<0?'↓ 하락 방향 노출':'— 중립';
+      dir.style.color=tot>0?'var(--green)':tot<0?'var(--red)':'var(--text-muted)';
+      fm.innerHTML='<code>'+d.toFixed(2)+' × 100 × '+c+' + '+s+' = '+tot.toFixed(0)+'</code>';
+    }
+    sd.addEventListener('input',u);sc.addEventListener('input',u);ss.addEventListener('input',u);u();
+  })();
+  </script>
 </section><hr class="divider">
 <section class="section reveal" id="section-05">
   <div class="section-num">04</div>
   <h2>그릭스가 옵션 가격을 정확히 맞혀주는 것은 아닙니다</h2>
   <div class="prose">
-<p>여기서 가장 조심할 오해는 “그릭스를 알면 옵션 가격을 정확히 맞힐 수 있다”는 생각입니다.</p>
+<p>여기서 가장 조심할 오해는 "그릭스를 알면 옵션 가격을 정확히 맞힐 수 있다"는 생각입니다.</p>
 <p>그릭스는 현재 조건 근처에서의 민감도입니다. 주가가 조금 움직이고, 시간이 조금 지나고, IV가 조금 바뀔 때 포지션이 어떤 방향으로 반응할지 보는 이론적 안내판입니다. 가격 변화 보증서가 아닙니다. 큰 갭, 유동성 공백, 호가 스프레드 확대, 조기행사, 배당, 모델 가정 변화까지 완벽하게 막아주지는 못합니다.</p>
 <p>예를 들어 델타 0.35인 콜옵션을 샀다고 해서 주가가 5달러 오르면 정확히 1.75달러 오른다고 단정하면 안 됩니다. 주가가 오르는 동안 델타도 감마 때문에 바뀝니다. IV가 빠질 수도 있고, 시간이 지날 수도 있습니다. 처음 기준으로 둔 숫자는 델타 0.35뿐이고, 실제로는 나머지 입력들이 함께 변합니다.</p>
 <p>또 하나의 오해는 그릭스를 하나씩 따로 보면 된다는 생각입니다. 델타가 좋아 보여도 세타와 베가가 불리할 수 있습니다. 세타가 좋아 보여도 음의 감마가 숨어 있을 수 있습니다. 베가가 좋아 보여도 실제 움직임이 부족하면 손익은 기대와 달라질 수 있습니다.</p>
@@ -404,7 +766,7 @@
   <div class="prose">
 <p>그릭스는 옵션 포지션의 반응을 쪼개서 보는 리스크 언어입니다. 델타는 주가 방향 변화, 감마는 델타의 변화 속도, 세타는 시간 경과, 베가는 내재변동성 변화, 로는 금리 변화에 대한 민감도를 봅니다.</p>
 <p>오늘의 숫자 예시는 모두 교육용 단순화입니다. 같은 105콜을 고정하고, 주가 1달러, 시간 하루, IV 1%포인트처럼 하나씩 움직여 보면서 각 그릭스가 무엇을 설명하는지 확인했습니다. 날숫자보다 중요한 것은 무엇을 고정했고 무엇을 바꿨는지입니다.</p>
-<p>제 계좌라면 옵션을 보기 전에 가격보다 그릭스 카드를 먼저 만들 것 같습니다. 델타가 어느 방향인지, 세타를 매일 얼마나 내는지, 베가가 이벤트 이후 얼마나 빠질 수 있는지 적어보는 겁니다. 그 한 장만 있어도 “싸 보여서 샀다”는 말을 꽤 많이 줄일 수 있습니다.</p>
+<p>제 계좌라면 옵션을 보기 전에 가격보다 그릭스 카드를 먼저 만들 것 같습니다. 델타가 어느 방향인지, 세타를 매일 얼마나 내는지, 베가가 이벤트 이후 얼마나 빠질 수 있는지 적어보는 겁니다. 그 한 장만 있어도 "싸 보여서 샀다"는 말을 꽤 많이 줄일 수 있습니다.</p>
 <p>다음 회차부터는 델타를 따로 떼어 봅니다. 델타는 방향 민감도이면서, 때로는 확률 감각과 헷지 비율의 언어로도 쓰입니다. 오늘 만든 계기판 중 첫 번째 눈금을 더 크게 확대하겠습니다.</p>
 <h3 class="subhead">이번 회차 압축</h3>
 <ul>
@@ -465,8 +827,8 @@
 <p>계산 기준: 콜 2계약은 0.35 × 100 × 2 = 70주입니다. 주식 50주를 더하면 총 델타는 약 120주입니다. 상승에 노출된 포지션입니다.</p>
 <h3 class="subhead">Worksheet D. 포지션 점검 문장</h3>
 <p>아래 문장을 직접 채워보세요.</p>
-<p>“이 옵션 포지션은 델타가 ________라서 주가가 ________할 때 유리하고, 세타가 ________라서 시간이 지나면 ________하며, 베가가 ________라서 IV가 ________할 때 유리하다.”</p>
-<p>예시 답안: “델타가 양수라서 주가가 상승할 때 유리하고, 세타가 음수라서 시간이 지나면 불리하며, 베가가 양수라서 IV가 상승할 때 유리하다.”</p>
+<p>"이 옵션 포지션은 델타가 ________라서 주가가 ________할 때 유리하고, 세타가 ________라서 시간이 지나면 ________하며, 베가가 ________라서 IV가 ________할 때 유리하다."</p>
+<p>예시 답안: "델타가 양수라서 주가가 상승할 때 유리하고, 세타가 음수라서 시간이 지나면 불리하며, 베가가 양수라서 IV가 상승할 때 유리하다."</p>
 <h3 class="subhead">Worksheet E. 실제 거래 전 5문장 체크</h3>
 <p>실제 옵션을 매매하지 않더라도 연습용으로 아래 다섯 문장을 적어보세요.</p>
 <ul>
