@@ -9,7 +9,8 @@ window.HOWINSIGHT_AUTH_CONFIG = {
 
   // 관리자 페이지 접근을 허용할 이메일. Supabase SQL의 admin_users에도 같은 이메일을 넣어야 합니다.
   adminEmails: [
-    'sniffshiba@gmail.com'
+    'sniffshiba@gmail.com',
+    'sikruwar@gmail.com'
   ],
 
   // 보호 대상 페이지. index.html과 admin.html은 별도 처리합니다.
