@@ -60,3 +60,14 @@ def test_expired_magic_link_message_is_friendly():
     js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
     assert 'authUrlError' in js
     assert '인증 링크가 만료됐거나 이미 사용된 링크입니다' in js
+
+
+def test_mobile_course_navigation_is_visible_on_course_pages():
+    pages = [ROOT / 'prologue.html', ROOT / 'epilogue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
+    assert len(pages) == 32
+    for path in pages:
+        html = path.read_text(encoding='utf-8')
+        assert 'Mobile course navigation: keep previous/index/next reachable on phones.' in html
+        assert '.nav-prev,.nav-index,.nav-forward { display:inline-flex !important;' in html
+        assert 'nav-index' in html
+        assert 'nav-forward' in html
