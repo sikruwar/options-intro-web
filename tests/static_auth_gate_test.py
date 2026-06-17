@@ -11,6 +11,14 @@ def test_auth_assets_exist():
     assert (ROOT / 'supabase_schema.sql').exists()
 
 
+def test_access_gate_can_be_temporarily_disabled():
+    config = (ROOT / 'assets' / 'auth-config.js').read_text(encoding='utf-8')
+    gate = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
+    assert 'accessGateEnabled: false' in config
+    assert 'accessGateEnabled' in gate
+    assert '!accessGateEnabled' in gate
+
+
 def test_protected_pages_load_gate_after_config():
     for path in PROTECTED:
         html = path.read_text(encoding='utf-8')

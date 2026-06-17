@@ -12,6 +12,10 @@ window.HOWINSIGHT_AUTH_CONFIG = {
     'sniffshiba@gmail.com'
   ],
 
+  // 최종 배포 전까지 접근 신청/승인 게이트를 잠시 비활성화합니다.
+  // 다시 활성화할 때 true로 바꾸면 기존 Supabase 설정을 그대로 사용합니다.
+  accessGateEnabled: false,
+
   // 보호 대상 페이지. index.html과 admin.html은 별도 처리합니다.
   protectedPathPattern: /\/(prologue|epilogue)\.html$|\/sessions\/session-\d+\.html$/,
 

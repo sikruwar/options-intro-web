@@ -1,12 +1,13 @@
 (() => {
   const config = window.HOWINSIGHT_AUTH_CONFIG || {};
-  const isConfigured = Boolean(config.supabaseUrl && config.supabaseAnonKey);
+  const accessGateEnabled = config.accessGateEnabled !== false;
+  const isConfigured = accessGateEnabled && Boolean(config.supabaseUrl && config.supabaseAnonKey);
   const path = window.location.pathname;
   const shouldProtect = config.protectedPathPattern instanceof RegExp
     ? config.protectedPathPattern.test(path)
     : /\/(prologue|epilogue)\.html$|\/sessions\/session-\d+\.html$/.test(path);
 
-  if (!shouldProtect) return;
+  if (!shouldProtect || !accessGateEnabled) return;
 
   if (!isConfigured) {
     console.warn('[HowInsight Auth] Supabase config is empty. Course remains public until assets/auth-config.js is configured.');
