@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,30 +25,31 @@
     .nav-brand { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-muted); letter-spacing: 0.08em; text-decoration: none; }
     .nav-brand span { color: var(--amber); }
     .nav-brand:hover { color: var(--text); }
-    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
     .nav-session { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim); }
-    .nav-prev, .nav-next { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+    .nav-prev, .nav-next { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
     .nav-prev:hover, .nav-next:hover { color: var(--amber); }
     .nav-sep { color: var(--text-dim); font-size: 12px; }
 
-    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 120px 10vw 80px; position: relative; overflow: hidden; }
+    .hero { min-height: 94vh; display: flex; align-items: center; padding: 122px 10vw 80px; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; top: -200px; right: -100px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(34,197,94,0.05) 0%, transparent 70%); pointer-events: none; }
+    .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
     .hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--amber); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 28px; }
-    .hero h1 { font-size: clamp(34px, 6.5vw, 70px); font-weight: 900; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(40px, 7vw, 84px); font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px; }
     .hero h1 .hi { color: var(--green); }
-    .hero-sub { font-size: clamp(15px, 2vw, 19px); color: var(--text-muted); font-weight: 300; max-width: 520px; margin-bottom: 48px; line-height: 1.7; }
-    .hero-thesis { background: var(--bg-card); border: 1px solid var(--border-light); border-left: 3px solid var(--amber); padding: 20px 28px; max-width: 580px; font-size: 17px; font-weight: 500; line-height: 1.65; border-radius: 0 8px 8px 0; }
+    .hero-sub { font-size: clamp(15px, 2vw, 19px); color: var(--text-muted); font-weight: 300; max-width: 740px; margin-bottom: 38px; line-height: 1.72; }
+    .hero-thesis { background: var(--bg-card); border: 1px solid var(--border-light); border-left: 3px solid var(--amber); padding: 20px 28px; max-width: 760px; font-size: 17px; font-weight: 500; line-height: 1.65; border-radius: 0 12px 12px 0; }
     .hero-thesis .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.15em; margin-bottom: 10px; }
     .scroll-hint { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .scroll-hint span { font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; }
     .scroll-dot { width: 4px; height: 24px; background: linear-gradient(var(--border-light), transparent); border-radius: 2px; animation: scrollPulse 2s ease-in-out infinite; }
     @keyframes scrollPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
 
-    .section { max-width: 760px; margin: 0 auto; padding: 80px 24px; }
-    .section-wide { max-width: 960px; margin: 0 auto; padding: 80px 24px; }
+    .section { max-width: 810px; margin: 0 auto; padding: 78px 24px; }
+    .section-wide { max-width: 1080px; margin: 0 auto; padding: 78px 24px; }
     .section-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
     .section-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 16px; }
-    .section h2, .section-wide h2 { font-size: clamp(22px, 4vw, 34px); font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 32px; }
+    .section h2, .section-wide h2 { font-size: clamp(24px, 4vw, 38px); font-weight: 800; line-height: 1.24; letter-spacing: 0; margin-bottom: 28px; }
     .prose p { font-size: 16px; line-height: 1.85; color: #D4CFC8; margin-bottom: 20px; }
     .prose p:last-child { margin-bottom: 0; }
     .prose strong { color: var(--text); font-weight: 600; }
@@ -256,7 +257,7 @@
     .theme-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
     @media (max-width: 680px) {
       .nav-right { gap: 8px; }
-      .nav-session, .nav-sep { display: none; }
+      .nav-session, .nav-prev, .nav-index, .nav-forward, .nav-sep { display: none; }
       .theme-btn { min-width: 42px; min-height: 30px; padding: 5px 8px; }
     }
   </style>
@@ -269,8 +270,9 @@
   <a href="../index.html" class="nav-brand">무기견 <span>@mugigyon</span></a>
   <div class="nav-right">
     <a href="session-03.html" class="nav-prev">3회차</a>
-    <span class="nav-sep">/</span>
     <span class="nav-session">SESSION 04</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-05.html" class="nav-next nav-forward">5회차 →</a>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
       <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
       <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
@@ -280,12 +282,14 @@
 
 <!-- HERO -->
 <section class="hero">
+  <div class="hero-inner">
   <div class="hero-eyebrow">무기견의 옵션 입문 · 4회차</div>
   <h1>만기<br><span class="hi">손익그래프</span>,<br>그림으로 보면<br>구조가 보인다</h1>
   <p class="hero-sub">네 가지 기본 포지션 · Level 1 · 읽기 약 15분</p>
   <div class="hero-thesis">
     <div class="label">4회차 핵심 문장</div>
     옵션은 숫자로만 보면 복잡하지만,<br>만기 손익그래프를 그리면 구조가 보입니다.
+  </div>
   </div>
   <div class="scroll-hint"><span>SCROLL</span><div class="scroll-dot"></div></div>
 </section>
@@ -895,7 +899,7 @@
     if (safeTheme === 'olive') {
       document.documentElement.setAttribute('data-theme', 'olive');
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', 'dark');
     }
     themeButtons.forEach(btn => {
       const active = btn.dataset.themeChoice === safeTheme;

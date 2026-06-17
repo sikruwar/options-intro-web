@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,27 +127,27 @@
       background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
       pointer-events: none;
     }
-    .hero-inner { position: relative; z-index: 1; max-width: 900px; }
+    .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
     .eyebrow {
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px; color: var(--amber); letter-spacing: .15em;
       text-transform: uppercase; margin-bottom: 26px;
     }
     .hero h1 {
-      font-size: clamp(38px, 7vw, 84px);
-      font-weight: 900; line-height: 1.06; letter-spacing: -.045em; margin-bottom: 24px;
+      font-size: clamp(40px, 7vw, 84px);
+      font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px;
     }
     .hero h1 .hi { color: var(--blue); }
     .hero-sub {
       font-size: clamp(15px, 2vw, 19px); color: var(--text-muted);
-      font-weight: 300; max-width: 680px; line-height: 1.72; margin-bottom: 38px;
+      font-weight: 300; max-width: 740px; line-height: 1.72; margin-bottom: 38px;
     }
     .thesis {
       background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
       border: 1px solid var(--border-light);
       border-left: 3px solid var(--blue);
       padding: 21px 28px; border-radius: 0 12px 12px 0;
-      box-shadow: var(--shadow); max-width: 710px;
+      box-shadow: var(--shadow); max-width: 760px;
     }
     .thesis-label {
       font-family: 'JetBrains Mono', monospace;
@@ -379,7 +379,7 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 760px) {
       nav { padding: 11px 18px; }
-      .nav-session { display: none; }
+      .nav-session, .nav-prev, .nav-index, .nav-forward { display: none; }
       .nav-right { gap: 8px; }
       .hero { padding: 104px 24px 62px; min-height: 88vh; }
       .section, .section-wide { padding: 58px 20px; }
@@ -402,7 +402,8 @@
   <div class="nav-right">
     <a href="session-06.html" class="nav-prev">6회차</a>
     <span class="nav-session">SESSION 07</span>
-    <a href="session-08.html" class="nav-next">8회차 →</a>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-08.html" class="nav-next nav-forward">8회차 →</a>
     <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
       <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
       <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
