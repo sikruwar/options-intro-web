@@ -46,8 +46,8 @@ Supabase Authentication → URL Configuration에서 다음을 설정합니다.
 5. 관리자는 `/admin.html`에서 신청자를 승인합니다.
 6. 승인된 이메일은 강의 페이지를 볼 수 있습니다.
 
-## 5. 현재 안전장치
+## 5. 현재 활성화 상태와 안전장치
 
-`assets/auth-config.js`의 Supabase 값이 비어 있으면 사이트는 공개 상태로 동작합니다. 설정 전 배포로 강의가 갑자기 막히지 않게 하기 위한 장치입니다.
+현재 `assets/auth-config.js`에는 HowInsight Supabase 프로젝트 URL, publishable anon key, 관리자 이메일이 들어가 있고 `accessGateEnabled: true`로 설정되어 있습니다. 따라서 보호 대상 강의 페이지는 이메일 magic link 로그인과 관리자 승인 후 열립니다.
 
-값을 채우고 배포하면 접근 제한이 활성화됩니다.
+긴급하게 전체 공개로 되돌려야 하면 `accessGateEnabled: false`로 바꾸고 다시 배포하면 됩니다. Supabase 값이 비어 있어도 사이트는 공개 상태로 동작합니다. 설정 오류로 강의가 갑자기 막히지 않게 하기 위한 안전장치입니다.

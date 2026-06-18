@@ -11,10 +11,10 @@ def test_auth_assets_exist():
     assert (ROOT / 'supabase_schema.sql').exists()
 
 
-def test_access_gate_can_be_temporarily_disabled():
+def test_access_gate_is_enabled_with_emergency_disable_switch():
     config = (ROOT / 'assets' / 'auth-config.js').read_text(encoding='utf-8')
     gate = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    assert 'accessGateEnabled: false' in config
+    assert 'accessGateEnabled: true' in config
     assert 'accessGateEnabled' in gate
     assert '!accessGateEnabled' in gate
 
