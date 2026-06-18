@@ -127,6 +127,8 @@ def test_x_subscriber_allowlist_admin_ui_exists():
     assert 'sync-subscribers' in admin
     assert '활성구독자 확인' in js
     assert '구독자 목록 없음' in js
+    assert "textarea.value = handles.join('\\n')" in js
+    assert '입력칸에 현재 명단을 표시했고' in js
     assert 'x_subscribers' in js
     assert 'x_subscribers' in schema
     assert 'Admins can manage x subscribers' in schema

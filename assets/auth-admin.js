@@ -323,8 +323,11 @@
       renderSubscriberSummary('X 활성 구독자 명단 테이블이 아직 연결되지 않았습니다. 신청 승인은 계속 사용할 수 있습니다.');
       return;
     }
-    activeSubscriberHandles = new Set((data || []).map((row) => canonicalXHandle(row.x_handle)).filter(Boolean));
-    renderSubscriberSummary(`활성 구독자 ${activeSubscriberHandles.size}명을 불러왔습니다. 신청 목록의 X 아이디와 자동 대조합니다.`);
+    const handles = (data || []).map((row) => normalizeXHandle(row.x_handle)).filter(Boolean);
+    activeSubscriberHandles = new Set(handles.map(canonicalXHandle));
+    const textarea = $('x-subscriber-handles');
+    if (textarea) textarea.value = handles.join('\n');
+    renderSubscriberSummary(`활성 구독자 ${activeSubscriberHandles.size}명을 불러왔습니다. 입력칸에 현재 명단을 표시했고, 신청 목록의 X 아이디와 자동 대조합니다.`);
   }
 
   async function syncSubscribers(supabase) {
