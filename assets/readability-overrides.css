@@ -1,0 +1,150 @@
+/* Course-wide readability tuning for dark and olive themes. */
+:root {
+  --readable-label: #ffd27a;
+  --readable-label-bg: rgba(245, 177, 76, .12);
+  --readable-label-border: rgba(245, 177, 76, .38);
+  --readable-label-glow: rgba(245, 177, 76, .18);
+  --readable-figure-text: #f5efe4;
+  --readable-figure-muted: #d2c7b5;
+  --readable-figure-dim: #bfb39f;
+  --readable-figure-border: rgba(245, 177, 76, .28);
+}
+
+:root[data-theme="olive"] {
+  --readable-label: #536a15;
+  --readable-label-bg: rgba(125, 143, 58, .14);
+  --readable-label-border: rgba(83, 106, 21, .32);
+  --readable-label-glow: rgba(83, 106, 21, .12);
+  --readable-figure-text: #162213;
+  --readable-figure-muted: #33412c;
+  --readable-figure-dim: #4f5d43;
+  --readable-figure-border: rgba(83, 106, 21, .26);
+}
+
+.section-num {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--readable-label-border);
+  border-radius: 999px;
+  background: var(--readable-label-bg);
+  color: var(--readable-label) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: .12em !important;
+  line-height: 1;
+  text-shadow: 0 0 18px var(--readable-label-glow);
+}
+
+.rt-num {
+  color: var(--readable-label) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  letter-spacing: .08em;
+  text-shadow: 0 0 16px var(--readable-label-glow);
+}
+
+.rt-section-label,
+.fig-label {
+  color: var(--readable-label) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: .1em !important;
+}
+
+.fig {
+  border-color: var(--readable-figure-border) !important;
+}
+
+.fig h2,
+.fig h3,
+.fig h4,
+.fig .mini-v,
+.fig strong,
+.fig b,
+.fig .slider-title,
+.fig .f6-role,
+.fig .result strong,
+.fig .premium-center span,
+.fig .premium-center b,
+.fig .language-core,
+.fig .language-node {
+  color: var(--readable-figure-text) !important;
+}
+
+.fig p,
+.fig li,
+.fig .mini-p,
+.fig .fig-caption,
+.fig .answer-row p,
+.fig .note-strip,
+.fig .viz-copy,
+.fig .f6-party p,
+.fig .f6-cmp p,
+.fig .worksheet-lines div,
+.fig .worksheet-prompts span,
+.fig .f6-chip,
+.fig .language-core,
+.fig .language-node {
+  color: var(--readable-figure-muted) !important;
+}
+
+.fig .mini-k,
+.fig .rail-step span,
+.fig .meta-row span,
+.fig .result span,
+.fig .scenario-strip span,
+.fig .f6-flow .f6-flow-k,
+.fig .f6-cmp .f6-cmp-k,
+.fig .worksheet-field label,
+.fig .compare-label,
+.fig .viz-metric span,
+.fig .next-label {
+  color: var(--readable-figure-dim) !important;
+  font-weight: 700 !important;
+}
+
+.fig .fig-caption,
+.fig .mini-p,
+.fig .answer-row p,
+.fig .note-strip {
+  font-size: 14px !important;
+  line-height: 1.68 !important;
+}
+
+.fig svg text,
+.fig .payoff-chart text,
+.fig .viz-label {
+  fill: var(--readable-figure-muted) !important;
+  color: var(--readable-figure-muted) !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+}
+
+.fig .badge.good,
+.fig .result.pos strong {
+  color: var(--green) !important;
+}
+
+.fig .badge.bad,
+.fig .result.neg strong {
+  color: var(--red) !important;
+}
+
+.fig .badge.warn,
+.fig .slider-val,
+.fig .answer-row strong {
+  color: var(--amber) !important;
+}
+
+@media (max-width: 760px) {
+  .section-num {
+    min-height: 26px;
+    font-size: 12px !important;
+  }
+
+  .rt-num {
+    font-size: 14px !important;
+  }
+}

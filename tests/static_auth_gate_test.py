@@ -88,6 +88,16 @@ def test_mobile_course_navigation_is_visible_on_course_pages():
         assert 'nav-forward' in html
 
 
+def test_course_readability_overrides_are_loaded_on_course_pages():
+    assert (ROOT / 'assets' / 'readability-overrides.css').exists()
+    pages = [ROOT / 'index.html', ROOT / 'prologue.html', ROOT / 'epilogue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
+    assert len(pages) == 33
+    for path in pages:
+        html = path.read_text(encoding='utf-8')
+        expected_href = '../assets/readability-overrides.css' if path.parent.name == 'sessions' else 'assets/readability-overrides.css'
+        assert expected_href in html
+
+
 
 def test_course_visibility_admin_ui_exists():
     admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
