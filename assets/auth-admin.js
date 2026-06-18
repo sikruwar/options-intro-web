@@ -3,6 +3,7 @@
   const isConfigured = Boolean(config.supabaseUrl && config.supabaseAnonKey);
   const adminEmails = (config.adminEmails || []).map((email) => String(email).trim().toLowerCase());
   let supabaseClient = null;
+  let activeSubscriberHandles = new Set();
 
   const $ = (id) => document.getElementById(id);
   const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
@@ -11,6 +12,8 @@
     if (!raw) return '';
     return raw.startsWith('@') ? raw : `@${raw}`;
   };
+
+  const canonicalXHandle = (handle) => normalizeXHandle(handle).toLowerCase();
 
   const DEFAULT_COURSE_SESSIONS = [
   {
@@ -289,6 +292,75 @@
     });
   }
 
+
+  function parseSubscriberHandles(text) {
+    const handles = String(text || '').match(/@?[A-Za-z0-9_]{1,15}/g) || [];
+    return Array.from(new Set(handles.map(canonicalXHandle).filter(Boolean))).sort();
+  }
+
+  function subscriberBadge(xHandle) {
+    const canonical = canonicalXHandle(xHandle);
+    if (!canonical) return '<span class="subscriber-status empty">X 미입력</span>';
+    if (!activeSubscriberHandles.size) return '<span class="subscriber-status empty">구독자 명단 미적용</span>';
+    if (activeSubscriberHandles.has(canonical)) return '<span class="subscriber-status active">활성구독자 확인</span>';
+    return '<span class="subscriber-status missing">구독자 목록 없음</span>';
+  }
+
+  function renderSubscriberSummary(text) {
+    const el = $('subscriber-summary');
+    if (el) el.textContent = text;
+  }
+
+  async function loadSubscribers(supabase) {
+    const { data, error } = await supabase
+      .from('x_subscribers')
+      .select('x_handle, active')
+      .eq('active', true)
+      .order('x_handle', { ascending: true });
+    if (error) {
+      console.warn('[HowInsight Admin] x_subscribers table unavailable:', error.message);
+      activeSubscriberHandles = new Set();
+      renderSubscriberSummary('X 활성 구독자 명단 테이블이 아직 연결되지 않았습니다. 신청 승인은 계속 사용할 수 있습니다.');
+      return;
+    }
+    activeSubscriberHandles = new Set((data || []).map((row) => canonicalXHandle(row.x_handle)).filter(Boolean));
+    renderSubscriberSummary(`활성 구독자 ${activeSubscriberHandles.size}명을 불러왔습니다. 신청 목록의 X 아이디와 자동 대조합니다.`);
+  }
+
+  async function syncSubscribers(supabase) {
+    const textarea = $('x-subscriber-handles');
+    const handles = parseSubscriberHandles(textarea?.value || '');
+    if (!handles.length) {
+      renderSubscriberSummary('붙여넣은 X 아이디가 없습니다. @아이디 목록을 입력한 뒤 동기화하세요.');
+      return;
+    }
+    const importedAt = new Date().toISOString();
+    const { data: existing, error: readError } = await supabase
+      .from('x_subscribers')
+      .select('x_handle')
+      .eq('active', true);
+    if (readError) throw readError;
+    const incoming = new Set(handles);
+    const toDeactivate = (existing || [])
+      .map((row) => canonicalXHandle(row.x_handle))
+      .filter((handle) => handle && !incoming.has(handle));
+    if (toDeactivate.length) {
+      const { error: deactivateError } = await supabase
+        .from('x_subscribers')
+        .update({ active: false, imported_at: importedAt })
+        .in('x_handle', toDeactivate);
+      if (deactivateError) throw deactivateError;
+    }
+    const payload = handles.map((handle) => ({ x_handle: handle, active: true, imported_at: importedAt }));
+    const { error } = await supabase
+      .from('x_subscribers')
+      .upsert(payload, { onConflict: 'x_handle' });
+    if (error) throw error;
+    await loadSubscribers(supabase);
+    await loadRequests(supabase);
+    renderSubscriberSummary(`활성 구독자 ${handles.length}명을 동기화했습니다. 이번 명단에 없는 기존 활성 구독자 ${toDeactivate.length}명은 비활성 처리했습니다.`);
+  }
+
   function rowTemplate(req) {
     const requested = req.requested_at ? new Date(req.requested_at).toLocaleString('ko-KR') : '-';
     const status = req.status || 'pending';
@@ -305,6 +377,7 @@
         <div>
           <strong>${email}</strong>
           <span>${xHandle}</span>
+          ${subscriberBadge(req.x_handle)}
           <small>${requested} · ${status}</small>
         </div>
         <div class="request-actions">${actions}</div>
@@ -422,6 +495,7 @@
     $('admin-email').textContent = email;
     $('admin-app')?.classList.remove('is-disabled');
     setStatus('신청 목록을 불러왔습니다.');
+    await loadSubscribers(supabase);
     await loadRequests(supabase);
     await loadSessionVisibility(supabase);
 
@@ -464,8 +538,31 @@
     });
 
     $('refresh-requests')?.addEventListener('click', async () => {
+      await loadSubscribers(supabase);
       await loadRequests(supabase);
       setStatus('새로고침 완료');
+    });
+    $('refresh-subscribers')?.addEventListener('click', async () => {
+      await loadSubscribers(supabase);
+      await loadRequests(supabase);
+      setStatus('X 활성 구독자 명단을 새로고침했습니다.');
+    });
+    $('sync-subscribers')?.addEventListener('click', async (event) => {
+      event.currentTarget.disabled = true;
+      try {
+        await syncSubscribers(supabase);
+        setStatus('X 활성 구독자 명단을 동기화했습니다.');
+      } catch (error) {
+        console.warn('[HowInsight Admin] x subscriber sync failed:', error.message);
+        setStatus('X 활성 구독자 명단을 저장하지 못했습니다. Supabase x_subscribers 테이블을 확인해주세요.');
+      } finally {
+        event.currentTarget.disabled = false;
+      }
+    });
+    $('clear-subscriber-input')?.addEventListener('click', () => {
+      const textarea = $('x-subscriber-handles');
+      if (textarea) textarea.value = '';
+      renderSubscriberSummary(`활성 구독자 ${activeSubscriberHandles.size}명을 불러온 상태입니다.`);
     });
     $('refresh-visibility')?.addEventListener('click', async () => {
       await loadSessionVisibility(supabase);

@@ -116,3 +116,17 @@ def test_visibility_checkboxes_render_before_remote_table():
     assert 'list.innerHTML = mergeVisibilityRows([]).map(visibilityRowTemplate).join' in js
     assert '체크박스는 먼저 선택할 수 있고' not in js
     assert 'course_session_visibility table unavailable' in js
+
+
+
+def test_x_subscriber_allowlist_admin_ui_exists():
+    admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
+    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
+    schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
+    assert 'x-subscriber-handles' in admin
+    assert 'sync-subscribers' in admin
+    assert '활성구독자 확인' in js
+    assert '구독자 목록 없음' in js
+    assert 'x_subscribers' in js
+    assert 'x_subscribers' in schema
+    assert 'Admins can manage x subscribers' in schema
