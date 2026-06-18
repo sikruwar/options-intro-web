@@ -291,17 +291,23 @@
 
   function rowTemplate(req) {
     const requested = req.requested_at ? new Date(req.requested_at).toLocaleString('ko-KR') : '-';
+    const status = req.status || 'pending';
+    const email = escapeHtml(req.email);
+    const xHandle = escapeHtml(req.x_handle || '-');
+    const rowClass = status === 'approved' ? ' is-approved' : status === 'rejected' ? ' is-rejected' : '';
+    const actions = status === 'approved'
+      ? '<span class="request-status approved">승인됨</span>'
+      : status === 'rejected'
+        ? `<button data-action="approve" data-email="${email}" data-x="${xHandle === '-' ? '' : xHandle}">재승인</button><span class="request-status rejected">거절됨</span>`
+        : `<button data-action="approve" data-email="${email}" data-x="${xHandle === '-' ? '' : xHandle}">승인</button><button data-action="reject" data-email="${email}">거절</button>`;
     return `
-      <div class="request-row" data-email="${req.email}">
+      <div class="request-row${rowClass}" data-email="${email}">
         <div>
-          <strong>${req.email}</strong>
-          <span>${req.x_handle || '-'}</span>
-          <small>${requested} · ${req.status || 'pending'}</small>
+          <strong>${email}</strong>
+          <span>${xHandle}</span>
+          <small>${requested} · ${status}</small>
         </div>
-        <div class="request-actions">
-          <button data-action="approve" data-email="${req.email}" data-x="${req.x_handle || ''}">승인</button>
-          <button data-action="reject" data-email="${req.email}">거절</button>
-        </div>
+        <div class="request-actions">${actions}</div>
       </div>
     `;
   }
@@ -366,13 +372,14 @@
   async function loadSessionVisibility(supabase) {
     const list = $('session-visibility-list');
     if (!list) return;
+    list.innerHTML = mergeVisibilityRows([]).map(visibilityRowTemplate).join('');
     const { data, error } = await supabase
       .from('course_session_visibility')
       .select('slug, visible')
       .order('sort_order', { ascending: true });
     if (error) {
-      list.innerHTML = '<p class="muted">공개 회차 테이블을 불러오지 못했습니다. supabase_schema.sql의 course_session_visibility 구문을 먼저 실행하세요.</p>';
-      throw error;
+      setStatus(`공개 회차 설정 테이블 확인 필요: ${error.message}. 체크박스는 먼저 선택할 수 있고, 저장하려면 supabase_schema.sql의 course_session_visibility 구문을 실행해야 합니다.`);
+      return;
     }
     const rows = mergeVisibilityRows(data || []);
     list.innerHTML = rows.map(visibilityRowTemplate).join('');
@@ -416,7 +423,7 @@
     $('admin-app')?.classList.remove('is-disabled');
     setStatus('신청 목록을 불러왔습니다.');
     await loadRequests(supabase);
-    try { await loadSessionVisibility(supabase); } catch (error) { setStatus(`공개 회차 설정 확인 필요: ${error.message}`); }
+    await loadSessionVisibility(supabase);
 
     $('request-list')?.addEventListener('click', async (event) => {
       const button = event.target.closest('button[data-action]');
@@ -425,9 +432,25 @@
       try {
         if (button.dataset.action === 'approve') {
           await approve(supabase, button.dataset.email, button.dataset.x);
-          setStatus(`${button.dataset.email} 승인 완료`);
+          const row = button.closest('.request-row');
+          if (row) {
+            row.classList.add('is-approved');
+            row.classList.remove('is-rejected');
+            const small = row.querySelector('small');
+            if (small) small.textContent = `${new Date().toLocaleString('ko-KR')} · approved`;
+            const actions = row.querySelector('.request-actions');
+            if (actions) actions.innerHTML = '<span class="request-status approved">승인됨</span>';
+          }
+          setStatus(`${button.dataset.email} 승인 완료. 승인 계정 목록에 반영됐습니다.`);
         } else {
           await reject(supabase, button.dataset.email);
+          const row = button.closest('.request-row');
+          if (row) {
+            row.classList.add('is-rejected');
+            row.classList.remove('is-approved');
+            const small = row.querySelector('small');
+            if (small) small.textContent = `${new Date().toLocaleString('ko-KR')} · rejected`;
+          }
           setStatus(`${button.dataset.email} 거절 처리 완료`);
         }
         await loadRequests(supabase);

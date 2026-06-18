@@ -36,6 +36,11 @@
     .request-row small { display:block; color:var(--text-dim); margin-top:4px; }
     .request-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
     .request-actions button[data-action="reject"] { background:transparent; color:var(--red); border:1px solid rgba(239,68,68,.35); }
+    .request-row.is-approved { border-color:rgba(53,208,127,.38); }
+    .request-row.is-rejected { border-color:rgba(239,68,68,.32); opacity:.72; }
+    .request-status { display:inline-flex; align-items:center; min-height:24px; padding:2px 9px; border-radius:999px; border:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); }
+    .request-status.approved { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .request-status.rejected { color:var(--red); border-color:rgba(239,68,68,.35); }
 
     .session-visibility-list { display:grid; gap:10px; }
     .session-visibility-row { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; border:1px solid var(--border); background:var(--bg-card); border-radius:14px; padding:13px 15px; }
@@ -98,10 +103,6 @@
           <button id="select-none-sessions" class="secondary" type="button">전체 비공개</button>
         </div>
         <p class="muted">처음 설정 전에는 사이트가 기본 공개 상태로 동작합니다. 저장 후에는 선택한 회차만 공개됩니다.</p>
-      </section>
-      <section class="panel">
-        <h2>필수 Supabase 테이블</h2>
-        <p>이 페이지는 <code>access_requests</code>, <code>approved_users</code>, <code>admin_users</code>, <code>course_session_visibility</code> 테이블을 사용합니다. SQL은 <code>supabase_schema.sql</code>에 들어 있습니다.</p>
       </section>
     </div>
   </main>

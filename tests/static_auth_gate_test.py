@@ -35,10 +35,11 @@ def test_public_index_hides_admin_link_and_request_copy():
 
 def test_admin_page_loads_admin_script():
     html = (ROOT / 'admin.html').read_text(encoding='utf-8')
+    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
     assert 'assets/auth-config.js' in html
     assert 'assets/auth-admin.js' in html
-    assert 'access_requests' in html
-    assert 'approved_users' in html
+    assert 'access_requests' in js
+    assert 'approved_users' in js
 
 
 def test_approved_user_identity_badge_exists():
@@ -80,6 +81,7 @@ def test_course_visibility_admin_ui_exists():
     schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
     assert 'session-visibility-list' in admin
     assert 'save-visibility' in admin
+    assert '필수 Supabase 테이블' not in admin
     assert 'course_session_visibility' in js
     assert 'course_session_visibility' in schema
     assert 'Anyone can read course session visibility' in schema
@@ -95,3 +97,19 @@ def test_course_visibility_script_is_loaded_on_course_pages():
         assert 'course-visibility.js' in html
         if 'auth-config.js' in html:
             assert html.index('auth-config.js') < html.index('course-visibility.js')
+
+
+
+def test_admin_request_approval_feedback_exists():
+    admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
+    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
+    assert 'request-status approved' in js
+    assert '승인됨' in js
+    assert 'is-approved' in admin
+    assert '승인 계정 목록에 반영됐습니다' in js
+
+
+def test_visibility_checkboxes_render_before_remote_table():
+    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
+    assert 'list.innerHTML = mergeVisibilityRows([]).map(visibilityRowTemplate).join' in js
+    assert '체크박스는 먼저 선택할 수 있고' in js
