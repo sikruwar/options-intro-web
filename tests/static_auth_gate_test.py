@@ -140,3 +140,17 @@ def test_x_subscriber_allowlist_admin_ui_exists():
     assert 'x_subscribers' in js
     assert 'x_subscribers' in schema
     assert 'Admins can manage x subscribers' in schema
+
+
+def test_access_request_rls_keeps_user_requests_pending_only():
+    gate_js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
+    schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
+
+    assert "Anyone can create pending access request" in schema
+    assert "Authenticated users can update pending own request metadata" in schema
+    assert 'drop policy if exists "Anyone can request access"' in schema
+    assert 'drop policy if exists "Authenticated users can update own request"' in schema
+    assert "status = 'pending'" in schema
+    assert "approved_at is null" in schema
+    assert "status: 'pending'" in gate_js
+    assert "approved_at: null" in gate_js

@@ -64,21 +64,42 @@ as $$
   );
 $$;
 
--- 신청자는 로그인 전에도 신청 정보를 남길 수 있어야 합니다.
+-- 신청자는 로그인 전에도 pending 신청 정보만 남길 수 있어야 합니다.
 drop policy if exists "Anyone can request access" on public.access_requests;
-create policy "Anyone can request access"
+drop policy if exists "Anyone can create pending access request" on public.access_requests;
+create policy "Anyone can create pending access request"
 on public.access_requests
 for insert
 to anon, authenticated
-with check (true);
+with check (
+  email = lower(trim(email))
+  and length(email) >= 3
+  and x_handle = trim(x_handle)
+  and length(x_handle) >= 2
+  and status = 'pending'
+  and approved_at is null
+);
 
 drop policy if exists "Authenticated users can update own request" on public.access_requests;
-create policy "Authenticated users can update own request"
+drop policy if exists "Authenticated users can update pending own request metadata" on public.access_requests;
+create policy "Authenticated users can update pending own request metadata"
 on public.access_requests
 for update
 to authenticated
-using (email = public.current_user_email())
-with check (email = public.current_user_email());
+using (
+  email = public.current_user_email()
+  and status = 'pending'
+  and approved_at is null
+)
+with check (
+  email = public.current_user_email()
+  and email = lower(trim(email))
+  and length(email) >= 3
+  and x_handle = trim(x_handle)
+  and length(x_handle) >= 2
+  and status = 'pending'
+  and approved_at is null
+);
 
 -- 관리자는 신청 목록을 보고 상태를 바꿀 수 있습니다.
 drop policy if exists "Admins can read requests" on public.access_requests;

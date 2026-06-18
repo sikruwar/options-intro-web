@@ -142,12 +142,13 @@
     return state.supabase;
   }
 
-  async function upsertRequest(email, xHandle, status = 'pending') {
+  async function upsertRequest(email, xHandle) {
     const supabase = await getClient();
     const payload = {
       email: normalizeEmail(email),
       x_handle: normalizeXHandle(xHandle),
-      status,
+      status: 'pending',
+      approved_at: null,
       source_path: path,
       requested_at: new Date().toISOString()
     };
@@ -216,7 +217,7 @@
       const btn = event.currentTarget.querySelector('button');
       btn.disabled = true;
       try {
-        await upsertRequest(email, event.currentTarget.x_handle.value, 'pending');
+        await upsertRequest(email, event.currentTarget.x_handle.value);
         statusMessage('신청 정보가 저장됐습니다. 승인 후 같은 이메일로 다시 접속하면 강의를 볼 수 있습니다.');
       } catch (error) {
         statusMessage(`저장 중 문제가 생겼습니다: ${error.message}`);
@@ -259,7 +260,7 @@
           statusMessage(`인증 메일을 방금 요청했습니다. 메일함을 먼저 확인해주세요. 다시 요청은 약 ${retryAfter}초 뒤에 가능합니다.`);
           return;
         }
-        await upsertRequest(email, xHandle, 'pending');
+        await upsertRequest(email, xHandle);
         const supabase = await getClient();
         const { error } = await supabase.auth.signInWithOtp({
           email,
