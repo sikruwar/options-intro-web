@@ -103,11 +103,17 @@
         <label for="x-subscriber-handles">활성 구독자 @아이디 목록</label>
         <textarea id="x-subscriber-handles" placeholder="@subscriber1&#10;@subscriber2&#10;subscriber3"></textarea>
         <div class="visibility-actions">
-          <button id="sync-subscribers" type="button">붙여넣은 명단으로 동기화</button>
+          <button id="sync-subscribers" type="button">입력칸 명단 저장</button>
+          <button id="normalize-subscriber-input" class="secondary" type="button">중복 정리</button>
           <button id="clear-subscriber-input" class="secondary" type="button">입력칸 비우기</button>
         </div>
+        <label for="x-subscriber-add-one">구독자 1명 빠른 추가</label>
+        <div class="visibility-actions">
+          <input id="x-subscriber-add-one" type="text" placeholder="@subscriber" autocomplete="off">
+          <button id="add-one-subscriber" type="button">추가</button>
+        </div>
         <div id="subscriber-summary" class="subscriber-summary">활성 구독자 명단을 불러오는 중입니다.</div>
-        <p class="muted">동기화는 붙여넣은 명단을 현재 활성 구독자 기준으로 봅니다. 명단에 없는 기존 구독자는 비활성 처리되어 신청 목록에서 ‘목록 없음’으로 표시됩니다.</p>
+        <p class="muted">추가는 입력칸에 @아이디를 더한 뒤 저장하면 됩니다. 삭제는 입력칸에서 해당 줄을 지우고 저장하면 반영됩니다. 저장 시 입력칸에 없는 기존 구독자는 비활성 처리되어 신청 목록에서 ‘목록 없음’으로 표시됩니다.</p>
       </section>
       <section class="panel">
         <div class="panel-head">

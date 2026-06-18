@@ -298,6 +298,22 @@
     return Array.from(new Set(handles.map(canonicalXHandle).filter(Boolean))).sort();
   }
 
+  function normalizeSubscriberTextarea() {
+    const textarea = $('x-subscriber-handles');
+    if (!textarea) return [];
+    const handles = parseSubscriberHandles(textarea.value);
+    textarea.value = handles.join('\n');
+    return handles;
+  }
+
+  function addOneSubscriberToTextarea(rawHandle) {
+    const textarea = $('x-subscriber-handles');
+    if (!textarea) return [];
+    const handles = parseSubscriberHandles(`${textarea.value}\n${rawHandle || ''}`);
+    textarea.value = handles.join('\n');
+    return handles;
+  }
+
   function subscriberBadge(xHandle) {
     const canonical = canonicalXHandle(xHandle);
     if (!canonical) return '<span class="subscriber-status empty">X 미입력</span>';
@@ -332,7 +348,7 @@
 
   async function syncSubscribers(supabase) {
     const textarea = $('x-subscriber-handles');
-    const handles = parseSubscriberHandles(textarea?.value || '');
+    const handles = normalizeSubscriberTextarea();
     if (!handles.length) {
       renderSubscriberSummary('붙여넣은 X 아이디가 없습니다. @아이디 목록을 입력한 뒤 동기화하세요.');
       return;
@@ -554,13 +570,31 @@
       event.currentTarget.disabled = true;
       try {
         await syncSubscribers(supabase);
-        setStatus('X 활성 구독자 명단을 동기화했습니다.');
+        setStatus('X 활성 구독자 명단을 저장했습니다. 입력칸 기준으로 추가·삭제가 반영됐습니다.');
       } catch (error) {
         console.warn('[HowInsight Admin] x subscriber sync failed:', error.message);
         setStatus('X 활성 구독자 명단을 저장하지 못했습니다. Supabase x_subscribers 테이블을 확인해주세요.');
       } finally {
         event.currentTarget.disabled = false;
       }
+    });
+    $('normalize-subscriber-input')?.addEventListener('click', () => {
+      const handles = normalizeSubscriberTextarea();
+      renderSubscriberSummary(`입력칸 명단을 ${handles.length}명으로 정리했습니다. 저장 버튼을 눌러야 실제 권한 기준에 반영됩니다.`);
+      setStatus('중복 정리 완료. 변경을 적용하려면 입력칸 명단 저장을 누르세요.');
+    });
+    $('add-one-subscriber')?.addEventListener('click', () => {
+      const input = $('x-subscriber-add-one');
+      const rawHandle = input?.value || '';
+      const handle = normalizeXHandle(rawHandle);
+      if (!handle) {
+        renderSubscriberSummary('추가할 @아이디를 입력해주세요.');
+        return;
+      }
+      const handles = addOneSubscriberToTextarea(handle);
+      if (input) input.value = '';
+      renderSubscriberSummary(`${handle}을 입력칸에 추가했습니다. 현재 입력칸 ${handles.length}명. 저장 버튼을 눌러야 실제 권한 기준에 반영됩니다.`);
+      setStatus(`${handle} 추가 준비 완료. 변경을 적용하려면 입력칸 명단 저장을 누르세요.`);
     });
     $('clear-subscriber-input')?.addEventListener('click', () => {
       const textarea = $('x-subscriber-handles');

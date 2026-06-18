@@ -125,8 +125,16 @@ def test_x_subscriber_allowlist_admin_ui_exists():
     schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
     assert 'x-subscriber-handles' in admin
     assert 'sync-subscribers' in admin
+    assert 'x-subscriber-add-one' in admin
+    assert 'add-one-subscriber' in admin
+    assert 'normalize-subscriber-input' in admin
+    assert '입력칸 명단 저장' in admin
+    assert '삭제는 입력칸에서 해당 줄을 지우고 저장하면 반영됩니다' in admin
     assert '활성구독자 확인' in js
     assert '구독자 목록 없음' in js
+    assert 'addOneSubscriberToTextarea' in js
+    assert 'normalizeSubscriberTextarea' in js
+    assert '추가·삭제가 반영됐습니다' in js
     assert "textarea.value = handles.join('\\n')" in js
     assert '입력칸에 현재 명단을 표시했고' in js
     assert 'x_subscribers' in js
