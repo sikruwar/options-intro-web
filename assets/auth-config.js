@@ -12,7 +12,7 @@ window.HOWINSIGHT_AUTH_CONFIG = {
     'sniffshiba@gmail.com'
   ],
 
-  // 이메일 magic link + X handle 신청 + 관리자 승인 게이트를 활성화합니다.
+  // 이메일 magic link + X 아이디 신청 + 관리자 승인 게이트를 활성화합니다.
   // 긴급 공개 전환이 필요하면 false로 바꾸면 됩니다.
   accessGateEnabled: true,
 

@@ -31,6 +31,9 @@
       .hi-auth-card input:focus { outline: 2px solid rgba(245,177,76,.35); border-color:#f5b14c; }
       .hi-auth-card button { width:100%; min-height:48px; margin-top:18px; border:0; border-radius:999px; background:#f5b14c; color:#11130f; font-weight:900; cursor:pointer; }
       .hi-auth-card button:disabled { opacity:.55; cursor:wait; }
+      .hi-consent { display:flex !important; align-items:flex-start; gap:9px; color:#a49b8b !important; line-height:1.6; }
+      .hi-consent input { width:auto !important; min-height:auto !important; margin-top:4px; accent-color:#f5b14c; }
+      .hi-consent a { color:#f5b14c; text-decoration:underline; text-underline-offset:2px; }
       .hi-auth-small { font-size:12px !important; color:#746f65 !important; margin-top:14px !important; }
       .hi-auth-message { border:1px solid #2d302a; border-radius:12px; padding:12px 14px; background:#0b0d0c; color:#d8d1c3 !important; margin-top:14px !important; }
       .hi-auth-row { display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:12px; }
@@ -203,9 +206,9 @@
     overlay(`
       <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
       <h2>승인 대기 중입니다</h2>
-      <p>${email} 계정은 아직 강의 접근 승인이 완료되지 않았습니다. 신청 시 입력한 X 닉네임과 이메일을 확인한 뒤 승인됩니다.</p>
+      <p>${email} 계정은 아직 강의 접근 승인이 완료되지 않았습니다. 신청 시 입력한 이메일과 X 아이디를 확인한 뒤 승인됩니다.</p>
       <form id="hi-request-form">
-        <label for="hi-x">X 닉네임</label>
+        <label for="hi-x">X 아이디</label>
         <input id="hi-x" name="x_handle" type="text" placeholder="@sniffshiba" autocomplete="nickname" required>
         <button type="submit">신청 정보 업데이트</button>
       </form>
@@ -236,16 +239,20 @@
     overlay(`
       <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
       <h2>${config.courseTitle || '강의'} 접근 신청</h2>
-      <p>승인된 이메일만 강의를 볼 수 있습니다. 이메일과 X 닉네임을 남기면 관리자 확인 후 접근 권한이 열립니다.</p>
+      <p>승인된 이메일만 강의를 볼 수 있습니다. 이메일과 X 아이디를 남기면 구독 여부 확인 후 접근 권한이 열립니다.</p>
       <form id="hi-login-form">
         <label for="hi-email">이메일</label>
         <input id="hi-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-        <label for="hi-x">X 닉네임</label>
+        <label for="hi-x">X 아이디</label>
         <input id="hi-x" name="x_handle" type="text" placeholder="@sniffshiba" autocomplete="nickname" required>
+        <label class="hi-consent" for="hi-privacy-consent">
+          <input id="hi-privacy-consent" name="privacy_consent" type="checkbox" required>
+          <span>강의 접근 승인과 구독 여부 확인을 위해 이메일과 X 아이디를 수집·이용하는 데 동의합니다. <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span>
+        </label>
         <button type="submit">이메일 인증 링크 받기</button>
       </form>
       <p id="hi-auth-message" class="hi-auth-message">입력한 이메일로 로그인 링크가 전송됩니다. 승인 전에는 대기 화면이 표시됩니다.</p>
-      <p class="hi-auth-small">강의 접근 관리를 위한 정보만 저장합니다. X 닉네임은 승인 확인용입니다.</p>
+      <p class="hi-auth-small">X 아이디는 프로필 주소에 표시되는 @아이디입니다. 예: @sniffshiba</p>
     `);
     document.getElementById('hi-login-form')?.addEventListener('submit', async (event) => {
       event.preventDefault();

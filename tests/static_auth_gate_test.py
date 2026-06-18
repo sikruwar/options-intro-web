@@ -42,6 +42,20 @@ def test_admin_page_loads_admin_script():
     assert 'approved_users' in js
 
 
+def test_privacy_consent_copy_uses_clear_x_id_language():
+    gate = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
+    admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
+    privacy = (ROOT / 'privacy.html').read_text(encoding='utf-8')
+    assert 'X 닉네임' not in gate
+    assert 'X 닉네임' not in admin
+    assert 'X 아이디' in gate
+    assert 'privacy_consent' in gate
+    assert '개인정보처리방침' in gate
+    assert 'privacy.html' in gate
+    assert '수집 항목' in privacy
+    assert '이메일, X 아이디' in privacy
+
+
 def test_approved_user_identity_badge_exists():
     js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
     assert 'renderApprovedBadge' in js
