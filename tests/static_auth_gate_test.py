@@ -107,9 +107,12 @@ def test_admin_request_approval_feedback_exists():
     assert '승인됨' in js
     assert 'is-approved' in admin
     assert '승인 계정 목록에 반영됐습니다' in js
+    assert 'data-action="revoke"' in js
+    assert '접근불가' in js
 
 
 def test_visibility_checkboxes_render_before_remote_table():
     js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
     assert 'list.innerHTML = mergeVisibilityRows([]).map(visibilityRowTemplate).join' in js
-    assert '체크박스는 먼저 선택할 수 있고' in js
+    assert '체크박스는 먼저 선택할 수 있고' not in js
+    assert 'course_session_visibility table unavailable' in js

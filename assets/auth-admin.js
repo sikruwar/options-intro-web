@@ -296,10 +296,10 @@
     const xHandle = escapeHtml(req.x_handle || '-');
     const rowClass = status === 'approved' ? ' is-approved' : status === 'rejected' ? ' is-rejected' : '';
     const actions = status === 'approved'
-      ? '<span class="request-status approved">승인됨</span>'
+      ? `<span class="request-status approved">승인됨</span><button data-action="revoke" data-email="${email}" class="danger">접근불가</button>`
       : status === 'rejected'
-        ? `<button data-action="approve" data-email="${email}" data-x="${xHandle === '-' ? '' : xHandle}">재승인</button><span class="request-status rejected">거절됨</span>`
-        : `<button data-action="approve" data-email="${email}" data-x="${xHandle === '-' ? '' : xHandle}">승인</button><button data-action="reject" data-email="${email}">거절</button>`;
+        ? `<button data-action="approve" data-email="${email}" data-x="${xHandle === '-' ? '' : xHandle}">재승인</button><span class="request-status rejected">접근불가</span>`
+        : `<button data-action="approve" data-email="${email}" data-x="${xHandle === '-' ? '' : xHandle}">승인</button><button data-action="reject" data-email="${email}" class="danger">거절</button>`;
     return `
       <div class="request-row${rowClass}" data-email="${email}">
         <div>
@@ -378,7 +378,7 @@
       .select('slug, visible')
       .order('sort_order', { ascending: true });
     if (error) {
-      setStatus(`공개 회차 설정 테이블 확인 필요: ${error.message}. 체크박스는 먼저 선택할 수 있고, 저장하려면 supabase_schema.sql의 course_session_visibility 구문을 실행해야 합니다.`);
+      console.warn('[HowInsight Admin] course_session_visibility table unavailable:', error.message);
       return;
     }
     const rows = mergeVisibilityRows(data || []);
@@ -439,7 +439,7 @@
             const small = row.querySelector('small');
             if (small) small.textContent = `${new Date().toLocaleString('ko-KR')} · approved`;
             const actions = row.querySelector('.request-actions');
-            if (actions) actions.innerHTML = '<span class="request-status approved">승인됨</span>';
+            if (actions) actions.innerHTML = `<span class="request-status approved">승인됨</span><button data-action="revoke" data-email="${button.dataset.email}" class="danger">접근불가</button>`;
           }
           setStatus(`${button.dataset.email} 승인 완료. 승인 계정 목록에 반영됐습니다.`);
         } else {
@@ -450,8 +450,10 @@
             row.classList.remove('is-approved');
             const small = row.querySelector('small');
             if (small) small.textContent = `${new Date().toLocaleString('ko-KR')} · rejected`;
+            const actions = row.querySelector('.request-actions');
+            if (actions) actions.innerHTML = `<button data-action="approve" data-email="${button.dataset.email}" data-x="${button.dataset.x || ''}">재승인</button><span class="request-status rejected">접근불가</span>`;
           }
-          setStatus(`${button.dataset.email} 거절 처리 완료`);
+          setStatus(`${button.dataset.email} 접근을 비활성화했습니다.`);
         }
         await loadRequests(supabase);
       } catch (error) {
@@ -475,7 +477,8 @@
         await saveSessionVisibility(supabase);
         setStatus('공개 회차 설정을 저장했습니다.');
       } catch (error) {
-        setStatus(`공개 회차 설정 저장 실패: ${error.message}`);
+        console.warn('[HowInsight Admin] session visibility save failed:', error.message);
+        setStatus('공개 회차 설정을 저장하지 못했습니다. 잠시 뒤 다시 시도해주세요.');
       } finally {
         event.currentTarget.disabled = false;
       }
