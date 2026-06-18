@@ -83,6 +83,39 @@
     .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
     .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
     .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .f6-chips { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:22px; }
+    .f6-chip { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); font-size:13px; color:var(--text-muted); line-height:1.4; }
+    .f6-chip b { color:var(--text); font-weight:800; }
+    .f6-chip i { font-family:'JetBrains Mono', monospace; font-style:normal; font-size:13px; font-weight:700; }
+    .f6-chip.pay i { color:var(--amber); } .f6-chip.right i { color:var(--blue); } .f6-chip.duty i { color:var(--amber); }
+    .f6-stage { display:grid; grid-template-columns:1fr minmax(150px,1.1fr) 1fr; gap:16px; align-items:stretch; }
+    .f6-party { border-radius:14px; padding:20px; border:1px solid var(--border); position:relative; }
+    .f6-party.buyer { background:linear-gradient(150deg,rgba(125,211,252,.12),rgba(53,208,127,.05)); border-color:rgba(125,211,252,.34); }
+    .f6-party.seller { background:linear-gradient(150deg,rgba(245,177,76,.13),rgba(245,177,76,.04)); border-color:rgba(245,177,76,.36); }
+    .f6-role { font-size:18px; font-weight:800; color:var(--text); margin:10px 0 4px; }
+    .f6-party p { font-size:13px; color:var(--text-muted); line-height:1.58; margin:0; }
+    .f6-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+    .f6-tag { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.04em; padding:3px 8px; border-radius:999px; border:1px solid var(--border-light); color:var(--text-muted); }
+    .f6-party.buyer .f6-tag { color:var(--blue); border-color:rgba(125,211,252,.34); }
+    .f6-party.seller .f6-tag { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .f6-channel { display:flex; flex-direction:column; justify-content:center; gap:14px; }
+    .f6-flow { border-radius:12px; padding:12px 10px; text-align:center; border:1px solid var(--border); background:var(--bg-card2); }
+    .f6-flow .f6-flow-k { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); }
+    .f6-flow .f6-flow-v { font-weight:800; color:var(--text); font-size:14px; margin-top:3px; }
+    .f6-flow .f6-track { font-family:'JetBrains Mono', monospace; font-size:15px; letter-spacing:.12em; margin-top:6px; }
+    .f6-flow.pay { background:linear-gradient(90deg,rgba(125,211,252,.10),rgba(245,177,76,.12)); }
+    .f6-flow.pay .f6-track { color:var(--amber); }
+    .f6-flow.give { background:linear-gradient(90deg,rgba(245,177,76,.10),rgba(125,211,252,.12)); }
+    .f6-flow.give .f6-track { color:var(--blue); }
+    .f6-compare { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:18px; }
+    .f6-cmp { border-radius:12px; padding:16px 18px; border:1px solid var(--border); background:var(--bg-card2); }
+    .f6-cmp.buyer { border-left:3px solid var(--blue); }
+    .f6-cmp.seller { border-left:3px solid var(--amber); }
+    .f6-cmp .f6-cmp-k { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); margin-bottom:6px; }
+    .f6-cmp.buyer .f6-cmp-k { color:var(--blue); } .f6-cmp.seller .f6-cmp-k { color:var(--amber); }
+    .f6-cmp strong { display:block; color:var(--text); font-size:15px; line-height:1.45; }
+    .f6-cmp p { margin:6px 0 0; font-size:13px; color:var(--text-muted); line-height:1.55; }
+    @media (max-width:760px) { .f6-stage,.f6-compare { grid-template-columns:1fr; } .f6-channel { gap:10px; } }
     .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
     .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
     .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
@@ -346,10 +379,32 @@
   <div class="fig">
     <div class="fig-label">Figure 06 — 옵션 매수자와 매도자 흐름도</div>
     <h3>매수자는 권리를 사고, 매도자는 의무를 집니다</h3>
-    <div class="flow-grid">
-      <div class="mini-card"><span class="badge good">BUYER</span><div class="mini-v">옵션 매수자</div><p class="mini-p">프리미엄을 냅니다. 그 대가로 권리를 얻고, 불리하면 권리를 행사하지 않을 수 있습니다.</p></div>
-      <div class="flow-arrow">프리미엄 →<br>← 권리 제공<br>의무 부담</div>
-      <div class="mini-card"><span class="badge warn">SELLER</span><div class="mini-v">옵션 매도자</div><p class="mini-p">프리미엄을 받습니다. 대신 상대방이 권리를 행사하면 계약을 이행해야 합니다.</p></div>
+    <div class="f6-chips">
+      <span class="f6-chip pay"><i>$ →</i> <span>프리미엄은 <b>매수자 → 매도자</b></span></span>
+      <span class="f6-chip right"><i>✓</i> <span>권리는 <b>매수자</b>에게</span></span>
+      <span class="f6-chip duty"><i>!</i> <span>의무는 <b>매도자</b>에게</span></span>
+    </div>
+    <div class="f6-stage">
+      <div class="f6-party buyer">
+        <span class="badge good">BUYER</span>
+        <div class="f6-role">옵션 매수자</div>
+        <p>프리미엄을 냅니다. 그 대가로 권리를 얻고, 불리하면 권리를 행사하지 않을 수 있습니다.</p>
+        <div class="f6-tags"><span class="f6-tag">프리미엄 지급</span><span class="f6-tag">권리 보유</span></div>
+      </div>
+      <div class="f6-channel">
+        <div class="f6-flow pay"><div class="f6-flow-k">위쪽 흐름 · 비용</div><div class="f6-flow-v">프리미엄 지급</div><div class="f6-track">━━▶</div></div>
+        <div class="f6-flow give"><div class="f6-flow-k">아래쪽 흐름 · 계약</div><div class="f6-flow-v">권리 제공 · 의무 발생</div><div class="f6-track">◀━━</div></div>
+      </div>
+      <div class="f6-party seller">
+        <span class="badge warn">SELLER</span>
+        <div class="f6-role">옵션 매도자</div>
+        <p>프리미엄을 받습니다. 대신 상대방이 권리를 행사하면 계약을 이행해야 합니다.</p>
+        <div class="f6-tags"><span class="f6-tag">프리미엄 수취</span><span class="f6-tag">의무 부담</span></div>
+      </div>
+    </div>
+    <div class="f6-compare">
+      <div class="f6-cmp buyer"><div class="f6-cmp-k">매수자의 선택</div><strong>유리하면 행사, 불리하면 포기</strong><p>권리를 쥐고 있으므로 상황을 보고 결정합니다. 손실은 일반적으로 프리미엄으로 제한됩니다.</p></div>
+      <div class="f6-cmp seller"><div class="f6-cmp-k">매도자의 의무</div><strong>상대가 행사하면 이행</strong><p>프리미엄을 받은 대가로, 매수자가 권리를 행사하면 정해진 조건대로 계약을 이행해야 합니다.</p></div>
     </div>
     <div class="fig-caption">옵션 매수자의 손실은 일반적으로 처음 낸 프리미엄으로 제한됩니다. 반대로 매도자는 프리미엄을 받는 대신 불리한 상황에서 의무를 떠안습니다.</div>
   </div>
