@@ -71,3 +71,27 @@ def test_mobile_course_navigation_is_visible_on_course_pages():
         assert '.nav-prev,.nav-index,.nav-forward { display:inline-flex !important;' in html
         assert 'nav-index' in html
         assert 'nav-forward' in html
+
+
+
+def test_course_visibility_admin_ui_exists():
+    admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
+    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
+    schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
+    assert 'session-visibility-list' in admin
+    assert 'save-visibility' in admin
+    assert 'course_session_visibility' in js
+    assert 'course_session_visibility' in schema
+    assert 'Anyone can read course session visibility' in schema
+    assert 'Admins can manage course session visibility' in schema
+
+
+def test_course_visibility_script_is_loaded_on_course_pages():
+    assert (ROOT / 'assets' / 'course-visibility.js').exists()
+    pages = [ROOT / 'index.html', ROOT / 'prologue.html', ROOT / 'epilogue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
+    assert len(pages) == 33
+    for path in pages:
+        html = path.read_text(encoding='utf-8')
+        assert 'course-visibility.js' in html
+        if 'auth-config.js' in html:
+            assert html.index('auth-config.js') < html.index('course-visibility.js')

@@ -36,6 +36,14 @@
     .request-row small { display:block; color:var(--text-dim); margin-top:4px; }
     .request-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
     .request-actions button[data-action="reject"] { background:transparent; color:var(--red); border:1px solid rgba(239,68,68,.35); }
+
+    .session-visibility-list { display:grid; gap:10px; }
+    .session-visibility-row { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; border:1px solid var(--border); background:var(--bg-card); border-radius:14px; padding:13px 15px; }
+    .session-visibility-row input { width:18px; min-height:18px; accent-color:var(--amber); }
+    .session-visibility-row strong { display:block; line-height:1.4; }
+    .session-visibility-row small { color:var(--text-dim); font-family:'JetBrains Mono',monospace; }
+    .visibility-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .visibility-pill { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); border:1px solid var(--border); border-radius:999px; padding:3px 8px; }
     .muted { color:var(--text-dim); }
     .is-disabled .panel { opacity:.55; pointer-events:none; }
     code { color:var(--amber); }
@@ -69,9 +77,31 @@
           <p class="muted">신청 목록을 불러오는 중입니다.</p>
         </div>
       </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>공개 회차 설정</h2>
+            <p>구독자에게 목차와 직접 링크에서 열어둘 회차를 선택합니다.</p>
+          </div>
+          <div>
+            <button id="refresh-visibility" class="secondary" type="button">불러오기</button>
+          </div>
+        </div>
+        <div id="session-visibility-list" class="session-visibility-list">
+          <p class="muted">공개 회차 설정을 불러오는 중입니다.</p>
+        </div>
+        <div class="visibility-actions">
+          <button id="save-visibility" type="button">공개 설정 저장</button>
+          <button id="select-visible-through-20" class="secondary" type="button">20회차까지 선택</button>
+          <button id="select-all-sessions" class="secondary" type="button">전체 공개</button>
+          <button id="select-none-sessions" class="secondary" type="button">전체 비공개</button>
+        </div>
+        <p class="muted">처음 설정 전에는 사이트가 기본 공개 상태로 동작합니다. 저장 후에는 선택한 회차만 공개됩니다.</p>
+      </section>
       <section class="panel">
         <h2>필수 Supabase 테이블</h2>
-        <p>이 페이지는 <code>access_requests</code>, <code>approved_users</code>, <code>admin_users</code> 테이블을 사용합니다. SQL은 <code>supabase_schema.sql</code>에 들어 있습니다.</p>
+        <p>이 페이지는 <code>access_requests</code>, <code>approved_users</code>, <code>admin_users</code>, <code>course_session_visibility</code> 테이블을 사용합니다. SQL은 <code>supabase_schema.sql</code>에 들어 있습니다.</p>
       </section>
     </div>
   </main>
