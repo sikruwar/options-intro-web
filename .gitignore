@@ -1,0 +1,9 @@
+# Local private subscriber/admin imports
+x_active_subscribers*
+supabase_*subscribers*.sql
+supabase_missing_tables_for_admin_features.sql
+private_admin_imports/
+
+# Local environment files
+.env
+.env.*
