@@ -165,6 +165,19 @@
     }
     .hero-cta:hover { opacity: 0.88; }
     .hero-cta-arrow { font-size: 18px; }
+    .hero-guide {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--text-dim);
+      max-width: 520px;
+      line-height: 1.6;
+    }
+    .hero-guide a {
+      color: var(--amber);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(245,158,11,0.35);
+    }
+    .hero-guide a:hover { border-bottom-color: var(--amber); }
     .hero-stat-row {
       display: flex; gap: 32px; margin-top: 48px;
     }
@@ -334,9 +347,10 @@
   <div class="hero-eyebrow">무기견의 옵션 입문</div>
   <h1>옵션을 배우는<br>가장 낮은<br><em>출발점</em></h1>
   <p class="hero-sub">돈을 버는 도구가 아니라, 시장이 불확실성을 가격에 반영하는 방식을 읽는 언어로 배웁니다.</p>
-  <a href="prologue.html" class="hero-cta">
-    강의 시작하기 <span class="hero-cta-arrow">→</span>
+  <a href="#roadmap" class="hero-cta">
+    공개 회차 확인하기 <span class="hero-cta-arrow">↓</span>
   </a>
+  <p class="hero-guide">아래 목차에서 현재 공개된 회차를 먼저 확인한 뒤 원하는 지점부터 시작할 수 있습니다. 처음이라면 <a href="prologue.html">프롤로그</a>부터 읽어주세요.</p>
   <div class="hero-stat-row">
     <div class="hero-stat">
       <div class="hero-stat-num">30</div>
@@ -356,7 +370,7 @@
 <hr class="divider">
 
 <!-- ── OVERVIEW ── -->
-<div class="section reveal">
+<div class="section reveal" id="overview">
   <div class="section-num">OVERVIEW</div>
   <h2>강의 구성</h2>
   <div class="overview-grid">
@@ -384,7 +398,7 @@
 <hr class="divider">
 
 <!-- ── ROADMAP ── -->
-<div class="section reveal">
+<div class="section reveal" id="roadmap">
   <div class="section-num">ROADMAP</div>
   <h2>전체 강의 목차</h2>
   <table class="roadmap-table">

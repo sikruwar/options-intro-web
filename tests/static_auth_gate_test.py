@@ -45,6 +45,9 @@ def test_public_index_hides_admin_link_and_request_copy():
     html = (ROOT / 'index.html').read_text(encoding='utf-8')
     assert 'admin.html' not in html
     assert '접근 제한을 켜면' not in html
+    assert 'href="#roadmap"' in html
+    assert '공개 회차 확인하기' in html
+    assert 'id="roadmap"' in html
 
 
 def test_admin_page_loads_admin_script():
