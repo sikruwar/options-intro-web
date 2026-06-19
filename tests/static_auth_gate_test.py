@@ -1,7 +1,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTECTED = [ROOT / 'prologue.html', ROOT / 'epilogue.html', ROOT / 'sessions' / 'session-01.html', ROOT / 'sessions' / 'session-30.html']
+OUTPUT_ROOT = ROOT.parent
+PROTECTED = [ROOT / 'prologue.html', ROOT / 'sessions' / 'session-01.html', ROOT / 'sessions' / 'session-05.html']
 
 
 def test_auth_assets_exist():
@@ -95,8 +96,8 @@ def test_expired_magic_link_message_is_friendly():
 
 
 def test_mobile_course_navigation_is_visible_on_course_pages():
-    pages = [ROOT / 'prologue.html', ROOT / 'epilogue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
-    assert len(pages) == 32
+    pages = [ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
+    assert len(pages) == 6
     for path in pages:
         html = path.read_text(encoding='utf-8')
         assert 'Mobile course navigation: keep previous/index/next reachable on phones.' in html
@@ -107,8 +108,8 @@ def test_mobile_course_navigation_is_visible_on_course_pages():
 
 def test_course_readability_overrides_are_loaded_on_course_pages():
     assert (ROOT / 'assets' / 'readability-overrides.css').exists()
-    pages = [ROOT / 'index.html', ROOT / 'prologue.html', ROOT / 'epilogue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
-    assert len(pages) == 33
+    pages = [ROOT / 'index.html', ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
+    assert len(pages) == 7
     for path in pages:
         html = path.read_text(encoding='utf-8')
         expected_href = '../assets/readability-overrides.css' if path.parent.name == 'sessions' else 'assets/readability-overrides.css'
@@ -137,13 +138,32 @@ def test_course_visibility_admin_ui_exists():
 
 def test_course_visibility_script_is_loaded_on_course_pages():
     assert (ROOT / 'assets' / 'course-visibility.js').exists()
-    pages = [ROOT / 'index.html', ROOT / 'prologue.html', ROOT / 'epilogue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
-    assert len(pages) == 33
+    pages = [ROOT / 'index.html', ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
+    assert len(pages) == 7
     for path in pages:
         html = path.read_text(encoding='utf-8')
         assert 'course-visibility.js' in html
         assert 'auth-config.js' in html
         assert html.index('auth-config.js') < html.index('course-visibility.js')
+
+
+def test_unreleased_sessions_are_kept_out_of_public_deploy():
+    public_sessions = sorted(path.name for path in (ROOT / 'sessions').glob('session-*.html'))
+    assert public_sessions == [f'session-{num:02d}.html' for num in range(1, 6)]
+    assert not (ROOT / 'epilogue.html').exists()
+    assert not (ROOT / 'sessions' / 'session-06.html').exists()
+    assert (OUTPUT_ROOT / 'drafts' / 'sessions' / 'session-06.html').exists()
+    assert (OUTPUT_ROOT / 'drafts' / 'sessions' / 'session-30.html').exists()
+    assert (OUTPUT_ROOT / 'drafts' / 'epilogue.html').exists()
+
+
+def test_session_five_points_to_upcoming_page():
+    html = (ROOT / 'sessions' / 'session-05.html').read_text(encoding='utf-8')
+    upcoming = (ROOT / 'upcoming.html').read_text(encoding='utf-8')
+    assert '../upcoming.html' in html
+    assert 'session-06.html' not in html
+    assert '다음 회차를 준비하고 있습니다' in upcoming
+    assert '공개 회차 확인하기' in upcoming
 
 
 def test_index_marks_prologue_open_and_remote_visible_sessions_as_open():
