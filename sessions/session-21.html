@@ -208,6 +208,102 @@
       .nav-forward { grid-column:3; grid-row:2; justify-self:end; }
     }
   </style>
+  <style>
+    /* Session 21 covered-call figure components */
+    .cc-legs { display:grid; grid-template-columns:1fr 38px 1fr 38px 1fr; gap:10px; align-items:stretch; }
+    .cc-leg { background:var(--bg-card2); border:1px solid var(--border-light); border-radius:14px; padding:18px; min-width:0; }
+    .cc-leg.long { border-color:rgba(125,211,252,.42); }
+    .cc-leg.short { border-color:rgba(245,177,76,.42); }
+    .cc-leg.result { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border-color:var(--border-light); }
+    .cc-leg .cc-tag { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+    .cc-leg.long .cc-tag { color:var(--blue); }
+    .cc-leg.short .cc-tag { color:var(--amber); }
+    .cc-leg.result .cc-tag { color:var(--green); }
+    .cc-leg .cc-leg-main { font-size:18px; font-weight:800; color:var(--text); line-height:1.32; }
+    .cc-leg .cc-leg-sub { margin-top:8px; color:var(--text-muted); font-size:13px; line-height:1.55; }
+    .cc-op { display:grid; place-items:center; font-family:'JetBrains Mono', monospace; font-size:26px; color:var(--amber); }
+    @media (max-width:760px) { .cc-legs { grid-template-columns:1fr; } .cc-op { min-height:30px; } }
+
+    .cc-flowstrip { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:14px 0; }
+    .cc-flowstrip .pill { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:9px 13px; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text); }
+    .cc-flowstrip .pill b { color:var(--amber); }
+    .cc-flowstrip .op { color:var(--text-dim); font-family:'JetBrains Mono', monospace; }
+    .cc-flowstrip .pill.res { border-color:rgba(53,208,127,.4); }
+    .cc-flowstrip .pill.res b { color:var(--green); }
+
+    .cc-readout { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .cc-readout .cc-ro { border:1px solid var(--border); border-radius:12px; padding:14px; background:var(--bg-card2); }
+    .cc-readout .cc-ro span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+    .cc-readout .cc-ro strong { font-size:19px; color:var(--text); }
+    .cc-readout .cc-ro.blue strong { color:var(--blue); }
+    .cc-readout .cc-ro.amber strong { color:var(--amber); }
+    .cc-readout .cc-ro.pos strong { color:var(--green); }
+    .cc-readout .cc-ro.neg strong { color:var(--red); }
+    @media (max-width:760px) { .cc-readout { grid-template-columns:1fr; } }
+
+    .cc-quickbtns { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .cc-quickbtns button { min-height:40px; min-width:54px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:8px 14px; font-family:'JetBrains Mono', monospace; font-size:12px; cursor:pointer; }
+    .cc-quickbtns button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+
+    .cc-scenboard { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; margin-top:6px; }
+    .cc-scen { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:14px; cursor:pointer; transition:border-color .2s,transform .2s; text-align:left; font:inherit; }
+    .cc-scen:hover,.cc-scen.active { border-color:var(--amber); transform:translateY(-2px); }
+    .cc-scen .cc-scen-px { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text); font-weight:700; }
+    .cc-scen .cc-scen-tag { font-size:11px; color:var(--text-dim); margin:4px 0 12px; line-height:1.4; }
+    .cc-scen .cc-pl { margin-top:9px; }
+    .cc-scen .cc-pl-k { font-family:'JetBrains Mono', monospace; font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); display:flex; justify-content:space-between; margin-bottom:4px; }
+    .cc-scen .cc-pl-k b { color:var(--text); }
+    .cc-scen .cc-pl-k.blue b { color:var(--blue); }
+    .cc-scen .cc-pl-k.amber b { color:var(--amber); }
+    .cc-meter { height:8px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; position:relative; }
+    .cc-meter i { position:absolute; top:0; bottom:0; left:50%; }
+    .cc-meter i.blue { background:var(--blue); }
+    .cc-meter i.amber { background:var(--amber); }
+    .cc-meter i.neg { background:var(--red); }
+    @media (max-width:760px) { .cc-scenboard { grid-template-columns:1fr; } .cc-scen { display:grid; grid-template-columns:auto 1fr; gap:4px 14px; align-items:center; } .cc-scen .cc-scen-tag { grid-column:2; margin:0; } .cc-scen .cc-pl { grid-column:1/-1; } }
+
+    .cc-strikes { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .cc-strike { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:16px; cursor:pointer; text-align:left; font:inherit; transition:border-color .2s; }
+    .cc-strike:hover { border-color:var(--border-light); }
+    .cc-strike.active { border-color:var(--amber); box-shadow:0 0 0 1px rgba(245,177,76,.2) inset; }
+    .cc-strike h5 { font-size:17px; color:var(--text); margin:0 0 4px; }
+    .cc-strike .cc-strike-prem { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); }
+    .cc-strike dl { display:grid; grid-template-columns:1fr auto; gap:6px 10px; margin-top:12px; font-size:13px; }
+    .cc-strike dt { color:var(--text-dim); }
+    .cc-strike dd { color:var(--text); font-family:'JetBrains Mono', monospace; margin:0; text-align:right; }
+    @media (max-width:760px) { .cc-strikes { grid-template-columns:1fr; } }
+
+    .cc-greek-bars { display:grid; gap:12px; margin-top:6px; }
+    .cc-gb { display:grid; grid-template-columns:120px 1fr 96px; gap:12px; align-items:center; }
+    .cc-gb .cc-gb-lab { color:var(--text-muted); font-size:13px; }
+    .cc-gb .cc-gb-val { font-family:'JetBrains Mono', monospace; font-size:14px; color:var(--text); text-align:right; }
+    .cc-axisbar { position:relative; height:18px; border-radius:6px; background:var(--bg-card); border:1px solid var(--border); }
+    .cc-axisbar::before { content:''; position:absolute; left:50%; top:-3px; bottom:-3px; width:1px; background:var(--border-light); }
+    .cc-axisbar i { position:absolute; top:0; bottom:0; }
+    .cc-axisbar i.blue { background:var(--blue); border-radius:4px; }
+    .cc-axisbar i.amber { background:var(--amber); border-radius:4px; }
+    .cc-axisbar i.net { background:var(--green); border-radius:4px; }
+    @media (max-width:760px) { .cc-gb { grid-template-columns:90px 1fr 70px; gap:8px; } }
+
+    .cc-etf-result { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .cc-etf-result .cc-ro span small { color:var(--text-dim); }
+    .cc-warnflag { margin-top:14px; border:1px solid rgba(245,177,76,.4); border-radius:12px; background:linear-gradient(135deg,rgba(245,177,76,.1),transparent); padding:14px 16px; color:var(--text-muted); font-size:13px; line-height:1.6; }
+    .cc-warnflag.off { border-color:var(--border); background:var(--bg-card2); }
+    .cc-warnflag b { color:var(--amber); }
+
+    .cc-form { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .cc-field { display:flex; flex-direction:column; gap:6px; }
+    .cc-field label { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); }
+    .cc-field input, .cc-field select { background:var(--bg-card); border:1px solid var(--border-light); border-radius:10px; padding:10px 12px; color:var(--text); font:inherit; font-size:14px; min-height:44px; }
+    .cc-field input:focus, .cc-field select:focus { outline:2px solid var(--amber); outline-offset:0; }
+    .cc-actions { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+    .cc-actions button { min-height:44px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 16px; font:inherit; font-weight:800; cursor:pointer; }
+    .cc-actions button:hover { border-color:var(--amber); }
+    .cc-actions button.primary { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .cc-result-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:6px; }
+    @media (max-width:760px) { .cc-form { grid-template-columns:1fr; } .cc-result-grid { grid-template-columns:1fr 1fr; } }
+    @media print { .cc-actions { display:none; } .cc-field input,.cc-field select { color:#111; border-color:#999; } }
+  </style>
   <link rel="stylesheet" href="../assets/readability-overrides.css">
 </head>
 <body>
@@ -247,12 +343,28 @@
   <div class="fig">
     <div class="fig-label">Figure 01 — 커버드콜 구조 카드</div>
     <h3>커버드콜 구조 카드</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
-      <div class="viz-panel"><h4>커버드콜 구조 카드</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>long stock 100 shares at 100. short 105 call, premium 2, multiplier 100.</strong></div><div class="viz-metric"><span>판정</span><strong>“주식은 보유하고, 행사가 위의 상승권리를 일부 넘긴다.”</strong></div><div class="viz-metric"><span>주의</span><strong>none. 첫 화면에서 구조를 빠르게 이해시키는 static card.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    <p class="viz-copy">커버드콜은 두 다리로 이루어진 한 포지션입니다. 주식 100주를 그대로 들고, 같은 기초자산의 콜 1계약을 매도합니다. 보유 주식이 콜 매도 의무를 덮어주는 담보가 됩니다.</p>
+    <div class="cc-legs">
+      <div class="cc-leg long">
+        <div class="cc-tag">LEG 1 · 보유</div>
+        <div class="cc-leg-main">+100 shares</div>
+        <div class="cc-leg-sub">주가 100달러에 매수한 주식 100주를 계속 보유합니다. 델타 +100.</div>
+      </div>
+      <div class="cc-op">+</div>
+      <div class="cc-leg short">
+        <div class="cc-tag">LEG 2 · 매도</div>
+        <div class="cc-leg-main">short 105 call</div>
+        <div class="cc-leg-sub">행사가 105달러 콜 1계약을 매도합니다. premium 2 · 승수 100주.</div>
+      </div>
+      <div class="cc-op">=</div>
+      <div class="cc-leg result">
+        <div class="cc-tag">결합 = 커버드콜</div>
+        <div class="cc-leg-main">현금 +200달러 선수취</div>
+        <div class="cc-leg-sub">프리미엄 2 × 100 = 200달러를 먼저 받고, 105달러 위 상승권리 일부를 넘깁니다.</div>
+      </div>
     </div>
 
-    <div class="viz-note">주식 100주 보유와 콜 1계약 매도를 한 장에서 연결한다.</div>
+    <div class="viz-note">주식은 보유하고, 행사가 위의 상승권리를 일부 넘깁니다. 받은 200달러는 공짜 수익이 아니라 미래 상방과 교환한 현금입니다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-02">
@@ -306,77 +418,213 @@
   <div class="fig">
     <div class="fig-label">Figure 02 — 프리미엄 현금흐름과 손익분기점</div>
     <h3>프리미엄 현금흐름과 손익분기점</h3>
-    <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line green" d="M72 188 C160 82, 250 82, 330 136 S488 206, 560 72"/><circle class="viz-dot green" cx="72" cy="188" r="7"/><circle class="viz-dot" cx="330" cy="136" r="7"/><circle class="viz-dot red" cx="560" cy="72" r="7"/><text class="viz-label" x="62" y="34">flow chart</text><text class="viz-number" x="342" y="132">재조정 지점</text></svg></div>
-    <div class="viz-flow"><div class="viz-step"><span>STEP 1</span><strong>가격 변화</strong><p>formula strip plus mini waterfall.</p></div><div class="viz-step"><span>STEP 2</span><strong>민감도 변화</strong><p>“고정: 주식 매수가 100. 변화: 프리미엄 2달러 수취로 손익분기점 98.”</p></div><div class="viz-step"><span>STEP 3</span><strong>포지션 조정</strong><p>stock entry 100, call premium 2, breakeven 98, premium cash 200 dollars.</p></div><div class="viz-step"><span>STEP 4</span><strong>계좌 영향</strong><p>premium slider 0.5~5.0. breakeven and premium cash update.</p></div></div>
+    <p class="viz-copy">주식 매수가 100달러는 고정입니다. 받은 프리미엄만큼 손익분기점이 내려갑니다. 슬라이더로 프리미엄을 바꿔 보세요. <code>손익분기점 = 주식 매수가 − 받은 프리미엄</code></p>
+    <div class="cc-flowstrip">
+      <span class="pill">주식 매수가 <b>100</b></span>
+      <span class="op">−</span>
+      <span class="pill">프리미엄 <b id="f2-prem">2.00</b></span>
+      <span class="op">=</span>
+      <span class="pill res">손익분기점 <b id="f2-be">98.00</b></span>
+    </div>
+    <div class="viz-range">
+      <label>받은 프리미엄(주당 달러) <output id="f2-out">2.00</output></label>
+      <input type="range" id="f2-slider" min="0.5" max="5" step="0.05" value="2" aria-label="콜 프리미엄 조정">
+    </div>
+    <div class="cc-readout">
+      <div class="cc-ro amber"><span>받은 프리미엄 현금 (premium × 100)</span><strong id="f2-cash">200달러</strong></div>
+      <div class="cc-ro pos"><span>손익분기점</span><strong id="f2-be2">98.00달러</strong></div>
+      <div class="cc-ro"><span>105콜 기준 최대이익 (105 − 100 + 프리미엄) × 100</span><strong id="f2-max">700달러</strong></div>
+      <div class="cc-ro"><span>하락 완충 폭 (프리미엄만큼)</span><strong id="f2-cushion">2.00달러</strong></div>
+    </div>
 
-    <div class="viz-note">받은 프리미엄이 손익분기점을 낮추는 과정을 보여준다.</div>
+    <div class="viz-note">고정: 주식 매수가 100. 변화: 프리미엄 수취로 손익분기점이 내려갑니다. 단, 완충 폭은 받은 프리미엄만큼이고 그 아래 하락 손실은 그대로 남습니다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-03">
   <div class="fig">
     <div class="fig-label">Figure 03 — 만기 손익그래프: 주식 단독 vs 커버드콜</div>
     <h3>만기 손익그래프: 주식 단독 vs 커버드콜</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-area" d="M58 218 L260 218 L365 130 L570 58 L570 218 Z"/><path class="viz-line payoff" d="M58 218 L260 218 L365 130 L570 58"/><path class="viz-line red" d="M58 164 L260 164 L365 164 L570 164" opacity=".65"/><circle class="viz-dot" cx="365" cy="130" r="7"/><text class="viz-label" x="245" y="238">K</text><text class="viz-label" x="350" y="238">B/E</text><text class="viz-number" x="382" y="126">손익 0선 통과</text><text class="viz-label" x="60" y="34">payoff chart</text></svg></div>
-      <div class="viz-panel"><h4>만기 손익그래프: 주식 단독 vs 커버드콜</h4><p class="viz-copy">상방 제한과 하락 완충을 동시에 보여준다.</p><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>stock entry 100, covered call K=105, premium=2, multiplier 100, expiration price range 80~130. Stock P/L = (S-100)×100. Covered call P/L = (S-100)×100 + 200 - max(S-105,0)×100.</strong></div><div class="viz-metric"><span>판정</span><strong>“98 손익분기점, 105 위 이익 상단, 최대 이익 700달러.”</strong></div><div class="viz-metric"><span>주의</span><strong>expiration price slider with quick buttons 90, 100, 103, 110, 130.</strong></div></div></div>
+    <p class="viz-copy">파란 선은 주식만 보유했을 때, 노란 선은 커버드콜(주식 + 105콜 매도, 프리미엄 2)의 만기 손익입니다. 같은 주가에서 두 선의 거리가 프리미엄이 보태거나 양보한 금액입니다.</p>
+    <div class="viz-panel accent">
+      <svg id="f3-svg" class="viz-svg" viewBox="0 0 620 300" role="img" aria-label="주식 단독과 커버드콜 만기 손익 그래프"></svg>
     </div>
-    <div class="viz-range payoff" data-viz-range><label>만기 주가 <output data-range-out>103</output></label><input type="range" min="80" max="130" value="103" aria-label="만기 주가 조정"></div>
+    <div class="cc-readout">
+      <div class="cc-ro blue"><span>만기 주가</span><strong id="f3-px">103.0달러</strong></div>
+      <div class="cc-ro blue"><span>주식 단독 손익</span><strong id="f3-stock">+300달러</strong></div>
+      <div class="cc-ro amber"><span>커버드콜 손익</span><strong id="f3-cc">+500달러</strong></div>
+      <div class="cc-ro"><span>두 전략 차이 (커버드콜 − 주식)</span><strong id="f3-diff">+200달러</strong></div>
+    </div>
+    <div class="viz-range">
+      <label>만기 주가 <output id="f3-out">103</output></label>
+      <input type="range" id="f3-slider" min="80" max="130" step="1" value="103" aria-label="만기 주가 조정">
+    </div>
+    <div class="cc-quickbtns" id="f3-quick">
+      <button type="button" data-px="90">90</button>
+      <button type="button" data-px="100">100</button>
+      <button type="button" data-px="103" class="active">103</button>
+      <button type="button" data-px="110">110</button>
+      <button type="button" data-px="130">130</button>
+    </div>
 
-    <div class="viz-note">상방 제한과 하락 완충을 동시에 보여준다.</div>
+    <div class="viz-note">손익분기점 98, 행사가 105 위로는 커버드콜 이익이 최대 700달러에서 멈춥니다. 주식 단독은 105 위에서도 계속 올라가지만, 105 아래에서는 프리미엄만큼 커버드콜이 앞섭니다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-04">
   <div class="fig">
     <div class="fig-label">Figure 04 — 시나리오 결과 보드</div>
     <h3>시나리오 결과 보드</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="92" y="86" width="144" height="102" rx="14" fill="rgba(125,211,252,.16)" stroke="var(--blue)"/><rect x="384" y="122" width="144" height="66" rx="14" fill="rgba(239,68,68,.14)" stroke="var(--red)"/><path class="viz-line" d="M250 138 L360 138"/><text class="viz-number" x="120" y="130">전</text><text class="viz-number" x="414" y="156">후</text><text class="viz-label" x="62" y="34">before / after panel</text></svg></div>
-      <div class="viz-panel"><h4>시나리오 결과 보드</h4><div class="viz-toggle" data-viz-toggle><button type="button" class="active">전</button><button type="button">후</button><button type="button">차이</button></div><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>expiration prices 90, 100, 103, 110, 130. Stock P/L: -1000, 0, 300, 1000, 3000. Covered call P/L: -800, 200, 500, 700, 700.</strong></div><div class="viz-metric"><span>판정</span><strong>“완만한 상승까지는 프리미엄이 보태지고, 큰 상승에서는 상단이 막힌다.”</strong></div><div class="viz-metric"><span>주의</span><strong>card hover or tap highlights matching point on Figure 3.</strong></div></div></div>
+    <p class="viz-copy">만기 주가 다섯 곳에서 주식 단독과 커버드콜 손익을 나란히 둡니다. 카드를 누르면 위 Figure 03 그래프의 해당 지점이 함께 움직입니다. 막대는 ±1,200달러를 기준으로 그렸습니다.</p>
+    <div class="cc-scenboard" id="f4-board">
+      <button type="button" class="cc-scen" data-px="90">
+        <div class="cc-scen-px">만기 90달러</div>
+        <div class="cc-scen-tag">10달러 하락</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>−1,000</b></div><div class="cc-meter"><i class="blue neg" data-val="-1000"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>커버드콜</span><b>−800</b></div><div class="cc-meter"><i class="amber neg" data-val="-800"></i></div></div>
+      </button>
+      <button type="button" class="cc-scen" data-px="100">
+        <div class="cc-scen-px">만기 100달러</div>
+        <div class="cc-scen-tag">제자리</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>0</b></div><div class="cc-meter"><i class="blue" data-val="0"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>커버드콜</span><b>+200</b></div><div class="cc-meter"><i class="amber" data-val="200"></i></div></div>
+      </button>
+      <button type="button" class="cc-scen active" data-px="103">
+        <div class="cc-scen-px">만기 103달러</div>
+        <div class="cc-scen-tag">완만한 상승</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>+300</b></div><div class="cc-meter"><i class="blue" data-val="300"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>커버드콜</span><b>+500</b></div><div class="cc-meter"><i class="amber" data-val="500"></i></div></div>
+      </button>
+      <button type="button" class="cc-scen" data-px="110">
+        <div class="cc-scen-px">만기 110달러</div>
+        <div class="cc-scen-tag">급등</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>+1,000</b></div><div class="cc-meter"><i class="blue" data-val="1000"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>커버드콜</span><b>+700</b></div><div class="cc-meter"><i class="amber" data-val="700"></i></div></div>
+      </button>
+      <button type="button" class="cc-scen" data-px="130">
+        <div class="cc-scen-px">만기 130달러</div>
+        <div class="cc-scen-tag">큰 급등</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>+3,000</b></div><div class="cc-meter"><i class="blue" data-val="3000"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>커버드콜</span><b>+700</b></div><div class="cc-meter"><i class="amber" data-val="700"></i></div></div>
+      </button>
     </div>
 
-    <div class="viz-note">제자리, 완만한 상승, 급등, 하락에서 커버드콜의 성격을 비교한다.</div>
+    <div class="viz-note">완만한 상승(100~105)까지는 프리미엄이 보태져 커버드콜이 앞섭니다. 110, 130처럼 크게 오르면 커버드콜 이익은 700달러에서 멈추고 주식 단독에 점점 뒤처집니다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-05">
   <div class="fig">
     <div class="fig-label">Figure 05 — 행사가 선택 비교 패널</div>
     <h3>행사가 선택 비교 패널</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><rect x="92" y="86" width="144" height="102" rx="14" fill="rgba(125,211,252,.16)" stroke="var(--blue)"/><rect x="384" y="122" width="144" height="66" rx="14" fill="rgba(239,68,68,.14)" stroke="var(--red)"/><path class="viz-line" d="M250 138 L360 138"/><text class="viz-number" x="120" y="130">전</text><text class="viz-number" x="414" y="156">후</text><text class="viz-label" x="62" y="34">before / after panel</text></svg></div>
-      <div class="viz-panel"><h4>행사가 선택 비교 패널</h4><div class="viz-toggle" data-viz-toggle><button type="button" class="active">전</button><button type="button">후</button><button type="button">차이</button></div><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>102 call premium 3.00, breakeven 97, max profit 500. 105 call premium 2.00, breakeven 98, max profit 700. 110 call premium 0.80, breakeven 99.20, max profit 1080.</strong></div><div class="viz-metric"><span>판정</span><strong>“낮은 행사가: 더 큰 현금과 더 낮은 상단. 높은 행사가: 작은 현금과 더 넓은 상방.”</strong></div><div class="viz-metric"><span>주의</span><strong>select strike. Selected values update a mini payoff chart.</strong></div></div></div>
+    <p class="viz-copy">현재 주가 100달러, 주식 100주 보유는 같습니다. 달라지는 것은 매도할 콜의 행사가와 프리미엄뿐입니다. 카드를 선택하면 아래 미니 손익그래프와 수치가 바뀝니다.</p>
+    <div class="cc-strikes" id="f5-strikes">
+      <button type="button" class="cc-strike" data-k="102" data-prem="3.00" data-be="97.00" data-max="500">
+        <h5>102콜 매도</h5>
+        <div class="cc-strike-prem">premium 3.00 · 낮은 행사가</div>
+        <dl><dt>받은 현금</dt><dd>300달러</dd><dt>손익분기점</dt><dd>97.00</dd><dt>최대이익</dt><dd>500달러</dd></dl>
+      </button>
+      <button type="button" class="cc-strike active" data-k="105" data-prem="2.00" data-be="98.00" data-max="700">
+        <h5>105콜 매도</h5>
+        <div class="cc-strike-prem">premium 2.00 · 기준 예시</div>
+        <dl><dt>받은 현금</dt><dd>200달러</dd><dt>손익분기점</dt><dd>98.00</dd><dt>최대이익</dt><dd>700달러</dd></dl>
+      </button>
+      <button type="button" class="cc-strike" data-k="110" data-prem="0.80" data-be="99.20" data-max="1080">
+        <h5>110콜 매도</h5>
+        <div class="cc-strike-prem">premium 0.80 · 높은 행사가</div>
+        <dl><dt>받은 현금</dt><dd>80달러</dd><dt>손익분기점</dt><dd>99.20</dd><dt>최대이익</dt><dd>1,080달러</dd></dl>
+      </button>
+    </div>
+    <div class="viz-panel accent" style="margin-top:14px">
+      <svg id="f5-svg" class="viz-svg" viewBox="0 0 620 280" role="img" aria-label="선택한 행사가의 커버드콜 만기 손익 미니 그래프"></svg>
+    </div>
+    <div class="cc-readout">
+      <div class="cc-ro amber"><span>받은 프리미엄 현금</span><strong id="f5-cash">200달러</strong></div>
+      <div class="cc-ro pos"><span>손익분기점</span><strong id="f5-be">98.00달러</strong></div>
+      <div class="cc-ro"><span>최대이익 (행사가 − 100 + 프리미엄) × 100</span><strong id="f5-max">700달러</strong></div>
     </div>
 
-    <div class="viz-note">낮은 행사가, 등가격에 가까운 행사가, 높은 행사가의 교환관계를 보여준다.</div>
+    <div class="viz-note">낮은 행사가(102)는 현금이 크고 손익분기점이 낮지만 상단이 빨리 막힙니다. 높은 행사가(110)는 현금이 작은 대신 상승 여지가 더 남습니다. 받은 현금만 보지 말고 넘긴 상방을 함께 보세요.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-06">
   <div class="fig">
     <div class="fig-label">Figure 06 — 커버드콜 그릭스 번역기</div>
     <h3>커버드콜 그릭스 번역기</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
-      <div class="viz-panel"><h4>커버드콜 그릭스 번역기</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>stock delta +100. short call delta -35 when call delta 0.35. net delta +65. gamma negative, theta positive, vega negative.</strong></div><div class="viz-metric"><span>판정</span><strong>“현재 조건의 순델타는 약 +65주. 시간이 지나며 이 값은 변한다.”</strong></div><div class="viz-metric"><span>주의</span><strong>call delta slider 0.10~0.80. net delta updates live.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    <p class="viz-copy">주식 100주는 델타 +100입니다. 콜을 매도하면 콜 델타만큼 노출이 줄어듭니다. 슬라이더로 콜 델타를 바꿔 순델타가 어떻게 변하는지 보세요. <code>순델타 = 100 − 콜 델타 × 100</code></p>
+    <div class="viz-range">
+      <label>105콜 델타 <output id="f6-out">0.35</output></label>
+      <input type="range" id="f6-slider" min="0.10" max="0.80" step="0.01" value="0.35" aria-label="콜 델타 조정">
+    </div>
+    <div class="cc-greek-bars">
+      <div class="cc-gb"><div class="cc-gb-lab">주식 100주</div><div class="cc-axisbar"><i class="blue" id="f6-bar-stock"></i></div><div class="cc-gb-val">+100주</div></div>
+      <div class="cc-gb"><div class="cc-gb-lab">숏콜 노출</div><div class="cc-axisbar"><i class="amber" id="f6-bar-call"></i></div><div class="cc-gb-val" id="f6-call">−35주</div></div>
+      <div class="cc-gb"><div class="cc-gb-lab">순델타</div><div class="cc-axisbar"><i class="net" id="f6-bar-net"></i></div><div class="cc-gb-val" id="f6-net">+65주</div></div>
+    </div>
+    <div class="viz-pill-row" style="margin-top:16px">
+      <span class="badge good">델타 양(+)</span>
+      <span class="badge bad">감마 음(−)</span>
+      <span class="badge good">세타 양(+)</span>
+      <span class="badge bad">베가 음(−)</span>
+    </div>
+    <div class="cc-readout">
+      <div class="cc-ro"><span>감마</span><strong style="color:var(--red)">음 (−)</strong></div>
+      <div class="cc-ro"><span>세타</span><strong style="color:var(--green)">양 (+)</strong></div>
+      <div class="cc-ro"><span>베가</span><strong style="color:var(--red)">음 (−)</strong></div>
+      <div class="cc-ro"><span>방향 성격</span><strong>완만한 상승·횡보에 유리</strong></div>
     </div>
 
-    <div class="viz-note">주식 + 숏콜을 델타, 감마, 세타, 베가로 읽게 한다.</div>
+    <div class="viz-note">기본값에서 순델타는 약 +65주입니다. 주가가 105 근처로 오르면 콜 델타가 커져 순델타가 줄고, 상방이 점점 둔해집니다. 음의 감마, 양의 세타, 음의 베가가 그 결과입니다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-07">
   <div class="fig">
     <div class="fig-label">Figure 07 — 커버드콜 ETF 읽기 카드</div>
     <h3>커버드콜 ETF 읽기 카드</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg dashboard gauge chart" viewBox="0 0 620 260" role="img" aria-label="대시보드"><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><g transform="translate(120,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -42.6 -33.2" fill="none" stroke="var(--blue)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Δ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(285,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -27.0 -46.8" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">Γ</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><g transform="translate(450,132)"><circle r="54" fill="none" stroke="var(--border)" stroke-width="12"/><path d="M -54 0 A 54 54 0 0 1 -50.1 -20.2" fill="none" stroke="var(--green)" stroke-width="12" stroke-linecap="round"/><text class="viz-number" text-anchor="middle" y="4">IV</text><text class="viz-label" text-anchor="middle" y="26">gauge</text></g><line class="viz-gridline" x1="86" y1="214" x2="534" y2="214"/><text class="viz-label" x="62" y="34">dashboard map</text></svg></div>
-      <div class="viz-panel"><h4>커버드콜 ETF 읽기 카드</h4><div class="viz-metrics"><div class="viz-metric"><span>입력</span><strong>illustrative monthly call sale premium 1.0%, underlying monthly return scenarios -8%, 0%, +3%, +10%. Covered call rough result: -7%, +1%, +3%, +4% when upside cap around 3% plus premium. Label all numbers as simplified i…</strong></div><div class="viz-metric"><span>판정</span><strong>“분배금은 총수익의 한 부분이다. 가격 변화와 상방 제한을 함께 본다.”</strong></div><div class="viz-metric"><span>주의</span><strong>none or simple scenario tabs.</strong></div></div><div class="viz-pill-row"><span class="viz-pill">direction</span><span class="viz-pill">time</span><span class="viz-pill">volatility</span><span class="viz-pill">liquidity</span></div></div>
+    <p class="viz-copy">커버드콜 ETF는 기초자산을 보유하고 주기적으로 콜을 매도해 프리미엄을 분배금으로 돌려줍니다. 흐름은 같습니다. 분배율만 보면 총수익을 착각하기 쉽습니다.</p>
+    <div class="cc-flowstrip">
+      <span class="pill">기초자산 보유</span>
+      <span class="op">→</span>
+      <span class="pill">콜 매도</span>
+      <span class="op">→</span>
+      <span class="pill">프리미엄 수취</span>
+      <span class="op">→</span>
+      <span class="pill">현금 분배</span>
+      <span class="op">→</span>
+      <span class="pill res">상방 제한</span>
     </div>
+    <p class="viz-copy" style="margin-top:6px">아래는 <strong>학습용 단순 예시</strong>입니다. 실제 ETF 수익률이 아니라 구조를 보여주려고 만든 숫자입니다. 월 프리미엄 약 1%, 상승 한도(cap) 약 3%로 가정합니다.</p>
+    <div class="cc-quickbtns" id="f7-tabs">
+      <button type="button" data-s="0" class="active">기초 −8%</button>
+      <button type="button" data-s="1">기초 0%</button>
+      <button type="button" data-s="2">기초 +3%</button>
+      <button type="button" data-s="3">기초 +10%</button>
+    </div>
+    <div class="cc-etf-result">
+      <div class="cc-ro blue"><span>기초자산 월 수익</span><strong id="f7-base">−8%</strong></div>
+      <div class="cc-ro amber"><span>커버드콜 대략 결과 <small>(프리미엄·cap 반영)</small></span><strong id="f7-cc">−7%</strong></div>
+      <div class="cc-ro"><span>이번 달 상방 제한 여부</span><strong id="f7-cap">하락이라 제한 영향 작음</strong></div>
+      <div class="cc-ro"><span>분배금 성격</span><strong>총수익의 일부일 뿐</strong></div>
+    </div>
+    <div class="cc-warnflag" id="f7-flag"><b>읽는 법.</b> 큰 하락(−8%)에서는 프리미엄 1%가 손실을 −7%로 약간 줄일 뿐입니다. 분배금이 들어와도 기초자산이 빠지면 총수익은 마이너스입니다.</div>
 
-    <div class="viz-note">높은 분배율과 총수익을 분리해 보게 한다.</div>
+    <div class="viz-note">분배금은 총수익의 한 부분입니다. 가격 변화와 상방 제한을 함께 봐야 합니다. 큰 상승장(+10%)에서는 cap 때문에 +4% 정도에 머물러 기초자산에 뒤처집니다.</div>
   </div>
 </section><section class="section-wide reveal" id="figure-08">
   <div class="fig">
     <div class="fig-label">Figure 08 — 배당과 조기배정 체크 타임라인</div>
     <h3>배당과 조기배정 체크 타임라인</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><svg class="viz-svg chart" viewBox="0 0 620 260" role="img" aria-label="차트"><line class="viz-gridline" x1="58" y1="42" x2="58" y2="218"/><line class="viz-gridline" x1="58" y1="218" x2="570" y2="218"/><line class="viz-gridline" x1="58" y1="130" x2="570" y2="130"/><line class="viz-axis" x1="58" y1="218" x2="570" y2="218"/><line class="viz-axis" x1="58" y1="42" x2="58" y2="218"/><defs><linearGradient id="vizGrad" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="var(--blue)" stop-opacity=".95"/><stop offset="55%" stop-color="var(--amber)" stop-opacity=".95"/><stop offset="100%" stop-color="var(--green)" stop-opacity=".95"/></linearGradient></defs><path class="viz-line red curve" d="M70 70 C170 72, 270 92, 350 140 S500 196, 560 214"/><path class="viz-line blue" d="M70 190 L220 150 L380 108 L560 72" opacity=".8"/><text class="viz-label" x="62" y="34">timeline curve</text><text class="viz-label" x="70" y="238">오늘</text><text class="viz-label" x="500" y="238">만기</text></svg></div>
-      <div class="viz-panel"><h4>배당과 조기배정 체크 타임라인</h4><div class="viz-timeline timeline"><div class="viz-time"><span>TODAY</span><strong>프리미엄 지불</strong><p>trade date D0, ex-dividend D18, option expiration D30, strike 105, stock price 110, remaining time value near 0, dividend attractiveness flag.</p></div><div class="viz-time"><span>MID</span><strong>시간가치 변화</strong><p>“배당락 전 깊은 내가격 숏콜은 조기배정 가능성을 점검한다. 가능성은 배당, 시간가치, 브로커 규칙에 따라 달라진다.”</p></div><div class="viz-time"><span>EXP</span><strong>만기 정산</strong><p>toggle 배당 있음 / 없음; risk flag copy changes.</p></div></div></div>
+    <p class="viz-copy">주가 110달러, 주식 100주 보유, 105콜 매도 상황입니다. 이 콜은 깊은 내가격입니다. 배당락 전 남은 시간가치가 거의 없으면 콜 매수자가 조기행사를 고려할 수 있습니다. 토글로 배당 유무를 바꿔 보세요.</p>
+    <div class="viz-timeline">
+      <div class="viz-time"><span>D0 · 거래일</span><strong>커버드콜 진입</strong><p>주식 100주 보유 + 105콜 매도. 프리미엄 2달러를 먼저 받습니다.</p></div>
+      <div class="viz-time"><span>D18 · 배당락</span><strong>배당락일 통과</strong><p>이 시점 직전이 조기배정 점검 구간입니다. 깊은 내가격 + 남은 시간가치≈0 + 매력적 배당이면 위험이 커집니다.</p></div>
+      <div class="viz-time"><span>D30 · 만기</span><strong>만기 정산</strong><p>주가 110 &gt; 105이면 만기에 주식 100주가 105달러에 배정될 수 있습니다.</p></div>
+    </div>
+    <div class="cc-quickbtns" id="f8-toggle">
+      <button type="button" data-div="yes" class="active">배당 있음</button>
+      <button type="button" data-div="no">배당 없음</button>
+    </div>
+    <div class="cc-warnflag" id="f8-flag"><b>조기배정 점검.</b> 배당락 전날, 105콜의 남은 시간가치가 받을 배당보다 작으면 콜 매수자는 배당을 노려 조기행사할 수 있습니다. 그러면 주식 100주가 105달러에 넘어갑니다. 배당락일·남은 시간가치·행사가 대비 현재가·호가 스프레드·브로커 안내를 확인하세요.</div>
+    <div class="cc-readout">
+      <div class="cc-ro"><span>현재가 / 행사가</span><strong>110 / 105 (깊은 내가격)</strong></div>
+      <div class="cc-ro"><span>남은 시간가치</span><strong>거의 0에 가까움</strong></div>
+      <div class="cc-ro"><span>배당락일</span><strong id="f8-exdiv">D18 (있음)</strong></div>
+      <div class="cc-ro"><span>조기배정 위험</span><strong id="f8-risk" style="color:var(--amber)">점검 필요</strong></div>
     </div>
 
-    <div class="viz-note">미국식 주식 옵션에서 배당락일, 남은 시간가치, 행사가 대비 현재가, 만기를 확인하게 한다.</div>
+    <div class="viz-note">조기배정이 반드시 일어난다는 뜻은 아닙니다. 다만 배당락일, 남은 시간가치, 행사가 대비 현재가, 호가 스프레드, 브로커 안내는 체크리스트에 들어가야 합니다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-05">
@@ -453,12 +701,36 @@
   <div class="fig">
     <div class="fig-label">Figure 09 — 커버드콜 판단 워크시트</div>
     <h3>커버드콜 판단 워크시트</h3>
-    <div class="viz-grid">
-      <div class="viz-panel accent"><h4>커버드콜 판단 워크시트</h4><table class="viz-matrix matrix"><thead><tr><th>번호</th><th>점검 항목</th><th>판정</th></tr></thead><tbody><tr><td>1</td><td>목적을 한 문장으로 설명</td><td>기록</td></tr><tr><td>2</td><td>손실 한도와 만기 확인</td><td>수치</td></tr><tr><td>3</td><td>유동성, 배정, 세금 확인</td><td>보류 가능</td></tr></tbody></table></div>
-      <div class="viz-panel"><h4>실행 전 checklist</h4><div class="viz-checklist checklist"><label class="viz-check"><input type="checkbox"><span>ticker, current price, share count, cost basis, call strike, call premium, days to expiration, call delta, ex-dividend date, assignment comfort, account size, max allocation.</span></label><label class="viz-check"><input type="checkbox"><span>“행사가에 팔려도 되는 주식인지 먼저 적고, 그다음 프리미엄을 본다.”</span></label><label class="viz-check"><input type="checkbox"><span>예시 채우기, 비우기, 계산하기, 인쇄용 보기 버튼. 외부 전송 없이 브라우저 내부에서만 계산한다.</span></label><label class="viz-check"><input type="checkbox"><span>학습자가 실제 보유 종목에 커버드콜을 붙일지 점검한다.</span></label></div></div>
+    <p class="viz-copy">행사가에 팔려도 되는 주식인지 먼저 적고, 그다음 프리미엄을 봅니다. 아래는 브라우저 안에서만 계산하며 외부로 전송하지 않습니다. <code>받은 현금 = 프리미엄 × 100</code>, <code>손익분기점 = 매수가 − 프리미엄</code>, <code>최대이익 = (행사가 − 매수가 + 프리미엄) × 100</code>, <code>순델타 = 100 − 콜델타 × 100</code></p>
+    <div class="cc-form">
+      <div class="cc-field"><label for="w-ticker">종목(ticker)</label><input id="w-ticker" type="text" autocomplete="off" placeholder="예: ABC"></div>
+      <div class="cc-field"><label for="w-price">현재가</label><input id="w-price" type="number" step="0.01" inputmode="decimal" placeholder="100"></div>
+      <div class="cc-field"><label for="w-shares">보유 수량(주)</label><input id="w-shares" type="number" step="1" inputmode="numeric" placeholder="100"></div>
+      <div class="cc-field"><label for="w-cost">매수 단가(cost basis)</label><input id="w-cost" type="number" step="0.01" inputmode="decimal" placeholder="100"></div>
+      <div class="cc-field"><label for="w-strike">콜 행사가</label><input id="w-strike" type="number" step="0.01" inputmode="decimal" placeholder="105"></div>
+      <div class="cc-field"><label for="w-prem">콜 프리미엄</label><input id="w-prem" type="number" step="0.01" inputmode="decimal" placeholder="2"></div>
+      <div class="cc-field"><label for="w-days">만기까지(일)</label><input id="w-days" type="number" step="1" inputmode="numeric" placeholder="30"></div>
+      <div class="cc-field"><label for="w-delta">콜 델타</label><input id="w-delta" type="number" step="0.01" inputmode="decimal" placeholder="0.35"></div>
+      <div class="cc-field"><label for="w-exdiv">배당락일</label><input id="w-exdiv" type="text" autocomplete="off" placeholder="예: 18일 뒤 / 없음"></div>
+      <div class="cc-field"><label for="w-comfort">행사가에 팔려도 되는가</label><select id="w-comfort"><option value="">선택</option><option value="ok">예, 그 가격이면 매도 만족</option><option value="no">아니오, 더 들고 싶음</option></select></div>
+      <div class="cc-field"><label for="w-account">계좌 크기</label><input id="w-account" type="number" step="1" inputmode="numeric" placeholder="100000"></div>
+      <div class="cc-field"><label for="w-alloc">최대 배분(%)</label><input id="w-alloc" type="number" step="1" inputmode="numeric" placeholder="15"></div>
     </div>
+    <div class="cc-actions">
+      <button type="button" class="primary" id="w-calc">계산하기</button>
+      <button type="button" id="w-fill">예시 채우기</button>
+      <button type="button" id="w-clear">비우기</button>
+      <button type="button" id="w-print">인쇄용 보기</button>
+    </div>
+    <div class="cc-result-grid">
+      <div class="cc-ro amber"><span>받은 현금</span><strong id="w-r-cash">—</strong></div>
+      <div class="cc-ro pos"><span>손익분기점</span><strong id="w-r-be">—</strong></div>
+      <div class="cc-ro"><span>최대이익</span><strong id="w-r-max">—</strong></div>
+      <div class="cc-ro blue"><span>순델타(주)</span><strong id="w-r-net">—</strong></div>
+    </div>
+    <div class="cc-warnflag off" id="w-comment">입력값을 채우고 <b>계산하기</b>를 누르면 받은 현금, 손익분기점, 최대이익, 순델타가 표시됩니다.</div>
 
-    <div class="viz-note">학습자가 실제 보유 종목에 커버드콜을 붙일지 점검한다.</div>
+    <div class="viz-note">행사가에 팔려도 되는 주식인지 먼저 적고, 그다음 프리미엄을 봅니다. 계산은 브라우저 안에서만 이뤄지며 어디로도 전송되지 않습니다.</div>
   </div>
 </section><hr class="divider">
 <section class="section reveal" id="section-08">
@@ -524,6 +796,149 @@ document.querySelectorAll('[data-viz-toggle]').forEach((group) => {
   }));
 });
 
+
+(function () {
+  const fmtUsd = (n) => `${n >= 0 ? '+' : '−'}${Math.abs(Math.round(n)).toLocaleString('ko-KR')}달러`;
+  const plainUsd = (n) => `${Math.round(n).toLocaleString('ko-KR')}달러`;
+  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+  const S0 = 100, K0 = 105, SHARES = 100, PREMIUM0 = 2;
+  const stockPL = (s) => (s - S0) * SHARES;
+  const coveredPL = (s, k = K0, p = PREMIUM0) => (s - S0) * SHARES + p * SHARES - Math.max(s - k, 0) * SHARES;
+
+  function payoffPath(k = K0, p = PREMIUM0) {
+    const xs = [80, 90, 98, 100, 103, 105, 110, 120, 130];
+    return xs.map((s) => ({ s, stock: stockPL(s), cc: coveredPL(s, k, p) }));
+  }
+
+  function renderPayoffSvg(svgId, selected = 103, k = K0, p = PREMIUM0) {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    const minS = 80, maxS = 130, minY = -2200, maxY = 3200;
+    const x = (s) => 58 + ((s - minS) / (maxS - minS)) * 500;
+    const y = (v) => 250 - ((v - minY) / (maxY - minY)) * 205;
+    const line = (key) => payoffPath(k, p).map((d, i) => `${i ? 'L' : 'M'}${x(d.s).toFixed(1)},${y(d[key]).toFixed(1)}`).join(' ');
+    const be = S0 - p;
+    const selStock = stockPL(selected);
+    const selCc = coveredPL(selected, k, p);
+    svg.innerHTML = `
+      <line class="viz-axis" x1="58" y1="250" x2="558" y2="250"/><line class="viz-axis" x1="58" y1="45" x2="58" y2="250"/>
+      ${[-2000,-1000,0,1000,2000,3000].map(v => `<line class="viz-gridline" x1="58" x2="558" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/><text class="viz-label" x="12" y="${(y(v)+4).toFixed(1)}">${v}</text>`).join('')}
+      ${[80,90,100,105,110,120,130].map(s => `<text class="viz-label" x="${x(s).toFixed(1)}" y="274" text-anchor="middle">${s}</text>`).join('')}
+      <path class="viz-line blue" d="${line('stock')}"/><path class="viz-line" d="${line('cc')}"/>
+      <line x1="${x(be).toFixed(1)}" x2="${x(be).toFixed(1)}" y1="45" y2="250" stroke="var(--green)" stroke-dasharray="5 5"/><text class="viz-label" x="${x(be).toFixed(1)}" y="35" text-anchor="middle">BE ${be.toFixed(1)}</text>
+      <line x1="${x(k).toFixed(1)}" x2="${x(k).toFixed(1)}" y1="45" y2="250" stroke="var(--amber)" stroke-dasharray="5 5"/><text class="viz-label" x="${x(k).toFixed(1)}" y="22" text-anchor="middle">K ${k}</text>
+      <circle class="viz-dot blue" cx="${x(selected).toFixed(1)}" cy="${y(selStock).toFixed(1)}" r="6"/><circle class="viz-dot" cx="${x(selected).toFixed(1)}" cy="${y(selCc).toFixed(1)}" r="6"/>
+      <text class="viz-label" x="420" y="62">파란 선: 주식 단독</text><text class="viz-label" x="420" y="80">노란 선: 커버드콜</text>`;
+  }
+
+  function updateF2() {
+    const input = document.getElementById('f2-slider');
+    if (!input) return;
+    const p = Number(input.value);
+    const be = S0 - p;
+    setText('f2-prem', p.toFixed(2)); setText('f2-out', p.toFixed(2)); setText('f2-be', be.toFixed(2));
+    setText('f2-cash', plainUsd(p * SHARES)); setText('f2-be2', `${be.toFixed(2)}달러`);
+    setText('f2-max', plainUsd((K0 - S0 + p) * SHARES)); setText('f2-cushion', `${p.toFixed(2)}달러`);
+  }
+
+  function updateF3(price = Number(document.getElementById('f3-slider')?.value || 103)) {
+    const slider = document.getElementById('f3-slider'); if (slider) slider.value = String(price);
+    setText('f3-out', String(price)); setText('f3-px', `${Number(price).toFixed(1)}달러`);
+    const st = stockPL(price), cc = coveredPL(price);
+    setText('f3-stock', fmtUsd(st)); setText('f3-cc', fmtUsd(cc)); setText('f3-diff', fmtUsd(cc - st));
+    renderPayoffSvg('f3-svg', price);
+    document.querySelectorAll('#f3-quick button,#f4-board button').forEach((btn) => btn.classList.toggle('active', Number(btn.dataset.px) === Number(price)));
+  }
+
+  function updateScenarioMeters() {
+    document.querySelectorAll('.cc-scen').forEach((card) => {
+      const px = Number(card.dataset.px);
+      const st = stockPL(px), cc = coveredPL(px);
+      const scale = 1200;
+      const meters = card.querySelectorAll('.cc-meter i');
+      [st, cc].forEach((v, i) => {
+        const el = meters[i]; if (!el) return;
+        const w = Math.min(50, Math.abs(v) / scale * 50);
+        el.style.left = v < 0 ? `${50 - w}%` : '50%'; el.style.width = `${w}%`; el.classList.toggle('neg', v < 0);
+      });
+    });
+  }
+
+  function updateF5(button = document.querySelector('#f5-strikes .cc-strike.active')) {
+    if (!button) return;
+    document.querySelectorAll('#f5-strikes .cc-strike').forEach((b) => b.classList.toggle('active', b === button));
+    const k = Number(button.dataset.k), p = Number(button.dataset.prem), be = Number(button.dataset.be), max = Number(button.dataset.max);
+    setText('f5-cash', plainUsd(p * SHARES)); setText('f5-be', `${be.toFixed(2)}달러`); setText('f5-max', plainUsd(max));
+    renderPayoffSvg('f5-svg', k, k, p);
+  }
+
+  function updateF6() {
+    const input = document.getElementById('f6-slider'); if (!input) return;
+    const d = Number(input.value); const call = -d * 100; const net = 100 + call;
+    setText('f6-out', d.toFixed(2)); setText('f6-call', `${Math.round(call)}주`); setText('f6-net', `+${Math.round(net)}주`);
+    const stockBar = document.getElementById('f6-bar-stock'), callBar = document.getElementById('f6-bar-call'), netBar = document.getElementById('f6-bar-net');
+    if (stockBar) { stockBar.style.left = '50%'; stockBar.style.width = '45%'; }
+    if (callBar) { callBar.style.left = `${50 - Math.min(45, d*45)}%`; callBar.style.width = `${Math.min(45, d*45)}%`; }
+    if (netBar) { netBar.style.left = '50%'; netBar.style.width = `${Math.min(45, net/100*45)}%`; }
+  }
+
+  function updateF7(index = 0) {
+    const rows = [
+      ['−8%', '−7%', '하락이라 제한 영향 작음', '큰 하락에서는 프리미엄 1%가 손실을 조금 줄일 뿐입니다. 분배금이 들어와도 총수익은 마이너스입니다.'],
+      ['0%', '+1%', '상승 제한 없음', '기초자산이 횡보하면 받은 프리미엄이 수익의 대부분이 됩니다.'],
+      ['+3%', '+3%', 'cap 근처', '완만한 상승에서는 기초자산 상승과 프리미엄이 일부 반영됩니다.'],
+      ['+10%', '+4%', '상방 제한 작동', '큰 상승장에서는 행사가 위 상승을 양보해 기초자산 수익률에 뒤처집니다.']
+    ];
+    const r = rows[index] || rows[0];
+    setText('f7-base', r[0]); setText('f7-cc', r[1]); setText('f7-cap', r[2]);
+    const flag = document.getElementById('f7-flag'); if (flag) flag.innerHTML = `<b>읽는 법.</b> ${r[3]}`;
+    document.querySelectorAll('#f7-tabs button').forEach((b, i) => b.classList.toggle('active', i === index));
+  }
+
+  function updateF8(hasDividend = true) {
+    setText('f8-exdiv', hasDividend ? 'D18 (있음)' : '없음');
+    setText('f8-risk', hasDividend ? '점검 필요' : '상대적으로 낮음');
+    const risk = document.getElementById('f8-risk'); if (risk) risk.style.color = hasDividend ? 'var(--amber)' : 'var(--green)';
+    const flag = document.getElementById('f8-flag');
+    if (flag) flag.innerHTML = hasDividend ? '<b>조기배정 점검.</b> 배당락 전날, 105콜의 남은 시간가치가 받을 배당보다 작으면 콜 매수자는 배당을 노려 조기행사할 수 있습니다. 그러면 주식 100주가 105달러에 넘어갑니다. 배당락일·남은 시간가치·행사가 대비 현재가·호가 스프레드·브로커 안내를 확인하세요.' : '<b>조기배정 점검.</b> 배당이 없으면 배당을 노린 조기행사 유인은 줄어듭니다. 그래도 깊은 내가격 옵션은 만기 전 유동성, 시간가치, 배정 가능성을 확인해야 합니다.';
+    document.querySelectorAll('#f8-toggle button').forEach((b) => b.classList.toggle('active', (b.dataset.div === 'yes') === hasDividend));
+  }
+
+  function worksheetValues(example = false) {
+    const ids = ['w-price','w-shares','w-cost','w-strike','w-prem','w-days','w-delta','w-account','w-alloc'];
+    if (example) {
+      const vals = {'w-ticker':'ABC','w-price':100,'w-shares':100,'w-cost':100,'w-strike':105,'w-prem':2,'w-days':30,'w-delta':0.35,'w-exdiv':'18일 뒤','w-comfort':'ok','w-account':100000,'w-alloc':15};
+      Object.entries(vals).forEach(([id, v]) => { const el = document.getElementById(id); if (el) el.value = v; });
+    }
+    const n = (id, fallback = 0) => Number(document.getElementById(id)?.value || fallback);
+    return { price:n('w-price',100), shares:n('w-shares',100), cost:n('w-cost',100), strike:n('w-strike',105), prem:n('w-prem',2), delta:n('w-delta',0.35), account:n('w-account',100000), alloc:n('w-alloc',15), comfort:document.getElementById('w-comfort')?.value || '' };
+  }
+  function updateWorksheet() {
+    const v = worksheetValues(false); const contracts = Math.floor(v.shares / 100) || 1;
+    const cash = v.prem * 100 * contracts; const be = v.cost - v.prem; const max = (v.strike - v.cost + v.prem) * 100 * contracts; const net = v.shares - v.delta * 100 * contracts;
+    setText('w-r-cash', plainUsd(cash)); setText('w-r-be', `${be.toFixed(2)}달러`); setText('w-r-max', plainUsd(max)); setText('w-r-net', `${net >= 0 ? '+' : '−'}${Math.abs(Math.round(net))}주`);
+    const msg = document.getElementById('w-comment');
+    if (msg) {
+      const ok = v.comfort === 'ok';
+      const alloc = v.account ? (v.cost * v.shares / v.account * 100) : 0;
+      msg.innerHTML = `<b>판정 메모.</b> ${ok ? '행사가 매도 수용 의사가 입력됐습니다.' : '행사가에 팔려도 되는지 아직 확인이 필요합니다.'} 포지션 명목 비중은 약 ${alloc.toFixed(1)}%입니다. 형이 정한 최대 배분 ${v.alloc || 0}%와 비교하세요.`;
+      msg.classList.toggle('off', false);
+    }
+  }
+
+  document.getElementById('f2-slider')?.addEventListener('input', updateF2);
+  document.getElementById('f3-slider')?.addEventListener('input', (e) => updateF3(Number(e.target.value)));
+  document.querySelectorAll('#f3-quick button,#f4-board button').forEach((b) => b.addEventListener('click', () => updateF3(Number(b.dataset.px))));
+  document.querySelectorAll('#f5-strikes .cc-strike').forEach((b) => b.addEventListener('click', () => updateF5(b)));
+  document.getElementById('f6-slider')?.addEventListener('input', updateF6);
+  document.querySelectorAll('#f7-tabs button').forEach((b, i) => b.addEventListener('click', () => updateF7(i)));
+  document.querySelectorAll('#f8-toggle button').forEach((b) => b.addEventListener('click', () => updateF8(b.dataset.div === 'yes')));
+  document.getElementById('w-calc')?.addEventListener('click', updateWorksheet);
+  document.getElementById('w-fill')?.addEventListener('click', () => { worksheetValues(true); updateWorksheet(); });
+  document.getElementById('w-clear')?.addEventListener('click', () => { document.querySelectorAll('.cc-form input,.cc-form select').forEach((el) => { el.value = ''; }); setText('w-r-cash','—'); setText('w-r-be','—'); setText('w-r-max','—'); setText('w-r-net','—'); const msg=document.getElementById('w-comment'); if(msg){ msg.innerHTML='입력값을 채우고 <b>계산하기</b>를 누르면 받은 현금, 손익분기점, 최대이익, 순델타가 표시됩니다.'; msg.classList.add('off'); }});
+  document.getElementById('w-print')?.addEventListener('click', () => window.print());
+  updateF2(); updateF3(103); updateScenarioMeters(); updateF5(); updateF6(); updateF7(0); updateF8(true);
+})();
 
 </script>
   <script src="../assets/auth-config.js?v=privacy-20260619"></script>
