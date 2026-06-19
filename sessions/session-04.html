@@ -484,6 +484,7 @@
       <defs>
         <linearGradient id="pbProfit" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22C55E" stop-opacity="0.3"/><stop offset="100%" stop-color="#22C55E" stop-opacity="0"/></linearGradient>
         <linearGradient id="pbLoss" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EF4444" stop-opacity="0"/><stop offset="100%" stop-color="#EF4444" stop-opacity="0.2"/></linearGradient>
+        <clipPath id="pbChartClip"><rect x="30" y="10" width="230" height="140"/></clipPath>
       </defs>
       <!-- fills -->
       <polygon points="30,10 30,110 155,110 73,10" fill="url(#pbProfit)"/>
@@ -509,7 +510,7 @@
       <text x="36" y="62" fill="#22C55E" font-size="9" font-family="Noto Sans KR, sans-serif">←이익</text>
       <text x="180" y="130" fill="#EF4444" font-size="9" font-family="Noto Sans KR, sans-serif">손실 −$2 고정</text>
       <!-- payoff line -->
-      <polyline points="30,-42 73,10 155,110 161,118 260,118" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="30,-42 73,10 155,110 161,118 260,118" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#pbChartClip)"/>
     </svg>
     <div class="fig-caption">프리미엄 2달러가 그래프를 2달러만큼 아래로 내렸습니다. 손익분기점이 행사가 90달러가 아니라 88달러가 됩니다.</div>
   </div>
@@ -542,6 +543,7 @@
       <defs>
         <linearGradient id="csProfit" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22C55E" stop-opacity="0.25"/><stop offset="100%" stop-color="#22C55E" stop-opacity="0"/></linearGradient>
         <linearGradient id="csLoss" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EF4444" stop-opacity="0"/><stop offset="100%" stop-color="#EF4444" stop-opacity="0.22"/></linearGradient>
+        <clipPath id="csChartClip"><rect x="30" y="10" width="230" height="140"/></clipPath>
       </defs>
       <!-- fills -->
       <polygon points="30,110 30,98 145,98 157,110" fill="url(#csProfit)"/>
@@ -567,7 +569,7 @@
       <text x="60" y="86" fill="#22C55E" font-size="9" font-family="Noto Sans KR, sans-serif">이익 +$3 상한</text>
       <text x="188" y="142" fill="#EF4444" font-size="9" font-family="Noto Sans KR, sans-serif">손실 확대→</text>
       <!-- payoff line -->
-      <polyline points="30,98 145,98 260,218" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="30,98 145,98 260,218" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#csChartClip)"/>
     </svg>
     <div class="fig-caption">콜 매도 그래프는 콜 매수 그래프를 0선 기준으로 뒤집은 모양입니다. 프리미엄 3달러가 그래프를 3달러만큼 위로 올렸고, 이것이 최대이익이자 손익의 출발점입니다.</div>
   </div>
@@ -600,6 +602,7 @@
       <defs>
         <linearGradient id="psProfit" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22C55E" stop-opacity="0.25"/><stop offset="100%" stop-color="#22C55E" stop-opacity="0"/></linearGradient>
         <linearGradient id="psLoss" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EF4444" stop-opacity="0"/><stop offset="100%" stop-color="#EF4444" stop-opacity="0.22"/></linearGradient>
+        <clipPath id="psChartClip"><rect x="30" y="10" width="230" height="140"/></clipPath>
       </defs>
       <!-- fills -->
       <polygon points="30,110 30,150 122,150 155,110" fill="url(#psLoss)"/>
@@ -625,7 +628,7 @@
       <text x="185" y="90" fill="#22C55E" font-size="9" font-family="Noto Sans KR, sans-serif">이익 +$2 상한</text>
       <text x="36" y="140" fill="#EF4444" font-size="9" font-family="Noto Sans KR, sans-serif">←손실 확대</text>
       <!-- payoff line -->
-      <polyline points="30,262 122,150 155,110 161,102 260,102" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="30,262 122,150 155,110 161,102 260,102" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#psChartClip)"/>
     </svg>
     <div class="fig-caption">풋 매도 그래프는 풋 매수 그래프를 0선 기준으로 뒤집은 모양입니다. 프리미엄 2달러가 그래프를 위로 올렸고, 이것이 최대이익의 상한입니다.</div>
   </div>
