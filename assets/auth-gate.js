@@ -92,7 +92,7 @@
   function authErrorMessage(error) {
     const message = String(error?.message || error || '');
     if (/rate limit|too many|email rate/i.test(message)) {
-      return '인증 메일 요청이 잠시 제한됐습니다. 이미 받은 메일이 있으면 최신 인증 링크를 눌러주세요. 메일이 없다면 잠시 뒤 다시 시도하면 됩니다.';
+      return '인증 메일 요청이 잠시 제한됐습니다. 같은 메일함에 최신 로그인 링크가 있으면 그 링크를 눌러주세요. 메일이 없다면 1~2분 뒤 다시 요청하면 됩니다.';
     }
     return `처리 중 문제가 생겼습니다: ${message}`;
   }
@@ -104,7 +104,7 @@
   function secondsUntilOtpRetry(email) {
     const sentAt = Number(localStorage.getItem(otpCooldownKey(email)) || 0);
     if (!sentAt) return 0;
-    const waitSeconds = 90;
+    const waitSeconds = 20;
     return Math.max(0, waitSeconds - Math.floor((Date.now() - sentAt) / 1000));
   }
 
@@ -280,10 +280,11 @@
       try {
         const retryAfter = secondsUntilOtpRetry(email);
         if (retryAfter > 0) {
-          statusMessage(`인증 메일을 방금 요청했습니다. 메일함을 먼저 확인해주세요. 다시 요청은 약 ${retryAfter}초 뒤에 가능합니다.`);
+          statusMessage(`로그인 링크를 방금 보냈습니다. 같은 메일함의 최신 링크를 먼저 눌러주세요. 새 링크 요청은 약 ${retryAfter}초 뒤에 다시 가능합니다.`);
           return;
         }
-        await upsertRequest(email, xHandle);
+        const existingApproval = await getApproval(email).catch(() => null);
+        if (!existingApproval) await upsertRequest(email, xHandle);
         const supabase = await getClient();
         const { error } = await supabase.auth.signInWithOtp({
           email,
@@ -291,7 +292,9 @@
         });
         if (error) throw error;
         localStorage.setItem(otpCooldownKey(email), String(Date.now()));
-        statusMessage('인증 링크를 보냈습니다. 메일함에서 링크를 누르면 승인 상태를 확인합니다.');
+        statusMessage(existingApproval
+          ? '승인된 이메일입니다. 메일함의 최신 로그인 링크를 누르면 바로 강의로 들어갑니다.'
+          : '인증 링크를 보냈습니다. 메일함에서 링크를 누르면 승인 상태를 확인합니다.');
       } catch (error) {
         statusMessage(authErrorMessage(error));
       } finally {
