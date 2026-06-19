@@ -621,8 +621,13 @@
       <input id="spSlider" type="range" min="75" max="125" value="100" step="5">
     </div>
 
-    <div id="strikeGrid" class="strike-grid">
-      <!-- populated by JS -->
+    <div id="strikeGrid" class="priceline-host">
+      <!-- populated by JS: 수평 가격선 -->
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:6px;font-size:12px;color:var(--text-muted);font-family:'JetBrains Mono',monospace">
+      <span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--green);vertical-align:middle;margin-right:5px"></i>ITM 내가격</span>
+      <span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--amber);vertical-align:middle;margin-right:5px"></i>ATM 등가격</span>
+      <span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--blue);vertical-align:middle;margin-right:5px"></i>OTM 외가격</span>
     </div>
 
     <div class="fig-caption" id="cpCaption">콜은 싸게 살 수 있으면 유리합니다. 현재가가 행사가보다 높을 때 콜은 내가격입니다. 슬라이더를 움직여 현재가가 바뀔 때 각 행사가의 상태가 어떻게 달라지는지 확인해보세요.</div>
@@ -725,48 +730,24 @@
     <table class="matrix-table">
       <thead>
         <tr>
-          <th>행사가 K</th>
-          <th>콜옵션 상태</th>
-          <th>콜 이유</th>
-          <th>풋옵션 상태</th>
-          <th>풋 이유</th>
+          <th>현재가 $100</th>
+          <th>K = $90</th>
+          <th>K = $100</th>
+          <th>K = $110</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="matrix-k">K = $80</td>
-          <td><span class="matrix-cell"><span class="badge-itm chain-badge itm">ITM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">$100 주식을 $80에 살 수 있음</td>
-          <td><span class="matrix-cell"><span class="badge-otm chain-badge otm">OTM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">$100 주식을 $80에 팔 이유 없음</td>
+          <td class="matrix-k">콜옵션<br><span style="font-size:12px;color:var(--text-muted)">살 권리</span></td>
+          <td><span class="chain-badge itm">ITM</span><div style="font-size:12px;color:var(--text-muted);margin-top:6px">$100 주식을 $90에 살 수 있음</div></td>
+          <td><span class="chain-badge atm">ATM</span><div style="font-size:12px;color:var(--text-muted);margin-top:6px">현재가와 행사가가 같음</div></td>
+          <td><span class="chain-badge otm">OTM</span><div style="font-size:12px;color:var(--text-muted);margin-top:6px">$100 주식을 $110에 살 이유 없음</div></td>
         </tr>
         <tr>
-          <td class="matrix-k">K = $90</td>
-          <td><span class="matrix-cell"><span class="badge-itm chain-badge itm">ITM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">$100 주식을 $90에 살 수 있음</td>
-          <td><span class="matrix-cell"><span class="badge-otm chain-badge otm">OTM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">$100 주식을 $90에 팔 이유 없음</td>
-        </tr>
-        <tr>
-          <td class="matrix-k">K = $100</td>
-          <td><span class="matrix-cell"><span class="badge-atm chain-badge atm">ATM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">현재가와 행사가가 같음</td>
-          <td><span class="matrix-cell"><span class="badge-atm chain-badge atm">ATM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">현재가와 행사가가 같음</td>
-        </tr>
-        <tr>
-          <td class="matrix-k">K = $110</td>
-          <td><span class="matrix-cell"><span class="badge-otm chain-badge otm">OTM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">$100 주식을 $110에 살 이유 없음</td>
-          <td><span class="matrix-cell"><span class="badge-itm chain-badge itm">ITM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">$100 주식을 $110에 팔 수 있음</td>
-        </tr>
-        <tr>
-          <td class="matrix-k">K = $120</td>
-          <td><span class="matrix-cell"><span class="badge-otm chain-badge otm">OTM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">$100 주식을 $120에 살 이유 없음</td>
-          <td><span class="matrix-cell"><span class="badge-itm chain-badge itm">ITM</span></span></td>
-          <td style="font-size:13px;color:var(--text-muted)">$100 주식을 $120에 팔 수 있음</td>
+          <td class="matrix-k">풋옵션<br><span style="font-size:12px;color:var(--text-muted)">팔 권리</span></td>
+          <td><span class="chain-badge otm">OTM</span><div style="font-size:12px;color:var(--text-muted);margin-top:6px">$100 주식을 $90에 팔 이유 없음</div></td>
+          <td><span class="chain-badge atm">ATM</span><div style="font-size:12px;color:var(--text-muted);margin-top:6px">현재가와 행사가가 같음</div></td>
+          <td><span class="chain-badge itm">ITM</span><div style="font-size:12px;color:var(--text-muted);margin-top:6px">$100 주식을 $110에 팔 수 있음</div></td>
         </tr>
       </tbody>
     </table>
@@ -845,66 +826,35 @@
 
   <div class="fig">
     <div class="fig-label">Figure 07 — 자체 제작 옵션 체인 모형 (현재가 $100)</div>
-    <div class="chain-current">현재 주가: $100</div>
-    <div class="chain-header">
-      <div>CALL</div>
-      <div style="text-align:center">행사가 K</div>
-      <div style="text-align:right">PUT</div>
-    </div>
-    <div class="chain-row">
-      <div class="chain-cell call-itm">
-        <span class="chain-badge itm">ITM</span>
-        <span class="chain-type">내가격</span>
-      </div>
-      <div class="chain-strike">$80</div>
-      <div class="chain-cell put-otm" style="justify-content:flex-end">
-        <span class="chain-type">외가격</span>
-        <span class="chain-badge otm">OTM</span>
-      </div>
-    </div>
-    <div class="chain-row">
-      <div class="chain-cell call-itm">
-        <span class="chain-badge itm">ITM</span>
-        <span class="chain-type">내가격</span>
-      </div>
-      <div class="chain-strike">$90</div>
-      <div class="chain-cell put-otm" style="justify-content:flex-end">
-        <span class="chain-type">외가격</span>
-        <span class="chain-badge otm">OTM</span>
-      </div>
-    </div>
-    <div class="chain-row atm-row">
-      <div class="chain-cell atm-cell">
-        <span class="chain-badge atm">ATM</span>
-        <span class="chain-type">등가격</span>
-      </div>
-      <div class="chain-strike" style="color:var(--amber)">$100</div>
-      <div class="chain-cell atm-cell" style="justify-content:flex-end">
-        <span class="chain-type">등가격</span>
-        <span class="chain-badge atm">ATM</span>
-      </div>
-    </div>
-    <div class="chain-row">
-      <div class="chain-cell call-otm">
-        <span class="chain-badge otm">OTM</span>
-        <span class="chain-type">외가격</span>
-      </div>
-      <div class="chain-strike">$110</div>
-      <div class="chain-cell put-itm" style="justify-content:flex-end">
-        <span class="chain-type">내가격</span>
-        <span class="chain-badge itm">ITM</span>
-      </div>
-    </div>
-    <div class="chain-row">
-      <div class="chain-cell call-otm">
-        <span class="chain-badge otm">OTM</span>
-        <span class="chain-type">외가격</span>
-      </div>
-      <div class="chain-strike">$120</div>
-      <div class="chain-cell put-itm" style="justify-content:flex-end">
-        <span class="chain-type">내가격</span>
-        <span class="chain-badge itm">ITM</span>
-      </div>
+    <div class="chain-current">현재 주가: $100 · 만기 30일</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table class="matrix-table" style="min-width:700px">
+        <thead>
+          <tr>
+            <th>만기</th><th>행사가</th><th>콜 bid/ask</th><th>콜 Δ</th><th>풋 bid/ask</th><th>풋 Δ</th><th>거래량</th><th>OI</th><th>IV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>30일</td><td class="matrix-k">$90</td>
+            <td><span class="chain-badge itm">ITM</span> 10.60 / 10.90</td><td>+0.82</td>
+            <td><span class="chain-badge otm">OTM</span> 0.40 / 0.50</td><td>-0.18</td>
+            <td>320</td><td>4,800</td><td>24%</td>
+          </tr>
+          <tr>
+            <td>30일</td><td class="matrix-k" style="color:var(--amber)">$100</td>
+            <td><span class="chain-badge atm">ATM</span> 4.80 / 5.10</td><td>+0.51</td>
+            <td><span class="chain-badge atm">ATM</span> 4.70 / 5.00</td><td>-0.49</td>
+            <td>1,240</td><td>8,900</td><td>28%</td>
+          </tr>
+          <tr>
+            <td>30일</td><td class="matrix-k">$110</td>
+            <td><span class="chain-badge otm">OTM</span> 1.15 / 1.30</td><td>+0.20</td>
+            <td><span class="chain-badge itm">ITM</span> 10.80 / 11.10</td><td>-0.80</td>
+            <td>410</td><td>5,200</td><td>25%</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div class="three" style="margin-top:18px">
       <div class="mini-card">
@@ -1038,39 +988,31 @@
   }
 
   function renderGrid() {
-    const s = parseInt(slider.value);
+    const s = parseInt(슬라이더.value, 10);
     spVal.textContent = '$' + s;
-    const maxIntr = 25;
-
-    grid.innerHTML = '';
+    const lo = 70, hi = 130, W = 640, H = 150, padX = 44, axisY = 96;
+    const X = p => padX + (p - lo) / (hi - lo) * (W - padX * 2);
+    let ticks = '';
     strikes.forEach(k => {
       const status = getStatus(s, k, currentMode);
-      const intr = getIntrinsicValue(s, k, currentMode);
-      const fillPct = Math.min(100, (intr / maxIntr) * 100);
-
-      const row = document.createElement('div');
-      row.className = 'strike-row' + (status === 'atm' ? ' atm-row' : '');
-
-      const badgeClass = status === 'itm' ? 'badge-itm' : status === 'atm' ? 'badge-atm' : 'badge-otm';
-      const fillColor = status === 'itm' ? 'var(--green)' : status === 'atm' ? 'var(--amber)' : 'var(--blue)';
-
-      row.innerHTML = `
-        <div class="strike-price">K=$${k}</div>
-        <div class="strike-bar-wrap">
-          <div class="strike-bar-fill" style="width:${fillPct}%;background:${fillColor}"></div>
-        </div>
-        <div class="strike-badge ${badgeClass}">${status.toUpperCase()}<br><span style="font-size:10px">${getStatusLabel(status)}</span></div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);text-align:center">
-          내재가치<br><span style="color:${fillColor};font-weight:800">$${intr}</span>
-        </div>
-      `;
-      grid.appendChild(row);
+      const color = status === 'itm' ? 'var(--green)' : status === 'atm' ? 'var(--amber)' : 'var(--blue)';
+      const x = X(k);
+      ticks += '<line x1="' + x.toFixed(1) + '" y1="' + (axisY - 8) + '" x2="' + x.toFixed(1) + '" y2="' + (axisY + 8) + '" stroke="' + color + '" stroke-width="2"/>'
+        + '<circle cx="' + x.toFixed(1) + '" cy="' + axisY + '" r="6" fill="' + color + '" stroke="var(--bg-card)" stroke-width="2"/>'
+        + '<text x="' + x.toFixed(1) + '" y="' + (axisY + 28) + '" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="var(--text)">$' + k + '</text>'
+        + '<text x="' + x.toFixed(1) + '" y="' + (axisY + 43) + '" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="' + color + '">' + status.toUpperCase() + '</text>';
     });
-
+    const sx = X(s);
+    const marker = '<line x1="' + sx.toFixed(1) + '" y1="34" x2="' + sx.toFixed(1) + '" y2="' + axisY + '" stroke="var(--amber)" stroke-dasharray="4 4" stroke-width="1.5"/>'
+      + '<polygon points="' + (sx - 7).toFixed(1) + ',26 ' + (sx + 7).toFixed(1) + ',26 ' + sx.toFixed(1) + ',36" fill="var(--amber)"/>'
+      + '<text x="' + sx.toFixed(1) + '" y="20" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="var(--amber)">현재가 $' + s + '</text>';
+    grid.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;overflow:visible" role="img" aria-label="현재가와 행사가 위치도">'
+      + '<line x1="' + padX + '" y1="' + axisY + '" x2="' + (W - padX) + '" y2="' + axisY + '" stroke="var(--border-light)" stroke-width="2"/>'
+      + ticks + marker + '</svg>';
     if (currentMode === 'call') {
-      caption.textContent = '콜은 싸게 살 수 있으면 유리합니다. 현재가가 행사가보다 높을 때 콜은 내가격입니다. 슬라이더를 움직여 현재가가 바뀔 때 각 행사가의 상태가 어떻게 달라지는지 확인해보세요.';
+      caption.textContent = '콜은 싸게 살 수 있으면 유리합니다. 현재가(노란 표시)보다 왼쪽에 있는 행사가의 콜이 내가격입니다. 슬라이더로 현재가를 움직이면 각 행사가의 상태가 어떻게 달라지는지 보입니다.';
     } else {
-      caption.textContent = '풋은 비싸게 팔 수 있으면 유리합니다. 현재가가 행사가보다 낮을 때 풋은 내가격입니다. 콜과 풋의 ITM/OTM 방향이 반대라는 점을 확인해보세요.';
+      caption.textContent = '풋은 비싸게 팔 수 있으면 유리합니다. 현재가(노란 표시)보다 오른쪽에 있는 행사가의 풋이 내가격입니다. 콜과 풋의 ITM/OTM 방향이 반대인 점을 확인하세요.';
     }
   }
 
