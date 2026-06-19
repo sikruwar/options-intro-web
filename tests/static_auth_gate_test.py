@@ -50,6 +50,8 @@ def test_public_index_hides_admin_link_and_request_copy():
     assert 'href="#roadmap"' in html
     assert '공개 회차 확인하기' in html
     assert 'id="roadmap"' in html
+    assert '저작권 보호 안내' in html
+    assert '무단 복제·전재·배포·재판매·2차 가공·AI 학습데이터 수집을 금지' in html
     assert '강의자료 레퍼런스 안내' in html
     assert '무기견의 내부 지식맵' not in html
     assert 'OIC, OCC, SEC, FINRA, Cboe' in html
