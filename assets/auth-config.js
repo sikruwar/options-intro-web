@@ -13,8 +13,16 @@ window.HOWINSIGHT_AUTH_CONFIG = {
   ],
 
   // 이메일 magic link + X 아이디 신청 + 관리자 승인 게이트를 활성화합니다.
-  // 긴급 공개 전환이 필요하면 false로 바꾸면 됩니다.
-  accessGateEnabled: true,
+  // 초기 오픈은 기기 이동이 쉬운 접근 코드 방식으로 운영합니다.
+  accessGateEnabled: false,
+
+  // 구독자에게 안내한 접근 코드를 입력하면 보호 페이지를 볼 수 있습니다.
+  // 같은 브라우저에서는 localStorage에 통과 상태가 저장되어 다시 입력하지 않아도 됩니다.
+  accessCodeGateEnabled: true,
+  accessCodes: [
+    'OPTION-OPEN-05'
+  ],
+  accessCodeStorageKey: 'howinsight-options-access-v1',
 
   // 보호 대상 페이지. index.html과 admin.html은 별도 처리합니다.
   protectedPathPattern: /\/(prologue|epilogue)\.html$|\/sessions\/session-\d+\.html$/,

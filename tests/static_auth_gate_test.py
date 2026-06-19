@@ -11,12 +11,26 @@ def test_auth_assets_exist():
     assert (ROOT / 'supabase_schema.sql').exists()
 
 
-def test_access_gate_is_enabled_with_emergency_disable_switch():
+def test_email_gate_is_disabled_and_access_code_gate_is_enabled():
     config = (ROOT / 'assets' / 'auth-config.js').read_text(encoding='utf-8')
     gate = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    assert 'accessGateEnabled: true' in config
+    assert 'accessGateEnabled: false' in config
+    assert 'accessCodeGateEnabled: true' in config
+    assert 'OPTION-OPEN-05' in config
+    assert 'accessCodeStorageKey' in config
     assert 'accessGateEnabled' in gate
-    assert '!accessGateEnabled' in gate
+    assert 'accessCodeGateEnabled' in gate
+    assert 'emailGateEnabled || accessCodeGateEnabled' in gate
+
+
+def test_access_code_gate_ui_exists():
+    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
+    assert 'renderAccessCodeGate' in js
+    assert '강의 접근 코드 입력' in js
+    assert '강의 들어가기' in js
+    assert '접근 코드가 맞지 않습니다' in js
+    assert 'method: \'access_code\'' in js
+    assert 'localStorage.setItem(accessCodeStorageKey()' in js
 
 
 def test_protected_pages_load_gate_after_config():

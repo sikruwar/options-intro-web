@@ -1,18 +1,15 @@
 (() => {
   const config = window.HOWINSIGHT_AUTH_CONFIG || {};
-  const accessGateEnabled = config.accessGateEnabled !== false;
-  const isConfigured = accessGateEnabled && Boolean(config.supabaseUrl && config.supabaseAnonKey);
+  const emailGateEnabled = config.accessGateEnabled !== false;
+  const accessCodeGateEnabled = config.accessCodeGateEnabled === true;
+  const accessGateEnabled = emailGateEnabled || accessCodeGateEnabled;
+  const isConfigured = emailGateEnabled && Boolean(config.supabaseUrl && config.supabaseAnonKey);
   const path = window.location.pathname;
   const shouldProtect = config.protectedPathPattern instanceof RegExp
     ? config.protectedPathPattern.test(path)
     : /\/(prologue|epilogue)\.html$|\/sessions\/session-\d+\.html$/.test(path);
 
   if (!shouldProtect || !accessGateEnabled) return;
-
-  if (!isConfigured) {
-    console.warn('[HowInsight Auth] Supabase config is empty. Course remains public until assets/auth-config.js is configured.');
-    return;
-  }
 
   const state = { supabase: null, session: null };
 
@@ -61,10 +58,14 @@
     document.documentElement.style.overflow = 'hidden';
   }
 
-  function unlock(approval) {
+  function removeLock() {
     const root = document.getElementById('hi-auth-lock');
     if (root) root.remove();
     document.documentElement.style.overflow = '';
+  }
+
+  function unlock(approval) {
+    removeLock();
     renderApprovedBadge(approval);
   }
 
@@ -87,6 +88,70 @@
   function statusMessage(text) {
     const el = document.getElementById('hi-auth-message');
     if (el) el.textContent = text;
+  }
+
+  function accessCodeStorageKey() {
+    return config.accessCodeStorageKey || 'howinsight-options-access-v1';
+  }
+
+  function configuredAccessCodes() {
+    return Array.isArray(config.accessCodes)
+      ? config.accessCodes.map((code) => String(code || '').trim()).filter(Boolean)
+      : [];
+  }
+
+  function hasAccessCodeGrant() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(accessCodeStorageKey()) || 'null');
+      return saved?.granted === true && saved?.method === 'access_code';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function grantAccessCode(code) {
+    localStorage.setItem(accessCodeStorageKey(), JSON.stringify({
+      granted: true,
+      grantedAt: new Date().toISOString(),
+      method: 'access_code',
+      code
+    }));
+  }
+
+  function renderAccessCodeGate() {
+    overlay(`
+      <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
+      <h2>강의 접근 코드 입력</h2>
+      <p>구독자에게 안내된 접근 코드를 입력하면 강의를 볼 수 있습니다. 같은 브라우저에서는 다시 입력하지 않아도 됩니다.</p>
+      <form id="hi-access-code-form">
+        <label for="hi-access-code">접근 코드</label>
+        <input id="hi-access-code" name="access_code" type="text" placeholder="접근 코드" autocomplete="off" autocapitalize="characters" required>
+        <button type="submit">강의 들어가기</button>
+      </form>
+      <p id="hi-auth-message" class="hi-auth-message">안내받은 코드를 그대로 입력해주세요.</p>
+    `);
+    document.getElementById('hi-access-code-form')?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const code = String(event.currentTarget.access_code.value || '').trim();
+      if (!configuredAccessCodes().includes(code)) {
+        statusMessage('접근 코드가 맞지 않습니다. 안내받은 코드를 다시 확인해주세요.');
+        return;
+      }
+      grantAccessCode(code);
+      removeLock();
+    });
+  }
+
+  function bootAccessCode() {
+    if (!configuredAccessCodes().length) {
+      console.warn('[HowInsight Auth] accessCodeGateEnabled is true, but accessCodes is empty. Course remains public.');
+      return;
+    }
+    if (hasAccessCodeGrant()) {
+      removeLock();
+      return;
+    }
+    renderAccessCodeGate();
   }
 
   function authErrorMessage(error) {
@@ -304,6 +369,10 @@
   }
 
   async function boot() {
+    if (!isConfigured) {
+      console.warn('[HowInsight Auth] Supabase config is empty. Course remains public until assets/auth-config.js is configured.');
+      return;
+    }
     overlay(`
       <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
       <h2>접근 권한 확인 중입니다</h2>
@@ -334,9 +403,10 @@
     }
   }
 
+  const bootGate = accessCodeGateEnabled ? bootAccessCode : boot;
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+    document.addEventListener('DOMContentLoaded', bootGate);
   } else {
-    boot();
+    bootGate();
   }
 })();
