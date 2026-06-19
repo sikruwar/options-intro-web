@@ -124,6 +124,11 @@
     history.replaceState(null, document.title, window.location.pathname + window.location.search.replace(/[?&](error|error_code|error_description)=[^&]*/g, ''));
   }
 
+  function hasAuthCallbackParams() {
+    const params = new URLSearchParams(`${window.location.search || ''}&${(window.location.hash || '').replace(/^#/, '')}`);
+    return ['code', 'access_token', 'refresh_token', 'token_hash', 'type'].some((key) => params.has(key));
+  }
+
   function loadSupabase() {
     return new Promise((resolve, reject) => {
       if (window.supabase?.createClient) return resolve(window.supabase);
@@ -179,6 +184,17 @@
       .maybeSingle();
     if (error) throw error;
     return data?.active ? data : null;
+  }
+
+  async function waitForSession(supabase) {
+    const attempts = hasAuthCallbackParams() ? 18 : 3;
+    for (let i = 0; i < attempts; i += 1) {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session?.user?.email) return data.session;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    const { data } = await supabase.auth.getSession();
+    return data?.session || null;
   }
 
   function renderApprovedBadge(approval) {
@@ -299,8 +315,7 @@
         return;
       }
       const supabase = await getClient();
-      const { data } = await supabase.auth.getSession();
-      state.session = data?.session || null;
+      state.session = await waitForSession(supabase);
       const user = state.session?.user;
       if (!user?.email) return renderLogin();
       const approval = await getApproval(user.email);
