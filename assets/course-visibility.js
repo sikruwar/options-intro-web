@@ -251,15 +251,15 @@
   }
 
   function visibilityMap(rows) {
-    const map = new Map(DEFAULT_COURSE_SESSIONS.map((item) => [item.slug, true]));
-    rows.forEach((row) => map.set(row.slug, row.visible !== false));
+    const map = new Map(DEFAULT_COURSE_SESSIONS.map((item) => [item.slug, false]));
+    rows.forEach((row) => map.set(row.slug, row.visible === true));
     return map;
   }
 
   function applyIndex(map) {
     ensureStyle();
     DEFAULT_COURSE_SESSIONS.forEach((item) => {
-      const visible = map.get(item.slug) !== false;
+      const visible = map.get(item.slug) === true;
       const link = document.querySelector(`a[href="${item.href}"], a[href="./${item.href}"]`);
       if (!link) return;
       const row = link.closest('tr');
@@ -302,13 +302,13 @@
   async function boot() {
     try {
       const rows = await fetchVisibility();
-      if (!rows.length) return;
       const map = visibilityMap(rows);
       if (/\/index\.html$|\/$/.test(window.location.pathname)) applyIndex(map);
       const slug = currentSlug();
-      if (slug && map.get(slug) === false) blockPage(slug);
+      if (slug && map.get(slug) !== true) blockPage(slug);
     } catch (error) {
-      console.warn('[HowInsight Course Visibility] 공개 회차 설정을 불러오지 못했습니다. 기본 공개 상태로 둡니다.', error?.message || error);
+      console.warn('[HowInsight Course Visibility] 공개 회차 설정을 불러오지 못했습니다. 목차는 기본 비공개 표기로 둡니다.', error?.message || error);
+      if (/\/index\.html$|\/$/.test(window.location.pathname)) applyIndex(visibilityMap([]));
     }
   }
 

@@ -137,6 +137,17 @@ def test_course_visibility_script_is_loaded_on_course_pages():
             assert html.index('auth-config.js') < html.index('course-visibility.js')
 
 
+def test_index_marks_only_remote_visible_sessions_as_open():
+    html = (ROOT / 'index.html').read_text(encoding='utf-8')
+    js = (ROOT / 'assets' / 'course-visibility.js').read_text(encoding='utf-8')
+    assert '<span class="rt-status open">공개</span>' not in html
+    assert '<span class="rt-status pending">비공개</span>' in html
+    assert 'new Map(DEFAULT_COURSE_SESSIONS.map((item) => [item.slug, false]))' in js
+    assert 'row.visible === true' in js
+    assert 'map.get(item.slug) === true' in js
+    assert 'map.get(slug) !== true' in js
+
+
 
 def test_admin_request_approval_feedback_exists():
     admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
