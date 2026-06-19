@@ -138,6 +138,34 @@
     .protection-line { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
     .floor-mark { min-width:90px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:12px; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.12),rgba(53,208,127,.06)); }
     .matrix-card { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+    .put-floor-compare { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
+    .put-floor-chart { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:14px; min-width:0; }
+    .put-floor-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+    .put-floor-chart text { font-family:'JetBrains Mono', monospace; fill:var(--text-muted); font-size:10px; }
+    .pf-grid { stroke:var(--border); stroke-width:1; opacity:.72; }
+    .pf-axis { stroke:var(--border-light); stroke-width:1.2; }
+    .pf-strike { stroke:var(--blue); stroke-width:1.4; stroke-dasharray:5 5; opacity:.85; }
+    .pf-stock { stroke:var(--red); stroke-width:4; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .pf-protected { stroke:var(--amber); stroke-width:4; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .pf-floor { stroke:var(--green); stroke-width:1.8; stroke-dasharray:6 6; }
+    .pf-zone { fill:rgba(53,208,127,.13); }
+    .pf-tag { fill:var(--text); font-size:11px; font-weight:700; }
+    .pf-tag-stock { fill:var(--red); font-size:11px; font-weight:700; }
+    .pf-tag-prot { fill:var(--amber); font-size:11px; font-weight:700; }
+    .pf-tag-floor { fill:var(--green); font-size:11px; font-weight:700; }
+    .put-floor-readout { display:grid; gap:10px; }
+    .put-floor-readout .mini-card { padding:18px; }
+    .put-floor-readout .mini-v { font-family:'JetBrains Mono', monospace; }
+    .put-floor-note { margin-top:16px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:14px 16px; color:var(--text-muted); font-size:13px; line-height:1.65; }
+    .put-floor-legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .put-floor-legend span { display:inline-flex; align-items:center; gap:6px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
+    .put-floor-legend i { width:22px; height:3px; border-radius:999px; display:inline-block; }
+    .put-floor-legend .stock-line { background:var(--red); }
+    .put-floor-legend .protected-line { background:var(--amber); }
+    .put-floor-legend .floor-line { background:var(--green); }
+    @media (max-width:760px) { .put-floor-compare { grid-template-columns:1fr; } .put-floor-chart { padding:10px; } .put-floor-chart text { font-size:9px; } }
+
     .matrix-cell.good { border-color:rgba(53,208,127,.36); }
     .matrix-cell.bad { border-color:rgba(239,68,68,.32); }
     @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip,.decision-branches,.protection-line,.matrix-card { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
@@ -389,14 +417,56 @@
 </section>
 <section class="section-wide reveal" id="figure-06">
   <div class="fig">
-    <div class="fig-label">Figure 06 — 풋옵션을 보험처럼 보는 미니 도식</div>
-    <h3>보호에는 항상 프리미엄과 만기 조건이 붙습니다</h3>
-    <div class="protection-line">
-      <div class="mini-card"><div class="mini-k">STOCK POSITION</div><div class="mini-v">하락에 노출된 주식 포지션</div><p class="mini-p">주식만 보유하면 큰 하락이 계좌에 직접 반영됩니다.</p></div>
-      <div class="floor-mark">PUT<br>FLOOR</div>
-      <div class="mini-card"><div class="mini-k">PROTECTION COST</div><div class="mini-v">일정 가격 아래 손실 완화</div><p class="mini-p">풋옵션은 보호 장치가 될 수 있지만, 프리미엄·만기·행사가를 직접 선택해야 합니다.</p></div>
+    <div class="fig-label">Figure 06 — PUT FLOOR 손익선 비교</div>
+    <h3>풋을 함께 사면 행사가 아래에서 계좌 손실선이 꺾입니다</h3>
+    <div class="put-floor-compare">
+      <div class="put-floor-chart">
+        <svg viewBox="0 0 640 340" role="img" aria-label="주식만 보유한 손익선과 주식에 90풋을 더한 보호 손익선 비교. 주식만 보유하면 주가 70에서 손익이 마이너스 30이지만, 90풋을 함께 사면 90 아래에서 손실선이 마이너스 12 근처에서 꺾여 평평해진다.">
+          <!-- 줄어든 손실 영역: 두 손익선 사이 (행사가 90 아래) -->
+          <polygon class="pf-zone" points="70,206 282,206 282,196 70,300"></polygon>
+          <!-- 가로 격자 + 손익 눈금 -->
+          <line class="pf-grid" x1="70" x2="600" y1="92" y2="92"></line>
+          <line class="pf-grid" x1="70" x2="600" y1="248" y2="248"></line>
+          <line class="pf-grid" x1="70" x2="600" y1="300" y2="300"></line>
+          <!-- 0 손익선 (가로축) -->
+          <line class="pf-axis" x1="70" x2="600" y1="144" y2="144"></line>
+          <!-- 행사가 90 세로선 -->
+          <line class="pf-strike" x1="282" x2="282" y1="40" y2="300"></line>
+          <!-- PUT FLOOR 바닥선 -->
+          <line class="pf-floor" x1="70" x2="600" y1="206" y2="206"></line>
+          <!-- 손익선 -->
+          <path class="pf-stock" d="M70 300 L600 40"></path>
+          <path class="pf-protected" d="M70 206 L282 206 L600 50"></path>
+          <!-- 표시점 -->
+          <circle cx="282" cy="206" r="5" fill="var(--green)"></circle>
+          <circle cx="70" cy="300" r="4" fill="var(--red)"></circle>
+          <circle cx="70" cy="206" r="4" fill="var(--amber)"></circle>
+          <!-- 손익 눈금 라벨 -->
+          <text x="8" y="44">+$20</text><text x="22" y="148">$0</text><text class="pf-tag-floor" x="14" y="210">-$12</text><text x="14" y="303">-$30</text>
+          <!-- 주가 눈금 라벨 -->
+          <text x="62" y="320">70</text><text x="274" y="320">90</text><text x="380" y="320">100</text><text x="486" y="320">110</text><text x="588" y="320">120</text>
+          <text x="540" y="334">주가($)</text>
+          <!-- 선 라벨 -->
+          <text class="pf-tag-stock" x="430" y="74">주식만 보유</text>
+          <text class="pf-tag-prot" x="430" y="126">주식 + 90풋</text>
+          <text class="pf-tag-floor" x="300" y="200">PUT FLOOR</text>
+          <text x="222" y="48" class="pf-tag">행사가 90</text>
+          <!-- 영역 라벨 -->
+          <text x="92" y="262">줄어든 손실</text>
+        </svg>
+        <div class="put-floor-legend">
+          <span><i class="stock-line"></i>주식만 보유</span>
+          <span><i class="protected-line"></i>주식 + 90풋</span>
+          <span><i class="floor-line"></i>PUT FLOOR (프리미엄 반영 바닥)</span>
+        </div>
+      </div>
+      <div class="put-floor-readout">
+        <div class="mini-card"><div class="mini-k">STOCK ONLY</div><div class="mini-v">하락폭이 그대로 손익</div><p class="mini-p">100에 산 주식이 70이 되면 손익은 -30달러입니다. 빨간 선처럼 하락이 계좌로 직접 들어옵니다.</p></div>
+        <div class="mini-card"><div class="mini-k">STOCK + PUT</div><div class="mini-v">90 아래에서 손실선이 꺾임</div><p class="mini-p">90풋을 2달러에 사두면 90 아래에서 팔 권리가 살아나, 같은 70에서도 손익이 약 -12달러에 멈춥니다.</p></div>
+        <div class="mini-card"><div class="mini-k">CONDITION</div><div class="mini-v">보호는 공짜가 아님</div><p class="mini-p">프리미엄 2달러, 정해진 만기, 행사가 90이라는 조건을 받아들인 대가로 얻는 바닥선입니다.</p></div>
+      </div>
     </div>
-    <div class="fig-caption">풋을 산다는 것은 하락을 바라는 행위만은 아닙니다. 다만 보호는 공짜가 아니며, 옵션은 보험과 완전히 같은 상품도 아닙니다.</div>
+    <div class="put-floor-note">풋 매수는 하락을 바라는 행동만은 아닙니다. 주식을 들고 있을 때 특정 가격 아래의 손실을 줄이는 바닥선을 사두는 선택이기도 합니다. 다만 그 바닥선은 프리미엄·만기·행사가를 정해서 얻는 조건부 보호입니다.</div>
   </div>
 </section>
 <section class="section reveal" id="direction-text">
