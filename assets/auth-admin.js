@@ -4,6 +4,7 @@
   const adminEmails = (config.adminEmails || []).map((email) => String(email).trim().toLowerCase());
   let supabaseClient = null;
   let activeSubscriberHandles = new Set();
+  let savedVisibilityBySlug = new Map();
 
   const $ = (id) => document.getElementById(id);
   const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
@@ -474,12 +475,65 @@
       return;
     }
     const rows = mergeVisibilityRows(data || []);
+    savedVisibilityBySlug = new Map(rows.map((row) => [row.slug, row.visible === true]));
     list.innerHTML = rows.map(visibilityRowTemplate).join('');
   }
 
+  function selectedVisibilityBySlug() {
+    return new Map(Array.from(document.querySelectorAll('[data-session-visible]')).map((input) => [
+      input.dataset.sessionVisible,
+      input.checked === true
+    ]));
+  }
+
+  function sessionLabel(slug) {
+    const item = DEFAULT_COURSE_SESSIONS.find((entry) => entry.slug === slug);
+    return item ? `${item.slug} · ${item.title}` : slug;
+  }
+
+  function summarizeVisibilityChanges(nextMap) {
+    const open = [];
+    const locked = [];
+    DEFAULT_COURSE_SESSIONS.forEach((item) => {
+      const before = savedVisibilityBySlug.has(item.slug)
+        ? savedVisibilityBySlug.get(item.slug) === true
+        : item.slug === 'prologue';
+      const after = nextMap.get(item.slug) === true;
+      if (before === after) return;
+      if (after) open.push(sessionLabel(item.slug));
+      else locked.push(sessionLabel(item.slug));
+    });
+    return { open, locked, changed: open.length + locked.length };
+  }
+
+  function compactChangeList(items) {
+    if (!items.length) return '- 없음';
+    const visibleItems = items.slice(0, 8).map((item) => `- ${item}`);
+    if (items.length > visibleItems.length) visibleItems.push(`- 외 ${items.length - visibleItems.length}개`);
+    return visibleItems.join('\n');
+  }
+
+  function confirmVisibilitySave(nextMap) {
+    const summary = summarizeVisibilityChanges(nextMap);
+    if (!summary.changed) {
+      setStatus('공개 회차 설정에 변경 사항이 없습니다.');
+      return false;
+    }
+    return window.confirm([
+      '공개 회차 설정을 저장할까요?',
+      '',
+      `공개로 변경 (${summary.open.length}개)`,
+      compactChangeList(summary.open),
+      '',
+      `비공개로 변경 (${summary.locked.length}개)`,
+      compactChangeList(summary.locked),
+      '',
+      '확인을 누르면 목차와 직접 링크 접근 설정에 반영됩니다.'
+    ].join('\n'));
+  }
+
   async function saveSessionVisibility(supabase) {
-    const inputs = Array.from(document.querySelectorAll('[data-session-visible]'));
-    const visibleBySlug = new Map(inputs.map((input) => [input.dataset.sessionVisible, input.checked]));
+    const visibleBySlug = selectedVisibilityBySlug();
     const payload = DEFAULT_COURSE_SESSIONS.map((item) => ({
       slug: item.slug,
       title: item.title,
@@ -606,6 +660,8 @@
       setStatus('공개 회차 설정을 불러왔습니다.');
     });
     $('save-visibility')?.addEventListener('click', async (event) => {
+      const nextMap = selectedVisibilityBySlug();
+      if (!confirmVisibilitySave(nextMap)) return;
       event.currentTarget.disabled = true;
       try {
         await saveSessionVisibility(supabase);

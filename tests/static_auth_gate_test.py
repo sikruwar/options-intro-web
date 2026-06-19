@@ -127,6 +127,12 @@ def test_course_visibility_admin_ui_exists():
     assert 'course_session_visibility' in schema
     assert 'Anyone can read course session visibility' in schema
     assert 'Admins can manage course session visibility' in schema
+    assert '저장 전 확인창' in admin
+    assert 'confirmVisibilitySave' in js
+    assert 'summarizeVisibilityChanges' in js
+    assert '공개로 변경' in js
+    assert '비공개로 변경' in js
+    assert 'window.confirm' in js
 
 
 def test_course_visibility_script_is_loaded_on_course_pages():
