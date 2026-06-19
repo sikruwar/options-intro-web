@@ -447,7 +447,7 @@
     const bySlug = new Map(rows.map((row) => [row.slug, row]));
     return DEFAULT_COURSE_SESSIONS.map((item) => {
       const row = bySlug.get(item.slug);
-      return { ...item, visible: row ? row.visible === true : false };
+      return { ...item, visible: row ? row.visible === true : item.slug === 'prologue' };
     });
   }
 

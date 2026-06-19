@@ -251,7 +251,7 @@
   }
 
   function visibilityMap(rows) {
-    const map = new Map(DEFAULT_COURSE_SESSIONS.map((item) => [item.slug, false]));
+    const map = new Map(DEFAULT_COURSE_SESSIONS.map((item) => [item.slug, item.slug === 'prologue']));
     rows.forEach((row) => map.set(row.slug, row.visible === true));
     return map;
   }
