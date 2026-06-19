@@ -17,11 +17,11 @@ def test_auth_assets_exist():
     assert (ROOT / 'sitemap.xml').exists()
 
 
-def test_x_handle_gate_is_prepared_and_access_code_gate_stays_enabled_until_rpc_deploy():
+def test_x_handle_and_access_code_gate_are_enabled_together():
     config = (ROOT / 'assets' / 'auth-config.js').read_text(encoding='utf-8')
     gate = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
     assert 'accessGateEnabled: false' in config
-    assert 'xHandleGateEnabled: false' in config
+    assert 'xHandleGateEnabled: true' in config
     assert 'xHandleStorageKey' in config
     assert 'accessCodeGateEnabled: true' in config
     assert 'OPTION-OPEN-05' in config
@@ -30,6 +30,10 @@ def test_x_handle_gate_is_prepared_and_access_code_gate_stays_enabled_until_rpc_
     assert 'xHandleGateEnabled' in gate
     assert 'accessCodeGateEnabled' in gate
     assert 'emailGateEnabled || xHandleGateEnabled || accessCodeGateEnabled' in gate
+    assert 'bootCodeAndXHandle' in gate
+    assert 'xHandleGateEnabled && accessCodeGateEnabled' in gate
+    assert 'requestXAccessWithFallback' in gate
+    assert 'isMissingXAccessRpc' in gate
 
 
 def test_x_handle_gate_ui_and_rpc_exist():
@@ -50,11 +54,15 @@ def test_x_handle_gate_ui_and_rpc_exist():
 def test_access_code_gate_ui_exists():
     js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
     assert 'renderAccessCodeGate' in js
+    assert 'renderCodeAndXHandleGate' in js
     assert '강의 접근 코드 입력' in js
+    assert '접근 코드와 X 아이디를 함께 확인합니다' in js
     assert '강의 들어가기' in js
     assert '접근 코드가 맞지 않습니다' in js
     assert 'method: \'access_code\'' in js
     assert 'localStorage.setItem(accessCodeStorageKey()' in js
+    assert '접근 코드가 맞을 때만 X 아이디 신청/진입 기록' in js
+    assert '접근 코드가 확인됐습니다. X 아이디 신청 기록을 남겼습니다.' in js
 
 
 def test_protected_pages_load_gate_after_config():
@@ -141,9 +149,10 @@ def test_privacy_consent_copy_uses_clear_x_id_language():
     assert 'X 아이디' in gate
     assert 'privacy_consent' in gate
     assert '개인정보처리방침' in gate
-    assert 'privacy.html' in gate
+    assert 'privacyHref' in gate
     assert '수집 항목' in privacy
-    assert '이메일, X 아이디' in privacy
+    assert 'X 아이디(예:' in privacy
+    assert '접근 코드 확인' in privacy
 
 
 def test_approved_user_identity_badge_exists():

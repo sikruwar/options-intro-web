@@ -91,6 +91,10 @@
     if (el) el.textContent = text;
   }
 
+  function privacyHref() {
+    return /\/sessions\//.test(path) ? '../privacy.html' : 'privacy.html';
+  }
+
   function accessCodeStorageKey() {
     return config.accessCodeStorageKey || 'howinsight-options-access-v1';
   }
@@ -101,14 +105,20 @@
 
   function configuredAccessCodes() {
     return Array.isArray(config.accessCodes)
-      ? config.accessCodes.map((code) => String(code || '').trim()).filter(Boolean)
+      ? config.accessCodes.map(normalizeAccessCode).filter(Boolean)
       : [];
+  }
+
+  function normalizeAccessCode(code) {
+    return String(code || '').trim().toUpperCase();
   }
 
   function hasAccessCodeGrant() {
     try {
       const saved = JSON.parse(localStorage.getItem(accessCodeStorageKey()) || 'null');
-      return saved?.granted === true && saved?.method === 'access_code';
+      return saved?.granted === true
+        && saved?.method === 'access_code'
+        && configuredAccessCodes().includes(normalizeAccessCode(saved?.code));
     } catch (_) {
       return false;
     }
@@ -119,7 +129,7 @@
       granted: true,
       grantedAt: new Date().toISOString(),
       method: 'access_code',
-      code
+      code: normalizeAccessCode(code)
     }));
   }
 
@@ -137,7 +147,7 @@
     `);
     document.getElementById('hi-access-code-form')?.addEventListener('submit', (event) => {
       event.preventDefault();
-      const code = String(event.currentTarget.access_code.value || '').trim();
+      const code = normalizeAccessCode(event.currentTarget.access_code.value);
       if (!configuredAccessCodes().includes(code)) {
         statusMessage('접근 코드가 맞지 않습니다. 안내받은 코드를 다시 확인해주세요.');
         return;
@@ -189,6 +199,123 @@
     });
     if (error) throw error;
     return Array.isArray(data) ? data[0] : data;
+  }
+
+  function isMissingXAccessRpc(error) {
+    return /PGRST202|request_x_course_access|Could not find the function/i.test(String(error?.message || error || ''));
+  }
+
+  function syntheticXEmail(rawHandle) {
+    const handle = normalizeXHandle(rawHandle).toLowerCase();
+    const local = handle.replace(/^@/, '').replace(/[^a-z0-9_]/g, '');
+    return `${local || 'unknown'}@x.howinsight.local`;
+  }
+
+  async function requestXAccessWithFallback(rawHandle) {
+    try {
+      return await requestXAccess(rawHandle);
+    } catch (error) {
+      if (!isMissingXAccessRpc(error)) throw error;
+      const handle = normalizeXHandle(rawHandle).toLowerCase();
+      const supabase = await getClient();
+      const { error: insertError } = await supabase.from('access_requests').insert({
+        email: syntheticXEmail(handle),
+        x_handle: handle,
+        status: 'pending',
+        source_path: path,
+        requested_at: new Date().toISOString()
+      });
+      if (insertError && !/duplicate|23505|409/i.test(String(insertError.message || insertError.code || ''))) {
+        console.warn('[HowInsight Auth] X fallback request insert failed:', insertError.message);
+      }
+      return {
+        allowed: true,
+        x_handle: handle,
+        status: 'code_only',
+        message: '접근 코드가 확인됐습니다. X 아이디 신청 기록을 남겼습니다.'
+      };
+    }
+  }
+
+  function renderCodeAndXHandleGate(message = '접근 코드와 X 아이디를 입력해주세요.') {
+    const saved = savedXAccess();
+    overlay(`
+      <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
+      <h2>${config.courseTitle || '강의'} 접근 확인</h2>
+      <p>안내받은 접근 코드와 X 아이디를 함께 확인합니다. X 아이디가 관리자 승인 목록 또는 활성 구독자 명단과 매칭되면 바로 입장합니다.</p>
+      <form id="hi-code-x-access-form">
+        <label for="hi-access-code">접근 코드</label>
+        <input id="hi-access-code" name="access_code" type="text" placeholder="접근 코드" autocomplete="off" autocapitalize="characters" required>
+        <label for="hi-x-access">X 아이디</label>
+        <input id="hi-x-access" name="x_handle" type="text" placeholder="@sniffshiba" autocomplete="nickname" value="${escapeHtml(saved?.xHandle || '')}" required>
+        <label class="hi-consent" for="hi-privacy-consent">
+          <input id="hi-privacy-consent" name="privacy_consent" type="checkbox" required>
+          <span>강의 접근 승인과 구독 여부 확인을 위해 X 아이디와 접근 기록을 수집·이용하는 데 동의합니다. <a href="${privacyHref()}" target="_blank" rel="noopener">개인정보처리방침</a></span>
+        </label>
+        <button type="submit">강의 들어가기</button>
+      </form>
+      <p id="hi-auth-message" class="hi-auth-message">${escapeHtml(message)}</p>
+      <p class="hi-auth-small">접근 코드가 맞을 때만 X 아이디 신청/진입 기록이 관리자 페이지에 남습니다.</p>
+    `);
+    document.getElementById('hi-code-x-access-form')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const btn = form.querySelector('button');
+      const code = normalizeAccessCode(form.access_code.value);
+      if (!configuredAccessCodes().includes(code)) {
+        statusMessage('접근 코드가 맞지 않습니다. 안내받은 코드를 다시 확인해주세요.');
+        return;
+      }
+      btn.disabled = true;
+      try {
+        const result = await requestXAccessWithFallback(form.x_handle.value);
+        if (result?.allowed === true) {
+          grantAccessCode(code);
+          rememberXAccess(result);
+          removeLock();
+          return;
+        }
+        clearXAccess();
+        statusMessage(result?.message || '승인 대기 상태입니다. 관리자가 X 아이디를 확인한 뒤 접근 권한을 열 수 있습니다.');
+      } catch (error) {
+        statusMessage(`접근 확인 중 문제가 생겼습니다: ${error.message}`);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  async function bootCodeAndXHandle() {
+    if (!configuredAccessCodes().length) {
+      console.warn('[HowInsight Auth] accessCodeGateEnabled is true, but accessCodes is empty. Course remains public.');
+      return;
+    }
+    if (!isConfigured) {
+      renderCodeAndXHandleGate('Supabase 설정이 없어 X 아이디 승인 상태를 확인할 수 없습니다. 관리자에게 알려주세요.');
+      return;
+    }
+    overlay(`
+      <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
+      <h2>접근 권한 확인 중입니다</h2>
+      <p>저장된 접근 코드와 X 아이디 승인 상태를 확인하고 있습니다.</p>
+    `);
+    const saved = savedXAccess();
+    if (!hasAccessCodeGrant() || !saved?.xHandle) {
+      renderCodeAndXHandleGate();
+      return;
+    }
+    try {
+      const result = await requestXAccessWithFallback(saved.xHandle);
+      if (result?.allowed === true) {
+        rememberXAccess(result);
+        removeLock();
+        return;
+      }
+      clearXAccess();
+      renderCodeAndXHandleGate(result?.message || '승인 상태가 확인되지 않았습니다. 접근 코드와 X 아이디를 다시 입력해주세요.');
+    } catch (error) {
+      renderCodeAndXHandleGate(`접근 확인 중 문제가 생겼습니다: ${error.message}`);
+    }
   }
 
   function renderXHandleGate(message = 'X 아이디를 입력하면 활성 구독자/승인 목록과 대조합니다.') {
@@ -430,7 +557,7 @@
         <input id="hi-x" name="x_handle" type="text" placeholder="@sniffshiba" autocomplete="nickname" required>
         <label class="hi-consent" for="hi-privacy-consent">
           <input id="hi-privacy-consent" name="privacy_consent" type="checkbox" required>
-          <span>강의 접근 승인과 구독 여부 확인을 위해 이메일과 X 아이디를 수집·이용하는 데 동의합니다. <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a></span>
+          <span>강의 접근 승인과 구독 여부 확인을 위해 이메일과 X 아이디를 수집·이용하는 데 동의합니다. <a href="${privacyHref()}" target="_blank" rel="noopener">개인정보처리방침</a></span>
         </label>
         <button type="submit">이메일 인증 링크 받기</button>
       </form>
@@ -505,7 +632,13 @@
     }
   }
 
-  const bootGate = xHandleGateEnabled ? bootXHandle : accessCodeGateEnabled ? bootAccessCode : boot;
+  const bootGate = xHandleGateEnabled && accessCodeGateEnabled
+    ? bootCodeAndXHandle
+    : xHandleGateEnabled
+      ? bootXHandle
+      : accessCodeGateEnabled
+        ? bootAccessCode
+        : boot;
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootGate);
   } else {
