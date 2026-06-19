@@ -10,6 +10,7 @@ def test_auth_assets_exist():
     assert (ROOT / 'assets' / 'auth-gate.js').exists()
     assert (ROOT / 'assets' / 'auth-admin.js').exists()
     assert (ROOT / 'supabase_schema.sql').exists()
+    assert (ROOT / 'references.html').exists()
 
 
 def test_email_gate_is_disabled_and_access_code_gate_is_enabled():
@@ -50,9 +51,22 @@ def test_public_index_hides_admin_link_and_request_copy():
     assert '공개 회차 확인하기' in html
     assert 'id="roadmap"' in html
     assert '강의자료 레퍼런스 안내' in html
-    assert 'Cboe/OCC 등 공개 교육자료' in html
-    assert '주요 옵션 교재와 무기견의 내부 지식맵' in html
-    assert '원문 문장, 도표, 예시를 복제하지 않고' in html
+    assert '무기견의 내부 지식맵' not in html
+    assert 'OIC, OCC, SEC, FINRA, Cboe' in html
+    assert 'href="references.html"' in html
+
+
+def test_references_page_lists_actual_sources():
+    html = (ROOT / 'references.html').read_text(encoding='utf-8')
+    assert '참고문헌과 출처' in html
+    assert 'Options Industry Council, Options Basics' in html
+    assert 'OCC, Characteristics and Risks of Standardized Options' in html
+    assert 'SEC Investor.gov, Options' in html
+    assert 'FINRA, Options' in html
+    assert 'Volatility Index Methodology: Cboe Volatility Index' in html
+    assert 'Sheldon Natenberg' in html
+    assert 'John C. Hull' in html
+    assert '무기견의 내부 지식맵' not in html
 
 
 def test_admin_page_loads_admin_script():
