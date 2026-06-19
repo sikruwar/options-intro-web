@@ -50,7 +50,9 @@ def test_public_index_hides_admin_link_and_request_copy():
     assert '공개 회차 확인하기' in html
     assert 'id="roadmap"' in html
     assert '강의자료 레퍼런스 안내' in html
-    assert '특정 종목이나 매매를 권유하지 않으며' in html
+    assert 'Cboe/OCC 등 공개 교육자료' in html
+    assert '주요 옵션 교재와 무기견의 내부 지식맵' in html
+    assert '원문 문장, 도표, 예시를 복제하지 않고' in html
 
 
 def test_admin_page_loads_admin_script():
