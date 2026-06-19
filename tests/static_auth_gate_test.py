@@ -11,6 +11,9 @@ def test_auth_assets_exist():
     assert (ROOT / 'assets' / 'auth-admin.js').exists()
     assert (ROOT / 'supabase_schema.sql').exists()
     assert (ROOT / 'references.html').exists()
+    assert (ROOT / 'copyright.html').exists()
+    assert (ROOT / 'robots.txt').exists()
+    assert (ROOT / 'sitemap.xml').exists()
 
 
 def test_email_gate_is_disabled_and_access_code_gate_is_enabled():
@@ -52,6 +55,8 @@ def test_public_index_hides_admin_link_and_request_copy():
     assert 'id="roadmap"' in html
     assert '저작권 보호 안내' in html
     assert '무단 복제·전재·배포·재판매·2차 가공·AI 학습데이터 수집을 금지' in html
+    assert '© 2026 무기견. All rights reserved.' in html
+    assert 'href="copyright.html"' in html
     assert '강의자료 레퍼런스 안내' in html
     assert '무기견의 내부 지식맵' not in html
     assert 'OIC, OCC, SEC, FINRA, Cboe' in html
@@ -70,6 +75,29 @@ def test_references_page_lists_actual_sources():
     assert 'John C. Hull' in html
     assert '무기견의 내부 지식맵' not in html
     assert '<h2>제작 원칙</h2>' not in html
+
+
+def test_copyright_page_and_robot_policy_exist():
+    copyright_html = (ROOT / 'copyright.html').read_text(encoding='utf-8')
+    robots = (ROOT / 'robots.txt').read_text(encoding='utf-8')
+    sitemap = (ROOT / 'sitemap.xml').read_text(encoding='utf-8')
+    assert '저작권 및 이용 제한' in copyright_html
+    assert '© 2026 무기견. All rights reserved.' in copyright_html
+    assert '무단 복제, 전재, 배포, 공유, 재판매' in copyright_html
+    assert 'AI 학습데이터 수집' in copyright_html
+    assert 'User-agent: GPTBot' in robots
+    assert 'User-agent: Google-Extended' in robots
+    assert 'User-agent: ClaudeBot' in robots
+    assert 'Disallow: /sessions/' in robots
+    assert 'https://howinsight.com/copyright.html' in sitemap
+
+
+def test_public_pages_link_to_copyright_footer():
+    pages = [ROOT / 'index.html', ROOT / 'prologue.html', ROOT / 'references.html', ROOT / 'privacy.html', ROOT / 'upcoming.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
+    for path in pages:
+        html = path.read_text(encoding='utf-8')
+        assert '© 2026 무기견. All rights reserved.' in html
+        assert '저작권 및 이용 제한' in html
 
 
 def test_admin_page_loads_admin_script():
