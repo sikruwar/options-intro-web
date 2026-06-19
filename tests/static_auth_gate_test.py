@@ -67,6 +67,7 @@ def test_references_page_lists_actual_sources():
     assert 'Sheldon Natenberg' in html
     assert 'John C. Hull' in html
     assert '무기견의 내부 지식맵' not in html
+    assert '<h2>제작 원칙</h2>' not in html
 
 
 def test_admin_page_loads_admin_script():
