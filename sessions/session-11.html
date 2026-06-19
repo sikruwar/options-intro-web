@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>11회차 — 델타 1편, 방향성과 변화율</title>
+  <meta name="description" content="델타는 기초자산의 1달러 움직임이 옵션 가격에 전달되는 비율이며, 옵션이 주식처럼 움직이는 정도를 보여주는 첫 번째 방향성 민감도입니다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d0c;
+      --bg-card: #151715;
+      --bg-card2: #1d211d;
+      --text: #f1eee5;
+      --text-muted: #a49b8b;
+      --text-dim: #746f65;
+      --amber: #f5b14c;
+      --green: #35d07f;
+      --blue: #7dd3fc;
+      --red: #ef4444;
+      --violet: #a78bfa;
+      --border: #2d302a;
+      --border-light: #44483d;
+      --nav-bg: rgba(11,13,12,.91);
+      --hero-glow-warm: rgba(245,177,76,.08);
+      --hero-glow-cool: rgba(125,211,252,.05);
+      --prose-text: #d8d1c3;
+      --cta-text: #11130f;
+      --shadow: 0 18px 60px rgba(0,0,0,.28);
+    }
+
+    :root[data-theme="olive"] {
+      color-scheme: light;
+      --bg: #fafaf2;
+      --bg-card: #fff;
+      --bg-card2: #f1f3e7;
+      --text: #1b2518;
+      --text-muted: #5d684f;
+      --text-dim: #889078;
+      --amber: #7d8f3a;
+      --green: #4f7a35;
+      --blue: #3d7796;
+      --red: #b94a48;
+      --violet: #7561a8;
+      --border: #e3e7d4;
+      --border-light: #d1d9bb;
+      --nav-bg: rgba(250,250,242,.92);
+      --hero-glow-warm: rgba(125,143,58,.12);
+      --hero-glow-cool: rgba(61,119,150,.08);
+      --prose-text: #35402f;
+      --cta-text: #fff;
+      --shadow: 0 18px 60px rgba(82,91,56,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      line-height: 1.82;
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s, color .25s;
+    }
+
+    .progress {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--amber), var(--green));
+      z-index: 100;
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--text-muted);
+      letter-spacing: .08em; text-decoration: none;
+    }
+    .nav-brand span { color: var(--amber); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-prev, .nav-next, .nav-session {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text-dim); text-decoration: none;
+    }
+    .nav-prev:hover, .nav-next:hover { color: var(--amber); }
+    .theme-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: var(--bg-card);
+    }
+    .theme-btn {
+      border: 0; min-width: 44px; min-height: 32px;
+      padding: 6px 10px; border-radius: 999px;
+      background: transparent; color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: .04em; cursor: pointer;
+    }
+    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
+
+    .hero {
+      min-height: 94vh; display: flex; align-items: center;
+      padding: 122px 10vw 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: -220px -160px auto auto;
+      width: 760px; height: 760px;
+      background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; left: -120px; bottom: -180px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 26px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 84px);
+      font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px;
+      word-break: keep-all; overflow-wrap: normal;
+    }
+    .hero h1 .hi { color: var(--amber); }
+    .mobile-break { display: none; }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px); color: var(--text-muted);
+      font-weight: 300; max-width: 740px; line-height: 1.72; margin-bottom: 38px;
+      word-break: keep-all; overflow-wrap: anywhere;
+    }
+    .thesis {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--amber);
+      padding: 21px 28px; border-radius: 0 12px 12px 0;
+      box-shadow: var(--shadow); max-width: 760px;
+    }
+    .thesis-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em; margin-bottom: 9px;
+    }
+    .thesis-main { font-size: 18px; font-weight: 700; line-height: 1.62; word-break: keep-all; overflow-wrap: anywhere; }
+
+    .divider { border: 0; border-top: 1px solid var(--border); }
+    .section { max-width: 810px; margin: 0 auto; padding: 78px 24px; }
+    .section-wide { max-width: 1080px; margin: 0 auto; padding: 78px 24px; }
+    .section-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .15em; margin-bottom: 16px;
+    }
+    .section h2, .section-wide h2 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800; line-height: 1.24; letter-spacing: 0; margin-bottom: 28px;
+    }
+    .prose p {
+      font-size: 16px; line-height: 1.86; color: var(--prose-text); margin-bottom: 19px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 700; }
+    .prose h3 { font-size: 21px; font-weight: 800; margin: 34px 0 14px; color: var(--text); }
+    .prose ol, .prose ul { margin: 0 0 19px 20px; color: var(--prose-text); line-height: 1.86; }
+    .prose li { margin-bottom: 6px; }
+    .prose code, code { font-family: 'JetBrains Mono', monospace; color: var(--amber); font-size: .92em; }
+
+    .fig {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: 16px; padding: 28px; margin: 32px 0;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .fig::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), var(--amber), transparent);
+      opacity: .48;
+    }
+    .fig-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .fig h2 { font-size: clamp(19px, 2.6vw, 24px); font-weight: 800; line-height: 1.3; margin-bottom: 20px; }
+    .fig-caption {
+      margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.65;
+    }
+
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .mini-card {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .mini-k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .08em; margin-bottom: 10px;
+    }
+    .mini-v { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.35; }
+    .mini-p { font-size: 13px; color: var(--text-muted); line-height: 1.58; margin-top: 8px; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+
+    input[type="range"] {
+      width: 100%; height: 5px; border-radius: 999px;
+      background: var(--border-light); outline: none; -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+      box-shadow: 0 0 0 4px rgba(245,177,76,.18);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+    }
+    svg { width: 100%; height: auto; display: block; }
+
+    .next-card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 26px 30px; margin-top: 34px;
+      display: flex; justify-content: space-between; gap: 20px;
+      text-decoration: none; color: inherit;
+    }
+    .next-card:hover { border-color: var(--amber); }
+    .next-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-dim); letter-spacing: .12em; margin-bottom: 7px;
+    }
+    .next-title { font-size: 17px; font-weight: 800; }
+    .next-desc { margin-top: 8px; color: var(--text-muted); font-size: 14px; line-height: 1.65; }
+    .next-arrow { font-size: 24px; color: var(--amber); }
+
+    footer {
+      border-top: 1px solid var(--border); padding: 30px 10vw;
+      display: flex; justify-content: space-between;
+      color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    }
+
+    .reveal {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    .svg-card { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; overflow: hidden; }
+    .svg-card svg { width: 100%; height: auto; display: block; }
+    svg text { font-family: 'JetBrains Mono', monospace; fill: var(--text-muted); font-size: 11px; }
+    .axis-line { stroke: var(--border-light); stroke-width: 1; }
+    .data-line { stroke: var(--amber); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .stock-line { stroke: var(--blue); stroke-width: 2; fill: none; stroke-linecap: round; }
+    .zero-line { stroke: var(--border-light); stroke-width: 1; stroke-dasharray: 2 4; }
+    .strike-line { stroke: var(--amber); stroke-width: 1.5; stroke-dasharray: 5 5; }
+
+    .controls { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-top: 16px; }
+    .control-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .control-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: .08em; }
+    .control-value { font-family: 'JetBrains Mono', monospace; font-size: 20px; color: var(--amber); font-weight: 800; }
+    .segmented { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .segmented button, .answer-btn { min-height: 44px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-muted); border-radius: 999px; padding: 9px 13px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .segmented button.active, .answer-btn.active { background: var(--amber); border-color: var(--amber); color: var(--cta-text); }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .metric { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .metric span { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 5px; }
+    .metric strong { color: var(--text); font-size: 19px; font-family: 'JetBrains Mono', monospace; }
+
+    .note-strip { margin-top: 14px; border-left: 3px solid var(--amber); padding: 12px 14px; background: linear-gradient(90deg, rgba(245,177,76,.08), transparent); color: var(--text-muted); font-size: 13px; line-height: 1.65; }
+
+    .badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; letter-spacing: .04em; }
+    .badge-good { color: var(--green); border: 1px solid var(--green); background: rgba(53,208,127,.08); }
+    .badge-bad { color: var(--red); border: 1px solid var(--red); background: rgba(239,68,68,.08); }
+    .badge-neutral { color: var(--text-muted); border: 1px solid var(--border-light); }
+
+    .worksheet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .worksheet-field { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .worksheet-field label { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 7px; }
+    .worksheet-field input { width: 100%; min-height: 44px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text); padding: 10px 12px; font: inherit; }
+    .worksheet-field output { display: block; min-height: 44px; border-radius: 10px; border: 1px dashed var(--border-light); background: var(--bg-card); color: var(--amber); padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; }
+    .answers { display: none; margin-top: 14px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .answers.open { display: block; }
+    .answers p { color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
+    .answers p:last-child { margin-bottom: 0; }
+    .answers strong { color: var(--amber); }
+
+    .range-bar { position: relative; height: 48px; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--border); overflow: visible; margin: 20px 0; }
+    .range-bar-fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 999px; }
+    .range-marker { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: var(--amber); border: 3px solid var(--bg-card); box-shadow: 0 0 0 4px rgba(245,177,76,.25); transform: translate(-50%, -50%); transition: left .35s ease; z-index: 2; }
+    .range-labels { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+
+    .exposure-bar { height: 36px; border-radius: 8px; display: flex; align-items: center; padding: 0 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; margin-bottom: 8px; min-width: 40px; }
+    .exposure-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 13px; }
+
+    .click-card { cursor: pointer; transition: border-color .2s, background .2s; }
+    .click-card:hover { border-color: var(--amber); }
+    .click-card.active { border-color: var(--amber); background: rgba(245,177,76,.06); }
+
+    .scenario-result { margin-top: 14px; padding: 16px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; }
+
+    .num-input { width: 80px; min-height: 44px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text); padding: 8px 10px; font-family: 'JetBrains Mono', monospace; font-size: 16px; text-align: center; }
+    .num-input:focus { border-color: var(--amber); outline: none; }
+
+    .result-big { font-family: 'JetBrains Mono', monospace; font-size: 32px; font-weight: 800; color: var(--amber); }
+    .formula-display { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-muted); padding: 12px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; margin: 14px 0; text-align: center; }
+
+    @media (max-width: 760px) {
+      body { overflow-x: hidden; }
+      nav { padding: 11px 16px; width: 100vw; max-width: 100vw; overflow: hidden; }
+      .nav-session, .nav-prev, .nav-index, .nav-forward { display: none; }
+      .nav-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); gap: 0; }
+      .nav-brand { font-size: 12px; max-width: 190px; overflow: hidden; white-space: nowrap; }
+      .theme-toggle { transform: scale(.78); transform-origin: right center; }
+      .theme-btn { min-width: 42px; min-height: 30px; }
+      .hero { padding: 104px 24px 62px; min-height: 88vh; width: 100vw; max-width: 100vw; }
+      .hero-inner { max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .mobile-break { display: block; }
+      .hero h1 { font-size: clamp(34px, 10vw, 44px); line-height: 1.14; word-break: keep-all; overflow-wrap: anywhere; }
+      .hero-sub, .thesis-main, .section h2, .section-wide h2 { word-break: break-all; overflow-wrap: anywhere; }
+      .section h2, .section-wide h2 { font-size: 24px; line-height: 1.28; max-width: 13em; }
+      .thesis { padding: 20px 22px; max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .section, .section-wide { padding: 58px 20px; max-width: 100vw; overflow: hidden; }
+      .fig { padding: 20px; max-width: calc(100vw - 40px); }
+      .two, .three, .metric-grid, .worksheet-grid { grid-template-columns: 1fr; }
+      .next-card { flex-direction: column; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media print {
+      nav, .progress, .theme-toggle { display: none !important; }
+      body { background: #fff; color: #111; }
+      .hero { min-height: auto; padding: 40px 24px; }
+      .reveal { opacity: 1; transform: none; }
+      .fig, .mini-card, .controls, .metric, .worksheet-field { box-shadow: none; break-inside: avoid; background: #fff; color: #111; border-color: #bbb; }
+      .answers { display: block !important; }
+      .worksheet-field input { border: 1px solid #999; background: #fff; color: #111; }
+      .num-input { border: 1px solid #999; background: #fff; color: #111; }
+    }
+  
+    /* Mobile title tuning: keep session hero titles readable on phones. */
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
+  
+    /* Mobile course navigation: keep previous/index/next reachable on phones. */
+    @media (max-width:760px) {
+      nav { display:grid !important; grid-template-columns:1fr auto auto; grid-template-rows:auto auto; row-gap:8px; align-items:center; padding:10px 14px 9px !important; overflow:visible !important; }
+      .nav-brand { grid-column:1 / 2; grid-row:1; max-width:170px !important; min-width:0; }
+      .nav-right { display:contents !important; position:static !important; transform:none !important; }
+      .nav-session { display:none !important; }
+      .theme-toggle { grid-column:3; grid-row:1; justify-self:end; transform:scale(.76) !important; transform-origin:right center; }
+      .nav-prev,.nav-index,.nav-forward { display:inline-flex !important; align-items:center; justify-content:center; min-height:28px; padding:0 10px; border:1px solid var(--border); border-radius:999px; background:var(--bg-card); color:var(--text-muted) !important; font-size:11px !important; line-height:1; white-space:nowrap; }
+      .nav-prev { grid-column:1; grid-row:2; justify-self:start; }
+      .nav-index { grid-column:2; grid-row:2; justify-self:center; }
+      .nav-forward { grid-column:3; grid-row:2; justify-self:end; }
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/readability-overrides.css">
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
+  <div class="nav-right">
+    <a href="session-10.html" class="nav-prev">10회차</a>
+    <span class="nav-session">SESSION 11</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-12.html" class="nav-next nav-forward">12회차 &rarr;</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 &middot; Session 11 &middot; Level 3</div>
+    <h1>델타 1편,<br><span class="hi">방향성</span>과 변화율</h1>
+    <p class="hero-sub">기초자산이 1달러 움직이면 옵션은 얼마나 움직일까요?<br class="mobile-break">콜 델타와 풋 델타의 부호와 크기를 읽고,<br class="mobile-break">주식 환산 노출까지 계산합니다.</p>
+    <div class="thesis"><div class="thesis-label">11회차 중심 문장</div><div class="thesis-main">델타는 기초자산의 1달러 움직임이 옵션 가격에 전달되는 비율이며, <br class="mobile-break">옵션이 주식처럼 움직이는 정도를 보여주는 <br class="mobile-break">첫 번째 방향성 민감도입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+
+<!-- ===== 00 · prior-session bridge ===== -->
+<section class="section reveal" id="section-00">
+  <div class="section-num">00 &middot; 그릭스 지도에서 델타를 먼저 꺼냅니다</div>
+  <h2>그릭스 지도에서 델타를 먼저 꺼냅니다</h2>
+  <div class="prose">
+    <p>10회차에서는 그릭스를 옵션 포지션의 계기판으로 봤습니다. 델타는 주가 변화, 감마는 델타 변화, 세타는 시간, 베가는 IV, 로는 금리 변화에 대한 민감도였습니다.</p>
+    <p>오늘은 그중 델타만 확대합니다. 델타는 가장 먼저 배우는 그릭스이면서, 초보자가 가장 자주 오해하는 숫자이기도 합니다. "델타 0.50이면 대충 절반 움직인다" 정도로 끝내면 실제 옵션 가격을 읽을 때 금방 막힙니다.</p>
+    <p>이번 회차에서는 델타를 세 겹으로 봅니다. 첫째, 기초자산 1달러 변화가 옵션 가격에 얼마나 전달되는가. 둘째, 콜과 풋의 델타 범위가 왜 다른가. 셋째, 외가격, 등가격, 내가격 위치에 따라 델타가 왜 달라지는가입니다.</p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 01 · today's question + Figure 1 ===== -->
+<section class="section-wide reveal" id="section-01">
+  <div class="section-num">01 &middot; 오늘의 질문</div>
+  <h2>기초자산이 1달러 움직이면 옵션은 얼마나 움직일까요</h2>
+  <div class="prose">
+    <p>델타를 배우기 전 먼저 걸리는 질문이 있습니다.</p>
+    <p><strong>같은 1달러 상승인데, 왜 어떤 콜옵션은 0.20달러만 오르고 어떤 콜옵션은 0.80달러 가까이 오를까요?</strong></p>
+    <p>주식은 단순합니다. 주식 1주를 들고 있으면 주가가 1달러 오를 때 내 포지션도 1달러 움직입니다. 주식 100주면 100달러입니다. 물론 환율, 세금, 체결가는 따로 있지만, 가격 민감도 자체는 직선에 가깝습니다.</p>
+    <p>옵션은 그 직선을 접어서 곡선으로 만든 상품입니다. 현재가 100달러인 주식에서 95콜, 100콜, 110콜은 모두 콜옵션입니다. 그런데 95콜은 이미 행사할 가치가 있으니 주식처럼 꽤 민감하게 움직이고, 110콜은 아직 멀리 있으니 주가 1달러 상승을 가격에 조금만 반영합니다.</p>
+    <p>숫자로 보겠습니다. 현재 주가를 100달러, 만기를 30일, IV와 금리와 배당을 고정한다고 가정합니다. 95콜의 델타가 0.78, 100콜의 델타가 0.52, 110콜의 델타가 0.18이라고 하겠습니다. 기초자산 가격만 1달러 움직인다고 놓습니다.</p>
+    <p>주가가 100에서 101달러로 오르면, 95콜은 대략 0.78달러, 100콜은 0.52달러, 110콜은 0.18달러 오를 수 있습니다. 같은 상승인데 옵션 가격 반응이 다릅니다. 이 차이가 델타입니다.</p>
+  </div>
+
+  <!-- Figure 1 -->
+  <div class="fig" id="figure-01">
+    <div class="fig-label">Figure 01 &mdash; 델타 오프닝: 주식 직선과 옵션 곡선</div>
+    <h2>주식은 직선, 옵션은 곡선</h2>
+    <div class="two">
+      <div class="svg-card">
+        <svg viewBox="0 0 300 240" role="img" aria-label="주식 가격 vs 포지션 가치 직선 그래프">
+          <text x="150" y="16" text-anchor="middle" font-size="11" fill="var(--text-dim)">STOCK 1:1</text>
+          <line class="axis-line" x1="40" y1="20" x2="40" y2="210"/>
+          <line class="axis-line" x1="40" y1="210" x2="280" y2="210"/>
+          <line class="stock-line" x1="40" y1="210" x2="280" y2="30"/>
+          <text x="20" y="220" font-size="9">90</text>
+          <text x="260" y="220" font-size="9">115</text>
+          <text x="8" y="35" font-size="9">+25</text>
+          <text x="8" y="215" font-size="9">0</text>
+          <circle id="f1StockDot" cx="136" cy="138" r="5" fill="var(--blue)" stroke="var(--bg-card)" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="svg-card">
+        <svg viewBox="0 0 300 240" role="img" aria-label="옵션 가격 곡선 그래프. 행사가 105, 델타 마커 표시">
+          <text x="150" y="16" text-anchor="middle" font-size="11" fill="var(--text-dim)">CALL OPTION (K=105)</text>
+          <line class="axis-line" x1="40" y1="20" x2="40" y2="210"/>
+          <line class="axis-line" x1="40" y1="210" x2="280" y2="210"/>
+          <path id="f1OptCurve" class="data-line" d="M40,205 C80,203 120,198 150,185 C170,175 190,155 210,125 C230,95 250,65 280,40"/>
+          <text x="70" y="230" font-size="9" fill="var(--text-dim)">OTM</text>
+          <text x="165" y="230" font-size="9" fill="var(--amber)">ATM</text>
+          <text x="245" y="230" font-size="9" fill="var(--text-dim)">ITM</text>
+          <line class="strike-line" x1="184" y1="20" x2="184" y2="210"/>
+          <text x="172" y="230" font-size="9" fill="var(--amber)">K105</text>
+          <circle id="f1OptDot" cx="136" cy="193" r="6" fill="var(--amber)" stroke="var(--bg-card)" stroke-width="2"/>
+          <text id="f1DeltaLabel" x="136" y="183" text-anchor="middle" font-size="11" font-weight="700" fill="var(--amber)">0.35</text>
+          <text x="20" y="220" font-size="9">90</text>
+          <text x="260" y="220" font-size="9">115</text>
+        </svg>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">주가</div>
+        <div class="control-value" id="f1Price">$100</div>
+      </div>
+      <input id="f1Slider" type="range" min="90" max="115" value="100" step="1" aria-label="주가 슬라이더">
+      <div class="metric-grid" style="grid-template-columns:1fr 1fr">
+        <div class="metric"><span>현재 델타</span><strong id="f1Delta">0.35</strong></div>
+        <div class="metric"><span>위치</span><strong id="f1Position">OTM</strong></div>
+      </div>
+    </div>
+    <div class="fig-caption">델타는 이 곡선의 현재 기울기다. 주가 90~115, 행사가 105, 교육용 델타 곡선.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 02 · central sentence ===== -->
+<section class="section reveal" id="section-02">
+  <div class="section-num">02 &middot; 오늘의 중심 문장</div>
+  <h2>델타는 옵션이 주식처럼 움직이는 정도를 보여줍니다</h2>
+  <div class="prose">
+    <p>이번 회차의 한 문장은 이렇습니다.</p>
+    <p><strong>델타는 기초자산의 1달러 움직임이 옵션 가격에 전달되는 비율이며, 옵션이 주식처럼 움직이는 정도를 보여주는 첫 번째 방향성 민감도입니다.</strong></p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 03 · concept explanation + Figures 2-8 ===== -->
+<section class="section reveal" id="section-03">
+  <div class="section-num">03 &middot; 콜 델타와 풋 델타의 부호와 크기를 읽습니다</div>
+  <h2>콜 델타와 풋 델타의 부호와 크기를 읽습니다</h2>
+  <div class="prose">
+    <p>델타를 가장 쉽게 읽는 방식은 "주가 1달러 변화에 대한 옵션 가격 변화"입니다. 델타가 0.40인 콜옵션은 다른 조건이 그대로라면 주가가 1달러 오를 때 옵션 가격이 약 0.40달러 오를 수 있다는 뜻입니다. 여기서 "다른 조건"은 만기까지 남은 시간, IV, 금리, 배당, 호가 스프레드입니다.</p>
+    <p>이 가정이 중요합니다. 실제 시장에서는 주가가 오르는 동안 시간도 지나고 IV도 변합니다. 그래도 델타를 따로 떼어 보는 이유는 기초자산 가격 변화가 옵션 가격에 전달되는 첫 번째 경로를 분리하기 위해서입니다.</p>
+    <p>콜옵션부터 보겠습니다. 콜은 정해진 가격에 살 수 있는 권리입니다. 기초자산 가격이 오르면 이 권리는 유리해집니다. 그래서 콜옵션 델타는 일반적으로 0과 1 사이에 있습니다.</p>
+    <p>현재 주가 100달러, 행사가 105달러, 만기 30일인 콜옵션을 생각해보겠습니다. 이 콜의 델타가 0.35라면, 주가가 100에서 101달러로 오를 때 옵션 가격은 델타 효과만으로 약 0.35달러 오를 수 있습니다. 주가가 100에서 99달러로 내려가면 약 0.35달러 내려갈 수 있겠죠. 이 예시에서 그대로 둔 조건은 IV, 시간, 금리, 배당이고, 움직인 쪽은 주가 1달러입니다.</p>
+  </div>
+</section>
+
+<!-- Figure 2: 콜 델타 범위 바 -->
+<section class="section-wide reveal" id="figure-02-wrap">
+  <div class="fig" id="figure-02">
+    <div class="fig-label">Figure 02 &mdash; 콜 델타 범위 바</div>
+    <h2>콜 델타는 0에서 1 사이에 있습니다</h2>
+    <div class="range-bar">
+      <div class="range-bar-fill" style="width:100%; background: linear-gradient(90deg, rgba(125,211,252,.08), rgba(245,177,76,.15), rgba(53,208,127,.12));"></div>
+      <div class="range-marker" id="f2Marker" style="left:52%"></div>
+    </div>
+    <div class="range-labels">
+      <span>0 &mdash; 거의 반응 없음</span>
+      <span>0.50 &mdash; 등가격 근처</span>
+      <span>1.00 &mdash; 주식처럼 반응</span>
+    </div>
+    <div class="segmented" id="f2Btns">
+      <button type="button" data-strike="90" data-delta="0.90">90콜 (0.90)</button>
+      <button type="button" data-strike="95" data-delta="0.78">95콜 (0.78)</button>
+      <button type="button" class="active" data-strike="100" data-delta="0.52">100콜 (0.52)</button>
+      <button type="button" data-strike="110" data-delta="0.18">110콜 (0.18)</button>
+    </div>
+    <div class="metric-grid" style="grid-template-columns:1fr 1fr; margin-top:14px">
+      <div class="metric"><span>선택 행사가</span><strong id="f2Strike">100콜</strong></div>
+      <div class="metric"><span>델타</span><strong id="f2Delta">0.52</strong></div>
+    </div>
+    <div class="fig-caption">고정: 현재 주가 100, 만기 30일, IV. 변화: 행사가.</div>
+  </div>
+</section>
+
+<section class="section reveal" id="section-03b">
+  <div class="prose">
+    <p>풋옵션은 부호가 반대입니다. 풋은 정해진 가격에 팔 수 있는 권리입니다. 기초자산 가격이 오르면 이 권리는 불리해지고, 기초자산 가격이 내려가면 유리해집니다. 그래서 풋옵션 델타는 일반적으로 -1과 0 사이에 있습니다.</p>
+    <p>현재 주가 100달러, 행사가 95달러, 만기 30일인 풋옵션의 델타가 -0.28이라고 해보겠습니다. 주가가 100에서 101달러로 오르면 풋 가격은 델타 효과만으로 약 0.28달러 내려갈 수 있습니다. 주가가 100에서 99달러로 내려가면 풋 가격은 약 0.28달러 오를 수 있습니다. 이때도 IV, 시간, 금리, 배당은 같은 조건으로 둡니다.</p>
+  </div>
+</section>
+
+<!-- Figure 3: 풋 델타 범위 바 -->
+<section class="section-wide reveal" id="figure-03-wrap">
+  <div class="fig" id="figure-03">
+    <div class="fig-label">Figure 03 &mdash; 풋 델타 범위 바</div>
+    <h2>풋 델타는 -1에서 0 사이이며, 부호가 음수입니다</h2>
+    <div class="range-bar">
+      <div class="range-bar-fill" style="width:100%; background: linear-gradient(90deg, rgba(239,68,68,.15), rgba(125,211,252,.08));"></div>
+      <div class="range-marker" id="f3Marker" style="left:28%"></div>
+    </div>
+    <div class="range-labels">
+      <span>-1.00 &mdash; 하락에 강하게 반응</span>
+      <span>-0.50</span>
+      <span>0 &mdash; 거의 반응 없음</span>
+    </div>
+    <div class="segmented" id="f3Btns">
+      <button type="button" class="active" data-put="105" data-delta="-0.72">105풋 (-0.72)</button>
+      <button type="button" data-put="100" data-delta="-0.49">100풋 (-0.49)</button>
+      <button type="button" data-put="90" data-delta="-0.16">90풋 (-0.16)</button>
+    </div>
+    <div class="segmented" id="f3Dir" style="margin-top:8px">
+      <button type="button" class="active" data-dir="+1">+1달러 상승</button>
+      <button type="button" data-dir="-1">-1달러 하락</button>
+    </div>
+    <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr; margin-top:14px">
+      <div class="metric"><span>선택 풋</span><strong id="f3Put">105풋</strong></div>
+      <div class="metric"><span>델타</span><strong id="f3Delta">-0.72</strong></div>
+      <div class="metric"><span>가격 변화</span><strong id="f3Change" style="color:var(--red)">-0.72</strong></div>
+    </div>
+    <div class="fig-caption">부호는 방향을, 절댓값은 반응 정도를 보여준다.</div>
+  </div>
+</section>
+
+<section class="section reveal" id="section-03c">
+  <div class="prose">
+    <p>콜 델타가 1을 넘기 어렵다는 점도 중요합니다. 콜옵션은 기초자산보다 더 빠르게 1대1 이상으로 움직이는 권리가 아닙니다. 매우 깊은 내가격 콜은 주식처럼 움직여서 델타가 1에 가까워질 수 있지만, 주가 1달러 변화에 옵션이 1달러보다 더 크게 지속적으로 반응하는 구조는 아닙니다.</p>
+    <p>외가격 콜은 반대입니다. 현재 주가가 100달러인데 120콜을 들고 있다면, 지금 당장 행사할 가치는 없습니다. 주가가 100에서 101달러로 올라도 아직 행사가까지 멀죠. 그래서 델타는 낮습니다. 시장은 "조금 가까워졌다" 정도만 가격에 반영합니다.</p>
+    <p>델타를 위치별로 나누면 감각이 더 선명해집니다. 현재가 100달러, 만기 30일, 같은 IV를 가정하겠습니다. 90콜은 깊은 내가격이라 델타가 0.90 근처일 수 있습니다. 100콜은 등가격이라 0.50 근처일 수 있습니다. 115콜은 외가격이라 0.15 근처일 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- Figure 4: 델타 가격변화 계산기 -->
+<section class="section-wide reveal" id="figure-04-wrap">
+  <div class="fig" id="figure-04">
+    <div class="fig-label">Figure 04 &mdash; 델타 가격변화 계산기</div>
+    <h2>기초자산 1달러 변화가 옵션 가격에 얼마나 전달되는가</h2>
+    <div class="formula-display" id="f4Formula">&Delta;Option &asymp; 0.35 &times; +1.00 = <strong>+0.35</strong></div>
+    <div class="controls" style="margin-top:0">
+      <div class="control-head">
+        <div class="control-title">델타</div>
+        <div class="control-value" id="f4DeltaVal">0.35</div>
+      </div>
+      <input id="f4DeltaSlider" type="range" min="0" max="100" value="35" step="1" aria-label="델타">
+    </div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">주가 변화 ($)</div>
+        <div class="control-value" id="f4MoveVal">+1.00</div>
+      </div>
+      <input id="f4MoveSlider" type="range" min="-300" max="300" value="100" step="10" aria-label="주가 변화">
+    </div>
+    <div class="metric-grid" style="grid-template-columns:1fr">
+      <div class="metric" style="text-align:center"><span>옵션 가격 변화 (추정)</span><strong id="f4Result" style="font-size:28px; color:var(--green)">+$0.35</strong></div>
+    </div>
+    <div class="fig-caption">고정: IV, 시간, 금리, 배당. 변화: 주가.</div>
+  </div>
+</section>
+
+<section class="section reveal" id="section-03d">
+  <div class="prose">
+    <p>풋은 거울처럼 보되 부호가 음수입니다. 현재가 100달러에서 110풋은 이미 내가격입니다. 델타가 -0.85 근처일 수 있습니다. 100풋은 등가격이라 -0.50 근처일 수 있습니다. 85풋은 외가격이라 -0.12 근처일 수 있습니다.</p>
+    <p>여기서 조심할 점이 있습니다. 델타의 절댓값이 크다고 해서 그 옵션이 무조건 좋은 옵션이라는 뜻은 아닙니다. 깊은 내가격 옵션은 주식처럼 잘 움직이지만 프리미엄이 큽니다. 외가격 옵션은 싸 보이지만 움직임이 옵션 가격에 적게 전달됩니다. 델타는 옵션의 매력도를 채점하지 않고, 가격 전달 비율을 보여줍니다.</p>
+  </div>
+</section>
+
+<!-- Figure 5: 위치별 콜옵션 3종 비교 카드 -->
+<section class="section-wide reveal" id="figure-05-wrap">
+  <div class="fig" id="figure-05">
+    <div class="fig-label">Figure 05 &mdash; 위치별 콜옵션 3종 비교 카드</div>
+    <h2>같은 콜옵션이라도 위치에 따라 반응이 다릅니다</h2>
+    <div class="three" id="f5Cards">
+      <div class="mini-card click-card active" data-f5="95">
+        <div class="mini-k">95콜 &middot; ITM</div>
+        <div class="mini-v">$7.50</div>
+        <div style="margin-top:8px">
+          <span class="badge badge-good">Delta 0.78</span>
+          <span class="badge badge-neutral" style="margin-left:4px">&asymp;78주</span>
+        </div>
+        <div class="mini-p" id="f5c95" style="margin-top:10px">+1달러 시: <strong class="pos">$8.28</strong> (+0.78)</div>
+      </div>
+      <div class="mini-card click-card" data-f5="100">
+        <div class="mini-k">100콜 &middot; ATM</div>
+        <div class="mini-v">$4.20</div>
+        <div style="margin-top:8px">
+          <span class="badge badge-good">Delta 0.52</span>
+          <span class="badge badge-neutral" style="margin-left:4px">&asymp;52주</span>
+        </div>
+        <div class="mini-p" id="f5c100" style="margin-top:10px">+1달러 시: <strong class="pos">$4.72</strong> (+0.52)</div>
+      </div>
+      <div class="mini-card click-card" data-f5="110">
+        <div class="mini-k">110콜 &middot; OTM</div>
+        <div class="mini-v">$1.20</div>
+        <div style="margin-top:8px">
+          <span class="badge badge-neutral">Delta 0.18</span>
+          <span class="badge badge-neutral" style="margin-left:4px">&asymp;18주</span>
+        </div>
+        <div class="mini-p" id="f5c110" style="margin-top:10px">+1달러 시: <strong class="pos">$1.38</strong> (+0.18)</div>
+      </div>
+    </div>
+    <div class="fig-caption">싸 보이는 옵션은 가격 전달 비율도 낮을 수 있다. 현재 주가 100, 만기 30일, IV 고정.</div>
+  </div>
+</section>
+
+<section class="section reveal" id="section-03e">
+  <div class="prose">
+    <p>델타는 옵션이 주식처럼 움직이는 정도를 보여주기도 합니다. 옵션 1계약이 주식 100주를 기준으로 한다면, 델타 0.40인 콜 1계약은 대략 주식 40주와 비슷한 방향 노출을 가집니다. 델타 0.75인 콜 1계약은 대략 주식 75주 방향 노출입니다.</p>
+    <p>예를 들어 델타 0.40인 콜 3계약을 매수했다고 해보겠습니다. 계약 승수는 100입니다. 총 델타는 0.40 &times; 100 &times; 3 = 120주입니다. 기준으로 둔 숫자는 델타 0.40과 승수 100이고, 노출을 키운 요인은 계약 수입니다. 이 포지션은 방향 노출만 보면 주식 120주를 들고 있는 것처럼 상승에 민감합니다.</p>
+    <p>풋 매수는 음의 주식 노출처럼 볼 수 있습니다. 델타 -0.30인 풋 2계약을 매수하면 총 델타는 -0.30 &times; 100 &times; 2 = -60주입니다. 주식 100주를 보유하고 이 풋 2계약을 함께 들고 있다면 총 델타는 +40주입니다. 이 상태에서는 하락 위험이 완전히 사라지지 않고, 방향 노출이 일부 낮아집니다.</p>
+    <p>이 계산은 개인투자자에게 꽤 실용적입니다. 옵션을 매수할 때 프리미엄만 보면 "300달러만 잃으면 된다"는 생각에 머물기 쉽습니다. 그런데 델타로 바꾸면 내 계좌가 지금 주식 몇 주만큼 움직이는지 볼 수 있습니다. 개인적으로는 초보자가 옵션 가격보다 이 델타 환산을 먼저 적어보는 편이 낫다고 봅니다.</p>
+  </div>
+</section>
+
+<!-- Figure 6: 주식 환산 델타 계산기 -->
+<section class="section-wide reveal" id="figure-06-wrap">
+  <div class="fig" id="figure-06">
+    <div class="fig-label">Figure 06 &mdash; 주식 환산 델타 계산기</div>
+    <h2>계약 수와 승수를 반영한 총 방향 노출</h2>
+    <div class="segmented" id="f6BuySell">
+      <button type="button" class="active" data-bs="buy">매수 (Buy)</button>
+      <button type="button" data-bs="sell">매도 (Sell)</button>
+    </div>
+    <div class="worksheet-grid" style="margin-top:14px">
+      <div class="worksheet-field">
+        <label>계약 수</label>
+        <input id="f6Contracts" class="num-input" type="number" min="0" max="100" value="3" style="width:100%">
+      </div>
+      <div class="worksheet-field">
+        <label>델타</label>
+        <input id="f6Delta" class="num-input" type="number" min="0" max="1" step="0.01" value="0.40" style="width:100%">
+      </div>
+      <div class="worksheet-field">
+        <label>승수 (고정)</label>
+        <output style="font-size:18px; font-weight:800; color:var(--text)">100</output>
+      </div>
+      <div class="worksheet-field">
+        <label>주식 보유 (주)</label>
+        <input id="f6Shares" class="num-input" type="number" min="0" max="10000" value="0" style="width:100%">
+      </div>
+    </div>
+    <div class="formula-display" id="f6Formula">3 &times; 0.40 &times; 100 + 0 = <strong>120주</strong></div>
+    <div class="metric-grid" style="grid-template-columns:1fr">
+      <div class="metric" style="text-align:center"><span>총 델타 (주식 환산)</span><strong id="f6Total" class="result-big">120주</strong></div>
+    </div>
+    <div class="fig-caption">프리미엄 금액과 별개로, 계좌가 어느 방향에 얼마나 민감한지 확인한다.</div>
+  </div>
+</section>
+
+<!-- Figure 7: 보호적 풋 총 델타 카드 -->
+<section class="section-wide reveal" id="figure-07-wrap">
+  <div class="fig" id="figure-07">
+    <div class="fig-label">Figure 07 &mdash; 보호적 풋 총 델타 카드</div>
+    <h2>풋 매수로 방향 노출을 일부 줄이는 구조</h2>
+    <div style="max-width:500px; margin:0 auto;">
+      <div class="exposure-label"><span>주식 보유</span><span class="pos" style="font-family:'JetBrains Mono',monospace; font-weight:700">+100주</span></div>
+      <div class="exposure-bar" style="background:rgba(53,208,127,.2); color:var(--green); width:100%;">+100</div>
+      <div class="exposure-label"><span>풋 1계약 (델타 <span id="f7PutDeltaLabel">-0.35</span>)</span><span class="neg" style="font-family:'JetBrains Mono',monospace; font-weight:700" id="f7PutShares">-35주</span></div>
+      <div class="exposure-bar" id="f7PutBar" style="background:rgba(239,68,68,.2); color:var(--red); width:35%;">-35</div>
+      <div class="exposure-label" style="border-top:2px solid var(--border); padding-top:10px; margin-top:10px"><span>총 델타</span><span style="color:var(--amber); font-family:'JetBrains Mono',monospace; font-weight:800; font-size:20px" id="f7Total">+65주</span></div>
+      <div class="exposure-bar" id="f7TotalBar" style="background:rgba(245,177,76,.15); color:var(--amber); width:65%;">+65</div>
+    </div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">풋 델타</div>
+        <div class="control-value" id="f7DeltaVal">-0.35</div>
+      </div>
+      <input id="f7Slider" type="range" min="10" max="80" value="35" step="1" aria-label="풋 델타 절댓값">
+    </div>
+    <div class="fig-caption">하락 위험은 남아 있고, 현재 조건의 방향 민감도만 낮아진 상태다.</div>
+  </div>
+</section>
+
+<section class="section reveal" id="section-03f">
+  <div class="prose">
+    <p>델타는 고정 숫자가 아닙니다. 이 부분은 다음 회차의 감마와도 이어집니다. 주가가 움직이면 옵션의 내가격, 등가격, 외가격 위치가 바뀌고, 델타도 함께 바뀝니다.</p>
+    <p>현재가 100달러, 105콜 델타 0.35를 다시 보겠습니다. 주가가 100에서 101달러로 오르면 델타 효과로 옵션 가격이 약 0.35달러 오릅니다. 그런데 주가가 101달러가 된 뒤에는 이 옵션이 행사가 105달러에 조금 더 가까워졌습니다. 그래서 델타가 0.38이나 0.39로 올라갈 수 있습니다.</p>
+    <p>한 번 더 1달러 오르면 처음의 0.35보다 새 델타에 가까운 반응을 보일 수 있습니다. 이게 옵션 가격이 곡선처럼 움직이는 출발점입니다. 오늘은 감마 계산을 깊게 하지 않지만, 델타가 주가 위치에 따라 이동한다는 점은 꼭 잡아야 합니다.</p>
+    <p>델타는 만기와 변동성에도 영향을 받습니다. 같은 행사가 105콜이라도 만기가 7일 남았는지 90일 남았는지에 따라 델타 분포가 다릅니다. 시간이 많이 남아 있으면 외가격 옵션도 내가격으로 들어올 가능성이 남아 있으므로 델타가 완전히 죽지 않을 수 있습니다.</p>
+    <p>변동성도 비슷합니다. IV가 높으면 먼 행사가까지 도달할 가능성이 가격에 더 많이 들어옵니다. 그래서 외가격 옵션의 델타가 낮더라도, 변동성이 커지면 그 델타가 올라갈 수 있습니다. 여기서 현재 주가와 행사가는 그대로 두고, 결과를 흔드는 쪽은 만기 또는 IV입니다.</p>
+    <p>하지만 이번 회차의 초점은 단순합니다. 기초자산 1달러 움직임이 옵션 가격에 얼마나 전달되는가. 델타의 부호가 어느 방향 노출을 뜻하는가. 델타의 크기가 옵션이 주식처럼 움직이는 정도를 어떻게 보여주는가. 이 세 가지만 확실히 잡으면 됩니다.</p>
+    <p>델타를 볼 때는 세 문장을 같이 적으면 좋습니다. "내 델타는 양수인가 음수인가." "1달러 움직임에 옵션 가격은 대략 얼마나 반응하는가." "계약 수를 반영하면 총 델타는 주식 몇 주 정도인가." 이 정도만 해도 옵션 체인을 보는 눈이 달라집니다.</p>
+    <h3>짧은 보충 예시</h3>
+    <p>짧게 말하면 델타는 운전대의 방향 감각입니다. 주식 100주를 들고 있으면 방향 노출이 거의 100주 그대로지만, 델타 0.35 콜 1계약은 대략 35주처럼 움직입니다. 그래서 프리미엄이 작아 보여도 실제 방향 노출은 생각보다 클 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- Figure 8: 델타가 움직이는 미니 애니메이션 -->
+<section class="section-wide reveal" id="figure-08-wrap">
+  <div class="fig" id="figure-08">
+    <div class="fig-label">Figure 08 &mdash; 델타가 움직이는 미니 애니메이션</div>
+    <h2>주가가 움직이면 델타도 함께 바뀝니다</h2>
+    <div class="svg-card">
+      <svg viewBox="0 0 560 280" role="img" aria-label="주가 98~108에서 105콜 델타가 0.26~0.60으로 변하는 곡선">
+        <line class="axis-line" x1="55" y1="30" x2="55" y2="240"/>
+        <line class="axis-line" x1="55" y1="240" x2="530" y2="240"/>
+        <text x="15" y="235">0.22</text>
+        <text x="15" y="175">0.35</text>
+        <text x="15" y="110">0.50</text>
+        <text x="15" y="45">0.62</text>
+        <text x="55" y="258">98</text>
+        <text x="150" y="258">100</text>
+        <text x="293" y="258">103</text>
+        <text x="388" y="258">105</text>
+        <text x="510" y="258">108</text>
+        <path class="data-line" d="M55,219 L102.5,198 L150,172 L197.5,146 L245,119 L292.5,93 L340,72 L387.5,62 L435,46 L482.5,35 L530,30" opacity="0.6"/>
+        <circle id="f8Dot" cx="150" cy="172" r="7" fill="var(--amber)" stroke="var(--bg-card)" stroke-width="2"/>
+        <text id="f8Label" x="150" y="160" text-anchor="middle" font-size="13" font-weight="700" fill="var(--amber)">0.35</text>
+        <text x="460" y="80" font-size="10" fill="var(--violet)" opacity="0.7">&rarr; 감마</text>
+      </svg>
+    </div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">주가</div>
+        <div class="control-value" id="f8Price">$100</div>
+      </div>
+      <input id="f8Slider" type="range" min="98" max="108" value="100" step="1" aria-label="주가">
+      <div class="metric-grid" style="grid-template-columns:1fr 1fr">
+        <div class="metric"><span>105콜 델타</span><strong id="f8Delta">0.35</strong></div>
+        <div class="metric"><span>주가 이동</span><strong id="f8Move">0</strong></div>
+      </div>
+    </div>
+    <div class="fig-caption">다음 1달러는 처음 1달러와 같은 델타로 움직이지 않을 수 있다. 105콜 기준 교육용 곡선.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 04 · misconception + Figure 9 ===== -->
+<section class="section reveal" id="section-04">
+  <div class="section-num">04 &middot; 위험한 오해</div>
+  <h2>델타가 높을수록 좋은 옵션이라는 생각은 위험합니다</h2>
+  <div class="prose">
+    <p>이 대목에서 경계할 착각은 "델타가 높을수록 좋은 옵션"이라는 생각입니다.</p>
+    <p>델타가 높은 콜은 주가 상승에 더 민감합니다. 하지만 그만큼 이미 내가격이거나 프리미엄이 비쌀 가능성이 큽니다. 델타가 낮은 외가격 콜은 싸 보이지만, 주가가 조금 움직여도 옵션 가격 반응이 약할 수 있습니다. 델타는 가격 전달 비율이지 매력 점수가 아닙니다.</p>
+    <p>예를 들어 현재 주가 100달러에서 95콜 가격이 7.50달러, 델타가 0.78이라고 해보겠습니다. 110콜 가격은 1.20달러, 델타가 0.18입니다. 주가가 1달러 오르면 95콜은 대략 0.78달러, 110콜은 0.18달러 오를 수 있습니다. 같은 주가 변화 1달러와 같은 IV, 시간 조건은 그대로 놓고 행사가와 그에 따른 델타 차이를 따로 보면 구조가 더 선명해집니다.</p>
+    <p>95콜은 비싸지만 더 주식처럼 움직입니다. 110콜은 싸지만 주가 상승이 가격에 천천히 전달됩니다. 어느 쪽이 낫다고 바로 말할 수 없습니다. 내 가설이 얼마나 빠른 상승인지, 만기까지 시간이 얼마나 남았는지, IV가 비싼지 싼지, 손실 가능 금액을 얼마로 제한할지에 따라 판단이 달라집니다.</p>
+    <p>또 다른 오해는 "델타 0.30이면 30% 확률"이라고 바로 결론 내리는 습관입니다. 델타는 확률 감각으로 쓰일 때가 있지만, 오늘 회차에서는 변화율과 방향성에 집중합니다. 확률 해석은 금리, 배당, 변동성, 행사가 위치, 모델 가정의 영향을 받습니다. 12회차에서 따로 다루겠습니다.</p>
+    <p>마지막으로 델타는 현재 조건 근처의 숫자입니다. 주가가 크게 갭상승하거나 갭하락하면 델타도 달라지고, IV와 시간가치도 함께 움직입니다. 델타 하나로 옵션 손익 전체를 설명하려고 하면 9회차에서 봤던 실수가 반복됩니다. 방향은 맞았는데 손실이 나는 상황 말입니다.</p>
+  </div>
+</section>
+
+<!-- Figure 9: 델타 오해 교정 패널 -->
+<section class="section-wide reveal" id="figure-09-wrap">
+  <div class="fig" id="figure-09">
+    <div class="fig-label">Figure 09 &mdash; 델타 오해 교정 패널</div>
+    <h2>델타는 가격 전달 비율이지 유리함 점수가 아닙니다</h2>
+    <div class="note-strip" style="margin-bottom:16px"><strong>교육용 델타 감각</strong> &mdash; 아래 숫자는 실제 모델 가격이 아니라 델타 감각 연습용입니다.</div>
+    <div class="two">
+      <div class="mini-card">
+        <div class="mini-k">95콜 &middot; ITM</div>
+        <div class="mini-v">$7.50 <span class="badge badge-good" style="font-size:10px; vertical-align:middle; margin-left:4px">Delta 0.78</span></div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">110콜 &middot; OTM</div>
+        <div class="mini-v">$1.20 <span class="badge badge-neutral" style="font-size:10px; vertical-align:middle; margin-left:4px">Delta 0.18</span></div>
+      </div>
+    </div>
+    <div class="segmented" id="f9Btns" style="margin-top:14px">
+      <button type="button" class="active" data-scenario="quick">빠른 +1달러</button>
+      <button type="button" data-scenario="slow">느린 횡보</button>
+      <button type="button" data-scenario="big">큰 +8달러</button>
+    </div>
+    <div class="scenario-result" id="f9Result">
+      <div class="two">
+        <div class="metric"><span>95콜</span><strong id="f9a" class="pos">$8.28 (+0.78)</strong></div>
+        <div class="metric"><span>110콜</span><strong id="f9b" class="pos">$1.38 (+0.18)</strong></div>
+      </div>
+    </div>
+    <div class="fig-caption">델타는 가격 전달 비율이지 유리함 점수가 아니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 05 · summary ===== -->
+<section class="section reveal" id="section-05">
+  <div class="section-num">05 &middot; 오늘의 정리</div>
+  <h2>델타는 방향과 반응 정도를 함께 보여줍니다</h2>
+  <div class="prose">
+    <p>델타는 기초자산 1달러 변화가 옵션 가격에 대략 얼마나 전달되는지 보여주는 숫자입니다. 콜 델타는 보통 0과 1 사이, 풋 델타는 보통 -1과 0 사이입니다. 부호는 방향을, 크기는 반응 정도를 보여줍니다.</p>
+    <p>같은 콜옵션이라도 내가격은 델타가 1에 가까워지고, 등가격은 0.50 근처, 외가격은 0에 가까워지는 경향이 있습니다. 풋은 음수 부호로 같은 구조를 가집니다. 여기서 숫자는 고정된 진리로 쓰기보다 현재 주가, 행사가, 만기, IV 조건에서 나온 민감도로 읽어야 합니다.</p>
+    <p>옵션 1계약이 주식 100주를 기준으로 한다면, 델타는 주식 환산 노출로도 읽을 수 있습니다. 델타 0.40인 콜 3계약은 대략 주식 120주 방향 노출입니다. 주식 100주에 델타 -0.30 풋 2계약을 더하면 총 델타는 약 +40주로 줄어듭니다.</p>
+    <p>오늘 배운 델타는 다음 회차에서 한 번 더 확장됩니다. 델타는 변화율이면서 헷지 비율이고, 경우에 따라 내가격 종료 확률을 대략 가늠하는 언어로도 쓰입니다. 다만 확률로 쓰기 전에 변화율로 먼저 몸에 익히는 편이 안전합니다.</p>
+    <h3>이번 회차 압축</h3>
+    <ul>
+      <li>델타는 옵션이 주식처럼 움직이는 정도를 보여준다.</li>
+      <li>콜 델타는 보통 양수, 풋 델타는 보통 음수이며 크기는 행사가와 만기에 따라 달라진다.</li>
+      <li>델타가 높다는 말은 안전하다는 뜻이 아니라 방향 노출이 크다는 뜻이다.</li>
+    </ul>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 06 · worksheets + Figure 10 ===== -->
+<section class="section reveal" id="section-06">
+  <div class="section-num">06 &middot; 워크시트</div>
+  <h2>델타로 옵션 가격 변화와 주식 환산 노출을 계산합니다</h2>
+  <div class="prose">
+    <p>현재 주가가 100달러인 주식을 가정합니다. 옵션 1계약은 주식 100주를 기준으로 하고, 금리와 배당은 교육 편의를 위해 무시합니다. 아래 숫자는 실제 추천 종목이나 실제 옵션 가격으로 쓰지 않는, 델타 감각 연습용 값입니다.</p>
+
+    <h3>Worksheet A. 콜 델타로 가격 변화 추정</h3>
+    <p>다음 콜옵션들이 있습니다. IV, 만기, 금리, 배당은 고정하고, 주가만 1달러 오른다고 가정합니다.</p>
+    <ul>
+      <li>95콜: 가격 7.50달러, 델타 0.78</li>
+      <li>100콜: 가격 4.20달러, 델타 0.52</li>
+      <li>110콜: 가격 1.20달러, 델타 0.18</li>
+    </ul>
+    <p>아래 질문으로 점검해보세요.</p>
+    <ol>
+      <li>주가가 1달러 오르면 95콜은 대략 얼마 오릅니까?</li>
+      <li>100콜은 대략 얼마 오릅니까?</li>
+      <li>110콜은 대략 얼마 오릅니까?</li>
+      <li>같은 1달러 상승인데 반응이 다른 이유를 한 문장으로 적어보세요.</li>
+    </ol>
+    <button class="answer-btn" type="button" data-answer="wsA" aria-expanded="false">정답 보기</button>
+    <div class="answers" id="wsA">
+      <p><strong>+0.78달러, +0.52달러, +0.18달러</strong>입니다. IV, 만기, 금리, 배당은 그대로 두고 주가만 1달러 움직였습니다. 행사가 위치가 달라 델타가 다르기 때문에 가격 반응도 다릅니다.</p>
+    </div>
+
+    <h3>Worksheet B. 풋 델타 부호 읽기</h3>
+    <p>다음 풋옵션들이 있습니다. 주가만 1달러 오른다고 가정합니다.</p>
+    <ul>
+      <li>105풋: 델타 -0.72</li>
+      <li>100풋: 델타 -0.49</li>
+      <li>90풋: 델타 -0.16</li>
+    </ul>
+    <p>아래 질문을 계산해보세요.</p>
+    <ol>
+      <li>105풋 가격은 델타 효과만으로 대략 어떻게 변합니까?</li>
+      <li>100풋 가격은 어떻게 변합니까?</li>
+      <li>90풋 가격은 어떻게 변합니까?</li>
+      <li>주가가 1달러 내려가면 부호는 어떻게 해석해야 합니까?</li>
+    </ol>
+    <button class="answer-btn" type="button" data-answer="wsB" aria-expanded="false">정답 보기</button>
+    <div class="answers" id="wsB">
+      <p>주가가 1달러 오르면 각각 약 <strong>-0.72달러, -0.49달러, -0.16달러</strong>입니다. 주가가 1달러 내려가면 풋에는 유리하므로 각각 약 <strong>+0.72달러, +0.49달러, +0.16달러</strong>로 생각할 수 있습니다. 단, 다른 조건은 고정한 교육용 추정입니다.</p>
+    </div>
+
+    <h3>Worksheet C. 총 델타 계산</h3>
+    <p>델타 0.42인 콜옵션 2계약을 매수했고, 주식 30주를 함께 보유하고 있습니다.</p>
+    <ol>
+      <li>콜옵션 2계약의 주식 환산 델타는 몇 주입니까?</li>
+      <li>주식 30주를 더한 총 델타는 몇 주입니까?</li>
+      <li>주가가 1달러 오르면 전체 포지션은 대략 얼마 움직입니까?</li>
+    </ol>
+    <button class="answer-btn" type="button" data-answer="wsC" aria-expanded="false">정답 보기</button>
+    <div class="answers" id="wsC">
+      <p><strong>0.42 &times; 100 &times; 2 = 84주</strong>입니다. 주식 30주를 더하면 총 델타는 약 <strong>114주</strong>입니다. 주가가 1달러 오르면 델타 효과만으로 약 <strong>+114달러</strong> 움직일 수 있습니다.</p>
+    </div>
+
+    <h3>Worksheet D. 보호적 풋 델타 감각</h3>
+    <p>주식 100주를 보유하고 있고, 델타 -0.35인 풋 1계약을 매수했습니다.</p>
+    <ol>
+      <li>풋 1계약의 주식 환산 델타는 몇 주입니까?</li>
+      <li>총 델타는 몇 주입니까?</li>
+      <li>이 포지션은 하락 위험을 완전히 제거한 상태입니까, 일부 줄인 상태입니까?</li>
+    </ol>
+    <button class="answer-btn" type="button" data-answer="wsD" aria-expanded="false">정답 보기</button>
+    <div class="answers" id="wsD">
+      <p>풋 1계약은 <strong>-35주</strong>입니다. 주식 100주와 합치면 총 델타는 <strong>+65주</strong>입니다. 방향 노출을 <strong>일부 줄인 상태</strong>입니다. 풋 가격, 만기, IV, 행사가에 따라 실제 보호력은 달라집니다.</p>
+    </div>
+
+    <h3>Worksheet E. 델타 점검 문장 만들기</h3>
+    <p>아래 문장을 직접 채워보세요.</p>
+    <p>"내가 보는 옵션의 델타는 ________이고, 옵션 1계약 기준 주식 환산 노출은 ________주입니다. 기초자산이 1달러 움직이면 옵션 가격은 다른 조건이 같을 때 약 ________달러 움직일 수 있습니다. 이 계산에서 기준으로 둔 입력은 ________이고, 결과를 흔드는 변수는 ________입니다."</p>
+    <button class="answer-btn" type="button" data-answer="wsE" aria-expanded="false">예시 답안 보기</button>
+    <div class="answers" id="wsE">
+      <p>"델타는 <strong>0.40</strong>이고, 옵션 1계약 기준 주식 환산 노출은 <strong>40주</strong>입니다. 기초자산이 1달러 움직이면 옵션 가격은 다른 조건이 같을 때 약 <strong>0.40달러</strong> 움직일 수 있습니다. 이 숫자에서 <strong>IV, 시간, 금리, 배당</strong>을 기준선으로 두고 <strong>기초자산 가격의 변화</strong>를 확인합니다."</p>
+    </div>
+  </div>
+</section>
+
+<!-- Figure 10: 델타 점검 워크시트 -->
+<section class="section-wide reveal" id="figure-10-wrap">
+  <div class="fig" id="figure-10">
+    <div class="fig-label">Figure 10 &mdash; 델타 점검 워크시트</div>
+    <h2>델타를 문장으로 바꿔봅니다</h2>
+    <div class="note-strip" style="margin-bottom:16px">교육용 연습지이며, 매매 전 기록 양식으로 쓰지 않는다. 외부 저장/전송 없이 localStorage만 사용합니다.</div>
+    <div class="worksheet-grid" id="f10Grid">
+      <div class="worksheet-field"><label>델타</label><input id="f10Delta" type="text" inputmode="decimal" placeholder="예: 0.42"></div>
+      <div class="worksheet-field"><label>계약 수</label><input id="f10Contracts" type="text" inputmode="decimal" placeholder="예: 2"></div>
+      <div class="worksheet-field"><label>승수</label><output>100</output></div>
+      <div class="worksheet-field"><label>주식 보유 (주)</label><input id="f10Shares" type="text" inputmode="decimal" placeholder="예: 30"></div>
+      <div class="worksheet-field"><label>총 델타 (자동)</label><output id="f10Total">&mdash;</output></div>
+      <div class="worksheet-field"><label>고정 변수</label><input id="f10Fixed" type="text" placeholder="예: IV, 시간, 금리, 배당"></div>
+      <div class="worksheet-field" style="grid-column: 1 / -1"><label>변화 변수</label><input id="f10Var" type="text" placeholder="예: 기초자산 가격"></div>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap">
+      <button class="answer-btn" type="button" id="f10Example">예시 채우기</button>
+      <button class="answer-btn" type="button" id="f10Save">저장 (localStorage)</button>
+      <button class="answer-btn" type="button" id="f10Clear">초기화</button>
+    </div>
+    <div class="fig-caption">화면에서 입력 가능, 인쇄 시 빈칸 유지. delta 0.42, contracts 2, multiplier 100, shares 30 &rarr; total 114.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 07 · next-session bridge ===== -->
+<section class="section reveal" id="section-07">
+  <div class="section-num">07 &middot; 다음 회차</div>
+  <h2>다음 회차에서는 델타를 확률과 헷지 언어로 확장합니다</h2>
+  <div class="prose">
+    <p>다음 회차는 델타 2편입니다.</p>
+    <p>오늘은 델타를 방향성과 변화율로 봤습니다. 다음에는 같은 델타가 왜 헷지 비율로 쓰이는지, 그리고 왜 시장에서는 델타를 내가격 종료 확률의 대략적인 감각으로도 이야기하는지 다룹니다.</p>
+    <p>확률 해석은 꽤 유용하지만 조심해서 써야 합니다. 델타 0.30을 보고 "30% 확률이니 열 번 중 세 번만 맞으면 된다"로 넘어가면 기대값과 손익 크기를 놓치기 쉽습니다. 다음 회차에서는 그 함정을 같이 보겠습니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next"><a class="next-card" href="session-12.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">12회차 &mdash; 델타 2편, 확률과 헷지 비율</div><p class="next-desc">델타를 확률 감각과 헷지 비율로 확장합니다.</p></div>
+    <div class="next-arrow">&rarr;</div>
+  </a></section>
+<footer>
+  <div>© 2026 무기견. All rights reserved.</div>
+  <div><a href="../copyright.html">저작권 및 이용 제한</a></div>
+</footer>
+
+<script>
+/* ── Theme ── */
+var THEME_KEY = 'mugigyeon-options-course-theme-v2';
+var root = document.documentElement;
+var themeButtons = [].slice.call(document.querySelectorAll('[data-theme-choice]'));
+function applyTheme(theme) {
+  var next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  themeButtons.forEach(function(b) {
+    var active = b.dataset.themeChoice === next;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (e) { applyTheme('dark'); }
+themeButtons.forEach(function(b) { b.addEventListener('click', function() { applyTheme(b.dataset.themeChoice); }); });
+
+/* ── Progress ── */
+var progressBar = document.querySelector('.progress');
+function updateProgress() {
+  var scrollTop = window.scrollY || document.documentElement.scrollTop;
+  var height = document.documentElement.scrollHeight - window.innerHeight;
+  var pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progressBar) progressBar.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+/* ── Reveal ── */
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+/* ── Figure 1: Stock/Option Opening ── */
+(function() {
+  var slider = document.getElementById('f1Slider');
+  var deltaData = {90:0.08,91:0.10,92:0.12,93:0.14,94:0.16,95:0.18,96:0.22,97:0.26,98:0.30,99:0.33,100:0.35,101:0.39,102:0.43,103:0.47,104:0.50,105:0.52,106:0.55,107:0.58,108:0.60,109:0.65,110:0.72,111:0.78,112:0.82,113:0.85,114:0.87,115:0.88};
+  function optY(s) {
+    var d = deltaData[s] || 0.35;
+    var cumVal = 0;
+    for (var i = 90; i < s; i++) { cumVal += (deltaData[i] || 0.35); }
+    return 205 - cumVal * 7.2;
+  }
+  function stockY(s) { return 210 - (s - 90) * (180 / 25); }
+  function mapX(s) { return 40 + (s - 90) / 25 * 240; }
+  function update() {
+    if (!slider) return;
+    var s = Number(slider.value);
+    var d = deltaData[s] || 0.35;
+    document.getElementById('f1Price').textContent = '$' + s;
+    document.getElementById('f1Delta').textContent = d.toFixed(2);
+    var pos = s < 103 ? 'OTM' : s <= 107 ? 'ATM' : 'ITM';
+    document.getElementById('f1Position').textContent = pos;
+    var x = mapX(s);
+    var stockDot = document.getElementById('f1StockDot');
+    stockDot.setAttribute('cx', x.toFixed(1));
+    stockDot.setAttribute('cy', stockY(s).toFixed(1));
+    var optDot = document.getElementById('f1OptDot');
+    var oy = optY(s);
+    optDot.setAttribute('cx', x.toFixed(1));
+    optDot.setAttribute('cy', oy.toFixed(1));
+    var lbl = document.getElementById('f1DeltaLabel');
+    lbl.setAttribute('x', x.toFixed(1));
+    lbl.setAttribute('y', (oy - 12).toFixed(1));
+    lbl.textContent = d.toFixed(2);
+  }
+  slider && slider.addEventListener('input', update);
+  update();
+})();
+
+/* ── Figure 2: Call Delta Range Bar ── */
+(function() {
+  var marker = document.getElementById('f2Marker');
+  var btns = document.querySelectorAll('#f2Btns button');
+  btns.forEach(function(b) {
+    b.addEventListener('click', function() {
+      btns.forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      var d = parseFloat(b.dataset.delta);
+      marker.style.left = (d * 100) + '%';
+      document.getElementById('f2Strike').textContent = b.dataset.strike + '콜';
+      document.getElementById('f2Delta').textContent = d.toFixed(2);
+    });
+  });
+})();
+
+/* ── Figure 3: Put Delta Range Bar ── */
+(function() {
+  var marker = document.getElementById('f3Marker');
+  var putBtns = document.querySelectorAll('#f3Btns button');
+  var dirBtns = document.querySelectorAll('#f3Dir button');
+  var curDelta = -0.72;
+  var curDir = 1;
+  function refresh() {
+    var pct = (curDelta + 1) * 100;
+    marker.style.left = pct + '%';
+    document.getElementById('f3Delta').textContent = curDelta.toFixed(2);
+    var change = curDelta * curDir;
+    var el = document.getElementById('f3Change');
+    el.textContent = (change >= 0 ? '+' : '') + change.toFixed(2);
+    el.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+  putBtns.forEach(function(b) {
+    b.addEventListener('click', function() {
+      putBtns.forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      curDelta = parseFloat(b.dataset.delta);
+      document.getElementById('f3Put').textContent = b.dataset.put + '풋';
+      refresh();
+    });
+  });
+  dirBtns.forEach(function(b) {
+    b.addEventListener('click', function() {
+      dirBtns.forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      curDir = parseInt(b.dataset.dir);
+      refresh();
+    });
+  });
+  refresh();
+})();
+
+/* ── Figure 4: Delta Price Change Calculator ── */
+(function() {
+  var dSlider = document.getElementById('f4DeltaSlider');
+  var mSlider = document.getElementById('f4MoveSlider');
+  function update() {
+    if (!dSlider || !mSlider) return;
+    var d = Number(dSlider.value) / 100;
+    var m = Number(mSlider.value) / 100;
+    var result = d * m;
+    document.getElementById('f4DeltaVal').textContent = d.toFixed(2);
+    document.getElementById('f4MoveVal').textContent = (m >= 0 ? '+' : '') + m.toFixed(2);
+    var rEl = document.getElementById('f4Result');
+    rEl.textContent = (result >= 0 ? '+$' : '-$') + Math.abs(result).toFixed(2);
+    rEl.style.color = result > 0 ? 'var(--green)' : result < 0 ? 'var(--red)' : 'var(--text)';
+    document.getElementById('f4Formula').innerHTML = '&Delta;Option &asymp; ' + d.toFixed(2) + ' &times; ' + (m >= 0 ? '+' : '') + m.toFixed(2) + ' = <strong>' + (result >= 0 ? '+' : '') + result.toFixed(2) + '</strong>';
+  }
+  dSlider && dSlider.addEventListener('input', update);
+  mSlider && mSlider.addEventListener('input', update);
+  update();
+})();
+
+/* ── Figure 5: 3-Card Comparison ── */
+(function() {
+  var cards = document.querySelectorAll('#f5Cards .click-card');
+  cards.forEach(function(c) {
+    c.addEventListener('click', function() {
+      cards.forEach(function(x) { x.classList.toggle('active', x === c); });
+    });
+  });
+})();
+
+/* ── Figure 6: Share-Equivalent Delta Calculator ── */
+(function() {
+  var cEl = document.getElementById('f6Contracts');
+  var dEl = document.getElementById('f6Delta');
+  var sEl = document.getElementById('f6Shares');
+  var bsBtns = document.querySelectorAll('#f6BuySell button');
+  var isSell = false;
+  function update() {
+    var c = parseFloat(cEl.value) || 0;
+    var d = parseFloat(dEl.value) || 0;
+    var s = parseFloat(sEl.value) || 0;
+    var sign = isSell ? -1 : 1;
+    var optDelta = sign * c * d * 100;
+    var total = optDelta + s;
+    var totalRound = Math.round(total);
+    document.getElementById('f6Total').textContent = (totalRound >= 0 ? '+' : '') + totalRound + '주';
+    document.getElementById('f6Formula').innerHTML = (isSell ? '-' : '') + c + ' &times; ' + d.toFixed(2) + ' &times; 100' + (s ? ' + ' + s : '') + ' = <strong>' + (totalRound >= 0 ? '+' : '') + totalRound + '주</strong>';
+  }
+  bsBtns.forEach(function(b) {
+    b.addEventListener('click', function() {
+      bsBtns.forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      isSell = b.dataset.bs === 'sell';
+      update();
+    });
+  });
+  [cEl, dEl, sEl].forEach(function(el) { el && el.addEventListener('input', update); });
+  update();
+})();
+
+/* ── Figure 7: Protective Put ── */
+(function() {
+  var slider = document.getElementById('f7Slider');
+  function update() {
+    if (!slider) return;
+    var absD = Number(slider.value);
+    var putShares = -absD;
+    var total = 100 + putShares;
+    document.getElementById('f7DeltaVal').textContent = '-0.' + (absD < 10 ? '0' : '') + absD;
+    document.getElementById('f7PutDeltaLabel').textContent = '-0.' + (absD < 10 ? '0' : '') + absD;
+    document.getElementById('f7PutShares').textContent = putShares + '주';
+    document.getElementById('f7PutBar').textContent = putShares;
+    document.getElementById('f7PutBar').style.width = absD + '%';
+    document.getElementById('f7Total').textContent = '+' + total + '주';
+    document.getElementById('f7TotalBar').textContent = '+' + total;
+    document.getElementById('f7TotalBar').style.width = total + '%';
+  }
+  slider && slider.addEventListener('input', update);
+  update();
+})();
+
+/* ── Figure 8: Delta Animation ── */
+(function() {
+  var slider = document.getElementById('f8Slider');
+  var deltaMap = {98:0.26,99:0.30,100:0.35,101:0.39,102:0.43,103:0.47,104:0.50,105:0.52,106:0.55,107:0.58,108:0.60};
+  function mapX(s) { return 55 + (s - 98) / 10 * 475; }
+  function mapY(d) { return 240 - (d - 0.22) / 0.40 * 210; }
+  function update() {
+    if (!slider) return;
+    var s = Number(slider.value);
+    var d = deltaMap[s] || 0.35;
+    document.getElementById('f8Price').textContent = '$' + s;
+    document.getElementById('f8Delta').textContent = d.toFixed(2);
+    document.getElementById('f8Move').textContent = (s >= 100 ? '+' : '') + (s - 100);
+    var dot = document.getElementById('f8Dot');
+    var lbl = document.getElementById('f8Label');
+    dot.setAttribute('cx', mapX(s).toFixed(1));
+    dot.setAttribute('cy', mapY(d).toFixed(1));
+    lbl.setAttribute('x', mapX(s).toFixed(1));
+    lbl.setAttribute('y', (mapY(d) - 12).toFixed(1));
+    lbl.textContent = d.toFixed(2);
+  }
+  slider && slider.addEventListener('input', update);
+  update();
+})();
+
+/* ── Figure 9: Misconception Scenarios ── */
+(function() {
+  var btns = document.querySelectorAll('#f9Btns button');
+  var scenarios = {
+    quick: { a: '$8.28 (+0.78)', b: '$1.38 (+0.18)', ac: 'pos', bc: 'pos' },
+    slow: { a: '$7.10 (-0.40)', b: '$1.05 (-0.15)', ac: 'neg', bc: 'neg' },
+    big: { a: '$14.00 (+6.50)', b: '$4.70 (+3.50)', ac: 'pos', bc: 'pos' }
+  };
+  btns.forEach(function(b) {
+    b.addEventListener('click', function() {
+      btns.forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      var sc = scenarios[b.dataset.scenario];
+      var a = document.getElementById('f9a');
+      var bEl = document.getElementById('f9b');
+      a.textContent = sc.a;
+      a.className = sc.ac;
+      bEl.textContent = sc.b;
+      bEl.className = sc.bc;
+    });
+  });
+})();
+
+/* ── Worksheet answer toggles ── */
+document.querySelectorAll('[data-answer]').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var target = document.getElementById(btn.dataset.answer);
+    if (!target) return;
+    var open = target.classList.toggle('open');
+    btn.classList.toggle('active', open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? '정답 닫기' : (btn.dataset.answer === 'wsE' ? '예시 답안 보기' : '정답 보기');
+  });
+});
+
+/* ── Figure 10: Printable Worksheet ── */
+(function() {
+  var dEl = document.getElementById('f10Delta');
+  var cEl = document.getElementById('f10Contracts');
+  var sEl = document.getElementById('f10Shares');
+  var tEl = document.getElementById('f10Total');
+  var LS_KEY = 'mugigyeon-s11-worksheet';
+  function calc() {
+    var d = parseFloat(dEl.value);
+    var c = parseFloat(cEl.value);
+    var s = parseFloat(sEl.value) || 0;
+    if (!isNaN(d) && !isNaN(c)) {
+      var total = Math.round(d * 100 * c + s);
+      tEl.textContent = total + '주';
+    } else {
+      tEl.textContent = '—';
+    }
+  }
+  [dEl, cEl, sEl].forEach(function(el) { el && el.addEventListener('input', calc); });
+
+  document.getElementById('f10Example').addEventListener('click', function() {
+    dEl.value = '0.42'; cEl.value = '2'; sEl.value = '30';
+    document.getElementById('f10Fixed').value = 'IV, 시간, 금리, 배당';
+    document.getElementById('f10Var').value = '기초자산 가격';
+    calc();
+  });
+  document.getElementById('f10Save').addEventListener('click', function() {
+    try {
+      var data = { delta: dEl.value, contracts: cEl.value, shares: sEl.value, fixed: document.getElementById('f10Fixed').value, variable: document.getElementById('f10Var').value };
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      this.textContent = '저장 완료';
+      var self = this;
+      setTimeout(function() { self.textContent = '저장 (localStorage)'; }, 1500);
+    } catch (e) {}
+  });
+  document.getElementById('f10Clear').addEventListener('click', function() {
+    dEl.value = ''; cEl.value = ''; sEl.value = '';
+    document.getElementById('f10Fixed').value = '';
+    document.getElementById('f10Var').value = '';
+    tEl.textContent = '—';
+    try { localStorage.removeItem(LS_KEY); } catch (e) {}
+  });
+  try {
+    var saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      var data = JSON.parse(saved);
+      if (data.delta) dEl.value = data.delta;
+      if (data.contracts) cEl.value = data.contracts;
+      if (data.shares) sEl.value = data.shares;
+      if (data.fixed) document.getElementById('f10Fixed').value = data.fixed;
+      if (data.variable) document.getElementById('f10Var').value = data.variable;
+      calc();
+    }
+  } catch (e) {}
+})();
+</script>
+  <script src="../assets/auth-config.js?v=privacy-20260619"></script>
+  <script src="../assets/course-visibility.js"></script>
+  <script src="../assets/auth-gate.js?v=privacy-20260619"></script>
+</body>
+</html>

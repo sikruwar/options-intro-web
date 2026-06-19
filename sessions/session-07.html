@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>7회차 — 시간가치, 만기가 길수록 왜 더 비싼가</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d0c;
+      --bg-card: #151715;
+      --bg-card2: #1d211d;
+      --text: #f1eee5;
+      --text-muted: #a49b8b;
+      --text-dim: #746f65;
+      --amber: #f5b14c;
+      --green: #35d07f;
+      --blue: #7dd3fc;
+      --red: #ef4444;
+      --violet: #a78bfa;
+      --border: #2d302a;
+      --border-light: #44483d;
+      --nav-bg: rgba(11,13,12,.91);
+      --hero-glow-warm: rgba(245,177,76,.08);
+      --hero-glow-cool: rgba(125,211,252,.05);
+      --prose-text: #d8d1c3;
+      --cta-text: #11130f;
+      --shadow: 0 18px 60px rgba(0,0,0,.28);
+    }
+
+    :root[data-theme="olive"] {
+      color-scheme: light;
+      --bg: #fafaf2;
+      --bg-card: #fff;
+      --bg-card2: #f1f3e7;
+      --text: #1b2518;
+      --text-muted: #5d684f;
+      --text-dim: #889078;
+      --amber: #7d8f3a;
+      --green: #4f7a35;
+      --blue: #3d7796;
+      --red: #b94a48;
+      --violet: #7561a8;
+      --border: #e3e7d4;
+      --border-light: #d1d9bb;
+      --nav-bg: rgba(250,250,242,.92);
+      --hero-glow-warm: rgba(125,143,58,.12);
+      --hero-glow-cool: rgba(61,119,150,.08);
+      --prose-text: #35402f;
+      --cta-text: #fff;
+      --shadow: 0 18px 60px rgba(82,91,56,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      line-height: 1.82;
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s, color .25s;
+    }
+
+    /* ── PROGRESS ── */
+    .progress {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--amber), var(--green));
+      z-index: 100;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--text-muted);
+      letter-spacing: .08em; text-decoration: none;
+    }
+    .nav-brand span { color: var(--amber); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-prev, .nav-next, .nav-session {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text-dim); text-decoration: none;
+    }
+    .nav-prev:hover, .nav-next:hover { color: var(--amber); }
+    .theme-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: var(--bg-card);
+    }
+    .theme-btn {
+      border: 0; min-width: 44px; min-height: 32px;
+      padding: 6px 10px; border-radius: 999px;
+      background: transparent; color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: .04em; cursor: pointer;
+    }
+    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 94vh; display: flex; align-items: center;
+      padding: 122px 10vw 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: -220px -160px auto auto;
+      width: 760px; height: 760px;
+      background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; left: -120px; bottom: -180px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 26px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 84px);
+      font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px;
+    }
+    .hero h1 .hi { color: var(--blue); }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px); color: var(--text-muted);
+      font-weight: 300; max-width: 740px; line-height: 1.72; margin-bottom: 38px;
+    }
+    .thesis {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--blue);
+      padding: 21px 28px; border-radius: 0 12px 12px 0;
+      box-shadow: var(--shadow); max-width: 760px;
+    }
+    .thesis-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--blue); letter-spacing: .15em; margin-bottom: 9px;
+    }
+    .thesis-main { font-size: 18px; font-weight: 700; line-height: 1.62; }
+
+    /* ── LAYOUT ── */
+    .divider { border: 0; border-top: 1px solid var(--border); }
+    .section { max-width: 810px; margin: 0 auto; padding: 78px 24px; }
+    .section-wide { max-width: 1080px; margin: 0 auto; padding: 78px 24px; }
+    .section-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .15em; margin-bottom: 16px;
+    }
+    .section h2, .section-wide h2 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800; line-height: 1.24; letter-spacing: -.025em; margin-bottom: 28px;
+    }
+    .prose p {
+      font-size: 16px; line-height: 1.86; color: var(--prose-text); margin-bottom: 19px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 700; }
+
+    /* ── FIGURE ── */
+    .fig {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: 16px; padding: 28px; margin: 32px 0;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .fig::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), var(--amber), transparent);
+      opacity: .48;
+    }
+    .fig-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .fig-caption {
+      margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.65;
+    }
+
+    /* ── GRID CARDS ── */
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .mini-card {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .mini-k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .08em; margin-bottom: 10px;
+    }
+    .mini-v { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.35; }
+    .mini-p { font-size: 13px; color: var(--text-muted); line-height: 1.58; margin-top: 8px; }
+
+    /* ── MATURITY BARS ── */
+    .maturity-row {
+      display: grid; grid-template-columns: 88px 1fr 72px;
+      gap: 14px; align-items: center; margin: 15px 0;
+    }
+    .dte {
+      font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-muted);
+    }
+    .bar {
+      height: 38px; border-radius: 999px;
+      background: var(--bg-card2); border: 1px solid var(--border); overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; display: flex; align-items: center; justify-content: center;
+      color: #101208; font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; font-weight: 800;
+      background: linear-gradient(90deg, var(--blue), var(--amber));
+    }
+    .price-tag {
+      font-family: 'JetBrains Mono', monospace; color: var(--text); font-size: 14px;
+    }
+
+    /* ── DTE CALCULATOR ── */
+    .calc { display: grid; grid-template-columns: 1fr 1.16fr; gap: 24px; align-items: center; }
+    .calc-panel {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+    }
+    .slider-head {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+    }
+    .slider-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .08em;
+    }
+    .slider-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px; font-weight: 800; color: var(--amber);
+    }
+    input[type="range"] {
+      width: 100%; height: 5px; border-radius: 999px;
+      background: var(--border-light); outline: none; -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+      box-shadow: 0 0 0 4px rgba(245,177,76,.18);
+    }
+    .calc-results {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px;
+    }
+    .result {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; text-align: center;
+    }
+    .result span {
+      display: block; font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-dim); margin-bottom: 5px;
+    }
+    .result b { font-family: 'JetBrains Mono', monospace; font-size: 22px; color: var(--text); }
+    svg { width: 100%; height: auto; display: block; }
+
+    /* ── HEAT STRIP ── */
+    .heat {
+      display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px;
+    }
+    .heat-cell {
+      height: 54px; border-radius: 6px;
+      background: var(--bg-card2); border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .heat-cell::after {
+      content: ''; position: absolute; inset: auto 0 0;
+      height: var(--h);
+      background: linear-gradient(180deg, var(--amber), var(--red));
+      opacity: .86;
+    }
+    .heat-labels {
+      display: flex; justify-content: space-between; margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim);
+    }
+
+    /* ── MONEYNESS TABS ── */
+    .tab-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tab-btn {
+      min-height: 42px; padding: 8px 16px; border-radius: 999px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; cursor: pointer;
+    }
+    .tab-btn.active {
+      border-color: var(--amber); color: var(--amber);
+      background: rgba(245,177,76,.08);
+    }
+
+    /* ── BALANCE ── */
+    .balance { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: stretch; }
+    .balance-mid {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    }
+
+    /* ── SCENARIO LANE ── */
+    .lane { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .time-lane {
+      height: 9px; border-radius: 999px;
+      background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+      margin: 20px 0; position: relative;
+    }
+    .pin {
+      position: absolute; top: -8px; width: 3px; height: 25px;
+      border-radius: 2px; background: var(--text);
+    }
+    .pin.p1 { left: 18%; }
+    .pin.p2 { left: 52%; }
+    .pin.p3 { left: 86%; }
+
+    /* ── QUIZ ── */
+    .quiz-btn {
+      width: 100%; margin-top: 18px;
+      background: transparent; border: 1px solid var(--border-light);
+      border-radius: 10px; padding: 12px; color: var(--text-muted);
+      font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+    }
+    .quiz-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .answers {
+      display: none; margin-top: 14px;
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+    }
+    .answers.visible { display: block; }
+    .answer-row {
+      display: flex; justify-content: space-between; gap: 12px;
+      border-bottom: 1px solid var(--border); padding: 10px 0;
+      font-size: 14px; color: var(--text-muted);
+    }
+    .answer-row:last-child { border-bottom: 0; }
+    .answer-row b { color: var(--amber); font-family: 'JetBrains Mono', monospace; }
+
+    /* ── NEXT CARD ── */
+    .next-card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 26px 30px; margin-top: 34px;
+      display: flex; justify-content: space-between; gap: 20px;
+      text-decoration: none; color: inherit;
+    }
+    .next-card:hover { border-color: var(--amber); }
+    .next-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-dim); letter-spacing: .12em; margin-bottom: 7px;
+    }
+    .next-title { font-size: 17px; font-weight: 800; }
+    .next-arrow { font-size: 24px; color: var(--amber); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 30px 10vw;
+      display: flex; justify-content: space-between;
+      color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 760px) {
+      nav { padding: 11px 18px; }
+      .nav-session, .nav-prev, .nav-index, .nav-forward { display: none; }
+      .nav-right { gap: 8px; }
+      .hero { padding: 104px 24px 62px; min-height: 88vh; }
+      .section, .section-wide { padding: 58px 20px; }
+      .two, .three, .calc, .balance, .lane { grid-template-columns: 1fr; }
+      .balance-mid { font-size: 18px; }
+      .maturity-row { grid-template-columns: 68px 1fr 52px; gap: 8px; }
+      .fig { padding: 20px; }
+      .theme-btn { min-width: 42px; min-height: 30px; }
+      .heat { grid-template-columns: repeat(15, 1fr); }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  
+    /* Mobile title tuning: keep session hero titles readable on phones. */
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
+  
+    /* Mobile course navigation: keep previous/index/next reachable on phones. */
+    @media (max-width:760px) {
+      nav { display:grid !important; grid-template-columns:1fr auto auto; grid-template-rows:auto auto; row-gap:8px; align-items:center; padding:10px 14px 9px !important; overflow:visible !important; }
+      .nav-brand { grid-column:1 / 2; grid-row:1; max-width:170px !important; min-width:0; }
+      .nav-right { display:contents !important; position:static !important; transform:none !important; }
+      .nav-session { display:none !important; }
+      .theme-toggle { grid-column:3; grid-row:1; justify-self:end; transform:scale(.76) !important; transform-origin:right center; }
+      .nav-prev,.nav-index,.nav-forward { display:inline-flex !important; align-items:center; justify-content:center; min-height:28px; padding:0 10px; border:1px solid var(--border); border-radius:999px; background:var(--bg-card); color:var(--text-muted) !important; font-size:11px !important; line-height:1; white-space:nowrap; }
+      .nav-prev { grid-column:1; grid-row:2; justify-self:start; }
+      .nav-index { grid-column:2; grid-row:2; justify-self:center; }
+      .nav-forward { grid-column:3; grid-row:2; justify-self:end; }
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/readability-overrides.css">
+</head>
+<body>
+
+<div class="progress"></div>
+
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
+  <div class="nav-right">
+    <a href="session-06.html" class="nav-prev">6회차</a>
+    <span class="nav-session">SESSION 07</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-08.html" class="nav-next nav-forward">8회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">무기견의 옵션 입문 · 7회차 · Level 2</div>
+    <h1>시간가치,<br>만기가 길수록<br><span class="hi">왜 더 비싼가</span></h1>
+    <p class="hero-sub">시간은 옵션 매수자에게 기회를 줍니다. 하지만 그 기회는 공짜가 아니라 프리미엄에 이미 반영됩니다.</p>
+    <div class="thesis">
+      <div class="thesis-label">7회차 중심 문장</div>
+      <div class="thesis-main">시간은 기회이자 비용입니다.<br>만기가 길면 가능성이 더 남아 있지만, 그 가능성의 가격도 더 많이 냅니다.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 00 브리지 ── -->
+<section class="section reveal">
+  <div class="section-num">00 · 6회차에서 이어집니다</div>
+  <h2>오늘은 프리미엄 중<br>시간가치만 따로 봅니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 01 — Premium Layer → Time Value</div>
+    <div class="two">
+      <div class="mini-card">
+        <div class="mini-k">SESSION 06</div>
+        <div class="mini-v">프리미엄 =<br>내재가치 + 시간가치</div>
+        <p class="mini-p">옵션 가격을 두 층으로 나눠 읽었습니다.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">SESSION 07</div>
+        <div class="mini-v" style="color:var(--blue)">시간가치는<br>어떻게 줄어드는가</div>
+        <p class="mini-p">만기와 시간가치 감소, 세타의 입구를 봅니다.</p>
+      </div>
+    </div>
+    <div class="fig-caption">시간가치는 만기까지 남아 있는 가능성의 가격입니다. 이번 회차는 그 가능성이 시간이 흐르며 어떻게 변하는지 보는 구간입니다.</div>
+  </div>
+
+  <div class="prose">
+    <p>6회차에서 프리미엄을 내재가치와 시간가치로 나눴습니다. 이번 회차에서는 그중 시간가치를 더 자세히 보겠습니다.</p>
+    <p>시간가치는 만기까지 남아 있는 가능성의 가격입니다. 가능성이 남아 있으려면 시간이 필요합니다. 그래서 같은 행사가, 같은 기초자산이라면 <strong>만기가 긴 옵션이 보통 더 비쌉니다.</strong></p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 01 만기별 가격 ── -->
+<section class="section-wide reveal">
+  <div class="section-num">01 · 만기별 가격</div>
+  <h2>같은 등가격 콜이라도<br>만기가 길면 더 비쌉니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 02 — S=$100, K=$100 등가격 콜 가격 비교</div>
+    <div class="maturity-row">
+      <div class="dte">7D</div>
+      <div class="bar"><div class="bar-fill" style="width:22%">시간가치 $2</div></div>
+      <div class="price-tag">$2</div>
+    </div>
+    <div class="maturity-row">
+      <div class="dte">30D</div>
+      <div class="bar"><div class="bar-fill" style="width:56%">시간가치 $5</div></div>
+      <div class="price-tag">$5</div>
+    </div>
+    <div class="maturity-row">
+      <div class="dte">90D</div>
+      <div class="bar"><div class="bar-fill" style="width:100%">시간가치 $9</div></div>
+      <div class="price-tag">$9</div>
+    </div>
+    <div class="fig-caption">세 옵션은 모두 등가격이라 내재가치가 거의 없습니다. 가격 차이는 대부분 남은 시간에 붙은 가능성의 가격에서 나옵니다.</div>
+  </div>
+
+  <div class="prose">
+    <p>만기가 길다는 말은 권리가 더 오래 살아 있다는 뜻입니다. 주가가 움직일 시간, 이벤트가 발생할 시간, 변동성이 반영될 시간이 더 남아 있습니다. 그래서 긴 만기 옵션은 보통 더 비쌉니다.</p>
+    <p>다만 시간이 길다고 무조건 좋은 거래가 되는 것은 아닙니다. 만기가 길면 기회가 더 많지만, <strong>그 기회에 대한 가격도 더 많이 냅니다.</strong></p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 02 DTE 슬라이더 ── -->
+<section class="section-wide reveal">
+  <div class="section-num">02 · 직접 움직여 보기</div>
+  <h2>시간가치는 만기 가까이에서<br>더 빠르게 줄어드는 경향이 있습니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 03 — DTE Slider: 시간가치 감소 곡선</div>
+    <div class="calc">
+      <div class="calc-panel">
+        <div class="slider-head">
+          <span class="slider-title">남은 만기 DTE</span>
+          <span class="slider-val" id="dteVal">90D</span>
+        </div>
+        <input id="dteSlider" type="range" min="1" max="90" value="90" step="1">
+        <div class="calc-results">
+          <div class="result">
+            <span>예시 시간가치</span>
+            <b id="tvVal" style="color:var(--blue)">$9.00</b>
+          </div>
+          <div class="result">
+            <span>하루 감소액</span>
+            <b id="thetaVal" style="color:var(--red)">−$0.05</b>
+          </div>
+        </div>
+        <p class="mini-p" style="margin-top:16px">예시는 교육용 단순 곡선입니다. 핵심은 만기가 줄수록 시간가치 감소 속도가 일정하지 않을 수 있다는 감각입니다.</p>
+      </div>
+      <svg viewBox="0 0 500 270" aria-label="시간가치 감소 곡선">
+        <line x1="58" y1="222" x2="455" y2="222" stroke="var(--border-light)"/>
+        <line x1="58" y1="222" x2="58" y2="38" stroke="var(--border-light)"/>
+        <path d="M58,42 C140,58 245,92 438,222" fill="none" stroke="var(--blue)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M58,42 C140,58 245,92 438,222" fill="none" stroke="var(--blue)" stroke-width="16" opacity=".08"/>
+        <text x="58" y="248" fill="var(--text-muted)" font-family="JetBrains Mono" font-size="12" text-anchor="middle">90D</text>
+        <text x="438" y="248" fill="var(--text-muted)" font-family="JetBrains Mono" font-size="12" text-anchor="middle">1D</text>
+        <text x="24" y="132" fill="var(--text-dim)" font-family="Noto Sans KR" font-size="12" transform="rotate(-90 24 132)">시간가치</text>
+        <circle id="curveDot" cx="58" cy="42" r="8" fill="var(--amber)"/>
+        <text id="curveLabel" x="72" y="30" fill="var(--amber)" font-family="JetBrains Mono" font-size="14">90D · TV $9.00</text>
+      </svg>
+    </div>
+    <div class="fig-caption">시간가치 감소는 달력처럼 매일 같은 폭으로 줄어든다고 생각하면 안 됩니다. 특히 등가격 옵션은 만기 근처에서 시간의 압력이 커질 수 있습니다.</div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 03 세타 감각 ── -->
+<section class="section-wide reveal">
+  <div class="section-num">03 · 세타 감각</div>
+  <h2>만기 근처에서는 하루가<br>더 무겁게 작용할 수 있습니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 04 — Daily Decay Heat Strip (30일→1일)</div>
+    <div class="heat">
+      <div class="heat-cell" style="--h:8%"></div>
+      <div class="heat-cell" style="--h:8%"></div>
+      <div class="heat-cell" style="--h:8%"></div>
+      <div class="heat-cell" style="--h:8%"></div>
+      <div class="heat-cell" style="--h:8%"></div>
+      <div class="heat-cell" style="--h:8%"></div>
+      <div class="heat-cell" style="--h:8%"></div>
+      <div class="heat-cell" style="--h:8%"></div>
+      <div class="heat-cell" style="--h:9%"></div>
+      <div class="heat-cell" style="--h:11%"></div>
+      <div class="heat-cell" style="--h:12%"></div>
+      <div class="heat-cell" style="--h:14%"></div>
+      <div class="heat-cell" style="--h:16%"></div>
+      <div class="heat-cell" style="--h:17%"></div>
+      <div class="heat-cell" style="--h:19%"></div>
+      <div class="heat-cell" style="--h:21%"></div>
+      <div class="heat-cell" style="--h:23%"></div>
+      <div class="heat-cell" style="--h:24%"></div>
+      <div class="heat-cell" style="--h:26%"></div>
+      <div class="heat-cell" style="--h:28%"></div>
+      <div class="heat-cell" style="--h:30%"></div>
+      <div class="heat-cell" style="--h:32%"></div>
+      <div class="heat-cell" style="--h:34%"></div>
+      <div class="heat-cell" style="--h:36%"></div>
+      <div class="heat-cell" style="--h:38%"></div>
+      <div class="heat-cell" style="--h:41%"></div>
+      <div class="heat-cell" style="--h:43%"></div>
+      <div class="heat-cell" style="--h:45%"></div>
+      <div class="heat-cell" style="--h:47%"></div>
+      <div class="heat-cell" style="--h:49%"></div>
+    </div>
+    <div class="heat-labels">
+      <span>30D</span>
+      <span>14D</span>
+      <span>7D</span>
+      <span>1D</span>
+    </div>
+    <div class="fig-caption">색과 높이가 커질수록 하루 시간가치 감소가 크게 느껴지는 구간입니다. 세타는 이 하루 감소 압력을 읽는 언어입니다.</div>
+  </div>
+
+  <div class="prose">
+    <p><strong>세타</strong>는 시간가치 감소를 하루 단위로 읽는 언어입니다. 지금은 수식보다 감각이 먼저입니다. 아무 일도 일어나지 않으면 옵션 매수자는 시간이 지날수록 시간가치를 잃습니다. 만기가 가까울수록 그 손실 속도가 빨라집니다.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 04 위치별 차이 ── -->
+<section class="section-wide reveal">
+  <div class="section-num">04 · 위치별 차이</div>
+  <h2>시간가치 감소는<br>등가격 근처에서 가장 잘 보입니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 05 — ITM / ATM / OTM 시간가치 감소 비교</div>
+    <div class="tab-row">
+      <button class="tab-btn active" data-m="atm">ATM</button>
+      <button class="tab-btn" data-m="itm">ITM</button>
+      <button class="tab-btn" data-m="otm">OTM</button>
+    </div>
+    <svg viewBox="0 0 500 270" aria-label="moneyness별 시간가치 곡선">
+      <line x1="58" y1="222" x2="455" y2="222" stroke="var(--border-light)"/>
+      <line x1="58" y1="222" x2="58" y2="38" stroke="var(--border-light)"/>
+      <path id="moneynessPath" d="M58,220 C145,212 240,185 438,42" fill="none" stroke="var(--amber)" stroke-width="5" stroke-linecap="round"/>
+      <text x="58" y="248" fill="var(--text-muted)" font-family="JetBrains Mono" font-size="12" text-anchor="middle">만기 멀다</text>
+      <text x="438" y="248" fill="var(--text-muted)" font-family="JetBrains Mono" font-size="12" text-anchor="middle">만기 가깝다</text>
+    </svg>
+    <p id="moneynessText" class="mini-p" style="font-size:14px;margin-top:14px"></p>
+    <div class="fig-caption">깊은 내가격이나 먼 외가격은 시간가치 자체가 작을 수 있습니다. 등가격은 작은 가격 변화로 권리가 살아나거나 사라지는 위치라 시간가치와 세타가 크게 보입니다.</div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 05 양면성 ── -->
+<section class="section reveal">
+  <div class="section-num">05 · 양면성</div>
+  <h2>긴 만기는 기회를 주지만<br>더 비싼 표를 사는 일입니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 06 — Time as Opportunity and Cost</div>
+    <div class="balance">
+      <div class="mini-card">
+        <div class="mini-k">OPPORTUNITY</div>
+        <div class="mini-v" style="color:var(--green)">움직일 시간이 더 많다</div>
+        <p class="mini-p">방향 가설이 천천히 맞아도 권리가 살아 있을 가능성이 높아집니다.</p>
+      </div>
+      <div class="balance-mid">↔</div>
+      <div class="mini-card">
+        <div class="mini-k">COST</div>
+        <div class="mini-v" style="color:var(--amber)">처음 내는 프리미엄이 크다</div>
+        <p class="mini-p">수익을 내려면 더 높은 프리미엄을 넘어서야 합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p>만기가 긴 옵션은 초보자에게 심리적으로 편해 보일 수 있습니다. 시간이 많기 때문입니다. 하지만 그 편안함의 가격이 프리미엄에 들어갑니다. 그래서 만기 선택은 "안전해 보이는가"보다 <strong>"내 가설의 속도와 비용이 맞는가"</strong>로 봐야 합니다.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 06 선택 비교 ── -->
+<section class="section-wide reveal">
+  <div class="section-num">06 · 선택 비교</div>
+  <h2>같은 상승 가설도<br>만기에 따라 다른 거래가 됩니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 짧은 만기 vs 긴 만기 시나리오</div>
+    <div class="lane">
+      <div class="mini-card">
+        <div class="mini-k">SHORT DTE</div>
+        <div class="mini-v">7일 만기 콜 $2</div>
+        <p class="mini-p">싸지만 빨리 움직여야 합니다. 예상이 늦게 맞으면 권리가 먼저 사라질 수 있습니다.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">LONG DTE</div>
+        <div class="mini-v">90일 만기 콜 $9</div>
+        <p class="mini-p">시간은 넉넉하지만 손익분기까지 더 많은 가격 이동이 필요합니다.</p>
+      </div>
+    </div>
+    <div class="time-lane">
+      <i class="pin p1"></i>
+      <i class="pin p2"></i>
+      <i class="pin p3"></i>
+    </div>
+    <div class="fig-caption">방향 가설이 같아도 만기를 어떻게 고르느냐에 따라 필요한 속도와 손익분기점이 달라집니다.</div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 07 매수자와 매도자 ── -->
+<section class="section reveal">
+  <div class="section-num">07 · 매수자와 매도자</div>
+  <h2>시간은 보통 매수자에게 비용,<br>매도자에게 수익원처럼 보입니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 08 — Long Option vs Short Option: 시간의 방향</div>
+    <div class="two">
+      <div class="mini-card">
+        <div class="mini-k">OPTION BUYER</div>
+        <div class="mini-v" style="color:var(--red)">시간이 지나면 불리</div>
+        <p class="mini-p">대체로 숏세타입니다. 움직임이 없으면 시간가치가 줄어듭니다.</p>
+      </div>
+      <div class="mini-card">
+        <div class="mini-k">OPTION SELLER</div>
+        <div class="mini-v" style="color:var(--green)">시간이 지나면 유리</div>
+        <p class="mini-p">대체로 롱세타입니다. 다만 큰 움직임이 나오면 감마 리스크가 커집니다.</p>
+      </div>
+    </div>
+    <div class="fig-caption">세타만 보고 옵션 매도를 편하게 보면 안 됩니다. 시간가치를 받는 대신 큰 움직임에 대한 위험을 떠안을 수 있습니다.</div>
+  </div>
+
+  <div class="prose">
+    <p>반대로 옵션 매도자는 시간이 지나면 대체로 유리해 보입니다. 하지만 이 유리함은 <strong>큰 움직임에 취약한 리스크와 교환</strong>됩니다. 세타만 보고 옵션 매도를 편하게 보면 안 됩니다.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 08 과제 ── -->
+<section class="section reveal">
+  <div class="section-num">08 · 7회차 과제</div>
+  <h2>만기별 가격 차이를<br>시간가치로 설명해보겠습니다</h2>
+
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 7회차 워크시트</div>
+    <div class="mini-card">
+      <div class="mini-k">조건</div>
+      <div class="mini-v">S=$100, K=$100 등가격 콜</div>
+      <p class="mini-p" style="font-size:15px;line-height:2;margin-top:12px">
+        7D 가격 $2 · 30D 가격 $5 · 90D 가격 $9<br><br>
+        1) 세 옵션의 내재가치는 얼마인가요?<br>
+        2) 세 옵션의 가격 차이는 주로 어떤 가치에서 나올까요?<br>
+        3) 만기가 짧은 옵션을 살 때 가장 먼저 점검할 질문은 무엇인가요?
+      </p>
+    </div>
+    <button class="quiz-btn" onclick="toggleAnswers('answers07')">정답 보기</button>
+    <div id="answers07" class="answers">
+      <div class="answer-row">
+        <span>세 옵션의 내재가치</span>
+        <b>$0 (모두 등가격)</b>
+      </div>
+      <div class="answer-row">
+        <span>가격 차이의 주된 원천</span>
+        <b>시간가치</b>
+      </div>
+      <div class="answer-row">
+        <span>만기 짧은 옵션의 질문</span>
+        <b>움직임이 만기 전에 충분히 빠른가?</b>
+      </div>
+    </div>
+  </div>
+
+  <a class="next-card" href="session-08.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">8회차 — 변동성, 옵션 가격을 비싸게 만드는 흔들림의 가격</div><p class="next-desc">다음 회차에서는 시간가치의 또 다른 큰 입력값인 변동성을 보겠습니다. 같은 만기라도 시장이 더 크게 흔들릴 것으로 보면 옵션 가격은 달라집니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+
+<footer>
+  <div>© 2026 무기견. All rights reserved.</div>
+  <div><a href="../copyright.html">저작권 및 이용 제한</a></div>
+</footer>
+
+<script>
+  /* ── THEME ── */
+  const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+
+  function applyTheme(t) {
+    const safe = t === 'olive' ? 'olive' : 'dark';
+    document.documentElement.dataset.theme = safe;
+    document.querySelectorAll('[data-theme-choice]').forEach(b => {
+      const on = b.dataset.themeChoice === safe;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+  document.querySelectorAll('[data-theme-choice]').forEach(b => {
+    b.addEventListener('click', () => {
+      localStorage.setItem(THEME_KEY, b.dataset.themeChoice);
+      applyTheme(b.dataset.themeChoice);
+    });
+  });
+
+  /* ── PROGRESS ── */
+  const progress = document.querySelector('.progress');
+  addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    progress.style.width = (h ? scrollY / h * 100 : 0) + '%';
+  });
+
+  /* ── REVEAL ── */
+  const io = new IntersectionObserver(
+    es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: .12 }
+  );
+  document.querySelectorAll('.reveal').forEach(e => io.observe(e));
+
+  /* ── QUIZ ── */
+  function toggleAnswers(id) {
+    document.getElementById(id).classList.toggle('visible');
+  }
+
+  /* ── DTE SLIDER ── */
+  function tv(days) { return +(9 * Math.sqrt(days / 90)).toFixed(2); }
+
+  const dteSlider = document.getElementById('dteSlider');
+  const dteVal = document.getElementById('dteVal');
+  const tvVal = document.getElementById('tvVal');
+  const thetaVal = document.getElementById('thetaVal');
+  const curveDot = document.getElementById('curveDot');
+  const curveLabel = document.getElementById('curveLabel');
+
+  function updateDte() {
+    const d = +dteSlider.value;
+    const v = tv(d);
+    const prev = tv(Math.max(d - 1, 1));
+    const th = +(v - prev).toFixed(2);
+    dteVal.textContent = d + 'D';
+    tvVal.textContent = '$' + v.toFixed(2);
+    thetaVal.textContent = '−$' + Math.abs(th).toFixed(2);
+    const x = 58 + (90 - d) / 89 * 380;
+    const y = 222 - (v / 9) * 164;
+    curveDot.setAttribute('cx', x);
+    curveDot.setAttribute('cy', y);
+    curveLabel.setAttribute('x', Math.min(330, x + 12));
+    curveLabel.setAttribute('y', Math.max(42, y - 12));
+    curveLabel.textContent = d + 'D · TV $' + v.toFixed(2);
+  }
+
+  dteSlider.addEventListener('input', updateDte);
+  updateDte();
+
+  /* ── MONEYNESS TABS ── */
+  const modes = {
+    atm: {
+      p: 'M58,220 C145,212 240,185 438,42',
+      color: 'var(--amber)',
+      txt: '등가격은 만기 근처에서 시간가치 감소가 가장 뚜렷합니다. 작은 가격 변화만으로 ITM/OTM 경계를 넘기 때문에 세타가 크게 보입니다.'
+    },
+    itm: {
+      p: 'M58,202 C170,190 270,150 438,98',
+      color: 'var(--green)',
+      txt: '깊은 내가격은 내재가치 비중이 커서 시간가치 감소가 상대적으로 완만합니다. 그러나 시간가치 자체도 작습니다.'
+    },
+    otm: {
+      p: 'M58,210 C180,204 285,184 438,128',
+      color: 'var(--blue)',
+      txt: '먼 외가격은 시간가치 자체가 작아 세타도 작게 보일 수 있습니다. 하지만 내가격이 될 가능성이 낮다는 점이 그 이유입니다.'
+    }
+  };
+
+  function setMode(m) {
+    const cfg = modes[m];
+    document.getElementById('moneynessPath').setAttribute('d', cfg.p);
+    document.getElementById('moneynessPath').setAttribute('stroke', cfg.color);
+    document.getElementById('moneynessText').textContent = cfg.txt;
+    document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('active', b.dataset.m === m));
+  }
+
+  document.querySelectorAll('[data-m]').forEach(b => {
+    b.addEventListener('click', () => setMode(b.dataset.m));
+  });
+  setMode('atm');
+</script>
+  <script src="../assets/auth-config.js?v=privacy-20260619"></script>
+  <script src="../assets/course-visibility.js"></script>
+  <script src="../assets/auth-gate.js?v=privacy-20260619"></script>
+</body>
+</html>

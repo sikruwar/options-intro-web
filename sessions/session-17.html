@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>17회차 — 옵션 매수의 본질, 감마를 사며 세타를 지불한다</title>
+  <meta name="description" content="옵션 매수는 제한손실 구조 안에서 감마와 베가 노출을 얻고, 그 대가로 세타 비용과 손익분기점 부담을 받아들이는 포지션입니다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d0c;
+      --bg-card: #151715;
+      --bg-card2: #1d211d;
+      --text: #f1eee5;
+      --text-muted: #a49b8b;
+      --text-dim: #746f65;
+      --amber: #f5b14c;
+      --green: #35d07f;
+      --blue: #7dd3fc;
+      --red: #ef4444;
+      --violet: #a78bfa;
+      --border: #2d302a;
+      --border-light: #44483d;
+      --nav-bg: rgba(11,13,12,.91);
+      --hero-glow-warm: rgba(245,177,76,.08);
+      --hero-glow-cool: rgba(125,211,252,.05);
+      --prose-text: #d8d1c3;
+      --cta-text: #11130f;
+      --shadow: 0 18px 60px rgba(0,0,0,.28);
+    }
+
+    :root[data-theme="olive"] {
+      color-scheme: light;
+      --bg: #fafaf2;
+      --bg-card: #fff;
+      --bg-card2: #f1f3e7;
+      --text: #1b2518;
+      --text-muted: #5d684f;
+      --text-dim: #889078;
+      --amber: #7d8f3a;
+      --green: #4f7a35;
+      --blue: #3d7796;
+      --red: #b94a48;
+      --violet: #7561a8;
+      --border: #e3e7d4;
+      --border-light: #d1d9bb;
+      --nav-bg: rgba(250,250,242,.92);
+      --hero-glow-warm: rgba(125,143,58,.12);
+      --hero-glow-cool: rgba(61,119,150,.08);
+      --prose-text: #35402f;
+      --cta-text: #fff;
+      --shadow: 0 18px 60px rgba(82,91,56,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      line-height: 1.82;
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s, color .25s;
+    }
+
+    /* ── PROGRESS ── */
+    .progress {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--amber), var(--green));
+      z-index: 100;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--text-muted);
+      letter-spacing: .08em; text-decoration: none;
+    }
+    .nav-brand span { color: var(--amber); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-prev, .nav-next, .nav-session {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text-dim); text-decoration: none;
+    }
+    .nav-prev:hover, .nav-next:hover { color: var(--amber); }
+    .theme-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: var(--bg-card);
+    }
+    .theme-btn {
+      border: 0; min-width: 44px; min-height: 32px;
+      padding: 6px 10px; border-radius: 999px;
+      background: transparent; color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: .04em; cursor: pointer;
+    }
+    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 94vh; display: flex; align-items: center;
+      padding: 122px 10vw 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: -220px -160px auto auto;
+      width: 760px; height: 760px;
+      background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; left: -120px; bottom: -180px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 26px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 84px);
+      font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px;
+      word-break: keep-all; overflow-wrap: normal;
+    }
+    .hero h1 .hi { color: var(--amber); }
+    .mobile-break { display: none; }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px); color: var(--text-muted);
+      font-weight: 300; max-width: 740px; line-height: 1.72; margin-bottom: 38px;
+      word-break: keep-all; overflow-wrap: anywhere;
+    }
+    .thesis {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--amber);
+      padding: 21px 28px; border-radius: 0 12px 12px 0;
+      box-shadow: var(--shadow); max-width: 760px;
+    }
+    .thesis-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em; margin-bottom: 9px;
+    }
+    .thesis-main { font-size: 18px; font-weight: 700; line-height: 1.62; word-break: keep-all; overflow-wrap: anywhere; }
+
+    /* ── LAYOUT ── */
+    .divider { border: 0; border-top: 1px solid var(--border); }
+    .section { max-width: 810px; margin: 0 auto; padding: 78px 24px; }
+    .section-wide { max-width: 1080px; margin: 0 auto; padding: 78px 24px; }
+    .section-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .15em; margin-bottom: 16px;
+    }
+    .section h2, .section-wide h2 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800; line-height: 1.24; letter-spacing: 0; margin-bottom: 28px;
+    }
+    .prose p {
+      font-size: 16px; line-height: 1.86; color: var(--prose-text); margin-bottom: 19px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 700; }
+    .prose h3 { font-size: 21px; font-weight: 800; margin: 34px 0 14px; color: var(--text); }
+    .prose ol, .prose ul { margin: 0 0 19px 20px; color: var(--prose-text); line-height: 1.86; }
+    .prose li { margin-bottom: 6px; }
+    .prose code, code { font-family: 'JetBrains Mono', monospace; color: var(--amber); font-size: .92em; }
+
+    /* ── FIGURE ── */
+    .fig {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: 16px; padding: 28px; margin: 32px 0;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .fig::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), var(--amber), transparent);
+      opacity: .48;
+    }
+    .fig-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .fig h2 { font-size: clamp(19px, 2.6vw, 24px); font-weight: 800; line-height: 1.3; margin-bottom: 20px; }
+    .fig-caption {
+      margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.65;
+    }
+
+    /* ── GRID CARDS ── */
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .mini-card {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .mini-k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .08em; margin-bottom: 10px;
+    }
+    .mini-v { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.35; }
+    .mini-p { font-size: 13px; color: var(--text-muted); line-height: 1.58; margin-top: 8px; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+
+    input[type="range"] {
+      width: 100%; height: 5px; border-radius: 999px;
+      background: var(--border-light); outline: none; -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+      box-shadow: 0 0 0 4px rgba(245,177,76,.18);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+    }
+    svg { width: 100%; height: auto; display: block; }
+
+    /* ── NEXT CARD ── */
+    .next-card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 26px 30px; margin-top: 34px;
+      display: flex; justify-content: space-between; gap: 20px;
+      text-decoration: none; color: inherit;
+    }
+    .next-card:hover { border-color: var(--amber); }
+    .next-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-dim); letter-spacing: .12em; margin-bottom: 7px;
+    }
+    .next-title { font-size: 17px; font-weight: 800; }
+    .next-desc { margin-top: 8px; color: var(--text-muted); font-size: 14px; line-height: 1.65; }
+    .next-arrow { font-size: 24px; color: var(--amber); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 30px 10vw;
+      display: flex; justify-content: space-between;
+      color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    .svg-card { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; overflow: hidden; }
+    .svg-card svg { width: 100%; height: auto; display: block; }
+    svg text { font-family: 'JetBrains Mono', monospace; fill: var(--text-muted); font-size: 11px; }
+    .axis-line { stroke: var(--border-light); stroke-width: 1; }
+
+    .controls { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-top: 16px; }
+    .control-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .control-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: .08em; }
+    .control-value { font-family: 'JetBrains Mono', monospace; font-size: 20px; color: var(--amber); font-weight: 800; }
+    .segmented { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .segmented button, .answer-btn { min-height: 44px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-muted); border-radius: 999px; padding: 9px 13px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .segmented button.active, .answer-btn.active { background: var(--amber); border-color: var(--amber); color: var(--cta-text); }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .metric { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .metric span { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 5px; }
+    .metric strong { color: var(--text); font-size: 19px; font-family: 'JetBrains Mono', monospace; }
+
+    .note-strip { margin-top: 14px; border-left: 3px solid var(--amber); padding: 12px 14px; background: linear-gradient(90deg, rgba(245,177,76,.08), transparent); color: var(--text-muted); font-size: 13px; line-height: 1.65; }
+
+    .badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; letter-spacing: .04em; }
+    .badge-good { color: var(--green); border: 1px solid var(--green); background: rgba(53,208,127,.08); }
+    .badge-bad { color: var(--red); border: 1px solid var(--red); background: rgba(239,68,68,.08); }
+    .badge-neutral { color: var(--text-muted); border: 1px solid var(--border-light); }
+
+    /* ── WORKSHEET ── */
+    .worksheet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .worksheet-field { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .worksheet-field label { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 7px; }
+    .worksheet-field input { width: 100%; min-height: 44px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text); padding: 10px 12px; font: inherit; }
+    .answers { display: none; margin-top: 14px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .answers.open { display: block; }
+    .answers p { color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
+    .answers p:last-child { margin-bottom: 0; }
+    .answers strong { color: var(--amber); }
+
+    /* ── CONCEPT BOARD ── */
+    .concept-layer {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 22px; text-align: center;
+      transition: border-color .2s, opacity .2s;
+    }
+    .concept-layer .layer-title {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: var(--amber); letter-spacing: .08em; margin-bottom: 10px; font-weight: 700;
+    }
+    .concept-layer .layer-value {
+      font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 8px;
+    }
+    .concept-layer .layer-desc {
+      font-size: 13px; color: var(--text-muted); line-height: 1.6;
+    }
+
+    /* ── STRIKE BUTTONS ── */
+    .strike-btn {
+      min-height: 44px; min-width: 80px; border: 1px solid var(--border-light);
+      background: var(--bg-card); color: var(--text-muted); border-radius: 999px;
+      padding: 9px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      font-weight: 700; cursor: pointer; transition: all .2s;
+    }
+    .strike-btn.active { background: var(--amber); border-color: var(--amber); color: var(--cta-text); }
+
+    /* ── RISK CARDS ── */
+    .risk-col {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 22px;
+    }
+    .risk-col .risk-title {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      letter-spacing: .08em; margin-bottom: 14px; font-weight: 700;
+    }
+    .risk-col .risk-item {
+      font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 8px;
+    }
+    .risk-col .risk-item:last-child { margin-bottom: 0; }
+
+    /* ── FORMULA DISPLAY ── */
+    .formula-box {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; margin-bottom: 14px;
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      color: var(--text-muted); line-height: 1.8;
+    }
+    .formula-box strong { color: var(--amber); }
+
+    /* ── BAR CHART ── */
+    .bar-wrap { display: flex; align-items: flex-end; gap: 16px; justify-content: center; padding: 20px 0; }
+    .bar-item { text-align: center; }
+    .bar-fill {
+      width: 54px; border-radius: 8px 8px 0 0; margin: 0 auto 8px;
+      transition: height .3s ease, background .3s ease;
+    }
+    .bar-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); }
+    .bar-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+
+    /* ── SIDE-BY-SIDE COMPARISON ── */
+    .compare-bar {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .compare-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); min-width: 90px; }
+    .compare-fill { height: 28px; border-radius: 6px; transition: width .3s ease; display: flex; align-items: center; padding: 0 10px; min-width: 60px; }
+    .compare-fill span { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--cta-text); white-space: nowrap; }
+
+    /* ── STACKED BAR ── */
+    .stacked-bar { display: flex; border-radius: 8px; overflow: hidden; height: 38px; }
+    .stacked-seg { display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; transition: width .3s ease; }
+
+    /* ── CHECKLIST ── */
+    .checklist { display: grid; gap: 10px; margin-top: 4px; }
+    .check-item { display: flex; gap: 12px; align-items: flex-start; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text-muted); font-size: 14px; line-height: 1.6; cursor: pointer; transition: border-color .2s, background .2s; }
+    .check-item input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--amber); flex-shrink: 0; }
+    .check-item.checked { border-color: var(--green); background: rgba(53,208,127,.06); color: var(--text); }
+    .check-count { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--amber); margin-top: 12px; }
+
+    @media (max-width: 760px) {
+      body { overflow-x: hidden; }
+      nav { padding: 11px 16px; width: 100vw; max-width: 100vw; overflow: hidden; }
+      .nav-session, .nav-prev, .nav-index, .nav-forward { display: none; }
+      .nav-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); gap: 0; }
+      .nav-brand { font-size: 12px; max-width: 190px; overflow: hidden; white-space: nowrap; }
+      .theme-toggle { transform: scale(.78); transform-origin: right center; }
+      .theme-btn { min-width: 42px; min-height: 30px; }
+      .hero { padding: 104px 24px 62px; min-height: 88vh; width: 100vw; max-width: 100vw; }
+      .hero-inner { max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .mobile-break { display: block; }
+      .hero h1 { font-size: clamp(34px, 10vw, 44px); line-height: 1.14; word-break: keep-all; overflow-wrap: anywhere; }
+      .hero-sub, .thesis-main, .section h2, .section-wide h2 { word-break: break-all; overflow-wrap: anywhere; }
+      .section h2, .section-wide h2 { font-size: 24px; line-height: 1.28; max-width: 13em; }
+      .thesis { padding: 20px 22px; max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .section, .section-wide { padding: 58px 20px; max-width: 100vw; overflow: hidden; }
+      .fig { padding: 20px; max-width: calc(100vw - 40px); }
+      .two, .three, .four, .metric-grid, .worksheet-grid { grid-template-columns: 1fr; }
+      .next-card { flex-direction: column; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
+    @media print {
+      nav, .progress, .theme-toggle { display: none !important; }
+      body { background: #fff; color: #111; }
+      .hero { min-height: auto; padding: 40px 24px; }
+      .reveal { opacity: 1; transform: none; }
+      .fig, .mini-card, .controls, .metric, .worksheet-field, .concept-layer, .risk-col { box-shadow: none; break-inside: avoid; background: #fff; color: #111; border-color: #bbb; }
+      .answers { display: block !important; }
+    }
+
+    /* Mobile course navigation: keep previous/index/next reachable on phones. */
+    @media (max-width:760px) {
+      nav { display:grid !important; grid-template-columns:1fr auto auto; grid-template-rows:auto auto; row-gap:8px; align-items:center; padding:10px 14px 9px !important; overflow:visible !important; }
+      .nav-brand { grid-column:1 / 2; grid-row:1; max-width:170px !important; min-width:0; }
+      .nav-right { display:contents !important; position:static !important; transform:none !important; }
+      .nav-session { display:none !important; }
+      .theme-toggle { grid-column:3; grid-row:1; justify-self:end; transform:scale(.76) !important; transform-origin:right center; }
+      .nav-prev,.nav-index,.nav-forward { display:inline-flex !important; align-items:center; justify-content:center; min-height:28px; padding:0 10px; border:1px solid var(--border); border-radius:999px; background:var(--bg-card); color:var(--text-muted) !important; font-size:11px !important; line-height:1; white-space:nowrap; }
+      .nav-prev { grid-column:1; grid-row:2; justify-self:start; }
+      .nav-index { grid-column:2; grid-row:2; justify-self:center; }
+      .nav-forward { grid-column:3; grid-row:2; justify-self:end; }
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/readability-overrides.css">
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
+  <div class="nav-right">
+    <a href="session-16.html" class="nav-prev">16회차</a>
+    <span class="nav-session">SESSION 17</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-18.html" class="nav-next nav-forward">18회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 17 · Level 4</div>
+    <h1><span class="hi">옵션 매수의 본질,</span><br class="mobile-break">감마를 사며<br class="mobile-break">세타를 지불한다</h1>
+    <p class="hero-sub">손실이 400달러로 제한된다는데, 방향까지 맞혔는데, 계좌는 왜 자주 줄어들까요? 매수 포지션이 실제로 무엇을 사고 무엇을 내는지 그릭스로 펼쳐 봅니다.</p>
+    <div class="thesis"><div class="thesis-label">17회차 중심 문장</div><div class="thesis-main">옵션 매수는 제한손실 구조 안에서 감마와 베가 노출을 얻고, 그 대가로 세타 비용과 손익분기점 부담을 받아들이는 포지션입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+
+<!-- ===== 00 · bridge from greeks ===== -->
+<section class="section reveal" id="section-00">
+  <div class="section-num">00 · 그릭스를 모아 포지션을 읽기 시작합니다</div>
+  <h2>그릭스를 외우는 구간에서 포지션을 해석하는 구간으로 넘어갑니다</h2>
+  <div class="prose">
+    <p>16회차까지 우리는 그릭스를 하나씩 분해했습니다. 델타는 방향 노출, 감마는 델타가 바뀌는 속도, 세타는 시간 경과 비용, 베가는 내재변동성 민감도, 로는 금리 민감도였습니다.</p>
+    <p>오늘부터는 “옵션을 산다”라는 행동을 그릭스 조합으로 읽습니다. 옵션 매수자는 프리미엄을 냅니다. 그 대가로 손실 한도를 정하고, 큰 움직임에 유리한 곡률을 얻으며, 대체로 시간 경과 비용을 부담합니다. 이 구조를 콜 매수와 풋 매수 모두에 적용해 보겠습니다.</p>
+    <p>먼저 매수 포지션이 보유한 그릭스 부호부터 한눈에 정리하겠습니다. 아래 카드에서 콜과 풋을 바꿔 보면, 두 포지션이 어떤 노출을 공유하고 어디서 갈라지는지 확인할 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- Figure 1: long buy greeks card -->
+<section class="section-wide reveal" id="figure-01-wrap">
+  <div class="fig" id="figure-01">
+    <div class="fig-label">Figure 01 — 옵션 매수 그릭스 카드</div>
+    <h2>매수 포지션이 들고 있는 델타·감마·세타·베가 부호</h2>
+    <div class="segmented" id="f1Toggle" style="justify-content:center">
+      <button class="strike-btn active" type="button" data-f1="call">롱 콜 매수</button>
+      <button class="strike-btn" type="button" data-f1="put">롱 풋 매수</button>
+    </div>
+    <div class="four" style="margin-top:16px">
+      <div class="concept-layer">
+        <div class="layer-title">DELTA</div>
+        <div class="layer-value" id="f1Delta" style="color:var(--green)">+0.50</div>
+        <div class="layer-desc" id="f1DeltaDesc">상승 방향 노출</div>
+      </div>
+      <div class="concept-layer">
+        <div class="layer-title">GAMMA</div>
+        <div class="layer-value" style="color:var(--amber)">+0.06</div>
+        <div class="layer-desc">유리한 쪽으로 델타가 빨라짐</div>
+      </div>
+      <div class="concept-layer">
+        <div class="layer-title">THETA</div>
+        <div class="layer-value" style="color:var(--red)">-0.08</div>
+        <div class="layer-desc">하루치 시간가치 비용</div>
+      </div>
+      <div class="concept-layer">
+        <div class="layer-title">VEGA</div>
+        <div class="layer-value" style="color:var(--blue)">+0.12</div>
+        <div class="layer-desc">IV 상승에 우호적</div>
+      </div>
+    </div>
+    <div class="note-strip" id="f1Note">롱 콜과 롱 풋은 감마·세타·베가 부호를 공유합니다. 양의 감마와 양의 베가를 얻고, 그 대가로 음의 세타를 냅니다. 갈라지는 부분은 델타 방향 하나입니다.</div>
+    <div class="fig-caption">30일 만기 등가격 옵션 기준 예시 수치입니다. (S=100, K=100, IV=30%)</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 01 · today's question ===== -->
+<section class="section reveal" id="section-01">
+  <div class="section-num">01 · 오늘의 질문</div>
+  <h2>손실이 제한되는데도 계좌가 자주 줄어드는 이유를 묻습니다</h2>
+  <div class="prose">
+    <p>매수 포지션을 볼 때 먼저 이 질문을 던지겠습니다.</p>
+    <p><strong>왜 옵션 매수자는 손실이 제한되어 있는데도 계좌에서는 자주 손실을 경험할까요?</strong></p>
+    <p>현재 주가 100달러, 행사가 100달러, 만기 30일 콜옵션을 4.00달러에 매수한다고 가정하겠습니다. 1계약은 주식 100주 기준입니다. 행사가, 만기 시작 시점, 계약 승수를 기준선으로 두고 주가 경로, 남은 시간, 내재변동성의 변화를 살펴봅니다.</p>
+    <p>만기 손익만 보면 손실은 프리미엄 400달러로 제한됩니다. 주가가 104달러를 넘으면 손익분기점을 지나고, 112달러가 되면 만기 손익은 <code>12 - 4 = 8달러</code>, 1계약 기준 800달러입니다. 그림으로 보면 꽤 매력적입니다.</p>
+    <p>그런데 만기 전 가격은 그렇게 단순하지 않습니다. 주가가 100달러에서 102달러로 올라도, 10일이 지나고 IV가 30%에서 24%로 내려가면 옵션 가격은 4.00달러에서 3.10달러로 낮아질 수 있습니다. 방향은 맞았지만 시간과 변동성이 불리하게 움직인 사례입니다.</p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 02 · central sentence ===== -->
+<section class="section reveal" id="section-02">
+  <div class="section-num">02 · 오늘의 중심 문장</div>
+  <h2>옵션 매수는 감마와 베가를 얻고 세타를 지불하는 구조입니다</h2>
+  <div class="prose">
+    <p>오늘의 중심 문장은 이렇습니다.</p>
+    <p><strong>옵션 매수는 제한손실 구조 안에서 감마와 베가 노출을 얻고, 그 대가로 세타 비용과 손익분기점 부담을 받아들이는 포지션입니다.</strong></p>
+    <p>이 한 문장을 콜 매수와 풋 매수의 만기 손익, 감마가 델타를 바꾸는 과정, 세타가 쌓이는 속도, IV가 흔드는 폭, 그리고 이 모든 힘이 합쳐진 손익 분해까지 차례로 풀어 보겠습니다.</p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 03 · limited loss + breakeven ===== -->
+<section class="section reveal" id="section-03">
+  <div class="section-num">03 · 제한손실과 손익분기점</div>
+  <h2>제한손실 뒤에는 손익분기점과 시간 비용이 붙어 있습니다</h2>
+  <div class="prose">
+    <p>옵션 매수의 첫 장점은 손실 한도가 계약 시작 때 보인다는 점입니다. 콜을 4.00달러에 사면 1계약 기준 최대손실은 400달러입니다. 풋을 3.50달러에 사면 1계약 기준 최대손실은 350달러입니다. 프리미엄과 계약 승수로 손실 상한이 보이고, 기초자산이 어디까지 불리하게 움직여도 매수자가 추가 의무를 지지 않는 구조입니다.</p>
+    <p>이 제한손실은 초보자에게 큰 심리적 안정감을 줍니다. 주식 100주를 100달러에 사면 10,000달러 노출이 생기지만, 4달러 콜 1계약은 400달러로 시작합니다. 다만 이 비교는 자본 사용액만 본 것입니다. 옵션은 만기와 손익분기점이라는 조건을 함께 요구합니다.</p>
+    <p>콜 매수의 만기 손익을 먼저 보겠습니다. 현재 주가 100달러, 행사가 100달러, 프리미엄 4.00달러입니다. 만기 주가가 100달러면 옵션은 행사 가치가 없고 손실은 -4.00달러입니다. 만기 주가가 104달러면 내재가치 4.00달러가 프리미엄을 겨우 회수합니다. 손익분기점은 104달러입니다.</p>
+    <p>아래 그래프에서 만기 주가를 움직이며 손익이 어떻게 꺾이는지 직접 확인해 보세요.</p>
+  </div>
+</section>
+
+<!-- Figure 2: call payoff -->
+<section class="section-wide reveal" id="figure-02-wrap">
+  <div class="fig" id="figure-02">
+    <div class="fig-label">Figure 02 — 콜 매수 만기 손익그래프</div>
+    <h2>콜 매수는 104달러를 넘어야 프리미엄을 회수합니다</h2>
+    <div class="svg-card">
+      <svg viewBox="0 0 620 280" role="img" aria-label="콜 매수 만기 손익 그래프">
+        <line class="axis-line" x1="55" y1="155" x2="595" y2="155"></line>
+        <line class="axis-line" x1="55" y1="30" x2="55" y2="250"></line>
+        <path id="f2Curve" d="" fill="none" stroke="var(--amber)" stroke-width="3"></path>
+        <line id="f2BeLine" x1="0" y1="30" x2="0" y2="250" stroke="var(--blue)" stroke-width="1" stroke-dasharray="4 4" opacity=".7"></line>
+        <circle id="f2Dot" cx="0" cy="0" r="6" fill="var(--amber)" stroke="var(--bg-card)" stroke-width="2"></circle>
+        <text id="f2DotText" x="0" y="0" text-anchor="middle" fill="var(--text)" style="font-size:12px;font-weight:700"></text>
+        <text x="540" y="148" style="font-size:10px">손익 0</text>
+        <text id="f2BeLabel" x="0" y="266" text-anchor="middle" style="font-size:10px;fill:var(--blue)">B/E 104</text>
+      </svg>
+    </div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">만기 주가 ($)</div>
+        <div class="control-value" id="f2PriceLabel">112</div>
+      </div>
+      <input id="f2Slider" type="range" min="80" max="130" value="112" step="1" aria-label="만기 주가">
+    </div>
+    <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr; margin-top:14px">
+      <div class="metric"><span>최대손실</span><strong style="color:var(--red)">-$400</strong></div>
+      <div class="metric"><span>손익분기점</span><strong style="color:var(--blue)">$104</strong></div>
+      <div class="metric"><span>1계약 손익</span><strong id="f2Pnl" style="color:var(--green)">+$800</strong></div>
+    </div>
+    <div class="note-strip">고정: 행사가 100, 프리미엄 4.00. 변화: 만기 주가. 만기 손익 = (max(S-100, 0) - 4) &times; 100. 만기 전 가격은 시간·IV가 더해져 달라집니다.</div>
+  </div>
+</section>
+
+<!-- Figure 3: put payoff -->
+<section class="section-wide reveal" id="figure-03-wrap">
+  <div class="fig" id="figure-03">
+    <div class="fig-label">Figure 03 — 풋 매수 만기 손익그래프</div>
+    <h2>풋 매수는 96.50달러 아래로 내려가야 프리미엄을 회수합니다</h2>
+    <div class="svg-card">
+      <svg viewBox="0 0 620 280" role="img" aria-label="풋 매수 만기 손익 그래프">
+        <line class="axis-line" x1="55" y1="155" x2="595" y2="155"></line>
+        <line class="axis-line" x1="55" y1="30" x2="55" y2="250"></line>
+        <path id="f3Curve" d="" fill="none" stroke="var(--blue)" stroke-width="3"></path>
+        <line id="f3BeLine" x1="0" y1="30" x2="0" y2="250" stroke="var(--amber)" stroke-width="1" stroke-dasharray="4 4" opacity=".7"></line>
+        <circle id="f3Dot" cx="0" cy="0" r="6" fill="var(--blue)" stroke="var(--bg-card)" stroke-width="2"></circle>
+        <text id="f3DotText" x="0" y="0" text-anchor="middle" fill="var(--text)" style="font-size:12px;font-weight:700"></text>
+        <text x="540" y="148" style="font-size:10px">손익 0</text>
+        <text id="f3BeLabel" x="0" y="266" text-anchor="middle" style="font-size:10px;fill:var(--amber)">B/E 96.5</text>
+      </svg>
+    </div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">만기 주가 ($)</div>
+        <div class="control-value" id="f3PriceLabel">90</div>
+      </div>
+      <input id="f3Slider" type="range" min="70" max="120" value="90" step="1" aria-label="만기 주가">
+    </div>
+    <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr; margin-top:14px">
+      <div class="metric"><span>최대손실</span><strong style="color:var(--red)">-$350</strong></div>
+      <div class="metric"><span>손익분기점</span><strong style="color:var(--amber)">$96.50</strong></div>
+      <div class="metric"><span>1계약 손익</span><strong id="f3Pnl" style="color:var(--green)">+$650</strong></div>
+    </div>
+    <div class="note-strip">고정: 행사가 100, 프리미엄 3.50. 변화: 만기 주가. 만기 손익 = (max(100-S, 0) - 3.5) &times; 100. 콜과 대칭으로 하락 방향에서 제한손실 구조가 작동합니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 04 · gamma ===== -->
+<section class="section reveal" id="section-04">
+  <div class="section-num">04 · 양의 감마</div>
+  <h2>방향만 맞히는 사람과 충분히 맞히는 사람은 다릅니다</h2>
+  <div class="prose">
+    <p>여기서 학습자가 놓치기 쉬운 지점이 있습니다. 옵션 매수자는 방향만 맞히면 되는 사람이 아닙니다. 콜 매수자는 주가가 올라야 하고, 그 상승이 프리미엄과 시간 경과 비용을 넘을 만큼 충분해야 하며, 가능하면 내재변동성도 불리하게 꺾이지 않아야 합니다.</p>
+    <p>감마를 붙이면 옵션 매수의 성격이 더 분명해집니다. 롱 콜과 롱 풋은 모두 양의 감마를 가집니다. 기초자산이 크게 움직이면 델타가 유리한 방향으로 빠르게 바뀔 수 있습니다. 콜은 상승할수록 델타가 1에 가까워지고, 풋은 하락할수록 델타가 -1에 가까워집니다.</p>
+    <p>숫자로 보겠습니다. 30일 만기 등가격 콜의 델타가 +0.50, 감마가 +0.06이라고 둡니다. 주가가 100달러에서 103달러로 오르면, 다른 조건을 고정한 단순 근사에서 델타는 <code>0.50 + 0.06 × 3 = 0.68</code>로 올라갑니다. 반대로 주가가 97달러로 내려가면 델타는 <code>0.50 - 0.06 × 3 = 0.32</code>로 낮아집니다.</p>
+    <p>같은 3달러 움직임이라도 유리한 쪽과 불리한 쪽의 노출 변화가 다릅니다. 유리한 방향으로 갈수록 노출이 커지고, 불리한 방향으로 갈수록 노출이 줄어듭니다. 이 비선형성이 옵션 매수의 곡률입니다. 아래에서 콜과 풋, 그리고 주가를 바꿔가며 델타가 어떻게 따라붙는지 보겠습니다.</p>
+  </div>
+</section>
+
+<!-- Figure 4: gamma ladder -->
+<section class="section-wide reveal" id="figure-04-wrap">
+  <div class="fig" id="figure-04">
+    <div class="fig-label">Figure 04 — 감마가 델타를 바꾸는 사다리</div>
+    <h2>주가가 움직이면 델타가 다음 발걸음을 바꿉니다</h2>
+    <div class="segmented" id="f4Side" style="justify-content:center">
+      <button class="strike-btn active" type="button" data-f4side="call">콜 매수</button>
+      <button class="strike-btn" type="button" data-f4side="put">풋 매수</button>
+    </div>
+    <div class="segmented" id="f4Price" style="justify-content:center; margin-top:10px">
+      <button class="strike-btn" type="button" data-f4s="97">주가 97</button>
+      <button class="strike-btn active" type="button" data-f4s="100">주가 100</button>
+      <button class="strike-btn" type="button" data-f4s="103">주가 103</button>
+    </div>
+    <div class="two" style="margin-top:16px">
+      <div class="concept-layer">
+        <div class="layer-title">근사 델타</div>
+        <div class="layer-value" id="f4Delta" style="color:var(--amber)">+0.50</div>
+        <div class="layer-desc" id="f4DeltaDesc">기준 델타 ±0.50 · 감마 0.06</div>
+      </div>
+      <div class="concept-layer">
+        <div class="layer-title">노출 변화</div>
+        <div class="layer-value" id="f4Move" style="color:var(--blue)">중립 기준점</div>
+        <div class="layer-desc" id="f4MoveDesc">유리한 방향에서 노출이 커집니다</div>
+      </div>
+    </div>
+    <div class="note-strip" id="f4Note">교육용 선형 근사입니다. 실제 델타와 감마는 매 순간 다시 계산됩니다. 콜은 상승 방향에서, 풋은 하락 방향에서 양의 감마가 매수자 편으로 작동합니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 05 · theta ===== -->
+<section class="section reveal" id="section-05">
+  <div class="section-num">05 · 음의 세타</div>
+  <h2>양의 감마는 공짜가 아니고, 매일 세타로 값을 치릅니다</h2>
+  <div class="prose">
+    <p>이 양의 감마는 공짜가 아닙니다. 옵션 매수자는 대체로 음의 세타를 가집니다. 아무 일도 일어나지 않으면 시간가치가 줄어듭니다. 주가, IV, 금리, 배당을 고정하고 하루만 지난다고 가정하면 콜 가격 4.00달러가 세타 -0.08 때문에 약 3.92달러가 될 수 있습니다.</p>
+    <p>1계약 기준으로는 하루 약 8달러의 시간 비용입니다. 10계약이면 하루 약 80달러입니다. 이 계산은 주가와 IV가 그대로일 때 남은 시간만 줄어드는 상황입니다. 그래서 옵션 매수자는 방향을 맞히는 동안에도 시간이 자기 편인지 계속 물어야 합니다.</p>
+    <p>만기가 가까워질수록 이 압박은 더 커질 수 있습니다. 같은 등가격 콜이 45일 남았을 때 세타가 -0.05, 15일 남았을 때 -0.09, 5일 남았을 때 -0.18이라고 두겠습니다. 짧은 만기 등가격 옵션은 감마가 커지는 대신 세타 비용도 빨라질 수 있습니다.</p>
+    <p>아래 슬라이더로 보유 일수와 계약 수를 바꾸며, 주가와 IV가 그대로일 때 시간이 얼마를 가져가는지 확인해 보세요.</p>
+  </div>
+</section>
+
+<!-- Figure 5: theta decay -->
+<section class="section-wide reveal" id="figure-05-wrap">
+  <div class="fig" id="figure-05">
+    <div class="fig-label">Figure 05 — 세타 비용 슬라이더</div>
+    <h2>주가와 IV가 그대로여도 시간은 매일 값을 빼 갑니다</h2>
+    <div class="formula-box">
+      옵션 가격 = <strong>4.00</strong> + (Theta <strong>-0.08</strong> &times; <span id="f5Days">5</span>일) = <span id="f5NewPrice">3.60</span><br>
+      누적 시간 비용 = Theta &times; 일수 &times; 100 &times; 계약수 = <span id="f5Cost">-$200.00</span>
+    </div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">보유 일수</div>
+        <div class="control-value" id="f5DaysLabel">5일</div>
+      </div>
+      <input id="f5DaysSlider" type="range" min="0" max="10" value="5" step="1" aria-label="보유 일수">
+      <div class="control-head" style="margin-top:14px">
+        <div class="control-title">계약 수</div>
+        <div class="control-value" id="f5ContLabel">5</div>
+      </div>
+      <input id="f5ContSlider" type="range" min="1" max="20" value="5" step="1" aria-label="계약 수">
+    </div>
+    <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr; margin-top:14px">
+      <div class="metric"><span>옵션당 가격</span><strong id="f5Price">$3.60</strong></div>
+      <div class="metric"><span>1계약 비용</span><strong id="f5One" style="color:var(--red)">-$40.00</strong></div>
+      <div class="metric"><span>총 시간 비용</span><strong id="f5Total" style="color:var(--red)">-$200.00</strong></div>
+    </div>
+    <div class="note-strip">고정: 주가, IV, 금리, 배당. 변화: 남은 시간과 계약 수. 단순 세타 근사이며 실제 세타는 만기·주가에 따라 매일 달라집니다.</div>
+  </div>
+</section>
+
+<!-- Figure 6: maturity gamma/theta compression -->
+<section class="section-wide reveal" id="figure-06-wrap">
+  <div class="fig" id="figure-06">
+    <div class="fig-label">Figure 06 — 만기별 감마·세타 압축</div>
+    <h2>만기가 짧아질수록 감마와 세타가 함께 커집니다</h2>
+    <div class="segmented" id="f6Toggle" style="justify-content:center">
+      <button class="strike-btn active" type="button" data-f6m="45">45일</button>
+      <button class="strike-btn" type="button" data-f6m="15">15일</button>
+      <button class="strike-btn" type="button" data-f6m="5">5일</button>
+    </div>
+    <div class="two" style="margin-top:16px">
+      <div>
+        <div class="control-title" style="margin-bottom:8px">감마 (큰 움직임의 도움)</div>
+        <div class="compare-bar"><div class="compare-label">45일</div><div class="compare-fill" id="f6G45" style="width:20%; background:var(--amber)"><span>0.03</span></div></div>
+        <div class="compare-bar"><div class="compare-label">15일</div><div class="compare-fill" id="f6G15" style="width:47%; background:var(--amber)"><span>0.07</span></div></div>
+        <div class="compare-bar"><div class="compare-label">5일</div><div class="compare-fill" id="f6G5" style="width:100%; background:var(--amber)"><span>0.15</span></div></div>
+      </div>
+      <div>
+        <div class="control-title" style="margin-bottom:8px">세타 (하루 시간 비용)</div>
+        <div class="compare-bar"><div class="compare-label">45일</div><div class="compare-fill" id="f6T45" style="width:28%; background:var(--red)"><span>-0.05</span></div></div>
+        <div class="compare-bar"><div class="compare-label">15일</div><div class="compare-fill" id="f6T15" style="width:50%; background:var(--red)"><span>-0.09</span></div></div>
+        <div class="compare-bar"><div class="compare-label">5일</div><div class="compare-fill" id="f6T5" style="width:100%; background:var(--red)"><span>-0.18</span></div></div>
+      </div>
+    </div>
+    <div class="note-strip" id="f6Note">45일 등가격 콜: 감마 0.03, 세타 -0.05. 큰 움직임을 노린다면 짧은 만기의 큰 감마가 매력적이지만, 같은 자리에서 세타도 함께 빨라집니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 06 · vega ===== -->
+<section class="section reveal" id="section-06">
+  <div class="section-num">06 · 양의 베가와 이벤트 위험</div>
+  <h2>베가는 친구가 되기도 하고, 실적 발표 뒤 적이 되기도 합니다</h2>
+  <div class="prose">
+    <p>베가도 옵션 매수자의 친구가 될 수 있습니다. 콜과 풋 단순 매수는 대체로 양의 베가를 가집니다. 30일 등가격 콜 가격 4.00달러, 베가 +0.12라고 하겠습니다. IV가 30%에서 34%로 4%포인트 오르면, 다른 조건을 고정한 단순 근사에서 옵션 가격은 <code>4.00 + 0.12 × 4 = 4.48달러</code>가 됩니다.</p>
+    <p>하지만 IV가 내려가면 같은 민감도가 손실로 작동합니다. 실적 발표 전 콜을 4.00달러에 샀는데 발표 뒤 IV가 30%에서 22%로 8%포인트 하락하고, 베가가 +0.12라면 IV 효과만 <code>-0.96달러</code>입니다. 주가가 조금 올라도 이 하락이 프리미엄을 눌러버릴 수 있습니다. 옵션 매수자가 이벤트 뒤에 자주 당황하는 구간입니다.</p>
+    <p>아래에서 IV를 직접 움직여 보면, 같은 베가가 어느 방향에서는 수익을, 어느 방향에서는 손실을 만드는지 보입니다.</p>
+  </div>
+</section>
+
+<!-- Figure 7: IV impact -->
+<section class="section-wide reveal" id="figure-07-wrap">
+  <div class="fig" id="figure-07">
+    <div class="fig-label">Figure 07 — IV 변화가 매수자에게 주는 영향</div>
+    <h2>IV 한 칸이 주가 없이도 프리미엄을 흔듭니다</h2>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">내재변동성 (IV)</div>
+        <div class="control-value" id="f7IvLabel">30%</div>
+      </div>
+      <input id="f7Slider" type="range" min="20" max="40" value="30" step="1" aria-label="내재변동성">
+    </div>
+    <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr; margin-top:14px">
+      <div class="metric"><span>IV 변화</span><strong id="f7IvChg">0pp</strong></div>
+      <div class="metric"><span>IV 효과</span><strong id="f7Eff" style="color:var(--text-muted)">$0.00</strong></div>
+      <div class="metric"><span>옵션 가격</span><strong id="f7Price" style="color:var(--amber)">$4.00</strong></div>
+    </div>
+    <div class="note-strip" id="f7Note">기준 IV 30%, 콜 4.00달러, 베가 +0.12. 고정: 주가, 만기, 금리, 배당. 변화: IV. 실적처럼 IV가 한 번에 떨어지면, 방향을 맞혀도 베가가 프리미엄을 깎습니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 07 · combined breakdown ===== -->
+<section class="section reveal" id="section-07">
+  <div class="section-num">07 · 세 힘을 합쳐 보기</div>
+  <h2>방향은 맞았는데 수익이 작아지는 장면을 분해합니다</h2>
+  <div class="prose">
+    <p>이제 세 가지 힘을 합쳐 보겠습니다. 콜을 4.00달러에 샀습니다. 하루 뒤 주가가 100달러에서 102달러로 오릅니다. 델타 효과를 +1.00달러로 잡고, 세타 효과를 -0.08달러, IV 하락 효과를 -0.72달러로 둡니다. 단순 합산 가격은 <code>4.00 + 1.00 - 0.08 - 0.72 = 4.20달러</code>입니다. 방향은 맞았지만 수익은 0.20달러, 1계약 기준 20달러에 그칩니다.</p>
+    <p>다른 경로도 보겠습니다. 같은 콜에서 주가가 100달러에서 106달러로 빠르게 오르고, 하루만 지나며, IV가 유지된다고 하겠습니다. 델타와 감마 효과를 합쳐 +3.40달러, 세타 -0.08달러, IV 효과 0으로 두면 옵션 가격은 약 7.32달러가 됩니다. 이때는 감마가 매수자에게 힘을 실어줍니다.</p>
+    <p>제가 옵션 매수를 볼 때 가장 먼저 떠올리는 문장은 “움직임의 크기와 시간 제한을 같이 산다”입니다. 큰 움직임이 빨리 나오면 포지션이 살아납니다. 움직임이 작거나 늦게 나오면 손실 한도 안에서 천천히 말라갈 수 있습니다.</p>
+    <p>아래에서 두 경로를 번갈아 보면, 같은 콜이 어떤 변수 조합에서 살고 어떤 조합에서 마르는지 한눈에 들어옵니다.</p>
+  </div>
+</section>
+
+<!-- Figure 8: pnl breakdown -->
+<section class="section-wide reveal" id="figure-08-wrap">
+  <div class="fig" id="figure-08">
+    <div class="fig-label">Figure 08 — 손익 분해</div>
+    <h2>같은 콜, 다른 경로: 방향·속도·시간·IV가 함께 결정합니다</h2>
+    <div class="segmented" id="f8Toggle" style="justify-content:center">
+      <button class="strike-btn active" type="button" data-f8="slow">완만한 상승 + IV 하락</button>
+      <button class="strike-btn" type="button" data-f8="fast">빠른 상승 + IV 유지</button>
+    </div>
+    <div class="four" style="margin-top:16px">
+      <div class="metric"><span>시작</span><strong>$4.00</strong></div>
+      <div class="metric"><span>방향·감마</span><strong id="f8Dir" style="color:var(--green)">+1.00</strong></div>
+      <div class="metric"><span>세타</span><strong id="f8Theta" style="color:var(--red)">-0.08</strong></div>
+      <div class="metric"><span>IV 효과</span><strong id="f8Iv" style="color:var(--red)">-0.72</strong></div>
+    </div>
+    <div class="stacked-bar" id="f8Bar" style="margin-top:16px"></div>
+    <div class="metric-grid" style="grid-template-columns:1fr 1fr; margin-top:14px">
+      <div class="metric"><span>결과 가격</span><strong id="f8Result" style="color:var(--amber)">$4.20</strong></div>
+      <div class="metric"><span>1계약 손익</span><strong id="f8Pnl" style="color:var(--green)">+$20.00</strong></div>
+    </div>
+    <div class="note-strip" id="f8Note">완만한 상승 경로: 방향은 맞았지만 세타와 IV 하락이 수익을 거의 지워, 1계약 손익은 +20달러에 그칩니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 08 · "limited loss = safe" trap ===== -->
+<section class="section reveal" id="section-08">
+  <div class="section-num">08 · 흔한 오해</div>
+  <h2>손실이 제한되니 안전하다는 생각은 위험합니다</h2>
+  <div class="prose">
+    <p>초보자가 자주 빠지는 함정은 “옵션 매수는 손실이 제한되니 안전하다”는 생각입니다. 손실 한도가 보인다는 점은 분명 장점입니다. 그러나 손실 확률, 손익분기점, 시간 경과, IV 하락, 유동성 비용은 그대로 남아 있습니다. 특히 외가격 옵션은 프리미엄이 작아 보여도 만기 안에 충분한 움직임이 나와야 합니다.</p>
+    <p>예를 들어 100달러 주식의 110콜을 1.00달러에 샀다고 하겠습니다. 만기 손익분기점은 111달러입니다. 주가가 100달러에서 107달러로 7% 올라도, 만기에는 여전히 가치가 없습니다. 방향 판단은 맞았지만 권리의 조건을 충족하지 못한 셈입니다.</p>
+    <p>또 하나의 오해는 멀티배거 사례만 보고 옵션 매수를 이해하는 것입니다. 1달러 옵션이 8달러가 되는 사례는 실제로 생길 수 있습니다. 같은 구조에서 1달러 옵션이 0.10달러가 되는 사례도 훨씬 자주 나올 수 있습니다. 학습자는 수익 배수와 발생 조건을 함께 봐야 합니다.</p>
+    <p>포지션 크기도 별도로 봐야 합니다. 손실이 제한된다고 해서 비중 제한이 사라지는 것은 아닙니다. 400달러 손실 한도의 콜 1계약은 괜찮아 보여도, 20계약이면 최대손실은 8,000달러입니다. 비교의 출발점은 계약당 프리미엄이고, 관찰 대상은 계약 수입니다. 제한손실도 반복되면 계좌 전체 손실이 됩니다.</p>
+  </div>
+</section>
+
+<!-- Figure 9: when buying makes sense -->
+<section class="section-wide reveal" id="figure-09-wrap">
+  <div class="fig" id="figure-09">
+    <div class="fig-label">Figure 09 — 옵션 매수 점검 체크리스트</div>
+    <h2>매수가 맞는 상황과 아닌 상황을 먼저 갈라 둡니다</h2>
+    <div class="two">
+      <div class="risk-col" style="border-color:rgba(53,208,127,.4)">
+        <div class="risk-title" style="color:var(--green)">매수가 어울리는 자리</div>
+        <div class="risk-item">하방을 제한하고 싶은 이벤트 베팅</div>
+        <div class="risk-item">보유 주식을 지키는 포트폴리오 보험</div>
+        <div class="risk-item">짧은 시간 안 큰 변동을 예상하는 포지션</div>
+        <div class="risk-item">제한된 금액으로 방향 노출을 잡는 경우</div>
+      </div>
+      <div class="risk-col" style="border-color:rgba(239,68,68,.4)">
+        <div class="risk-title" style="color:var(--red)">매수가 불리한 자리</div>
+        <div class="risk-item">방향만 막연히 맞다고 보고 시간이 없는 경우</div>
+        <div class="risk-item">이미 IV가 높이 부푼 이벤트 직전 매수</div>
+        <div class="risk-item">손익분기점까지 거리가 너무 먼 외가격</div>
+        <div class="risk-item">손실 제한을 믿고 계약 수를 키운 경우</div>
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <div class="control-title" style="margin-bottom:10px">실행 전 체크 (눌러서 표시)</div>
+      <div class="checklist" id="f9List">
+        <label class="check-item"><input type="checkbox"><span>방향 가설이 손익분기점을 넘을 만큼 충분한가?</span></label>
+        <label class="check-item"><input type="checkbox"><span>그 움직임이 만기 전에 나올 수 있는가?</span></label>
+        <label class="check-item"><input type="checkbox"><span>현재 IV는 내가 사도 될 만큼 합리적인가?</span></label>
+        <label class="check-item"><input type="checkbox"><span>계약 수까지 곱한 최대손실을 받아들일 수 있는가?</span></label>
+      </div>
+      <div class="check-count" id="f9Count">0 / 4 확인</div>
+    </div>
+    <div class="note-strip">네 문장이 모두 “예”가 되기 전에는, 작아 보이는 프리미엄이 매수 결정을 끌고 가게 두지 마세요.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 09 · worksheets ===== -->
+<section class="section reveal" id="section-09">
+  <div class="section-num">09 · 직접 정리하기</div>
+  <h2>매수 포지션의 장점과 비용을 직접 계산합니다</h2>
+  <div class="prose">
+    <p>아래 숫자는 학습용 예시입니다. 실제 옵션 체인, 수수료, 호가 스프레드, 세금, 체결 리스크는 반영하지 않습니다. 먼저 스스로 계산해 본 뒤 답을 펼쳐 확인하세요.</p>
+
+    <h3>Worksheet A. 콜 매수 손익분기점 계산</h3>
+    <p>현재 주가 100달러, 행사가 100달러, 프리미엄 4.00달러 콜을 1계약 매수합니다. 1계약은 주식 100주 기준입니다.</p>
+    <ol>
+      <li>최대손실은 얼마입니까?</li>
+      <li>만기 손익분기점은 얼마입니까?</li>
+      <li>만기 주가가 112달러일 때 1계약 손익은 얼마입니까?</li>
+    </ol>
+    <button class="answer-btn" id="wsABtn" type="button">정답 보기</button>
+    <div class="answers" id="wsAAnswers">
+      <p><strong>최대손실</strong> — 프리미엄 4.00달러 &times; 100 = <strong>400달러</strong>입니다.</p>
+      <p><strong>손익분기점</strong> — 행사가 100 + 프리미엄 4.00 = <strong>104달러</strong>입니다.</p>
+      <p><strong>112달러 손익</strong> — (112 - 100 - 4) &times; 100 = 옵션당 8달러, <strong>1계약 800달러 이익</strong>입니다.</p>
+    </div>
+
+    <h3>Worksheet B. 풋 매수 손익분기점 계산</h3>
+    <p>현재 주가 100달러, 행사가 100달러, 프리미엄 3.50달러 풋을 1계약 매수합니다.</p>
+    <ol>
+      <li>최대손실은 얼마입니까?</li>
+      <li>만기 손익분기점은 얼마입니까?</li>
+      <li>만기 주가가 90달러일 때 1계약 손익은 얼마입니까?</li>
+    </ol>
+    <button class="answer-btn" id="wsBBtn" type="button">정답 보기</button>
+    <div class="answers" id="wsBAnswers">
+      <p><strong>최대손실</strong> — 프리미엄 3.50달러 &times; 100 = <strong>350달러</strong>입니다.</p>
+      <p><strong>손익분기점</strong> — 행사가 100 - 프리미엄 3.50 = <strong>96.50달러</strong>입니다.</p>
+      <p><strong>90달러 손익</strong> — (100 - 90 - 3.5) &times; 100 = 옵션당 6.50달러, <strong>1계약 650달러 이익</strong>입니다.</p>
+    </div>
+
+    <h3>Worksheet C. 감마가 델타를 바꾸는 과정</h3>
+    <p>30일 만기 등가격 콜의 델타가 +0.50, 감마가 +0.06입니다. 다른 조건은 단순화를 위해 고정합니다.</p>
+    <ol>
+      <li>주가가 3달러 오르면 근사 델타는 얼마입니까?</li>
+      <li>주가가 3달러 내리면 근사 델타는 얼마입니까?</li>
+      <li>이 변화가 옵션 매수자에게 어떤 의미인지 한 문단으로 적어보세요.</li>
+    </ol>
+    <button class="answer-btn" id="wsCBtn" type="button">정답 보기</button>
+    <div class="answers" id="wsCAnswers">
+      <p><strong>상승 시</strong> — 0.50 + 0.06 &times; 3 = 약 <strong>+0.68</strong>입니다.</p>
+      <p><strong>하락 시</strong> — 0.50 - 0.06 &times; 3 = 약 <strong>+0.32</strong>입니다.</p>
+      <p><strong>의미</strong> — 유리한 방향으로 움직이면 노출이 커지고, 불리한 방향으로 움직이면 노출이 줄어드는 비선형성이 나타납니다. 큰 움직임이 매수자 편으로 작동하는 곡률입니다.</p>
+    </div>
+
+    <h3>Worksheet D. 세타 비용 계산</h3>
+    <p>콜 가격 4.00달러, 세타 -0.08, 계약 수 5개입니다. 주가와 IV는 고정하고 하루가 지난다고 가정합니다.</p>
+    <ol>
+      <li>옵션당 가격 변화는 얼마입니까?</li>
+      <li>5계약 기준 하루 시간 비용은 얼마입니까?</li>
+      <li>같은 포지션을 5일 들고 있고 다른 조건이 그대로라면 단순 근사 손실은 얼마입니까?</li>
+    </ol>
+    <button class="answer-btn" id="wsDBtn" type="button">정답 보기</button>
+    <div class="answers" id="wsDAnswers">
+      <p><strong>옵션당 변화</strong> — <strong>-0.08달러</strong>입니다.</p>
+      <p><strong>하루 5계약 비용</strong> — 0.08 &times; 100 &times; 5 = 약 <strong>-40달러</strong>입니다.</p>
+      <p><strong>5일 단순 근사</strong> — -40달러 &times; 5 = 약 <strong>-200달러</strong>입니다. 시간만 흘렀다고 본 단순 계산입니다.</p>
+    </div>
+
+    <h3>Worksheet E. 매수 전 체크 문장 만들기</h3>
+    <p>아래 칸을 직접 채워 본 뒤 예시 답안과 비교해 보세요.</p>
+    <div class="worksheet-grid" id="f10Sheet">
+      <div class="worksheet-field"><label>옵션 종류</label><input id="f10Type" type="text" placeholder="콜 / 풋"></div>
+      <div class="worksheet-field"><label>행사가</label><input id="f10Strike" type="text" placeholder="예: 100"></div>
+      <div class="worksheet-field"><label>프리미엄</label><input id="f10Prem" type="text" placeholder="예: 4.00"></div>
+      <div class="worksheet-field"><label>만기</label><input id="f10Exp" type="text" placeholder="예: 30일"></div>
+      <div class="worksheet-field"><label>최대손실</label><input id="f10MaxLoss" type="text" placeholder="프리미엄 × 100 × 계약수"></div>
+      <div class="worksheet-field"><label>손익분기점</label><input id="f10Be" type="text" placeholder="행사가 ± 프리미엄"></div>
+      <div class="worksheet-field"><label>시장 가설 (만기 전 목표가)</label><input id="f10Move" type="text" placeholder="예: 108까지 빠르게"></div>
+      <div class="worksheet-field"><label>가장 조심할 비용</label><input id="f10Cost" type="text" placeholder="예: 세타 / IV 하락"></div>
+    </div>
+    <div class="segmented" style="margin-top:12px">
+      <button class="answer-btn" id="f10Fill" type="button">예시 채우기</button>
+      <button class="answer-btn" id="f10Clear" type="button">비우기</button>
+      <button class="answer-btn" id="wsEBtn" type="button">예시 답안 보기</button>
+    </div>
+    <div class="answers" id="wsEAnswers">
+      <p><strong>예시</strong> — 콜 / 행사가 100 / 프리미엄 4.00 / 만기 30일. 최대손실 400달러, 손익분기점 104달러.</p>
+      <p>시장 가설: 기초자산이 만기 전 108달러까지 빠르게 움직인다. 이 가설이 맞으려면 방향에 더해 속도, 시간, IV 조건이 함께 필요하다. 가장 조심할 비용은 <strong>세타</strong>다.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 10 · summary ===== -->
+<section class="section reveal" id="section-10">
+  <div class="section-num">10 · 이번 회차 압축</div>
+  <h2>옵션 매수는 리스크 한도와 비용이 동시에 보이는 포지션입니다</h2>
+  <div class="prose">
+    <p>옵션 매수자는 프리미엄을 지불하고 권리를 삽니다. 최대손실은 일반적으로 지불한 프리미엄으로 제한되고, 이 구조는 리스크 한도를 계약 시작 때 보여줍니다. 그 대가로 옵션 매수자는 양의 감마와 양의 베가를 얻는 경우가 많습니다. 큰 움직임이 빠르게 나오거나 IV가 올라가면 프리미엄이 유리하게 움직일 수 있습니다.</p>
+    <p>비용은 세타입니다. 주가와 IV가 그대로라면 시간이 지나며 시간가치가 줄어듭니다. 만기가 짧고 등가격에 가까울수록 감마와 세타가 함께 강해질 수 있습니다.</p>
+  </div>
+  <div class="three" style="margin-top:8px">
+    <div class="mini-card"><div class="mini-k">손실 한도</div><div class="mini-v">프리미엄으로 계산</div><div class="mini-p">계약당 프리미엄 &times; 100 &times; 계약 수가 최대손실입니다.</div></div>
+    <div class="mini-card"><div class="mini-k">곡률</div><div class="mini-v pos">양의 감마·베가</div><div class="mini-p">큰 움직임과 IV 상승이 매수자 편으로 작동합니다.</div></div>
+    <div class="mini-card"><div class="mini-k">비용</div><div class="mini-v neg">세타·IV 하락</div><div class="mini-p">방향이 맞아도 시간과 IV 하락이 손익을 깎을 수 있습니다.</div></div>
+  </div>
+  <div class="prose" style="margin-top:24px">
+    <ul>
+      <li>옵션 매수자는 손실 한도를 사지만 세타 비용을 지불합니다.</li>
+      <li>롱 콜과 롱 풋은 대체로 양의 감마와 양의 베가를 갖습니다.</li>
+      <li>손실이 제한되어도 계약 수가 늘면 계좌 손실은 빠르게 커집니다.</li>
+    </ul>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 11 · next ===== -->
+<section class="section reveal" id="section-11">
+  <div class="section-num">11 · 다음 회차로</div>
+  <h2>다음 회차에서는 프리미엄을 받는 옵션 매도를 봅니다</h2>
+  <div class="prose">
+    <p>다음 18회차에서는 옵션 매도를 봅니다. 옵션 매도자는 프리미엄을 먼저 받지만, 그 대가로 음의 감마와 음의 베가를 떠안을 수 있습니다.</p>
+    <p>오늘 배운 매수자의 구조를 뒤집어서 보면 다음 회차가 자연스럽게 이어집니다. 매수자가 시간 비용을 내고 큰 움직임을 기다린다면, 매도자는 시간 수익을 받으며 큰 움직임을 피하려 합니다. 이 둘은 같은 계약의 양쪽입니다.</p>
+  </div>
+  <a class="next-card" href="session-18.html">
+    <div>
+      <div class="next-label">다음 회차</div>
+      <div class="next-title">18회차 — 옵션 매도의 본질, 세타를 받으며 감마 리스크를 진다</div>
+      <p class="next-desc">매수자의 반대편에서, 프리미엄을 먼저 받는 매도 포지션이 무엇을 얻고 무엇을 떠안는지 봅니다.</p>
+    </div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 2026 무기견. All rights reserved.</div>
+  <div><a href="../copyright.html">저작권 및 이용 제한</a></div>
+</footer>
+<script>
+/* ── Theme ── */
+var THEME_KEY = 'mugigyeon-options-course-theme-v2';
+var root = document.documentElement;
+var themeButtons = [].slice.call(document.querySelectorAll('[data-theme-choice]'));
+function applyTheme(theme) {
+  var next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  themeButtons.forEach(function(button) {
+    var active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (e) { applyTheme('dark'); }
+themeButtons.forEach(function(button) { button.addEventListener('click', function() { applyTheme(button.dataset.themeChoice); }); });
+
+/* ── Progress ── */
+var progress = document.querySelector('.progress');
+function updateProgress() {
+  var scrollTop = window.scrollY || document.documentElement.scrollTop;
+  var height = document.documentElement.scrollHeight - window.innerHeight;
+  var pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+/* ── Reveal ── */
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+/* ── Figure 1: long buy greeks card ── */
+(function() {
+  var data = {
+    'call': { delta: '+0.50', color: 'var(--green)', desc: '상승 방향 노출',
+      note: '롱 콜은 양의 델타로 상승 방향에 베팅합니다. 감마·베가는 양, 세타는 음입니다. 큰 상승이 빨리 나오면 감마가, IV 상승이 나오면 베가가 매수자 편으로 작동합니다.' },
+    'put': { delta: '-0.50', color: 'var(--red)', desc: '하락 방향 노출',
+      note: '롱 풋은 음의 델타로 하락 방향에 베팅합니다. 감마·베가는 콜과 같은 양의 부호, 세타도 같은 음의 부호입니다. 갈라지는 부분은 델타 방향 하나입니다.' }
+  };
+  function setF1(k) {
+    var d = data[k];
+    var dEl = document.getElementById('f1Delta');
+    dEl.textContent = d.delta;
+    dEl.style.color = d.color;
+    document.getElementById('f1DeltaDesc').textContent = d.desc;
+    document.getElementById('f1Note').textContent = d.note;
+    document.querySelectorAll('#f1Toggle .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.f1 === k);
+    });
+  }
+  document.querySelectorAll('#f1Toggle .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { setF1(b.dataset.f1); });
+  });
+  setF1('call');
+})();
+
+/* ── Payoff chart helper ── */
+function makePayoff(opt) {
+  // opt: { curveId, dotId, dotTextId, beLineId, beLabelId, sliderId, labelId, pnlId,
+  //        sMin, sMax, premium, strike, isCall, pnlMax }
+  var xL = 55, xR = 595, yMid = 155, yTop = 30, yBot = 250;
+  var pMax = opt.pnlMax; // dollars-per-share scale for vertical axis
+  function sx(s) { return xL + (s - opt.sMin) / (opt.sMax - opt.sMin) * (xR - xL); }
+  function sy(v) {
+    var clamped = Math.max(-pMax, Math.min(pMax, v));
+    return yMid - (clamped / pMax) * (yMid - yTop);
+  }
+  function intrinsic(s) { return opt.isCall ? Math.max(s - opt.strike, 0) : Math.max(opt.strike - s, 0); }
+  function pnl(s) { return intrinsic(s) - opt.premium; }
+  var path = '';
+  for (var s = opt.sMin; s <= opt.sMax; s += 0.5) {
+    path += (s === opt.sMin ? 'M' : 'L') + sx(s).toFixed(1) + ' ' + sy(pnl(s)).toFixed(1);
+  }
+  document.getElementById(opt.curveId).setAttribute('d', path);
+  var be = opt.isCall ? opt.strike + opt.premium : opt.strike - opt.premium;
+  var bx = sx(be);
+  var beLine = document.getElementById(opt.beLineId);
+  beLine.setAttribute('x1', bx.toFixed(1));
+  beLine.setAttribute('x2', bx.toFixed(1));
+  var beLabel = document.getElementById(opt.beLabelId);
+  beLabel.setAttribute('x', bx.toFixed(1));
+  beLabel.textContent = 'B/E ' + be;
+
+  var slider = document.getElementById(opt.sliderId);
+  function render() {
+    var s = Number(slider.value);
+    var v = pnl(s);
+    var total = v * 100;
+    document.getElementById(opt.labelId).textContent = s;
+    var pnlEl = document.getElementById(opt.pnlId);
+    pnlEl.textContent = (total >= 0 ? '+$' : '-$') + Math.abs(total).toFixed(0);
+    pnlEl.style.color = total > 0 ? 'var(--green)' : (total < 0 ? 'var(--red)' : 'var(--text-muted)');
+    var cx = sx(s), cy = sy(v);
+    var dot = document.getElementById(opt.dotId);
+    dot.setAttribute('cx', cx.toFixed(1));
+    dot.setAttribute('cy', cy.toFixed(1));
+    var dt = document.getElementById(opt.dotTextId);
+    dt.setAttribute('x', cx.toFixed(1));
+    dt.setAttribute('y', (cy - 12).toFixed(1));
+    dt.textContent = (v >= 0 ? '+' : '') + v.toFixed(2);
+  }
+  slider.addEventListener('input', render);
+  render();
+}
+
+/* ── Figure 2: call payoff ── */
+makePayoff({ curveId: 'f2Curve', dotId: 'f2Dot', dotTextId: 'f2DotText',
+  beLineId: 'f2BeLine', beLabelId: 'f2BeLabel', sliderId: 'f2Slider',
+  labelId: 'f2PriceLabel', pnlId: 'f2Pnl',
+  sMin: 80, sMax: 130, premium: 4.0, strike: 100, isCall: true, pnlMax: 16 });
+
+/* ── Figure 3: put payoff ── */
+makePayoff({ curveId: 'f3Curve', dotId: 'f3Dot', dotTextId: 'f3DotText',
+  beLineId: 'f3BeLine', beLabelId: 'f3BeLabel', sliderId: 'f3Slider',
+  labelId: 'f3PriceLabel', pnlId: 'f3Pnl',
+  sMin: 70, sMax: 120, premium: 3.5, strike: 100, isCall: false, pnlMax: 16 });
+
+/* ── Figure 4: gamma ladder ── */
+(function() {
+  var side = 'call';
+  var s = 100;
+  var baseDelta = 0.50, gamma = 0.06, strike = 100;
+  function setSide(v) { side = v; render(); }
+  function setS(v) { s = Number(v); render(); }
+  function render() {
+    // Simple linear approximation: call delta = 0.50 + gamma*(s-K), put delta = -0.50 - gamma*(s-K).
+    var delta = side === 'call'
+      ? baseDelta + gamma * (s - strike)
+      : -baseDelta - gamma * (s - strike);
+    var dEl = document.getElementById('f4Delta');
+    dEl.textContent = (delta >= 0 ? '+' : '') + delta.toFixed(2);
+    dEl.style.color = side === 'call' ? 'var(--green)' : 'var(--red)';
+    document.getElementById('f4DeltaDesc').textContent = '기준 델타 ' + (side === 'call' ? '+0.50' : '-0.50') + ' · 감마 0.06 · 주가 ' + s;
+
+    var moveEl = document.getElementById('f4Move');
+    var descEl = document.getElementById('f4MoveDesc');
+    var favorable = (side === 'call' && s > 100) || (side === 'put' && s < 100);
+    var against = (side === 'call' && s < 100) || (side === 'put' && s > 100);
+    if (s === 100) {
+      moveEl.textContent = '중립 기준점';
+      moveEl.style.color = 'var(--blue)';
+      descEl.textContent = '등가격에서 출발한 델타입니다.';
+    } else if (favorable) {
+      moveEl.textContent = '노출 확대';
+      moveEl.style.color = 'var(--green)';
+      descEl.textContent = '유리한 방향으로 움직여 델타가 1에 가까워집니다.';
+    } else {
+      moveEl.textContent = '노출 축소';
+      moveEl.style.color = 'var(--amber)';
+      descEl.textContent = '불리한 방향으로 움직여 델타가 줄고 손실 속도가 완화됩니다.';
+    }
+    document.querySelectorAll('#f4Side .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.f4side === side);
+    });
+    document.querySelectorAll('#f4Price .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', Number(b.dataset.f4s) === s);
+    });
+  }
+  document.querySelectorAll('#f4Side .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { setSide(b.dataset.f4side); });
+  });
+  document.querySelectorAll('#f4Price .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { setS(b.dataset.f4s); });
+  });
+  render();
+})();
+
+/* ── Figure 5: theta decay ── */
+(function() {
+  var price = 4.0, theta = -0.08;
+  var daysSlider = document.getElementById('f5DaysSlider');
+  var contSlider = document.getElementById('f5ContSlider');
+  function render() {
+    var days = Number(daysSlider.value);
+    var cont = Number(contSlider.value);
+    var newPrice = price + theta * days;
+    var oneCost = theta * days * 100;
+    var totalCost = oneCost * cont;
+    document.getElementById('f5Days').textContent = days;
+    document.getElementById('f5NewPrice').textContent = newPrice.toFixed(2);
+    document.getElementById('f5Cost').textContent = (totalCost >= 0 ? '$' : '-$') + Math.abs(totalCost).toFixed(2);
+    document.getElementById('f5DaysLabel').textContent = days + '일';
+    document.getElementById('f5ContLabel').textContent = cont;
+    document.getElementById('f5Price').textContent = '$' + newPrice.toFixed(2);
+    document.getElementById('f5One').textContent = (oneCost >= 0 ? '$' : '-$') + Math.abs(oneCost).toFixed(2);
+    document.getElementById('f5Total').textContent = (totalCost >= 0 ? '$' : '-$') + Math.abs(totalCost).toFixed(2);
+  }
+  daysSlider.addEventListener('input', render);
+  contSlider.addEventListener('input', render);
+  render();
+})();
+
+/* ── Figure 6: maturity gamma/theta compression ── */
+(function() {
+  var data = {
+    '45': { note: '45일 등가격 콜: 감마 0.03, 세타 -0.05. 시간 여유가 있어 세타 압박은 작지만, 같은 주가 움직임에 대한 감마 도움도 작습니다.' },
+    '15': { note: '15일 등가격 콜: 감마 0.07, 세타 -0.09. 감마와 세타가 함께 올라오는 중간 구간입니다.' },
+    '5': { note: '5일 등가격 콜: 감마 0.15, 세타 -0.18. 큰 감마로 빠른 움직임을 노릴 수 있지만, 가만히 있으면 세타도 가장 빠르게 빠집니다.' }
+  };
+  function setF6(m) {
+    document.getElementById('f6Note').textContent = data[m].note;
+    ['45', '15', '5'].forEach(function(k) {
+      var g = document.getElementById('f6G' + k);
+      var t = document.getElementById('f6T' + k);
+      var on = (k === m);
+      g.style.opacity = on ? '1' : '0.4';
+      t.style.opacity = on ? '1' : '0.4';
+    });
+    document.querySelectorAll('#f6Toggle .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.f6m === m);
+    });
+  }
+  document.querySelectorAll('#f6Toggle .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { setF6(b.dataset.f6m); });
+  });
+  setF6('45');
+})();
+
+/* ── Figure 7: IV impact ── */
+(function() {
+  var baseIv = 30, price = 4.0, vega = 0.12;
+  var slider = document.getElementById('f7Slider');
+  function render() {
+    var iv = Number(slider.value);
+    var chg = iv - baseIv;
+    var eff = vega * chg;
+    var newPrice = price + eff;
+    document.getElementById('f7IvLabel').textContent = iv + '%';
+    document.getElementById('f7IvChg').textContent = (chg >= 0 ? '+' : '') + chg + 'pp';
+    var effEl = document.getElementById('f7Eff');
+    effEl.textContent = (eff >= 0 ? '+$' : '-$') + Math.abs(eff).toFixed(2);
+    effEl.style.color = eff > 0 ? 'var(--green)' : (eff < 0 ? 'var(--red)' : 'var(--text-muted)');
+    document.getElementById('f7Price').textContent = '$' + newPrice.toFixed(2);
+    var note = document.getElementById('f7Note');
+    if (chg < 0) {
+      note.textContent = 'IV가 ' + Math.abs(chg) + '%포인트 내려가 옵션 가격이 ' + Math.abs(eff).toFixed(2) + '달러 줄었습니다. 실적 발표 뒤 IV 하락처럼, 방향을 맞혀도 베가가 프리미엄을 깎는 장면입니다.';
+    } else if (chg > 0) {
+      note.textContent = 'IV가 ' + chg + '%포인트 올라 옵션 가격이 ' + eff.toFixed(2) + '달러 늘었습니다. 양의 베가가 매수자 편으로 작동하는 구간입니다.';
+    } else {
+      note.textContent = '기준 IV 30%, 콜 4.00달러, 베가 +0.12. 고정: 주가, 만기, 금리, 배당. 변화: IV. 주가가 가만히 있어도 IV만으로 프리미엄이 흔들립니다.';
+    }
+  }
+  slider.addEventListener('input', render);
+  render();
+})();
+
+/* ── Figure 8: pnl breakdown ── */
+(function() {
+  var scenarios = {
+    'slow': { dir: 1.00, theta: -0.08, iv: -0.72,
+      note: '완만한 상승 경로: 주가는 +2달러 올랐지만 세타와 IV 하락이 수익을 거의 지워, 1계약 손익은 +20달러에 그칩니다.' },
+    'fast': { dir: 3.40, theta: -0.08, iv: 0.00,
+      note: '빠른 상승 경로: 주가가 +6달러 빠르게 오르며 감마가 힘을 보태고 IV는 유지되어, 옵션 가격이 약 7.32달러까지 살아납니다.' }
+  };
+  var start = 4.0;
+  function setF8(k) {
+    var d = scenarios[k];
+    var result = start + d.dir + d.theta + d.iv;
+    var pnl = (result - start) * 100;
+    document.getElementById('f8Dir').textContent = (d.dir >= 0 ? '+' : '') + d.dir.toFixed(2);
+    var thEl = document.getElementById('f8Theta');
+    thEl.textContent = d.theta.toFixed(2);
+    var ivEl = document.getElementById('f8Iv');
+    ivEl.textContent = (d.iv >= 0 ? '+' : '') + d.iv.toFixed(2);
+    ivEl.style.color = d.iv < 0 ? 'var(--red)' : 'var(--text-muted)';
+    document.getElementById('f8Result').textContent = '$' + result.toFixed(2);
+    var pnlEl = document.getElementById('f8Pnl');
+    pnlEl.textContent = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toFixed(2);
+    pnlEl.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('f8Note').textContent = d.note;
+
+    // stacked bar: start, +dir (green), theta (red), iv (red/none)
+    var parts = [
+      { v: start, color: 'var(--blue)', label: '4.00' },
+      { v: Math.abs(d.dir), color: d.dir >= 0 ? 'var(--green)' : 'var(--red)', label: (d.dir >= 0 ? '+' : '') + d.dir.toFixed(2) },
+      { v: Math.abs(d.theta), color: 'var(--red)', label: d.theta.toFixed(2) },
+      { v: Math.abs(d.iv), color: 'var(--red)', label: d.iv.toFixed(2) }
+    ];
+    var total = parts.reduce(function(a, p) { return a + p.v; }, 0) || 1;
+    var bar = document.getElementById('f8Bar');
+    bar.innerHTML = '';
+    parts.forEach(function(p) {
+      if (p.v <= 0) return;
+      var seg = document.createElement('div');
+      seg.className = 'stacked-seg';
+      seg.style.width = (p.v / total * 100) + '%';
+      seg.style.background = p.color;
+      seg.style.color = 'var(--cta-text)';
+      seg.textContent = p.label;
+      bar.appendChild(seg);
+    });
+    document.querySelectorAll('#f8Toggle .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.f8 === k);
+    });
+  }
+  document.querySelectorAll('#f8Toggle .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { setF8(b.dataset.f8); });
+  });
+  setF8('slow');
+})();
+
+/* ── Figure 9: checklist ── */
+(function() {
+  var items = [].slice.call(document.querySelectorAll('#f9List .check-item'));
+  var count = document.getElementById('f9Count');
+  function render() {
+    var n = 0;
+    items.forEach(function(it) {
+      var on = it.querySelector('input').checked;
+      it.classList.toggle('checked', on);
+      if (on) n++;
+    });
+    count.textContent = n + ' / ' + items.length + ' 확인';
+  }
+  items.forEach(function(it) {
+    it.querySelector('input').addEventListener('change', render);
+  });
+  render();
+})();
+
+/* ── Worksheet E: fill/clear ── */
+(function() {
+  var ids = ['f10Type', 'f10Strike', 'f10Prem', 'f10Exp', 'f10MaxLoss', 'f10Be', 'f10Move', 'f10Cost'];
+  var example = ['콜', '100', '4.00', '30일', '$400', '$104', '108까지 빠르게', '세타'];
+  document.getElementById('f10Fill').addEventListener('click', function() {
+    ids.forEach(function(id, i) { document.getElementById(id).value = example[i]; });
+  });
+  document.getElementById('f10Clear').addEventListener('click', function() {
+    ids.forEach(function(id) { document.getElementById(id).value = ''; });
+  });
+})();
+
+/* ── Worksheet answer toggles ── */
+function makeToggle(btnId, answerId) {
+  var btn = document.getElementById(btnId);
+  var ans = document.getElementById(answerId);
+  if (btn && ans) btn.addEventListener('click', function() {
+    var open = ans.classList.toggle('open');
+    btn.classList.toggle('active', open);
+    btn.textContent = open ? btn.textContent.replace('보기', '닫기') : btn.textContent.replace('닫기', '보기');
+  });
+}
+makeToggle('wsABtn', 'wsAAnswers');
+makeToggle('wsBBtn', 'wsBAnswers');
+makeToggle('wsCBtn', 'wsCAnswers');
+makeToggle('wsDBtn', 'wsDAnswers');
+makeToggle('wsEBtn', 'wsEAnswers');
+</script>
+  <script src="../assets/auth-config.js?v=privacy-20260619"></script>
+  <script src="../assets/course-visibility.js"></script>
+  <script src="../assets/auth-gate.js?v=privacy-20260619"></script>
+</body>
+</html>

@@ -24,12 +24,17 @@ window.HOWINSIGHT_AUTH_CONFIG = {
   // 같은 브라우저에서는 localStorage에 통과 상태가 저장되어 다시 입력하지 않아도 됩니다.
   accessCodeGateEnabled: true,
   accessCodes: [
-    'OPTION-OPEN-05'
+    'OPTION-OPEN-05',
+    'OPTION-OPEN-25'
   ],
   accessCodeStorageKey: 'howinsight-options-access-v1',
 
   // 보호 대상 페이지. index.html과 admin.html은 별도 처리합니다.
   protectedPathPattern: /\/(prologue|epilogue)\.html$|\/sessions\/session-\d+\.html$/,
+
+  // 현재 정적 배포본 기준으로 구독자에게 열어둘 마지막 회차입니다.
+  // Supabase 공개 회차 테이블이 오래된 경우에도 이 숫자까지는 목차와 직접 링크에서 열립니다.
+  publishedThroughSession: 25,
 
   // 사이트명/문구
   courseTitle: '무기견의 옵션 입문',

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>22회차 — 보호적 풋, 포트폴리오 보험의 기본형</title>
+  <meta name="description" content="보호적 풋, 포트폴리오 보험의 기본형">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul,.prose ol { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+
+    .viz-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
+    .viz-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:18px; min-width:0; }
+    .viz-panel.accent { background:linear-gradient(135deg,rgba(245,177,76,.11),rgba(125,211,252,.06)),var(--bg-card2); border-color:var(--border-light); }
+    .viz-panel h4 { font-size:15px; line-height:1.42; color:var(--text); margin:0 0 12px; }
+    .viz-copy { color:var(--text-muted); font-size:13px; line-height:1.62; margin:8px 0 0; overflow-wrap:anywhere; }
+    .viz-svg { width:100%; min-height:238px; display:block; overflow:visible; }
+    .viz-axis { stroke:var(--border-light); stroke-width:1; }
+    .viz-gridline { stroke:var(--border); stroke-width:1; opacity:.72; }
+    .viz-line { fill:none; stroke:var(--amber); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .viz-line.blue { stroke:var(--blue); }
+    .viz-line.green { stroke:var(--green); }
+    .viz-line.red { stroke:var(--red); }
+    .viz-area { fill:rgba(245,177,76,.13); }
+    .viz-label { font-family:'JetBrains Mono', monospace; font-size:10px; fill:var(--text-muted); }
+    .viz-number { font-family:'JetBrains Mono', monospace; font-size:13px; fill:var(--text); font-weight:700; }
+    .viz-dot { fill:var(--amber); stroke:var(--bg-card); stroke-width:3; }
+    .viz-dot.blue { fill:var(--blue); }
+    .viz-dot.green { fill:var(--green); }
+    .viz-dot.red { fill:var(--red); }
+    .viz-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .viz-metric { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:13px; min-width:0; }
+    .viz-metric span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:6px; text-transform:uppercase; }
+    .viz-metric strong { display:block; color:var(--text); font-size:17px; line-height:1.3; overflow-wrap:anywhere; }
+    .viz-metric small { display:block; margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+    .viz-range { margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); }
+    .viz-range label { display:flex; align-items:baseline; justify-content:space-between; gap:12px; color:var(--text); font-weight:800; font-size:14px; }
+    .viz-range output { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:18px; }
+    .viz-range input[type="range"] { width:100%; margin-top:12px; accent-color:var(--amber); }
+    .viz-bars { display:grid; gap:10px; margin-top:12px; }
+    .viz-bar { display:grid; grid-template-columns:128px 1fr 62px; gap:10px; align-items:center; }
+    .viz-bar span { color:var(--text-muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+    .viz-bar b { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text); text-align:right; }
+    .viz-track { height:14px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; }
+    .viz-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--amber)); }
+    .viz-fill.good { background:linear-gradient(90deg,var(--green),var(--blue)); }
+    .viz-fill.bad { background:linear-gradient(90deg,var(--amber),var(--red)); }
+    .viz-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; margin-top:14px; }
+    .viz-step { border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); padding:14px; min-height:116px; position:relative; }
+    .viz-step::after { content:'→'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--amber); font-family:'JetBrains Mono', monospace; }
+    .viz-step:last-child::after { content:''; }
+    .viz-step span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+    .viz-step strong { display:block; color:var(--text); font-size:15px; line-height:1.4; }
+    .viz-step p { margin:8px 0 0; color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .viz-timeline { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .viz-time { border:1px solid var(--border); background:var(--bg-card2); border-radius:12px; padding:14px; min-height:120px; }
+    .viz-time span { display:block; font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:11px; margin-bottom:8px; }
+    .viz-time strong { color:var(--text); font-size:15px; line-height:1.35; }
+    .viz-time p { color:var(--text-muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .viz-matrix { width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--border); font-size:13px; }
+    .viz-matrix th,.viz-matrix td { border-bottom:1px solid var(--border); padding:12px; text-align:left; color:var(--text-muted); vertical-align:top; }
+    .viz-matrix th { background:var(--bg-card2); color:var(--text); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .viz-matrix tr:last-child td { border-bottom:0; }
+    .viz-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .viz-check { display:flex; gap:10px; align-items:flex-start; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-muted); font-size:13px; line-height:1.45; }
+    .viz-check input { margin-top:3px; accent-color:var(--amber); }
+    .viz-toggle { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .viz-toggle button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 12px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .viz-toggle button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .viz-note { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
+    .viz-pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .viz-pill { border:1px solid var(--border-light); border-radius:999px; padding:6px 10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
+    @media (max-width:760px) { .viz-grid,.viz-flow,.viz-timeline,.viz-checklist { grid-template-columns:1fr; } .viz-metrics { grid-template-columns:1fr; } .viz-step::after { display:none; } .viz-bar { grid-template-columns:1fr; } .viz-bar b { text-align:left; } .viz-svg { min-height:200px; } }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+
+    /* Mobile title tuning: keep session hero titles readable on phones. */
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
+
+    /* Mobile course navigation: keep previous/index/next reachable on phones. */
+    @media (max-width:760px) {
+      nav { display:grid !important; grid-template-columns:1fr auto auto; grid-template-rows:auto auto; row-gap:8px; align-items:center; padding:10px 14px 9px !important; overflow:visible !important; }
+      .nav-brand { grid-column:1 / 2; grid-row:1; max-width:170px !important; min-width:0; }
+      .nav-right { display:contents !important; position:static !important; transform:none !important; }
+      .nav-session { display:none !important; }
+      .theme-toggle { grid-column:3; grid-row:1; justify-self:end; transform:scale(.76) !important; transform-origin:right center; }
+      .nav-prev,.nav-index,.nav-forward { display:inline-flex !important; align-items:center; justify-content:center; min-height:28px; padding:0 10px; border:1px solid var(--border); border-radius:999px; background:var(--bg-card); color:var(--text-muted) !important; font-size:11px !important; line-height:1; white-space:nowrap; }
+      .nav-prev { grid-column:1; grid-row:2; justify-self:start; }
+      .nav-index { grid-column:2; grid-row:2; justify-self:center; }
+      .nav-forward { grid-column:3; grid-row:2; justify-self:end; }
+    }
+  </style>
+  <style>
+    /* Session 22 protective-put figure components */
+    .cc-legs { display:grid; grid-template-columns:1fr 38px 1fr 38px 1fr; gap:10px; align-items:stretch; }
+    .cc-leg { background:var(--bg-card2); border:1px solid var(--border-light); border-radius:14px; padding:18px; min-width:0; }
+    .cc-leg.long { border-color:rgba(125,211,252,.42); }
+    .cc-leg.short { border-color:rgba(245,177,76,.42); }
+    .cc-leg.result { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border-color:var(--border-light); }
+    .cc-leg .cc-tag { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+    .cc-leg.long .cc-tag { color:var(--blue); }
+    .cc-leg.short .cc-tag { color:var(--amber); }
+    .cc-leg.result .cc-tag { color:var(--green); }
+    .cc-leg .cc-leg-main { font-size:18px; font-weight:800; color:var(--text); line-height:1.32; }
+    .cc-leg .cc-leg-sub { margin-top:8px; color:var(--text-muted); font-size:13px; line-height:1.55; }
+    .cc-op { display:grid; place-items:center; font-family:'JetBrains Mono', monospace; font-size:26px; color:var(--amber); }
+    @media (max-width:760px) { .cc-legs { grid-template-columns:1fr; } .cc-op { min-height:30px; } }
+
+    .cc-flowstrip { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:14px 0; }
+    .cc-flowstrip .pill { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:9px 13px; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text); }
+    .cc-flowstrip .pill b { color:var(--amber); }
+    .cc-flowstrip .op { color:var(--text-dim); font-family:'JetBrains Mono', monospace; }
+    .cc-flowstrip .pill.res { border-color:rgba(53,208,127,.4); }
+    .cc-flowstrip .pill.res b { color:var(--green); }
+
+    .cc-readout { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .cc-readout .cc-ro { border:1px solid var(--border); border-radius:12px; padding:14px; background:var(--bg-card2); }
+    .cc-readout .cc-ro span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+    .cc-readout .cc-ro strong { font-size:19px; color:var(--text); }
+    .cc-readout .cc-ro.blue strong { color:var(--blue); }
+    .cc-readout .cc-ro.amber strong { color:var(--amber); }
+    .cc-readout .cc-ro.pos strong { color:var(--green); }
+    .cc-readout .cc-ro.neg strong { color:var(--red); }
+    @media (max-width:760px) { .cc-readout { grid-template-columns:1fr; } }
+
+    .cc-quickbtns { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .cc-quickbtns button { min-height:40px; min-width:54px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:8px 14px; font-family:'JetBrains Mono', monospace; font-size:12px; cursor:pointer; }
+    .cc-quickbtns button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+
+    .cc-scenboard { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; margin-top:6px; }
+    .cc-scen { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:14px; cursor:pointer; transition:border-color .2s,transform .2s; text-align:left; font:inherit; }
+    .cc-scen:hover,.cc-scen.active { border-color:var(--amber); transform:translateY(-2px); }
+    .cc-scen .cc-scen-px { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text); font-weight:700; }
+    .cc-scen .cc-scen-tag { font-size:11px; color:var(--text-dim); margin:4px 0 12px; line-height:1.4; }
+    .cc-scen .cc-pl { margin-top:9px; }
+    .cc-scen .cc-pl-k { font-family:'JetBrains Mono', monospace; font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); display:flex; justify-content:space-between; margin-bottom:4px; }
+    .cc-scen .cc-pl-k b { color:var(--text); }
+    .cc-scen .cc-pl-k.blue b { color:var(--blue); }
+    .cc-scen .cc-pl-k.amber b { color:var(--amber); }
+    .cc-meter { height:8px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; position:relative; }
+    .cc-meter i { position:absolute; top:0; bottom:0; left:50%; }
+    .cc-meter i.blue { background:var(--blue); }
+    .cc-meter i.amber { background:var(--amber); }
+    .cc-meter i.neg { background:var(--red); }
+    @media (max-width:760px) { .cc-scenboard { grid-template-columns:1fr; } .cc-scen { display:grid; grid-template-columns:auto 1fr; gap:4px 14px; align-items:center; } .cc-scen .cc-scen-tag { grid-column:2; margin:0; } .cc-scen .cc-pl { grid-column:1/-1; } }
+
+    .cc-strikes { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .cc-strike { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:16px; cursor:pointer; text-align:left; font:inherit; transition:border-color .2s; }
+    .cc-strike:hover { border-color:var(--border-light); }
+    .cc-strike.active { border-color:var(--amber); box-shadow:0 0 0 1px rgba(245,177,76,.2) inset; }
+    .cc-strike h5 { font-size:17px; color:var(--text); margin:0 0 4px; }
+    .cc-strike .cc-strike-prem { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); }
+    .cc-strike dl { display:grid; grid-template-columns:1fr auto; gap:6px 10px; margin-top:12px; font-size:13px; }
+    .cc-strike dt { color:var(--text-dim); }
+    .cc-strike dd { color:var(--text); font-family:'JetBrains Mono', monospace; margin:0; text-align:right; }
+    @media (max-width:760px) { .cc-strikes { grid-template-columns:1fr; } }
+
+    .cc-greek-bars { display:grid; gap:12px; margin-top:6px; }
+    .cc-gb { display:grid; grid-template-columns:120px 1fr 96px; gap:12px; align-items:center; }
+    .cc-gb .cc-gb-lab { color:var(--text-muted); font-size:13px; }
+    .cc-gb .cc-gb-val { font-family:'JetBrains Mono', monospace; font-size:14px; color:var(--text); text-align:right; }
+    .cc-axisbar { position:relative; height:18px; border-radius:6px; background:var(--bg-card); border:1px solid var(--border); }
+    .cc-axisbar::before { content:''; position:absolute; left:50%; top:-3px; bottom:-3px; width:1px; background:var(--border-light); }
+    .cc-axisbar i { position:absolute; top:0; bottom:0; }
+    .cc-axisbar i.blue { background:var(--blue); border-radius:4px; }
+    .cc-axisbar i.amber { background:var(--amber); border-radius:4px; }
+    .cc-axisbar i.net { background:var(--green); border-radius:4px; }
+    @media (max-width:760px) { .cc-gb { grid-template-columns:90px 1fr 70px; gap:8px; } }
+
+    .cc-etf-result { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .cc-etf-result .cc-ro span small { color:var(--text-dim); }
+    .cc-warnflag { margin-top:14px; border:1px solid rgba(245,177,76,.4); border-radius:12px; background:linear-gradient(135deg,rgba(245,177,76,.1),transparent); padding:14px 16px; color:var(--text-muted); font-size:13px; line-height:1.6; }
+    .cc-warnflag.off { border-color:var(--border); background:var(--bg-card2); }
+    .cc-warnflag b { color:var(--amber); }
+
+    .cc-coverage { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .cc-coverage .badge { font-size:11px; }
+
+    .cc-form { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .cc-field { display:flex; flex-direction:column; gap:6px; }
+    .cc-field label { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); }
+    .cc-field input, .cc-field select { background:var(--bg-card); border:1px solid var(--border-light); border-radius:10px; padding:10px 12px; color:var(--text); font:inherit; font-size:14px; min-height:44px; }
+    .cc-field input:focus, .cc-field select:focus { outline:2px solid var(--amber); outline-offset:0; }
+    .cc-actions { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+    .cc-actions button { min-height:44px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 16px; font:inherit; font-weight:800; cursor:pointer; }
+    .cc-actions button:hover { border-color:var(--amber); }
+    .cc-actions button.primary { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .cc-result-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:6px; }
+    @media (max-width:760px) { .cc-form { grid-template-columns:1fr; } .cc-result-grid { grid-template-columns:1fr 1fr; } }
+    @media print { .cc-actions { display:none; } .cc-field input,.cc-field select { color:#111; border-color:#999; } }
+  </style>
+  <link rel="stylesheet" href="../assets/readability-overrides.css">
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
+  <div class="nav-right">
+    <a href="session-21.html" class="nav-prev">21회차</a>
+    <span class="nav-session">SESSION 22</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-23.html" class="nav-next nav-forward">23회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 22 · Level 4</div>
+    <h1>보호적 풋, 포트폴리오 보험의 기본형</h1>
+    <p class="hero-sub">내 주식 포트폴리오가 무너질까 두려울 때, 풋옵션을 사면 정말 보험처럼 작동할까요?</p>
+    <div class="thesis"><div class="thesis-label">중심 문장</div><div class="thesis-main">보호적 풋은 보유 주식의 하방 손실을 행사가 근처에서 제한하기 위해 풋 프리미엄을 지불하는 포트폴리오 보험 구조입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>커버드콜의 상방 제한에서 포트폴리오 보험으로 넘어갑니다</h2>
+  <div class="prose">
+<p>21회차에서는 커버드콜을 봤습니다. 주식 100주를 보유한 상태에서 콜을 매도하면 프리미엄이 먼저 들어오고, 손익분기점은 낮아졌습니다. 대신 행사가 위의 상승 참여가 제한됐죠.</p>
+<p>오늘은 반대 방향의 결합 구조로 넘어갑니다. 주식은 그대로 보유하고, 그 아래에 풋옵션을 매수합니다. 현금이 먼저 들어오지 않습니다. 현금을 먼저 지불하고 하방 한도를 정하는 구조입니다.</p>
+<p>커버드콜이 상방 일부를 넘기며 프리미엄을 받는 전략이었다면, 보호적 풋은 프리미엄을 내고 바닥을 정하는 전략입니다. 두 전략 모두 주식과 옵션을 결합하지만 계좌가 받는 리스크의 모양은 꽤 다릅니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 보호적 풋 구조 카드</div>
+    <h3>보호적 풋 구조 카드</h3>
+    <p class="viz-copy">보호적 풋은 두 다리로 이루어진 한 포지션입니다. 주식 100주를 그대로 들고, 같은 기초자산의 풋 1계약을 매수합니다. 매수한 풋이 행사가 아래의 하락을 막아주는 바닥이 됩니다.</p>
+    <div class="cc-legs">
+      <div class="cc-leg long">
+        <div class="cc-tag">LEG 1 · 보유</div>
+        <div class="cc-leg-main">+100 shares</div>
+        <div class="cc-leg-sub">주가 100달러에 매수한 주식 100주를 계속 보유합니다. 델타 +100.</div>
+      </div>
+      <div class="cc-op">+</div>
+      <div class="cc-leg short">
+        <div class="cc-tag">LEG 2 · 매수</div>
+        <div class="cc-leg-main">long 95 put</div>
+        <div class="cc-leg-sub">행사가 95달러 풋 1계약을 매수합니다. premium 2.50 · 승수 100주.</div>
+      </div>
+      <div class="cc-op">=</div>
+      <div class="cc-leg result">
+        <div class="cc-tag">결합 = 보호적 풋</div>
+        <div class="cc-leg-main">현금 −250달러 선지불</div>
+        <div class="cc-leg-sub">프리미엄 2.50 × 100 = 250달러를 먼저 내고, 95달러 아래의 하락을 풋 권리로 제한합니다.</div>
+      </div>
+    </div>
+
+    <div class="viz-note">주식은 보유하고, 95 아래의 하락을 풋 권리로 제한합니다. 낸 250달러는 사고가 없으면 사라지는 보험료입니다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>보험처럼 보이는 풋에도 비용과 빈틈이 있습니다</h2>
+  <div class="prose">
+<p>보호적 풋은 보험이라는 말 때문에 오해가 생깁니다.</p>
+<p>내 주식 포트폴리오가 무너질까 두려울 때, 풋옵션을 사면 정말 보험처럼 작동할까요?</p>
+<p>현재 주가가 100달러인 종목을 100주 보유한다고 가정하겠습니다. 30일 만기 95풋을 2.50달러에 매수합니다. 계산 기준은 주식 매수가 100달러, 보유 수량 100주, 풋 행사가 95달러, 지불 프리미엄 2.50달러, 계약 승수 100주입니다. 결과를 결정하는 큰 변수는 만기 주가입니다.</p>
+<p>주식만 들고 있으면 만기 주가가 80달러로 내려갈 때 손실은 -2,000달러입니다. 보호적 풋은 95달러에 팔 수 있는 권리를 보유하므로, 95달러 아래의 추가 하락을 크게 제한합니다. 다만 250달러의 보험료는 먼저 지불했습니다.</p>
+<p>이 지점이 초보자에게 불편합니다. 보험을 샀는데 주가가 오르면 풋은 거의 사라집니다. 주가가 오르는 좋은 상황에서도 계좌 수익률은 보험료만큼 낮아집니다. 보험이 필요한 순간에는 고맙지만, 사고가 없으면 비용으로 남습니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>보호적 풋은 주식 하방을 제한하는 보험료 구조입니다</h2>
+  <div class="prose">
+<p>이번 회차의 기준 문장은 이렇습니다.</p>
+<p>보호적 풋은 보유 주식의 하방 손실을 행사가 근처에서 제한하기 위해 풋 프리미엄을 지불하는 포트폴리오 보험 구조입니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>주식 보유와 풋 매수가 손실선을 어떻게 바꾸는지 봅니다</h2>
+  <div class="prose">
+<p>보호적 풋의 구조는 주식 보유와 풋 매수의 결합입니다. 주식 100주를 들고 같은 기초자산의 풋 1계약을 삽니다. 풋은 정해진 행사가에 팔 수 있는 권리이므로, 주가가 크게 내려갈 때 손실을 제한하는 기능을 합니다.</p>
+<p>예시를 숫자로 보겠습니다. 현재 주가 100달러, 주식 100주 보유, 30일 만기 95풋 매수, 풋 프리미엄 2.50달러입니다. 풋 매수 비용은 <code>2.50 × 100 = 250달러</code>입니다. 이 250달러는 보험료처럼 먼저 나가는 비용입니다.</p>
+<p>만기 주가가 110달러라면 주식 손익은 +1,000달러입니다. 풋은 95달러에 팔 수 있는 권리인데 시장에서 110달러에 팔 수 있으므로 행사할 이유가 없습니다. 풋은 만기 가치가 0이 되고, 총손익은 주식 이익 1,000달러에서 풋 비용 250달러를 뺀 +750달러입니다.</p>
+<p>만기 주가가 100달러라면 주식 손익은 0달러입니다. 풋은 외가격으로 끝나며 가치가 사라집니다. 총손익은 -250달러입니다. 주가가 제자리였으니 보험 사고가 없었고, 풋 비용만 비용으로 남은 셈입니다.</p>
+<p>만기 주가가 95달러라면 주식 손실은 -500달러입니다. 풋은 행사가와 만기 주가가 같아 만기 내재가치가 거의 없습니다. 총손익은 주식 손실 -500달러와 풋 비용 -250달러를 합친 -750달러입니다. 이 가격이 이 보호 구조의 손익분기선 아래쪽으로 내려가는 문턱입니다.</p>
+<p>만기 주가가 80달러라면 주식 손실은 -2,000달러입니다. 풋은 95달러에 팔 수 있는 권리라서 <code>95 - 80 = 15달러</code>의 내재가치를 가집니다. 100주 기준 풋 가치는 1,500달러입니다. 총손익은 주식 손실 -2,000달러, 풋 이익 +1,500달러, 풋 비용 -250달러를 합쳐 -750달러입니다.</p>
+<p>이 예시에서 최대 손실은 대략 750달러입니다. 계산식은 <code>(주식 매수가 100 - 풋 행사가 95 + 풋 프리미엄 2.50) × 100 = 750달러</code>입니다. 매수가, 행사가, 프리미엄이 손실 상한을 정합니다. 주가가 80달러든 60달러든 만기 기준 손실은 이 근처에서 멈춥니다.</p>
+<p>상방 손익분기점도 계산해야 합니다. 주식을 100달러에 사고 풋 보험료 2.50달러를 냈으므로, 주가가 102.50달러를 넘어야 전체 포지션이 플러스가 됩니다. 식은 <code>주식 매수가 100 + 풋 프리미엄 2.50 = 102.50달러</code>입니다. 보험료는 하방을 막는 대가이면서 상방 수익률의 출발점을 높입니다.</p>
+<p>보호적 풋은 콜 매수와 비슷한 손익 모양을 만듭니다. 주식 보유로 상승 참여는 열려 있고, 풋 매수로 하방 손실은 제한됩니다. 그래서 만기 손익그래프는 아래쪽이 바닥을 만들고 위쪽은 계속 올라가는 형태가 됩니다. 이 형태가 보험이라는 직관을 줍니다.</p>
+<h3 class="subhead">심화: 보호적 풋은 풋-콜 패리티로도 연결됩니다</h3>
+<p>여기까지 온 뒤에는 풋-콜 패리티를 가볍게 붙일 수 있습니다. 같은 기초자산, 같은 행사가, 같은 만기의 옵션을 놓고 보면, 보호적 풋인 <code>주식 + 풋</code>은 <code>콜 + 행사가를 지불할 현금</code>과 비슷한 만기 손익을 만듭니다.</p>
+<p>그래서 이 관계를 <code>C + PV(K) ≈ P + S</code>처럼 씁니다. C는 콜 가격, P는 풋 가격, S는 현재 주가, K는 행사가입니다. 금리와 배당을 잠시 단순화하면 <code>C - P ≈ S - K</code>라는 감각으로 줄여볼 수도 있습니다.</p>
+<p>공식 암기가 목적은 아닙니다. 중요한 것은 콜, 풋, 주식, 현금이 서로 완전히 따로 노는 가격표가 아니라는 점입니다. 같은 만기 손익을 만드는 조합이라면 가격도 크게 벌어지기 어렵습니다. 실제 시장에서는 금리, 배당, 미국식 조기행사, 유동성, 호가 스프레드 때문에 완전히 기계적으로 맞지는 않습니다.</p>
+<p>그릭스로 보면 구조가 더 잘 보입니다. 주식 100주는 델타 +100입니다. 95풋 델타가 -0.30이라면 풋 1계약 매수는 약 -30주 노출입니다. 결합 포지션의 초기 순델타는 약 +70주입니다. 주식을 들고 있지만 풋이 일부 하락 노출을 줄인 상태입니다.</p>
+<p>이 순델타는 주가가 내려갈수록 더 작아질 수 있습니다. 풋이 내가격으로 들어가면 풋 델타의 절댓값이 커집니다. 주식 델타 +100에 풋 델타 -70, -90이 붙으면 계좌의 추가 하락 민감도가 줄어듭니다. 그래서 급락이 깊어질수록 풋의 방어력이 더 뚜렷해집니다.</p>
+<p>감마는 보호적 풋 매수자에게 양의 방향으로 작용합니다. 주가가 크게 움직일 때 풋 델타가 빠르게 변해 하방 방어가 강화됩니다. 세타는 비용입니다. 시간이 지나고 주가가 큰 폭으로 내려가지 않으면 풋의 시간가치는 줄어듭니다.</p>
+<p>베가는 보호적 풋 매수자에게 대체로 우호적입니다. 시장 공포가 커져 내재변동성이 오르면 풋 가격이 비싸질 수 있습니다. 주가 하락과 IV 상승이 같이 나오면 풋은 델타와 베가 두 경로로 방어 기여를 할 수 있습니다. 반대로 시장이 안정되면 풋 가격은 시간가치와 변동성 하락을 함께 맞을 수 있습니다.</p>
+<p>보험료가 언제 비싸지는지도 중요합니다. VIX가 높고, 실적이나 FOMC 같은 이벤트가 가까우며, 시장이 하방 위험을 크게 가격에 반영할 때 풋 프리미엄은 비싸질 수 있습니다. 이때 풋을 사면 보호는 강하지만 비용도 큽니다. 보험을 가장 사고 싶은 순간이 보험료가 가장 부담스러운 순간일 때가 많습니다.</p>
+<p>행사가 선택은 공제액을 정하는 일과 비슷합니다. 100달러 주식에 95풋을 사면 처음 5달러 하락은 내가 감당하고, 그 아래를 풋이 막기 시작합니다. 90풋을 사면 보험료는 싸질 수 있지만 10달러 하락까지는 계좌가 감당해야 합니다. 100풋을 사면 보호는 두껍지만 보험료가 비쌉니다.</p>
+<p>예를 들어 30일 만기 90풋이 1.00달러, 95풋이 2.50달러, 100풋이 5.00달러라고 하겠습니다. 현재 주가 100달러와 주식 100주 보유는 같고, 풋 행사가와 보험료만 다릅니다. 90풋의 최대 손실은 1,100달러, 95풋은 750달러, 100풋은 500달러입니다.</p>
+<p>비용도 같이 봐야 합니다. 90풋은 100달러만 지불하지만 손실 바닥이 낮습니다. 100풋은 500달러를 지불하지만 만기 기준 손실 한도를 500달러로 좁힙니다. 어느 쪽이 낫다는 결론보다, 내가 감당할 하락 폭과 지불할 보험료를 같은 표에 두는 일이 먼저입니다.</p>
+<p>보호적 풋은 장기투자자에게도 쓸 수 있습니다. 세금, 포지션 유지, 매도 제한, 이벤트 리스크 때문에 주식을 팔고 싶지 않을 때 하방을 한시적으로 제한할 수 있습니다. 다만 매번 풋을 사면 보험료가 누적됩니다. 매달 2% 보험료를 내면 1년 누적 비용은 단순 합산으로도 24%에 가까워질 수 있습니다. 실제로는 만기와 IV에 따라 다르지만, 반복 보험은 장기 성과를 갉아먹을 수 있습니다.</p>
+<p>개인적으로 보호적 풋을 볼 때 가장 먼저 묻는 것은 “나는 어떤 손실 구간부터 정말 견디기 어려운가”입니다. 3% 조정도 못 견디는지, 10% 급락부터 막고 싶은지에 따라 행사가가 달라집니다. 손실 허용 범위를 적지 않고 풋 가격만 보면, 비싼 보험을 사고도 마음이 편하지 않을 수 있습니다.</p>
+<p>포트폴리오 단위에서는 개별주 풋보다 지수 풋을 쓰는 경우도 있습니다. 예를 들어 S&amp;P 500 ETF를 많이 보유한 투자자는 SPY 풋이나 지수 옵션으로 일부 하방을 막을 수 있습니다. 하지만 내 포트폴리오가 지수와 얼마나 비슷하게 움직이는지, 베타와 섹터 편중이 어떤지 확인해야 합니다. 지수 풋 하나로 개별 성장주 집중 포트폴리오를 완전히 보호한다고 생각하면 오차가 커질 수 있습니다.</p>
+<p>보호적 풋은 안심 장치지만 실행 비용도 있습니다. 호가 스프레드, 만기 선택, 유동성, 세금, 롤오버 시점, 급락 중 체결 가격이 모두 결과에 영향을 줍니다. 특히 공포가 이미 커진 뒤에는 풋 가격이 크게 올라 있습니다. 그때 사는 보험은 심리적으로 편하지만 기대 보상은 낮아질 수 있습니다.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>보호적 풋은 자동차 보험과 비슷합니다. 사고가 나면 도움이 되지만, 사고가 나지 않아도 보험료는 비용으로 사라집니다. 보험을 매달 반복하면 포트폴리오가 그 비용을 이길 만큼 충분히 벌어야 합니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 보험료 현금흐름과 상방 손익분기점</div>
+    <h3>보험료 현금흐름과 상방 손익분기점</h3>
+    <p class="viz-copy">주식 매수가 100달러는 고정입니다. 낸 보험료만큼 상방 손익분기점이 올라갑니다. 슬라이더로 풋 프리미엄을 바꿔 보세요. <code>상방 손익분기점 = 주식 매수가 + 지불 프리미엄</code></p>
+    <div class="cc-flowstrip">
+      <span class="pill">주식 매수가 <b>100</b></span>
+      <span class="op">+</span>
+      <span class="pill">프리미엄 <b id="f2-prem">2.50</b></span>
+      <span class="op">=</span>
+      <span class="pill res">상방 손익분기점 <b id="f2-be">102.50</b></span>
+    </div>
+    <div class="viz-range">
+      <label>지불 프리미엄(주당 달러) <output id="f2-out">2.50</output></label>
+      <input type="range" id="f2-slider" min="0.5" max="6" step="0.05" value="2.5" aria-label="풋 프리미엄 조정">
+    </div>
+    <div class="cc-readout">
+      <div class="cc-ro amber"><span>보험료 현금 (premium × 100)</span><strong id="f2-cash">250달러</strong></div>
+      <div class="cc-ro neg"><span>상방 손익분기점</span><strong id="f2-be2">102.50달러</strong></div>
+      <div class="cc-ro"><span>최대 손실 (100 − 95 + 프리미엄) × 100</span><strong id="f2-max">750달러</strong></div>
+      <div class="cc-ro"><span>공제액 (첫 부담 폭, 100 − 95)</span><strong id="f2-deduct">5.00달러</strong></div>
+    </div>
+
+    <div class="viz-note">고정: 주식 매수가 100, 공제액 5. 변화: 풋 프리미엄을 지불할수록 상방 손익분기점이 올라가고 최대 손실 한도가 넓어집니다. 보험료는 분명한 비용입니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — 만기 손익그래프: 주식 단독 vs 보호적 풋</div>
+    <h3>만기 손익그래프: 주식 단독 vs 보호적 풋</h3>
+    <p class="viz-copy">파란 선은 주식만 보유했을 때, 노란 선은 보호적 풋(주식 + 95풋 매수, 프리미엄 2.50)의 만기 손익입니다. 노란 선은 아래쪽에 바닥을 만들고 위쪽은 계속 올라갑니다.</p>
+    <div class="viz-panel accent">
+      <svg id="f3-svg" class="viz-svg" viewBox="0 0 620 300" role="img" aria-label="주식 단독과 보호적 풋 만기 손익 그래프"></svg>
+    </div>
+    <div class="cc-readout">
+      <div class="cc-ro blue"><span>만기 주가</span><strong id="f3-px">100.0달러</strong></div>
+      <div class="cc-ro blue"><span>주식 단독 손익</span><strong id="f3-stock">0달러</strong></div>
+      <div class="cc-ro amber"><span>보호적 풋 손익</span><strong id="f3-cc">−250달러</strong></div>
+      <div class="cc-ro"><span>두 전략 차이 (보호적 풋 − 주식)</span><strong id="f3-diff">−250달러</strong></div>
+    </div>
+    <div class="viz-range">
+      <label>만기 주가 <output id="f3-out">100</output></label>
+      <input type="range" id="f3-slider" min="70" max="130" step="1" value="100" aria-label="만기 주가 조정">
+    </div>
+    <div class="cc-quickbtns" id="f3-quick">
+      <button type="button" data-px="80">80</button>
+      <button type="button" data-px="95">95</button>
+      <button type="button" data-px="100" class="active">100</button>
+      <button type="button" data-px="110">110</button>
+      <button type="button" data-px="130">130</button>
+    </div>
+
+    <div class="viz-note">상방 손익분기점 102.50, 보호 시작점 95, 최대 손실 −750달러. 95 아래로는 보호적 풋이 바닥을 만들고, 102.50 위로는 보험료만큼 주식 단독에 뒤처집니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 시나리오 결과 보드</div>
+    <h3>시나리오 결과 보드</h3>
+    <p class="viz-copy">만기 주가 다섯 곳에서 주식 단독과 보호적 풋 손익을 나란히 둡니다. 카드를 누르면 위 Figure 03 그래프의 해당 지점이 함께 움직입니다. 막대는 ±3,000달러를 기준으로 그렸습니다.</p>
+    <div class="cc-scenboard" id="f4-board">
+      <button type="button" class="cc-scen" data-px="80">
+        <div class="cc-scen-px">만기 80달러</div>
+        <div class="cc-scen-tag">20달러 급락</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>−2,000</b></div><div class="cc-meter"><i class="blue neg" data-val="-2000"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>보호적 풋</span><b>−750</b></div><div class="cc-meter"><i class="amber neg" data-val="-750"></i></div></div>
+      </button>
+      <button type="button" class="cc-scen" data-px="95">
+        <div class="cc-scen-px">만기 95달러</div>
+        <div class="cc-scen-tag">보호 시작점</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>−500</b></div><div class="cc-meter"><i class="blue neg" data-val="-500"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>보호적 풋</span><b>−750</b></div><div class="cc-meter"><i class="amber neg" data-val="-750"></i></div></div>
+      </button>
+      <button type="button" class="cc-scen active" data-px="100">
+        <div class="cc-scen-px">만기 100달러</div>
+        <div class="cc-scen-tag">제자리</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>0</b></div><div class="cc-meter"><i class="blue" data-val="0"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>보호적 풋</span><b>−250</b></div><div class="cc-meter"><i class="amber neg" data-val="-250"></i></div></div>
+      </button>
+      <button type="button" class="cc-scen" data-px="110">
+        <div class="cc-scen-px">만기 110달러</div>
+        <div class="cc-scen-tag">상승</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>+1,000</b></div><div class="cc-meter"><i class="blue" data-val="1000"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>보호적 풋</span><b>+750</b></div><div class="cc-meter"><i class="amber" data-val="750"></i></div></div>
+      </button>
+      <button type="button" class="cc-scen" data-px="130">
+        <div class="cc-scen-px">만기 130달러</div>
+        <div class="cc-scen-tag">강한 상승</div>
+        <div class="cc-pl"><div class="cc-pl-k blue"><span>주식</span><b>+3,000</b></div><div class="cc-meter"><i class="blue" data-val="3000"></i></div></div>
+        <div class="cc-pl"><div class="cc-pl-k amber"><span>보호적 풋</span><b>+2,750</b></div><div class="cc-meter"><i class="amber" data-val="2750"></i></div></div>
+      </button>
+    </div>
+
+    <div class="viz-note">급락(80, 95)에서는 보호적 풋 손실이 −750달러 바닥에서 멈춥니다. 상승장(110, 130)에서는 보험료 250달러만큼 주식 단독에 뒤처집니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 행사가 선택 비교 패널</div>
+    <h3>행사가 선택 비교 패널</h3>
+    <p class="viz-copy">현재 주가 100달러, 주식 100주 보유는 같습니다. 달라지는 것은 매수할 풋의 행사가와 보험료뿐입니다. 행사가 선택은 보험의 공제액을 정하는 일과 같습니다. 카드를 선택하면 아래 미니 손익그래프와 수치가 바뀝니다.</p>
+    <div class="cc-strikes" id="f5-strikes">
+      <button type="button" class="cc-strike" data-k="90" data-prem="1.00" data-be="101.00" data-max="1100">
+        <h5>90풋 매수</h5>
+        <div class="cc-strike-prem">premium 1.00 · 낮은 행사가</div>
+        <dl><dt>보험료</dt><dd>100달러</dd><dt>상방 손익분기점</dt><dd>101.00</dd><dt>최대 손실</dt><dd>1,100달러</dd></dl>
+      </button>
+      <button type="button" class="cc-strike active" data-k="95" data-prem="2.50" data-be="102.50" data-max="750">
+        <h5>95풋 매수</h5>
+        <div class="cc-strike-prem">premium 2.50 · 기준 예시</div>
+        <dl><dt>보험료</dt><dd>250달러</dd><dt>상방 손익분기점</dt><dd>102.50</dd><dt>최대 손실</dt><dd>750달러</dd></dl>
+      </button>
+      <button type="button" class="cc-strike" data-k="100" data-prem="5.00" data-be="105.00" data-max="500">
+        <h5>100풋 매수</h5>
+        <div class="cc-strike-prem">premium 5.00 · 등가격</div>
+        <dl><dt>보험료</dt><dd>500달러</dd><dt>상방 손익분기점</dt><dd>105.00</dd><dt>최대 손실</dt><dd>500달러</dd></dl>
+      </button>
+    </div>
+    <div class="viz-panel accent" style="margin-top:14px">
+      <svg id="f5-svg" class="viz-svg" viewBox="0 0 620 280" role="img" aria-label="선택한 행사가의 보호적 풋 만기 손익 미니 그래프"></svg>
+    </div>
+    <div class="cc-readout">
+      <div class="cc-ro amber"><span>보험료 현금</span><strong id="f5-cash">250달러</strong></div>
+      <div class="cc-ro neg"><span>상방 손익분기점</span><strong id="f5-be">102.50달러</strong></div>
+      <div class="cc-ro"><span>최대 손실 (100 − 행사가 + 프리미엄) × 100</span><strong id="f5-max">750달러</strong></div>
+    </div>
+
+    <div class="viz-note">낮은 행사가(90)는 보험료가 싼 대신 공제액이 크고 손실 바닥이 낮습니다. 등가격(100)은 보험료가 비싼 대신 손실 한도를 500달러로 좁힙니다. 감당할 하락 폭과 보험료를 같은 표에 두세요.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 보호적 풋 그릭스 번역기</div>
+    <h3>보호적 풋 그릭스 번역기</h3>
+    <p class="viz-copy">주식 100주는 델타 +100입니다. 풋을 매수하면 풋 델타만큼 노출이 줄어듭니다. 슬라이더로 풋 델타의 절댓값을 바꿔 순델타가 어떻게 변하는지 보세요. <code>순델타 = 100 − 풋 델타 × 100</code></p>
+    <div class="viz-range">
+      <label>95풋 델타 절댓값 <output id="f6-out">0.30</output></label>
+      <input type="range" id="f6-slider" min="0.10" max="0.80" step="0.01" value="0.30" aria-label="풋 델타 조정">
+    </div>
+    <div class="cc-greek-bars">
+      <div class="cc-gb"><div class="cc-gb-lab">주식 100주</div><div class="cc-axisbar"><i class="blue" id="f6-bar-stock"></i></div><div class="cc-gb-val">+100주</div></div>
+      <div class="cc-gb"><div class="cc-gb-lab">롱풋 노출</div><div class="cc-axisbar"><i class="amber" id="f6-bar-put"></i></div><div class="cc-gb-val" id="f6-put">−30주</div></div>
+      <div class="cc-gb"><div class="cc-gb-lab">순델타</div><div class="cc-axisbar"><i class="net" id="f6-bar-net"></i></div><div class="cc-gb-val" id="f6-net">+70주</div></div>
+    </div>
+    <div class="viz-pill-row" style="margin-top:16px">
+      <span class="badge good">델타 양(+)</span>
+      <span class="badge good">감마 양(+)</span>
+      <span class="badge bad">세타 음(−)</span>
+      <span class="badge good">베가 양(+)</span>
+    </div>
+    <div class="cc-readout">
+      <div class="cc-ro"><span>감마</span><strong style="color:var(--green)">양 (+)</strong></div>
+      <div class="cc-ro"><span>세타</span><strong style="color:var(--red)">음 (−)</strong></div>
+      <div class="cc-ro"><span>베가</span><strong style="color:var(--green)">양 (+)</strong></div>
+      <div class="cc-ro"><span>방향 성격</span><strong>급락·변동성 상승에 방어</strong></div>
+    </div>
+
+    <div class="viz-note">기본값에서 순델타는 약 +70주입니다. 주가가 내려가면 풋 델타의 절댓값이 커져 순델타가 줄고, 추가 하락 민감도가 작아집니다. 양의 감마와 양의 베가가 급락·변동성 상승에서 방어를 강화합니다. 대신 세타는 비용입니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 보험료가 비싸지는 환경 카드</div>
+    <h3>보험료가 비싸지는 환경 카드</h3>
+    <p class="viz-copy">VIX가 높고, 실적이나 FOMC 같은 이벤트가 가깝고, 시장이 하방 위험을 크게 가격에 반영하면 풋 프리미엄이 비싸집니다. 탭으로 환경을 바꿔 같은 95풋의 보험료가 어떻게 달라지는지 보세요.</p>
+    <p class="viz-copy" style="margin-top:6px">아래는 <strong>학습용 단순 예시</strong>입니다. 실제 VIX 수준별 옵션가격이 아니라 방향을 보여주려고 만든 숫자입니다.</p>
+    <div class="cc-quickbtns" id="f7-tabs">
+      <button type="button" data-s="0" class="active">차분한 시장</button>
+      <button type="button" data-s="1">이벤트 전</button>
+      <button type="button" data-s="2">스트레스</button>
+    </div>
+    <div class="cc-etf-result">
+      <div class="cc-ro blue"><span>VIX 수준 <small>(단순 예시)</small></span><strong id="f7-vix">14</strong></div>
+      <div class="cc-ro amber"><span>95풋 프리미엄(주당)</span><strong id="f7-prem">1.40달러</strong></div>
+      <div class="cc-ro neg"><span>보험료 총액 (× 100)</span><strong id="f7-cost">140달러</strong></div>
+      <div class="cc-ro"><span>상방 손익분기점</span><strong id="f7-be">101.40달러</strong></div>
+    </div>
+    <div class="cc-warnflag" id="f7-flag"><b>읽는 법.</b> 차분한 시장에서는 보험료가 싸지만, 막아야 할 급락도 멀어 보입니다. 보험이 가장 필요해 보이는 순간일수록 보험료는 이미 올라 있을 수 있습니다.</div>
+
+    <div class="viz-note">보험을 사고 싶은 순간(스트레스 국면)일수록 보험료가 이미 올라 있을 수 있습니다. 공포가 커진 뒤에 사는 보험은 심리적으로 편하지만 기대 보상은 낮아질 수 있습니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 포트폴리오 보험 범위 지도</div>
+    <h3>포트폴리오 보험 범위 지도</h3>
+    <p class="viz-copy">포트폴리오가 광범위 지수 60%(베타 1.0), 성장주 25%(베타 1.5), 현금 15%로 구성됐다고 하겠습니다. 개별주 풋과 지수 풋은 덮는 범위가 다릅니다. 토글로 어디까지 보호되는지 비교해 보세요.</p>
+    <div class="viz-bars">
+      <div class="viz-bar"><span>광범위 지수 (베타 1.0)</span><div class="viz-track"><div class="viz-fill" style="width:60%"></div></div><b>60%</b></div>
+      <div class="viz-bar"><span>성장주 (베타 1.5)</span><div class="viz-track"><div class="viz-fill bad" style="width:25%"></div></div><b>25%</b></div>
+      <div class="viz-bar"><span>현금</span><div class="viz-track"><div class="viz-fill good" style="width:15%"></div></div><b>15%</b></div>
+    </div>
+    <div class="cc-quickbtns" id="f8-toggle">
+      <button type="button" data-mode="index" class="active">지수 풋 (SPY)</button>
+      <button type="button" data-mode="single">개별주 풋</button>
+    </div>
+    <div class="cc-coverage" id="f8-chips"></div>
+    <div class="cc-warnflag" id="f8-flag"></div>
+
+    <div class="viz-note">지수 풋은 시장 베타를 줄이지만, 개별 종목 리스크와 섹터 베이시스 리스크까지 완전히 지우지는 않습니다. 내 포트폴리오가 지수와 얼마나 비슷하게 움직이는지 먼저 확인하세요.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>풋을 샀으니 손실 걱정이 사라진다는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>초보자가 자주 빠지는 함정은 “풋을 샀으니 손실 걱정이 사라진다”는 생각입니다.</p>
+<p>풋은 행사가와 만기 안에서 작동하는 계약입니다. 95풋은 95달러 아래 손실을 제한하지만, 100달러에서 95달러까지의 하락과 풋 프리미엄은 투자자가 부담합니다. 예시에서는 최대 손실이 0달러로 사라지지 않았습니다. 750달러가 남았습니다.</p>
+<p>두 번째 오해는 “보험은 언제 사도 좋다”는 생각입니다. 시장이 이미 급락했고 VIX가 크게 오른 상태에서는 풋 가격이 비쌀 수 있습니다. 이 경우 하방 방어는 얻지만, 이후 시장이 안정되면 주가 반등과 IV 하락 속에서 풋 비용이 빠르게 사라질 수 있습니다.</p>
+<p>세 번째 오해는 “풋 매수는 하락장 예측이다”라는 생각입니다. 보호적 풋은 꼭 하락 확신에서만 쓰는 도구가 아닙니다. 장기 보유 포지션을 유지하면서 특정 기간의 꼬리위험을 줄이는 용도로도 쓸 수 있습니다. 목적이 예측인지 보험인지 먼저 적어야 합니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>보험료는 손익분기점과 장기 성과에 영향을 줍니다</h2>
+  <div class="prose">
+<p>보호적 풋은 주식 100주와 풋 매수 1계약을 결합한 구조입니다. 주식 상승 참여는 열어두고, 하방은 풋 행사가 근처에서 제한합니다. 예시에서는 100달러 주식에 95풋을 2.50달러에 매수해 최대 손실이 약 750달러로 제한됐습니다.</p>
+<p>보험료는 분명한 비용입니다. 주가가 오르거나 제자리이면 풋 프리미엄은 수익률을 낮춥니다. 상방 손익분기점은 102.50달러로 올라갔습니다. 보험을 산 만큼 주식이 더 올라야 전체 포지션이 플러스가 됩니다.</p>
+<p>그릭스로 보면 보호적 풋은 양의 델타를 유지하면서 하락 구간에서 델타를 줄이고, 양의 감마와 양의 베가를 가집니다. 대신 세타 비용을 부담합니다. 급락과 변동성 상승이 같이 나올 때 방어 효과가 커질 수 있고, 조용한 시장에서는 보험료가 비용으로 남습니다.</p>
+<p>오늘의 체크포인트는 다섯 가지입니다. 보호하려는 기간을 적습니다. 감당 가능한 하락 폭을 정합니다. 행사가와 보험료를 함께 비교합니다. 최대 손실과 상방 손익분기점을 계산합니다. VIX와 이벤트 일정으로 보험료가 비싼 구간인지 확인합니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>보호적 풋은 하방 보험이지만 보험료가 성과 허들을 높인다.</li>
+<li>반복적으로 보험을 사면 비용 누적이 장기 수익률을 크게 깎을 수 있다.</li>
+<li>보험의 목적, 보호 구간, 만기, 비용을 포트폴리오 단위로 계산한다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>보호적 풋의 최대손실과 보험료를 계산합니다</h2>
+  <div class="prose">
+<p>아래 숫자는 학습용 예시입니다. 실제 옵션 체인, 세금, 수수료, 호가 스프레드, 조기행사, 체결 가격, 브로커별 증거금 산식은 반영하지 않습니다.</p>
+<h3 class="subhead">Worksheet A. 기본 보호적 풋 손익 계산</h3>
+<p>현재 주가 100달러인 주식 100주를 보유하고 있습니다. 30일 만기 95풋을 2.50달러에 매수했습니다.</p>
+<ol>
+<li>풋 매수 비용 총액은 얼마입니까?</li>
+<li>최대 손실은 얼마입니까?</li>
+<li>상방 손익분기점은 얼마입니까?</li>
+<li>만기 주가 80달러에서 총손익은 얼마입니까?</li>
+</ol>
+<p>계산 기준: 풋 비용은 250달러입니다. 최대 손실은 <code>(100 - 95 + 2.50) × 100 = 750달러</code>입니다. 상방 손익분기점은 102.50달러입니다. 만기 주가 80달러에서 주식 손실 -2,000달러, 풋 가치 +1,500달러, 풋 비용 -250달러를 합쳐 -750달러입니다.</p>
+<h3 class="subhead">Worksheet B. 보험료가 수익률에 미치는 영향</h3>
+<p>같은 보호적 풋에서 만기 주가가 110달러가 되었습니다.</p>
+<ol>
+<li>주식 단독 손익은 얼마입니까?</li>
+<li>보호적 풋 총손익은 얼마입니까?</li>
+<li>보험료가 줄인 수익은 몇 달러입니까?</li>
+</ol>
+<p>풀이의 핵심: 주식 단독 손익은 +1,000달러입니다. 보호적 풋 총손익은 +750달러입니다. 풋 비용 250달러가 상승장에서 수익을 줄였습니다. 주식 수량과 풋 비용을 기준선으로 두고 만기 주가가 상승했다는 점의 변화를 확인합니다.</p>
+<h3 class="subhead">Worksheet C. 행사가 선택 비교</h3>
+<p>현재 주가 100달러, 주식 100주 보유는 같습니다. 세 가지 풋 매수를 비교합니다.</p>
+<ul>
+<li>90풋 프리미엄 1.00달러</li>
+<li>95풋 프리미엄 2.50달러</li>
+<li>100풋 프리미엄 5.00달러</li>
+</ul>
+<p>각 선택지에 대해 최대 손실과 상방 손익분기점을 계산해보세요.</p>
+<p>점검 기준: 90풋은 최대 손실 1,100달러, 손익분기점 101달러입니다. 95풋은 최대 손실 750달러, 손익분기점 102.50달러입니다. 100풋은 최대 손실 500달러, 손익분기점 105달러입니다. 현재 주가 100달러은 그대로 두고, 결과를 흔드는 쪽은 보호 시작 가격과 보험료입니다.</p>
+<h3 class="subhead">Worksheet D. 순델타 계산</h3>
+<p>주식 100주를 보유하고 95풋을 1계약 매수했습니다. 95풋 델타는 -0.30이라고 둡니다.</p>
+<ol>
+<li>주식 델타는 얼마입니까?</li>
+<li>롱풋 델타는 몇 주 노출입니까?</li>
+<li>결합 포지션의 초기 순델타는 얼마입니까?</li>
+</ol>
+<p>확인 기준: 주식 델타는 +100주입니다. 롱풋 델타는 -30주입니다. 결합 포지션의 초기 순델타는 +70주입니다. 지금 계산에는 현재 풋 델타를 썼고, 주가가 하락하면 풋 델타의 절댓값이 커질 수 있습니다.</p>
+<h3 class="subhead">Worksheet E. 내 포트폴리오 보험 문장</h3>
+<p>아래 문장을 직접 채워보세요.</p>
+<p>“내가 보호하려는 자산은 ________이고, 현재가 ________, 보유 수량 ________주입니다. 내가 걱정하는 기간은 ________까지입니다. 내가 감당할 수 있는 하락 폭은 약 ________%입니다. 고려하는 풋은 행사가 ________, 만기 ________, 프리미엄 ________입니다. 보험료 총액은 ________이고, 최대 손실은 ________입니다. 상방 손익분기점은 ________입니다. 현재 VIX와 이벤트 일정상 보험료는 ________한 편으로 판단합니다. 이 보험은 계좌 전체에서 ________% 손실 제한을 위해 사용합니다.”</p>
+<p>예시 답안: “내가 보호하려는 자산은 ABC이고, 현재가 100달러, 보유 수량 100주입니다. 내가 걱정하는 기간은 다음 실적 발표까지입니다. 내가 감당할 수 있는 하락 폭은 약 5%입니다. 고려하는 풋은 행사가 95달러, 만기 30일, 프리미엄 2.50달러입니다. 보험료 총액은 250달러이고, 최대 손실은 750달러입니다. 상방 손익분기점은 102.50달러입니다. 현재 VIX와 이벤트 일정상 보험료는 다소 높은 편으로 판단합니다. 이 보험은 계좌 전체에서 3% 손실 제한을 위해 사용합니다.”</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 보호적 풋 판단 워크시트</div>
+    <h3>보호적 풋 판단 워크시트</h3>
+    <p class="viz-copy">막고 싶은 손실 구간을 먼저 적고, 그다음 보험료를 봅니다. 아래는 브라우저 안에서만 계산하며 외부로 전송하지 않습니다. <code>보험료 = 프리미엄 × 100 × 계약수</code>, <code>최대 손실 = (매수가 − 행사가 + 프리미엄) × 100</code>, <code>상방 손익분기점 = 매수가 + 프리미엄</code>, <code>순델타 = 보유주 − 풋델타 × 100 × 계약수</code></p>
+    <div class="cc-form">
+      <div class="cc-field"><label for="w-ticker">종목(ticker)</label><input id="w-ticker" type="text" autocomplete="off" placeholder="예: ABC"></div>
+      <div class="cc-field"><label for="w-price">현재가</label><input id="w-price" type="number" step="0.01" inputmode="decimal" placeholder="100"></div>
+      <div class="cc-field"><label for="w-shares">보유 수량(주)</label><input id="w-shares" type="number" step="1" inputmode="numeric" placeholder="100"></div>
+      <div class="cc-field"><label for="w-cost">매수 단가(cost basis)</label><input id="w-cost" type="number" step="0.01" inputmode="decimal" placeholder="100"></div>
+      <div class="cc-field"><label for="w-strike">풋 행사가</label><input id="w-strike" type="number" step="0.01" inputmode="decimal" placeholder="95"></div>
+      <div class="cc-field"><label for="w-prem">풋 프리미엄</label><input id="w-prem" type="number" step="0.01" inputmode="decimal" placeholder="2.50"></div>
+      <div class="cc-field"><label for="w-days">만기까지(일)</label><input id="w-days" type="number" step="1" inputmode="numeric" placeholder="30"></div>
+      <div class="cc-field"><label for="w-delta">풋 델타 절댓값</label><input id="w-delta" type="number" step="0.01" inputmode="decimal" placeholder="0.30"></div>
+      <div class="cc-field"><label for="w-vix">VIX 수준</label><input id="w-vix" type="number" step="0.1" inputmode="decimal" placeholder="22"></div>
+      <div class="cc-field"><label for="w-event">이벤트 일정</label><input id="w-event" type="text" autocomplete="off" placeholder="예: 다음 실적"></div>
+      <div class="cc-field"><label for="w-tol">감당 하락 폭(%)</label><input id="w-tol" type="number" step="0.5" inputmode="decimal" placeholder="5"></div>
+      <div class="cc-field"><label for="w-account">계좌 크기</label><input id="w-account" type="number" step="1" inputmode="numeric" placeholder="100000"></div>
+      <div class="cc-field"><label for="w-budget">최대 보험료 예산</label><input id="w-budget" type="number" step="1" inputmode="numeric" placeholder="300"></div>
+    </div>
+    <div class="cc-actions">
+      <button type="button" class="primary" id="w-calc">계산하기</button>
+      <button type="button" id="w-fill">예시 채우기</button>
+      <button type="button" id="w-clear">비우기</button>
+      <button type="button" id="w-print">인쇄용 보기</button>
+    </div>
+    <div class="cc-result-grid">
+      <div class="cc-ro amber"><span>보험료 총액</span><strong id="w-r-cost">—</strong></div>
+      <div class="cc-ro neg"><span>최대 손실</span><strong id="w-r-max">—</strong></div>
+      <div class="cc-ro"><span>상방 손익분기점</span><strong id="w-r-be">—</strong></div>
+      <div class="cc-ro blue"><span>순델타(주)</span><strong id="w-r-net">—</strong></div>
+    </div>
+    <div class="cc-warnflag off" id="w-comment">입력값을 채우고 <b>계산하기</b>를 누르면 보험료 총액, 최대 손실, 상방 손익분기점, 순델타가 표시됩니다.</div>
+
+    <div class="viz-note">막고 싶은 손실 구간을 먼저 적고, 그다음 보험료를 봅니다. 계산은 브라우저 안에서만 이뤄지며 어디로도 전송되지 않습니다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차에서는 옵션을 함께 사고팔아 비용을 조정합니다</h2>
+  <div class="prose">
+<p>다음 23회차에서는 스프레드 전략을 다룹니다. 보호적 풋은 하방을 제한하지만 보험료를 전액 지불합니다. 그래서 투자자는 때때로 다른 옵션을 함께 팔아 비용을 줄이려 합니다.</p>
+<p>스프레드는 한쪽 옵션으로 다른 리스크를 줄이는 구조입니다. 비용을 낮추는 대신 수익이나 보호 범위도 같이 제한될 수 있습니다. 다음 회차에서는 단일 옵션보다 스프레드가 나을 수 있는 조건과, 그 대가로 무엇을 포기하는지 보겠습니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-23.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">23회차 — 스프레드 전략, 한쪽 옵션으로 다른 리스크를 줄인다</div><p class="next-desc">다음 23회차에서는 스프레드 전략을 다룹니다. 보호적 풋은 하방을 제한하지만 보험료를 전액 지불합니다. 그래서 투자자는 때때로 다른 옵션을 함께 팔아 비용을 줄이려 합니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 2026 무기견. All rights reserved.</div>
+  <div><a href="../copyright.html">저작권 및 이용 제한</a></div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+
+(function () {
+  const fmtUsd = (n) => `${n >= 0 ? '+' : '−'}${Math.abs(Math.round(n)).toLocaleString('ko-KR')}달러`;
+  const plainUsd = (n) => `${Math.round(n).toLocaleString('ko-KR')}달러`;
+  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+  const S0 = 100, K0 = 95, SHARES = 100, PREMIUM0 = 2.5;
+  const stockPL = (s) => (s - S0) * SHARES;
+  const protectivePL = (s, k = K0, p = PREMIUM0) => (s - S0) * SHARES + Math.max(k - s, 0) * SHARES - p * SHARES;
+
+  function payoffPath(k = K0, p = PREMIUM0) {
+    const xs = [70, 80, 90, 95, 100, 102.5, 105, 110, 120, 130];
+    return xs.map((s) => ({ s, stock: stockPL(s), pp: protectivePL(s, k, p) }));
+  }
+
+  function renderPayoffSvg(svgId, selected = 100, k = K0, p = PREMIUM0) {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    const minS = 70, maxS = 130, minY = -3300, maxY = 3300;
+    const x = (s) => 58 + ((s - minS) / (maxS - minS)) * 500;
+    const y = (v) => 250 - ((v - minY) / (maxY - minY)) * 205;
+    const line = (key) => payoffPath(k, p).map((d, i) => `${i ? 'L' : 'M'}${x(d.s).toFixed(1)},${y(d[key]).toFixed(1)}`).join(' ');
+    const be = S0 + p;
+    const floor = -(S0 - k + p) * SHARES;
+    const selStock = stockPL(selected);
+    const selPp = protectivePL(selected, k, p);
+    svg.innerHTML = `
+      <line class="viz-axis" x1="58" y1="250" x2="558" y2="250"/><line class="viz-axis" x1="58" y1="45" x2="58" y2="250"/>
+      ${[-3000,-2000,-1000,0,1000,2000,3000].map(v => `<line class="viz-gridline" x1="58" x2="558" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/><text class="viz-label" x="12" y="${(y(v)+4).toFixed(1)}">${v}</text>`).join('')}
+      ${[70,80,90,95,100,110,120,130].map(s => `<text class="viz-label" x="${x(s).toFixed(1)}" y="274" text-anchor="middle">${s}</text>`).join('')}
+      <line x1="58" x2="558" y1="${y(floor).toFixed(1)}" y2="${y(floor).toFixed(1)}" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".75"/>
+      <text class="viz-number" x="552" y="${(y(floor)-7).toFixed(1)}" text-anchor="end" fill="var(--red)">최대손실 ${Math.round(floor).toLocaleString('ko-KR')}</text>
+      <path class="viz-line blue" d="${line('stock')}"/><path class="viz-line" d="${line('pp')}"/>
+      <line x1="${x(be).toFixed(1)}" x2="${x(be).toFixed(1)}" y1="45" y2="250" stroke="var(--green)" stroke-dasharray="5 5"/><text class="viz-label" x="${x(be).toFixed(1)}" y="35" text-anchor="middle">BE ${be.toFixed(2)}</text>
+      <line x1="${x(k).toFixed(1)}" x2="${x(k).toFixed(1)}" y1="45" y2="250" stroke="var(--amber)" stroke-dasharray="5 5"/><text class="viz-label" x="${x(k).toFixed(1)}" y="22" text-anchor="middle">K ${k}</text>
+      <circle class="viz-dot blue" cx="${x(selected).toFixed(1)}" cy="${y(selStock).toFixed(1)}" r="6"/><circle class="viz-dot" cx="${x(selected).toFixed(1)}" cy="${y(selPp).toFixed(1)}" r="6"/>
+      <text class="viz-label" x="100" y="62">파란 선: 주식 단독</text><text class="viz-label" x="100" y="80">노란 선: 보호적 풋</text>`;
+  }
+
+  function updateF2() {
+    const input = document.getElementById('f2-slider');
+    if (!input) return;
+    const p = Number(input.value);
+    const be = S0 + p;
+    setText('f2-prem', p.toFixed(2)); setText('f2-out', p.toFixed(2)); setText('f2-be', be.toFixed(2));
+    setText('f2-cash', plainUsd(p * SHARES)); setText('f2-be2', `${be.toFixed(2)}달러`);
+    setText('f2-max', plainUsd((S0 - K0 + p) * SHARES)); setText('f2-deduct', `${(S0 - K0).toFixed(2)}달러`);
+  }
+
+  function updateF3(price = Number(document.getElementById('f3-slider')?.value || 100)) {
+    const slider = document.getElementById('f3-slider'); if (slider) slider.value = String(price);
+    setText('f3-out', String(price)); setText('f3-px', `${Number(price).toFixed(1)}달러`);
+    const st = stockPL(price), pp = protectivePL(price);
+    setText('f3-stock', fmtUsd(st)); setText('f3-cc', fmtUsd(pp)); setText('f3-diff', fmtUsd(pp - st));
+    renderPayoffSvg('f3-svg', price);
+    document.querySelectorAll('#f3-quick button,#f4-board button').forEach((btn) => btn.classList.toggle('active', Number(btn.dataset.px) === Number(price)));
+  }
+
+  function updateScenarioMeters() {
+    document.querySelectorAll('.cc-scen').forEach((card) => {
+      const px = Number(card.dataset.px);
+      const st = stockPL(px), pp = protectivePL(px);
+      const scale = 3000;
+      const meters = card.querySelectorAll('.cc-meter i');
+      [st, pp].forEach((v, i) => {
+        const el = meters[i]; if (!el) return;
+        const w = Math.min(50, Math.abs(v) / scale * 50);
+        el.style.left = v < 0 ? `${50 - w}%` : '50%'; el.style.width = `${w}%`; el.classList.toggle('neg', v < 0);
+      });
+    });
+  }
+
+  function updateF5(button = document.querySelector('#f5-strikes .cc-strike.active')) {
+    if (!button) return;
+    document.querySelectorAll('#f5-strikes .cc-strike').forEach((b) => b.classList.toggle('active', b === button));
+    const k = Number(button.dataset.k), p = Number(button.dataset.prem), be = Number(button.dataset.be), max = Number(button.dataset.max);
+    setText('f5-cash', plainUsd(p * SHARES)); setText('f5-be', `${be.toFixed(2)}달러`); setText('f5-max', plainUsd(max));
+    renderPayoffSvg('f5-svg', 100, k, p);
+  }
+
+  function updateF6() {
+    const input = document.getElementById('f6-slider'); if (!input) return;
+    const d = Number(input.value); const put = -d * 100; const net = 100 + put;
+    setText('f6-out', d.toFixed(2)); setText('f6-put', `${Math.round(put)}주`); setText('f6-net', `+${Math.round(net)}주`);
+    const stockBar = document.getElementById('f6-bar-stock'), putBar = document.getElementById('f6-bar-put'), netBar = document.getElementById('f6-bar-net');
+    if (stockBar) { stockBar.style.left = '50%'; stockBar.style.width = '45%'; }
+    if (putBar) { putBar.style.left = `${50 - Math.min(45, d*45)}%`; putBar.style.width = `${Math.min(45, d*45)}%`; }
+    if (netBar) { netBar.style.left = '50%'; netBar.style.width = `${Math.min(45, net/100*45)}%`; }
+  }
+
+  function updateF7(index = 0) {
+    const rows = [
+      ['14', 1.40, '차분한 시장에서는 보험료가 싸지만, 막아야 할 급락도 멀어 보입니다. 보험이 가장 필요해 보이는 순간일수록 보험료는 이미 올라 있을 수 있습니다.'],
+      ['22', 2.50, '실적이나 FOMC 같은 이벤트가 가까우면 풋 수요가 늘어 프리미엄이 올라갑니다. 같은 95풋도 차분한 시장보다 비싸집니다.'],
+      ['35', 5.50, '시장이 이미 급락하고 공포가 커진 스트레스 국면에서는 풋이 크게 비싸집니다. 보호는 강하지만 비용도 큽니다. 이후 시장이 안정되면 풋 비용이 빠르게 사라질 수 있습니다.']
+    ];
+    const r = rows[index] || rows[0];
+    const vix = r[0], prem = r[1];
+    setText('f7-vix', vix); setText('f7-prem', `${prem.toFixed(2)}달러`); setText('f7-cost', plainUsd(prem * SHARES)); setText('f7-be', `${(S0 + prem).toFixed(2)}달러`);
+    const flag = document.getElementById('f7-flag'); if (flag) flag.innerHTML = `<b>읽는 법.</b> ${r[2]}`;
+    document.querySelectorAll('#f7-tabs button').forEach((b, i) => b.classList.toggle('active', i === index));
+  }
+
+  function updateF8(mode = 'index') {
+    const chips = document.getElementById('f8-chips');
+    const flag = document.getElementById('f8-flag');
+    const data = {
+      index: {
+        chips: [
+          ['good', '광범위 지수 60% 베타 보호'],
+          ['warn', '성장주 25% 베타1.5 잔존'],
+          ['bad', '섹터 편중 베이시스 리스크'],
+          ['', '현금 15% 보호 불필요']
+        ],
+        flag: '<b>지수 풋 (SPY).</b> 시장 베타가 큰 비중(광범위 지수 60%)은 덮습니다. 다만 성장주 25%는 베타가 1.5라 지수보다 더 빠지고, 섹터 편중은 베이시스 리스크로 남습니다. 지수 풋 하나로 개별 성장주 집중 포트폴리오를 완전히 보호한다고 보면 오차가 커집니다.'
+      },
+      single: {
+        chips: [
+          ['good', '해당 종목 하방 직접 보호'],
+          ['bad', '나머지 포트폴리오 미보호'],
+          ['warn', '종목 수만큼 풋 필요'],
+          ['bad', '보험료 누적 큼']
+        ],
+        flag: '<b>개별주 풋.</b> 보유한 그 종목의 하방은 정밀하게 막습니다. 대신 나머지 포트폴리오는 덮지 못하고, 여러 종목을 보호하려면 풋을 여러 개 사야 해 보험료가 빠르게 누적됩니다.'
+      }
+    };
+    const d = data[mode] || data.index;
+    if (chips) chips.innerHTML = d.chips.map(([cls, txt]) => `<span class="badge ${cls}">${txt}</span>`).join('');
+    if (flag) flag.innerHTML = d.flag;
+    document.querySelectorAll('#f8-toggle button').forEach((b) => b.classList.toggle('active', b.dataset.mode === mode));
+  }
+
+  function worksheetValues(example = false) {
+    if (example) {
+      const vals = {'w-ticker':'ABC','w-price':100,'w-shares':100,'w-cost':100,'w-strike':95,'w-prem':2.5,'w-days':30,'w-delta':0.30,'w-vix':22,'w-event':'다음 실적','w-tol':5,'w-account':100000,'w-budget':300};
+      Object.entries(vals).forEach(([id, v]) => { const el = document.getElementById(id); if (el) el.value = v; });
+    }
+    const n = (id, fallback = 0) => Number(document.getElementById(id)?.value || fallback);
+    return { price:n('w-price',100), shares:n('w-shares',100), cost:n('w-cost',100), strike:n('w-strike',95), prem:n('w-prem',2.5), delta:n('w-delta',0.30), tol:n('w-tol',5), account:n('w-account',100000), budget:n('w-budget',300) };
+  }
+  function updateWorksheet() {
+    const v = worksheetValues(false); const contracts = Math.floor(v.shares / 100) || 1;
+    const cost = v.prem * 100 * contracts; const be = v.cost + v.prem; const max = (v.cost - v.strike + v.prem) * 100 * contracts; const net = v.shares - v.delta * 100 * contracts;
+    setText('w-r-cost', plainUsd(cost)); setText('w-r-be', `${be.toFixed(2)}달러`); setText('w-r-max', plainUsd(max)); setText('w-r-net', `${net >= 0 ? '+' : '−'}${Math.abs(Math.round(net))}주`);
+    const msg = document.getElementById('w-comment');
+    if (msg) {
+      const overBudget = v.budget && cost > v.budget;
+      const lossPct = v.account ? (max / v.account * 100) : 0;
+      msg.innerHTML = `<b>판정 메모.</b> 보험료 총액은 약 ${plainUsd(cost)}입니다. ${overBudget ? `정한 보험료 예산 ${plainUsd(v.budget)}을 넘습니다.` : `정한 보험료 예산 ${plainUsd(v.budget || 0)} 안에 들어옵니다.`} 만기 기준 최대 손실은 계좌의 약 ${lossPct.toFixed(1)}%이고, 입력한 감당 하락 폭은 ${v.tol || 0}%입니다. 막고 싶은 손실 구간을 먼저 정하고 보험료를 비교하세요.`;
+      msg.classList.toggle('off', false);
+    }
+  }
+
+  document.getElementById('f2-slider')?.addEventListener('input', updateF2);
+  document.getElementById('f3-slider')?.addEventListener('input', (e) => updateF3(Number(e.target.value)));
+  document.querySelectorAll('#f3-quick button,#f4-board button').forEach((b) => b.addEventListener('click', () => updateF3(Number(b.dataset.px))));
+  document.querySelectorAll('#f5-strikes .cc-strike').forEach((b) => b.addEventListener('click', () => updateF5(b)));
+  document.getElementById('f6-slider')?.addEventListener('input', updateF6);
+  document.querySelectorAll('#f7-tabs button').forEach((b, i) => b.addEventListener('click', () => updateF7(i)));
+  document.querySelectorAll('#f8-toggle button').forEach((b) => b.addEventListener('click', () => updateF8(b.dataset.mode)));
+  document.getElementById('w-calc')?.addEventListener('click', updateWorksheet);
+  document.getElementById('w-fill')?.addEventListener('click', () => { worksheetValues(true); updateWorksheet(); });
+  document.getElementById('w-clear')?.addEventListener('click', () => { document.querySelectorAll('.cc-form input,.cc-form select').forEach((el) => { el.value = ''; }); setText('w-r-cost','—'); setText('w-r-be','—'); setText('w-r-max','—'); setText('w-r-net','—'); const msg=document.getElementById('w-comment'); if(msg){ msg.innerHTML='입력값을 채우고 <b>계산하기</b>를 누르면 보험료 총액, 최대 손실, 상방 손익분기점, 순델타가 표시됩니다.'; msg.classList.add('off'); }});
+  document.getElementById('w-print')?.addEventListener('click', () => window.print());
+  updateF2(); updateF3(100); updateScenarioMeters(); updateF5(); updateF6(); updateF7(0); updateF8('index');
+})();
+
+</script>
+  <script src="../assets/auth-config.js?v=privacy-20260619"></script>
+  <script src="../assets/course-visibility.js"></script>
+  <script src="../assets/auth-gate.js?v=privacy-20260619"></script>
+</body>
+</html>

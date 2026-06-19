@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>20회차 — 내가격 옵션과 주식 대체 효과</title>
+  <meta name="description" content="내가격 옵션은 높은 델타로 주식 노출을 압축해 담을 수 있지만, 시간가치, 만기, 유동성, 레버리지 착시를 함께 관리해야 하는 계약입니다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d0c;
+      --bg-card: #151715;
+      --bg-card2: #1d211d;
+      --text: #f1eee5;
+      --text-muted: #a49b8b;
+      --text-dim: #746f65;
+      --amber: #f5b14c;
+      --green: #35d07f;
+      --blue: #7dd3fc;
+      --red: #ef4444;
+      --violet: #a78bfa;
+      --border: #2d302a;
+      --border-light: #44483d;
+      --nav-bg: rgba(11,13,12,.91);
+      --hero-glow-warm: rgba(245,177,76,.08);
+      --hero-glow-cool: rgba(125,211,252,.05);
+      --prose-text: #d8d1c3;
+      --cta-text: #11130f;
+      --shadow: 0 18px 60px rgba(0,0,0,.28);
+    }
+
+    :root[data-theme="olive"] {
+      color-scheme: light;
+      --bg: #fafaf2;
+      --bg-card: #fff;
+      --bg-card2: #f1f3e7;
+      --text: #1b2518;
+      --text-muted: #5d684f;
+      --text-dim: #889078;
+      --amber: #7d8f3a;
+      --green: #4f7a35;
+      --blue: #3d7796;
+      --red: #b94a48;
+      --violet: #7561a8;
+      --border: #e3e7d4;
+      --border-light: #d1d9bb;
+      --nav-bg: rgba(250,250,242,.92);
+      --hero-glow-warm: rgba(125,143,58,.12);
+      --hero-glow-cool: rgba(61,119,150,.08);
+      --prose-text: #35402f;
+      --cta-text: #fff;
+      --shadow: 0 18px 60px rgba(82,91,56,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      line-height: 1.82;
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s, color .25s;
+      overflow-x: hidden;
+    }
+
+    /* ── PROGRESS ── */
+    .progress {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--amber), var(--green));
+      z-index: 100;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--text-muted);
+      letter-spacing: .08em; text-decoration: none;
+    }
+    .nav-brand span { color: var(--amber); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-prev, .nav-next, .nav-session {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text-dim); text-decoration: none;
+    }
+    .nav-prev:hover, .nav-next:hover { color: var(--amber); }
+    .theme-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      background: var(--bg-card);
+    }
+    .theme-btn {
+      border: 0; min-width: 44px; min-height: 32px;
+      padding: 6px 10px; border-radius: 999px;
+      background: transparent; color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700; letter-spacing: .04em; cursor: pointer;
+    }
+    .theme-btn.active { background: var(--amber); color: var(--cta-text); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 94vh; display: flex; align-items: center;
+      padding: 122px 10vw 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: -220px -160px auto auto;
+      width: 760px; height: 760px;
+      background: radial-gradient(circle, var(--hero-glow-warm) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; left: -120px; bottom: -180px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, var(--hero-glow-cool) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 920px; width: 100%; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 26px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 84px);
+      font-weight: 900; line-height: 1.06; letter-spacing: 0; margin-bottom: 24px;
+      word-break: keep-all; overflow-wrap: normal;
+    }
+    .hero h1 .hi { color: var(--amber); }
+    .mobile-break { display: none; }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px); color: var(--text-muted);
+      font-weight: 300; max-width: 740px; line-height: 1.72; margin-bottom: 38px;
+      word-break: keep-all; overflow-wrap: anywhere;
+    }
+    .thesis {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--amber);
+      padding: 21px 28px; border-radius: 0 12px 12px 0;
+      box-shadow: var(--shadow); max-width: 760px;
+    }
+    .thesis-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em; margin-bottom: 9px;
+    }
+    .thesis-main { font-size: 18px; font-weight: 700; line-height: 1.62; word-break: keep-all; overflow-wrap: anywhere; }
+
+    /* ── LAYOUT ── */
+    .divider { border: 0; border-top: 1px solid var(--border); }
+    .section { max-width: 810px; margin: 0 auto; padding: 78px 24px; }
+    .section-wide { max-width: 1080px; margin: 0 auto; padding: 78px 24px; }
+    .section-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .15em; margin-bottom: 16px;
+    }
+    .section h2, .section-wide h2 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800; line-height: 1.24; letter-spacing: 0; margin-bottom: 28px;
+    }
+    .prose p {
+      font-size: 16px; line-height: 1.86; color: var(--prose-text); margin-bottom: 19px;
+    }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--text); font-weight: 700; }
+    .prose h3, .subhead { font-size: 21px; font-weight: 800; margin: 34px 0 14px; color: var(--text); }
+    .prose ol, .prose ul { margin: 0 0 19px 20px; color: var(--prose-text); line-height: 1.86; }
+    .prose li { margin-bottom: 6px; }
+    .prose code, code { font-family: 'JetBrains Mono', monospace; color: var(--amber); font-size: .92em; }
+
+    /* ── FIGURE ── */
+    .fig {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: 16px; padding: 28px; margin: 32px 0;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .fig::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), var(--amber), transparent);
+      opacity: .48;
+    }
+    .fig-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--amber); letter-spacing: .15em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .fig h2 { font-size: clamp(19px, 2.6vw, 24px); font-weight: 800; line-height: 1.3; margin-bottom: 20px; }
+    .fig-caption {
+      margin-top: 18px; font-size: 13px; color: var(--text-muted); line-height: 1.65;
+    }
+
+    /* ── GRID CARDS ── */
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .mini-card {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .mini-k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-dim); letter-spacing: .08em; margin-bottom: 10px;
+    }
+    .mini-v { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.35; }
+    .mini-p { font-size: 13px; color: var(--text-muted); line-height: 1.58; margin-top: 8px; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+
+    input[type="range"] {
+      width: 100%; height: 5px; border-radius: 999px;
+      background: var(--border-light); outline: none; -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+      box-shadow: 0 0 0 4px rgba(245,177,76,.18);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--amber); border: 3px solid var(--bg-card);
+    }
+    svg { width: 100%; height: auto; display: block; }
+
+    /* ── NEXT CARD ── */
+    .next-card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 26px 30px; margin-top: 34px;
+      display: flex; justify-content: space-between; gap: 20px;
+      text-decoration: none; color: inherit;
+    }
+    .next-card:hover { border-color: var(--amber); }
+    .next-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-dim); letter-spacing: .12em; margin-bottom: 7px;
+    }
+    .next-title { font-size: 17px; font-weight: 800; }
+    .next-desc { margin-top: 8px; color: var(--text-muted); font-size: 14px; line-height: 1.65; }
+    .next-arrow { font-size: 24px; color: var(--amber); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 30px 10vw;
+      display: flex; justify-content: space-between;
+      color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    .svg-card { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; overflow: hidden; }
+    .svg-card svg { width: 100%; height: auto; display: block; }
+    svg text { font-family: 'JetBrains Mono', monospace; fill: var(--text-muted); font-size: 11px; }
+    .axis-line { stroke: var(--border-light); stroke-width: 1; }
+
+    .controls { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-top: 16px; }
+    .control-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .control-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: .08em; }
+    .control-value { font-family: 'JetBrains Mono', monospace; font-size: 20px; color: var(--amber); font-weight: 800; }
+    .segmented { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .segmented button, .answer-btn { min-height: 44px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-muted); border-radius: 999px; padding: 9px 13px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .segmented button.active, .answer-btn.active { background: var(--amber); border-color: var(--amber); color: var(--cta-text); }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .metric { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .metric span { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 5px; }
+    .metric strong { color: var(--text); font-size: 19px; font-family: 'JetBrains Mono', monospace; }
+
+    .note-strip { margin-top: 14px; border-left: 3px solid var(--amber); padding: 12px 14px; background: linear-gradient(90deg, rgba(245,177,76,.08), transparent); color: var(--text-muted); font-size: 13px; line-height: 1.65; }
+
+    .badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; letter-spacing: .04em; }
+    .badge-good { color: var(--green); border: 1px solid var(--green); background: rgba(53,208,127,.08); }
+    .badge-bad { color: var(--red); border: 1px solid var(--red); background: rgba(239,68,68,.08); }
+    .badge-neutral { color: var(--text-muted); border: 1px solid var(--border-light); }
+
+    /* ── STACKED PREMIUM BAR ── */
+    .stack-bar { display: flex; height: 44px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); margin-top: 8px; }
+    .stack-seg { display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--cta-text); transition: width .3s ease; white-space: nowrap; min-width: 0; overflow: hidden; }
+    .stack-seg.intrinsic { background: var(--amber); }
+    .stack-seg.time { background: var(--blue); }
+    .stack-legend { display: flex; gap: 16px; margin-top: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+    .stack-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .stack-dot { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+    .stack-dot.intrinsic { background: var(--amber); }
+    .stack-dot.time { background: var(--blue); }
+
+    /* ── CONCEPT BOARD ── */
+    .concept-layer {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 22px; text-align: center;
+      transition: border-color .2s, opacity .2s;
+    }
+    .concept-layer .layer-title {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: var(--amber); letter-spacing: .08em; margin-bottom: 10px; font-weight: 700;
+    }
+    .concept-layer .layer-value {
+      font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 8px;
+    }
+    .concept-layer .layer-desc {
+      font-size: 13px; color: var(--text-muted); line-height: 1.6;
+    }
+
+    /* ── STRIKE BUTTONS ── */
+    .strike-btn {
+      min-height: 44px; min-width: 80px; border: 1px solid var(--border-light);
+      background: var(--bg-card); color: var(--text-muted); border-radius: 999px;
+      padding: 9px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      font-weight: 700; cursor: pointer; transition: all .2s;
+    }
+    .strike-btn.active { background: var(--amber); border-color: var(--amber); color: var(--cta-text); }
+
+    /* ── COMPARISON BARS ── */
+    .compare-bar {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+      transition: opacity .2s;
+    }
+    .compare-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); min-width: 78px; }
+    .compare-fill { height: 28px; border-radius: 6px; transition: width .3s ease; display: flex; align-items: center; padding: 0 10px; min-width: 60px; }
+    .compare-fill span { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--cta-text); white-space: nowrap; }
+
+    /* ── WORKSHEET ── */
+    .worksheet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .worksheet-field { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .worksheet-field label { display: block; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 10px; letter-spacing: .08em; margin-bottom: 7px; }
+    .worksheet-field input { width: 100%; min-height: 44px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text); padding: 10px 12px; font: inherit; }
+    .answers { display: none; margin-top: 14px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+    .answers.open { display: block; }
+    .answers p { color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
+    .answers p:last-child { margin-bottom: 0; }
+    .answers strong { color: var(--amber); }
+
+    @media (max-width: 760px) {
+      body { overflow-x: hidden; }
+      nav { padding: 11px 16px; width: 100vw; max-width: 100vw; overflow: hidden; }
+      .nav-session, .nav-prev, .nav-index, .nav-forward { display: none; }
+      .nav-right { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); gap: 0; }
+      .nav-brand { font-size: 12px; max-width: 190px; overflow: hidden; white-space: nowrap; }
+      .theme-toggle { transform: scale(.78); transform-origin: right center; }
+      .theme-btn { min-width: 42px; min-height: 30px; }
+      .hero { padding: 104px 24px 62px; min-height: 88vh; width: 100vw; max-width: 100vw; }
+      .hero-inner { max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .mobile-break { display: block; }
+      .hero h1 { font-size: clamp(34px, 10vw, 44px); line-height: 1.14; word-break: keep-all; overflow-wrap: anywhere; }
+      .hero-sub, .thesis-main, .section h2, .section-wide h2 { word-break: break-all; overflow-wrap: anywhere; }
+      .section h2, .section-wide h2 { font-size: 24px; line-height: 1.28; max-width: 13em; }
+      .thesis { padding: 20px 22px; max-width: calc(100vw - 48px); width: calc(100vw - 48px); }
+      .section, .section-wide { padding: 58px 20px; max-width: 100vw; overflow: hidden; }
+      .fig { padding: 20px; max-width: calc(100vw - 40px); }
+      .two, .three, .four, .metric-grid, .worksheet-grid { grid-template-columns: 1fr; }
+      .next-card { flex-direction: column; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
+
+    /* Mobile course navigation: keep previous/index/next reachable on phones. */
+    @media (max-width:760px) {
+      nav { display:grid !important; grid-template-columns:1fr auto auto; grid-template-rows:auto auto; row-gap:8px; align-items:center; padding:10px 14px 9px !important; overflow:visible !important; }
+      .nav-brand { grid-column:1 / 2; grid-row:1; max-width:170px !important; min-width:0; }
+      .nav-right { display:contents !important; position:static !important; transform:none !important; }
+      .nav-session { display:none !important; }
+      .theme-toggle { grid-column:3; grid-row:1; justify-self:end; transform:scale(.76) !important; transform-origin:right center; }
+      .nav-prev,.nav-index,.nav-forward { display:inline-flex !important; align-items:center; justify-content:center; min-height:28px; padding:0 10px; border:1px solid var(--border); border-radius:999px; background:var(--bg-card); color:var(--text-muted) !important; font-size:11px !important; line-height:1; white-space:nowrap; }
+      .nav-prev { grid-column:1; grid-row:2; justify-self:start; }
+      .nav-index { grid-column:2; grid-row:2; justify-self:center; }
+      .nav-forward { grid-column:3; grid-row:2; justify-self:end; }
+    }
+    @media print {
+      nav, .progress, .theme-toggle { display: none !important; }
+      body { background: #fff; color: #111; }
+      .hero { min-height: auto; padding: 40px 24px; }
+      .reveal { opacity: 1; transform: none; }
+      .fig, .mini-card, .controls, .metric, .worksheet-field, .concept-layer { box-shadow: none; break-inside: avoid; background: #fff; color: #111; border-color: #bbb; }
+      .answers { display: block !important; }
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/readability-overrides.css">
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
+  <div class="nav-right">
+    <a href="session-19.html" class="nav-prev">19회차</a>
+    <span class="nav-session">SESSION 20</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-21.html" class="nav-next nav-forward">21회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 20 · Level 4</div>
+    <h1><span class="hi">내가격 옵션과</span><br class="mobile-break">주식 대체 효과</h1>
+    <p class="hero-sub">70콜 1계약은 3,200달러, 주식 100주는 1만 달러입니다. 적은 현금으로 비슷한 방향 노출을 얻는 것처럼 보이지만, 그 안에는 시간가치와 만기라는 반납일이 들어 있습니다. 내가격 콜을 주식 대체로 볼 때 무엇을 먼저 계산해야 하는지, 자본효율과 만기 리스크를 나란히 펼쳐 봅니다.</p>
+    <div class="thesis"><div class="thesis-label">20회차 중심 문장</div><div class="thesis-main">내가격 옵션은 높은 델타로 주식 노출을 압축해 담을 수 있지만, 시간가치, 만기, 유동성, 레버리지 착시를 함께 관리해야 하는 계약입니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+
+<!-- ===== 00 · bridge from OTM ===== -->
+<section class="section reveal" id="section-00">
+  <div class="section-num">00 · 외가격의 유혹에서 내가격의 주식 대체 효과로</div>
+  <h2>외가격의 유혹에서 내가격의 주식 대체 효과로 넘어갑니다</h2>
+  <div class="prose">
+    <p>19회차에서는 외가격 옵션을 다뤘습니다. 외가격 옵션은 프리미엄이 작아 보이지만, 손익분기점까지 필요한 이동률이 크고 0으로 끝나는 결과를 자주 만날 수 있었습니다. 매도자에게는 작은 프리미엄 수취 뒤에 꼬리 손실이 숨어 있었습니다.</p>
+    <p>오늘은 반대편에 가까운 내가격 옵션을 봅니다. 내가격 옵션은 지금 행사하면 내재가치가 있는 옵션입니다. 콜 기준으로는 행사가가 현재 주가보다 낮고, 풋 기준으로는 행사가가 현재 주가보다 높습니다.</p>
+    <p>내가격 옵션은 외가격 옵션보다 비쌉니다. 대신 델타가 높고 주식 가격 변화에 더 민감하게 움직입니다. 이 때문에 일부 투자자는 내가격 콜이나 장기 내가격 콜을 주식 대체 수단처럼 바라봅니다. 먼저 내가격이 가격 지도에서 어디에 있는지부터 정리하겠습니다.</p>
+  </div>
+</section>
+
+<!-- Figure 1: ITM strike map -->
+<section class="section-wide reveal" id="figure-01-wrap">
+  <div class="fig" id="figure-01">
+    <div class="fig-label">Figure 01 — 내가격 옵션 위치 지도</div>
+    <h2>현재가 안쪽에 자리한 행사가가 내가격 구간입니다</h2>
+    <div class="segmented" id="f1Toggle" style="justify-content:center">
+      <button class="strike-btn active" type="button" data-f1="call">콜 기준</button>
+      <button class="strike-btn" type="button" data-f1="put">풋 기준</button>
+    </div>
+    <div class="svg-card" style="margin-top:16px">
+      <svg viewBox="0 0 620 170" role="img" aria-label="내가격 위치 지도">
+        <line class="axis-line" x1="40" y1="118" x2="600" y2="118"></line>
+        <g id="f1Marks"></g>
+      </svg>
+    </div>
+    <div class="metric-grid" style="margin-top:14px">
+      <div class="metric"><span>현재가</span><strong>$100</strong></div>
+      <div class="metric"><span id="f1ItmLabel">내가격 콜 행사가</span><strong id="f1Strikes" style="color:var(--amber)">70 · 80 · 90</strong></div>
+      <div class="metric"><span>지금 행사 시 내재가치</span><strong id="f1Intr" style="color:var(--green)">있음</strong></div>
+    </div>
+    <div class="note-strip" id="f1Note">콜은 현재가보다 낮은 행사가가 내가격입니다. 70콜·80콜·90콜은 지금 행사하면 각각 30·20·10달러의 내재가치가 있습니다. 행사가가 낮을수록 내재가치가 크고 시간가치 비중은 작아집니다.</div>
+    <div class="fig-caption">현재 주가 100달러 기준 예시입니다. 등가격은 약 100달러, 그 안쪽이 내가격 구간입니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 01 · today's question ===== -->
+<section class="section reveal" id="section-01">
+  <div class="section-num">01 · 오늘의 질문</div>
+  <h2>내가격 옵션은 정말 주식처럼 쓸 수 있을까요</h2>
+  <div class="prose">
+<p>내가격 옵션을 주식 대체로 볼 때 먼저 확인할 질문입니다.</p>
+<p><strong>내가격 콜은 왜 주식처럼 움직일 수 있고, 그래도 왜 주식과 똑같이 다루면 위험할까요?</strong></p>
+<p>현재 주가가 100달러인 종목을 가정하겠습니다. 70행사가 콜이 32달러에 거래되고, 델타는 0.85라고 둡니다. 만기는 90일입니다. 현재 주가 100달러, 행사가 70달러, 프리미엄 32달러, 계약 승수 100주를 계산의 출발점으로 두고 만기 주가와 시간 경과를 봅니다.</p>
+<p>주식 100주를 사려면 10,000달러가 필요합니다. 70콜 1계약은 3,200달러입니다. 투입 현금은 주식의 32% 수준인데, 델타 기준 방향 노출은 약 85주입니다. 숫자만 보면 자본효율이 좋아 보이죠.</p>
+<p>하지만 이 옵션 안에는 내재가치 30달러와 시간가치 2달러가 함께 들어 있습니다. 주가가 제자리여도 시간이 지나면 그 2달러가 줄어들 수 있습니다. 그리고 만기에는 옵션의 권리가 끝납니다.</p>
+  </div>
+</section>
+
+<!-- Figure 2: premium decomposition bar -->
+<section class="section-wide reveal" id="figure-02-wrap">
+  <div class="fig" id="figure-02">
+    <div class="fig-label">Figure 02 — 프리미엄의 두 층: 내재가치와 시간가치</div>
+    <h2>같은 프리미엄도 내재가치와 시간가치 비중이 다릅니다</h2>
+    <div class="segmented" id="f2Toggle" style="justify-content:center; flex-wrap:wrap">
+      <button class="strike-btn active" type="button" data-f2="c70">70콜 (90일)</button>
+      <button class="strike-btn" type="button" data-f2="leaps80">80콜 LEAPS (1년)</button>
+    </div>
+    <div style="margin-top:16px">
+      <div class="control-title" style="margin-bottom:6px">프리미엄 <strong id="f2PremLabel" style="color:var(--amber)">$32</strong> = 내재가치 + 시간가치</div>
+      <div class="stack-bar">
+        <div class="stack-seg intrinsic" id="f2Intr" style="width:93.75%">내재 $30</div>
+        <div class="stack-seg time" id="f2Time" style="width:6.25%">$2</div>
+      </div>
+      <div class="stack-legend">
+        <span><span class="stack-dot intrinsic"></span>내재가치</span>
+        <span><span class="stack-dot time"></span>시간가치</span>
+      </div>
+    </div>
+    <div class="metric-grid" style="margin-top:16px">
+      <div class="metric"><span>프리미엄</span><strong id="f2Prem" style="color:var(--amber)">$32</strong></div>
+      <div class="metric"><span>내재가치</span><strong id="f2IntrVal" style="color:var(--text)">$30</strong></div>
+      <div class="metric"><span>시간가치</span><strong id="f2TimeVal" style="color:var(--blue)">$2</strong></div>
+    </div>
+    <div class="note-strip" id="f2Note">70콜은 프리미엄 32달러 중 내재가치가 30달러, 시간가치가 2달러입니다. 깊은 내가격일수록 시간가치 비중은 작지만 0은 아닙니다. 주가가 제자리여도 만기에는 이 시간가치가 사라질 수 있습니다.</div>
+    <div class="fig-caption">고정: 현재가 100. 변화: 행사가와 만기. 콜 내재가치 = max(현재가 − 행사가, 0), 시간가치 = 프리미엄 − 내재가치.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 02 · central sentence ===== -->
+<section class="section reveal" id="section-02">
+  <div class="section-num">02 · 오늘의 중심 문장</div>
+  <h2>내가격 옵션은 높은 델타와 만기 리스크를 함께 가집니다</h2>
+  <div class="prose">
+<p>이번 회차는 다음 문장으로 묶겠습니다.</p>
+<p><strong>내가격 옵션은 높은 델타로 주식 노출을 압축해 담을 수 있지만, 시간가치, 만기, 유동성, 레버리지 착시를 함께 관리해야 하는 계약입니다.</strong></p>
+<p>이 한 문장을 가치 분해, 주식과의 비용 비교, 만기 손익 경로, 델타 등가 노출, LEAPS 시나리오, 레버리지 착시까지 차례로 풀어 보겠습니다.</p>
+  </div>
+</section>
+
+<!-- Figure 3: stock vs call cost -->
+<section class="section-wide reveal" id="figure-03-wrap">
+  <div class="fig" id="figure-03">
+    <div class="fig-label">Figure 03 — 주식 100주와 70콜 1계약 비용 비교</div>
+    <h2>투입 현금은 32%지만 방향 노출은 약 85주입니다</h2>
+    <div class="two">
+      <div class="concept-layer" style="border-color:rgba(125,211,252,.4)">
+        <div class="layer-title" style="color:var(--blue)">주식 100주</div>
+        <div class="layer-value">$10,000</div>
+        <div class="layer-desc">방향 노출 100주. 만기 없이 계속 보유할 수 있습니다.</div>
+      </div>
+      <div class="concept-layer" style="border-color:rgba(245,177,76,.4)">
+        <div class="layer-title" style="color:var(--amber)">70콜 1계약</div>
+        <div class="layer-value">$3,200</div>
+        <div class="layer-desc">델타 0.85 기준 방향 노출 약 85주. 대신 만기와 시간가치가 붙습니다.</div>
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <div class="control-title" style="margin-bottom:10px">투입 현금 비교</div>
+      <div class="compare-bar"><div class="compare-label">주식 100주</div><div class="compare-fill" style="width:100%; background:var(--blue)"><span>$10,000</span></div></div>
+      <div class="compare-bar"><div class="compare-label">70콜 1계약</div><div class="compare-fill" style="width:32%; background:var(--amber)"><span>$3,200</span></div></div>
+    </div>
+    <div class="metric-grid" style="margin-top:16px">
+      <div class="metric"><span>현금 투입 비율</span><strong style="color:var(--amber)">32%</strong></div>
+      <div class="metric"><span>델타 등가 주식</span><strong style="color:var(--green)">≈ 85주</strong></div>
+      <div class="metric"><span>노출 대비 효율</span><strong style="color:var(--text)">압축</strong></div>
+    </div>
+    <div class="note-strip">투입 현금은 주식의 약 32%지만, 델타 기준 방향 노출은 약 85주입니다. 지불 현금과 방향 노출은 서로 다른 숫자라는 점이 내가격 콜을 읽는 출발점입니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 03 · payoff path body ===== -->
+<section class="section reveal" id="section-03">
+  <div class="section-num">03 · 주식과 내가격 콜의 노출</div>
+  <h2>주식 100주와 내가격 콜의 노출을 비교합니다</h2>
+  <div class="prose">
+<p>내가격 옵션은 지금 행사하면 가치가 있는 상태입니다. 현재 주가가 100달러일 때 70콜은 70달러에 살 권리입니다. 지금 행사하면 100달러짜리를 70달러에 살 수 있으므로 내재가치가 30달러입니다.</p>
+<p>이 70콜의 프리미엄이 32달러라면 가격은 두 층으로 나뉩니다. 내재가치 30달러, 시간가치 2달러입니다. 현재 주가 100달러와 행사가 70달러를 놓고 보면, 옵션 가격 32달러 안에서 확정에 가까운 가치와 남은 가능성의 가치가 나뉩니다.</p>
+<p>내가격 콜이 주식처럼 보이는 첫 이유는 델타입니다. 70콜 델타가 0.85라면 주가가 1달러 움직일 때, 다른 조건을 고정하면 옵션 가격은 약 0.85달러 움직입니다. 1계약은 100주 단위이므로 주가가 5달러 오르면 옵션 가격 변화는 대략 <code>0.85 × 5 × 100 = 425달러</code>입니다.</p>
+<p>주식 100주는 같은 5달러 상승에서 500달러를 법니다. 내가격 콜 1계약은 대략 425달러를 벌 수 있습니다. 투입 현금은 주식 10,000달러보다 작은 3,200달러입니다. 그래서 수익률 관점에서는 옵션 쪽이 더 크게 움직일 수 있습니다.</p>
+<p>예를 들어 만기 주가가 110달러가 된다고 하겠습니다. 주식 100주는 1,000달러 이익입니다. 70콜은 만기 가치가 40달러, 1계약 기준 4,000달러입니다. 처음 3,200달러를 냈으므로 손익은 800달러입니다. 주식보다 이익 달러는 작지만 투입금 대비 수익률은 25%입니다.</p>
+<p>만기 주가가 130달러라면 차이가 더 커집니다. 주식 100주는 3,000달러 이익입니다. 70콜은 만기 가치 60달러, 1계약 기준 6,000달러입니다. 손익은 2,800달러입니다. 투입금 3,200달러 대비 87.5%입니다. 행사가와 프리미엄을 먼저 넣고, 만기 주가가 레버리지 효과를 결정합니다.</p>
+<p>여기까지 보면 내가격 콜은 꽤 매력적입니다. 그런데 하락 시나리오를 넣으면 성격이 달라집니다. 만기 주가가 90달러라면 주식 100주는 1,000달러 손실입니다. 70콜은 만기 가치 20달러, 1계약 기준 2,000달러입니다. 손익은 -1,200달러입니다.</p>
+<p>주식보다 달러 손실이 더 큽니다. 왜 그럴까요. 주식은 100에서 90으로 내려 10달러를 잃었습니다. 옵션은 내재가치가 30달러에서 20달러로 줄었고, 처음에 지불한 시간가치 2달러도 만기에는 사라졌습니다. 방향 손실과 시간가치 소멸이 같이 반영된 겁니다.</p>
+<p>만기 주가가 100달러 그대로라면 주식 손익은 0입니다. 70콜은 만기 가치 30달러이고 처음 지불한 가격은 32달러입니다. 손익은 -200달러입니다. 주가가 움직이지 않았는데도 시간가치 2달러를 잃었습니다. 이게 내가격 콜을 주식처럼 볼 때 빠지기 쉬운 부분입니다.</p>
+<p>손익분기점도 계산해야 합니다. 70콜을 32달러에 샀다면 만기 손익분기점은 <code>70 + 32 = 102달러</code>입니다. 현재 주가 100달러에서 2% 상승해야 만기 기준으로 프리미엄을 회수합니다. 아래에서 만기 주가를 옮겨 보면, 같은 내가격 콜이 상승·제자리·하락에서 어떻게 다른 손익을 내는지 확인할 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- Figure 4: ITM call payoff calculator -->
+<section class="section-wide reveal" id="figure-04-wrap">
+  <div class="fig" id="figure-04">
+    <div class="fig-label">Figure 04 — 내가격 콜 만기 손익 계산기</div>
+    <h2>70콜 매수는 102달러에서 본전, 그 위에서 수익이 커집니다</h2>
+    <div class="svg-card">
+      <svg viewBox="0 0 620 280" role="img" aria-label="내가격 콜 매수 만기 손익 그래프">
+        <line class="axis-line" x1="55" y1="155" x2="595" y2="155"></line>
+        <line class="axis-line" x1="55" y1="30" x2="55" y2="250"></line>
+        <path id="f4Curve" d="" fill="none" stroke="var(--amber)" stroke-width="3"></path>
+        <line id="f4BeLine" x1="0" y1="30" x2="0" y2="250" stroke="var(--blue)" stroke-width="1" stroke-dasharray="4 4" opacity=".7"></line>
+        <circle id="f4Dot" cx="0" cy="0" r="6" fill="var(--amber)" stroke="var(--bg-card)" stroke-width="2"></circle>
+        <text id="f4DotText" x="0" y="0" text-anchor="middle" fill="var(--text)" style="font-size:12px;font-weight:700"></text>
+        <text x="540" y="148" style="font-size:10px">손익 0</text>
+        <text id="f4BeLabel" x="0" y="266" text-anchor="middle" style="font-size:10px;fill:var(--blue)">B/E 102</text>
+      </svg>
+    </div>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">만기 주가 ($)</div>
+        <div class="control-value" id="f4PriceLabel">100</div>
+      </div>
+      <input id="f4Slider" type="range" min="60" max="140" value="100" step="1" aria-label="만기 주가">
+      <div class="segmented" id="f4Quick" style="justify-content:center">
+        <button class="strike-btn" type="button" data-f4q="90">90</button>
+        <button class="strike-btn" type="button" data-f4q="100">100</button>
+        <button class="strike-btn" type="button" data-f4q="110">110</button>
+        <button class="strike-btn" type="button" data-f4q="130">130</button>
+      </div>
+    </div>
+    <div class="metric-grid" style="margin-top:14px">
+      <div class="metric"><span>옵션당 손익</span><strong id="f4Share" style="color:var(--red)">-2.00</strong></div>
+      <div class="metric"><span>1계약 손익</span><strong id="f4Pnl" style="color:var(--red)">-$200</strong></div>
+      <div class="metric"><span>투입금 대비 수익률</span><strong id="f4Roi" style="color:var(--red)">-6.3%</strong></div>
+    </div>
+    <div class="note-strip" id="f4Note">고정: 현재가 100, 행사가 70, 프리미엄 32. 변화: 만기 주가. 만기 손익 = (max(S−70, 0) − 32) × 100. 100달러에서는 -200달러, 110달러에서는 +800달러, 130달러에서는 +2,800달러입니다.</div>
+  </div>
+</section>
+
+<!-- Figure 5: stock vs option payoff path -->
+<section class="section-wide reveal" id="figure-05-wrap">
+  <div class="fig" id="figure-05">
+    <div class="fig-label">Figure 05 — 주식 손익과 내가격 콜 손익 비교</div>
+    <h2>옵션은 102달러부터 이익, 같은 만기 주가에서 손익 경로가 다릅니다</h2>
+    <div class="svg-card">
+      <svg viewBox="0 0 620 280" role="img" aria-label="주식과 내가격 콜 만기 손익 비교">
+        <line class="axis-line" x1="55" y1="150" x2="595" y2="150"></line>
+        <line class="axis-line" x1="55" y1="30" x2="55" y2="270"></line>
+        <path id="f5Stock" d="" fill="none" stroke="var(--blue)" stroke-width="3"></path>
+        <path id="f5Opt" d="" fill="none" stroke="var(--amber)" stroke-width="3"></path>
+        <circle id="f5StockDot" cx="0" cy="0" r="6" fill="var(--blue)" stroke="var(--bg-card)" stroke-width="2"></circle>
+        <circle id="f5OptDot" cx="0" cy="0" r="6" fill="var(--amber)" stroke="var(--bg-card)" stroke-width="2"></circle>
+        <text x="540" y="143" style="font-size:10px">손익 0</text>
+        <text x="510" y="46" style="font-size:10px;fill:var(--blue)">주식 100주</text>
+        <text x="510" y="62" style="font-size:10px;fill:var(--amber)">70콜 1계약</text>
+      </svg>
+    </div>
+    <div class="segmented" id="f5Points" style="justify-content:center; flex-wrap:wrap">
+      <button class="strike-btn active" type="button" data-f5p="70">70</button>
+      <button class="strike-btn" type="button" data-f5p="90">90</button>
+      <button class="strike-btn" type="button" data-f5p="100">100</button>
+      <button class="strike-btn" type="button" data-f5p="102">102</button>
+      <button class="strike-btn" type="button" data-f5p="110">110</button>
+      <button class="strike-btn" type="button" data-f5p="130">130</button>
+    </div>
+    <div class="metric-grid" style="margin-top:14px">
+      <div class="metric"><span>주식 100주 손익</span><strong id="f5StockPnl" style="color:var(--red)">-$3,000</strong></div>
+      <div class="metric"><span>70콜 1계약 손익</span><strong id="f5OptPnl" style="color:var(--red)">-$3,200</strong></div>
+      <div class="metric"><span>옵션 − 주식</span><strong id="f5Diff" style="color:var(--red)">-$200</strong></div>
+    </div>
+    <div class="note-strip" id="f5Note">고정: 주식 진입 100, 70콜 매수가 32. 변화: 만기 주가. 주식 손익 = (S − 100) × 100, 옵션 손익 = (max(S−70, 0) − 32) × 100. 옵션은 102달러부터 만기 이익으로 돌아섭니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 04 · delta equivalent ===== -->
+<section class="section reveal" id="section-04">
+  <div class="section-num">04 · 델타 등가 노출</div>
+  <h2>내가격 콜은 고정된 주식 등가물이 아닙니다</h2>
+  <div class="prose">
+<p>내가격 콜은 외가격 콜보다 손익분기점이 현재가에 가깝습니다. 19회차의 120콜은 손익분기점이 120.35달러였습니다. 이번 70콜은 102달러입니다. 대신 처음 지불하는 프리미엄은 35달러가 아닌 3,200달러입니다. 가까운 손익분기점과 큰 선불 비용을 함께 봐야 합니다.</p>
+<p>내가격 옵션의 델타가 높다는 말도 조심해서 써야 합니다. 0.85 델타는 지금 조건에서의 근사값입니다. 주가가 더 오르면 콜 델타는 1에 가까워질 수 있고, 주가가 내려가면 델타는 낮아집니다. 시간이 지나고 변동성이 바뀌어도 델타는 변합니다.</p>
+<p>즉 내가격 콜의 주식 대체 효과는 고정된 등가물이 아닙니다. 현재 조건에서 주식 몇 주와 비슷한 방향 노출을 갖는다는 뜻에 가깝습니다. 70콜 1계약 델타 0.85는 약 85주 노출입니다. 5계약이면 현재 조건에서 425주에 가까운 방향 노출로 계산할 수 있습니다. 단, 가격 경로가 바뀌면 이 숫자도 바뀝니다.</p>
+<p>개인적으로 내가격 콜을 볼 때 가장 먼저 하는 계산은 “몇 주를 대신 들고 있는 셈인가”입니다. 프리미엄이 싸냐 비싸냐보다 델타 등가 주식 수를 먼저 봅니다. 그다음 만기 손익분기점과 시간가치 비용을 봅니다. 이 순서가 레버리지 착시를 줄여줍니다.</p>
+  </div>
+</section>
+
+<!-- Figure 6: delta equivalent calculator -->
+<section class="section-wide reveal" id="figure-06-wrap">
+  <div class="fig" id="figure-06">
+    <div class="fig-label">Figure 06 — 델타 등가 주식 수 계산기</div>
+    <h2>델타 × 계약 수 × 100이 현재 조건의 방향 노출입니다</h2>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">델타</div>
+        <div class="control-value" id="f6DeltaOut">0.85</div>
+      </div>
+      <input id="f6Delta" type="range" min="0.50" max="0.98" value="0.85" step="0.01" aria-label="델타">
+      <div class="control-head" style="margin-top:14px">
+        <div class="control-title">계약 수</div>
+        <div class="control-value" id="f6ContOut">1</div>
+      </div>
+      <input id="f6Cont" type="range" min="1" max="10" value="1" step="1" aria-label="계약 수">
+    </div>
+    <div class="worksheet-grid" style="margin-top:14px; grid-template-columns:1fr">
+      <div class="worksheet-field"><label>현재 주가 ($)</label><input id="f6Price" type="number" value="100" min="1" step="1" inputmode="decimal"></div>
+    </div>
+    <div class="metric-grid" style="margin-top:14px">
+      <div class="metric"><span>델타 등가 주식 수</span><strong id="f6Shares" style="color:var(--green)">85주</strong></div>
+      <div class="metric"><span>현재가 기준 등가 노출</span><strong id="f6Notional" style="color:var(--amber)">$8,500</strong></div>
+      <div class="metric"><span>계약당 등가 주식</span><strong id="f6PerContract" style="color:var(--text)">85주</strong></div>
+    </div>
+    <div class="note-strip" id="f6Note">델타 등가 주식 수 = 델타 × 계약 수 × 100. 등가 노출액 = 등가 주식 수 × 현재 주가. 지금 설정에서 1계약은 약 85주, 현재가 100달러 기준 8,500달러어치 방향 노출입니다. 이 숫자는 현재 조건의 근사값이며 가격 경로가 바뀌면 함께 변합니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 05 · LEAPS ===== -->
+<section class="section reveal" id="section-05">
+  <div class="section-num">05 · LEAPS와 레버리지 착시</div>
+  <h2>장기 내가격 콜도 같은 프레임으로 봅니다</h2>
+  <div class="prose">
+<p>LEAPS도 같은 프레임으로 봅니다. LEAPS는 보통 만기가 긴 옵션을 말합니다. 예를 들어 현재 주가 100달러, 1년 만기 80콜이 25달러이고 델타가 0.78이라고 둡니다. 내재가치는 20달러, 시간가치는 5달러입니다.</p>
+<p>이 80콜 1계약의 비용은 2,500달러입니다. 델타 기준으로는 약 78주 노출입니다. 주식 100주 10,000달러와 비교하면 투입 현금은 25%이고, 방향 노출은 78주 수준입니다. 자본효율은 좋아 보입니다. 손익분기점은 <code>80 + 25 = 105달러</code>입니다.</p>
+<p>주가가 120달러가 되면 옵션 만기 가치는 40달러, 손익은 1,500달러입니다. 같은 기간 주식 100주는 2,000달러 이익입니다. 옵션은 덜 벌었지만 투입금 대비 수익률은 60%입니다. 반대로 주가가 90달러로 끝나면 80콜의 만기 가치는 10달러, 손익은 -1,500달러입니다. 주식 100주의 손실은 -1,000달러입니다. 레버리지 압축이 수익률과 손실률을 동시에 키웁니다.</p>
+<p>여기서 포지션 크기가 중요해집니다. 80콜 LEAPS 5계약을 사면 비용은 12,500달러입니다. 델타 노출은 <code>0.78 × 100 × 5 = 390주</code>입니다. 현재가 100달러 기준으로 주식 39,000달러어치와 비슷한 방향 노출입니다. 옵션 비용만 보고 “12,500달러만 넣었다”고 느끼면 실제 방향 리스크를 작게 볼 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- Figure 7: LEAPS scenario board -->
+<section class="section-wide reveal" id="figure-07-wrap">
+  <div class="fig" id="figure-07">
+    <div class="fig-label">Figure 07 — LEAPS 주식 대체 시나리오 보드</div>
+    <h2>80콜 LEAPS와 주식 100주는 만기 주가마다 다르게 끝납니다</h2>
+    <div class="segmented" id="f7Toggle" style="justify-content:center; flex-wrap:wrap">
+      <button class="strike-btn" type="button" data-f7="90">주가 90</button>
+      <button class="strike-btn" type="button" data-f7="100">주가 100</button>
+      <button class="strike-btn active" type="button" data-f7="105">주가 105</button>
+      <button class="strike-btn" type="button" data-f7="120">주가 120</button>
+      <button class="strike-btn" type="button" data-f7="140">주가 140</button>
+    </div>
+    <div class="two" style="margin-top:16px">
+      <div class="concept-layer">
+        <div class="layer-title" style="color:var(--amber)">80콜 LEAPS 1계약 손익</div>
+        <div class="layer-value" id="f7Opt">$0</div>
+        <div class="layer-desc" id="f7OptDesc">투입 2,500달러 대비 손익률 0%</div>
+      </div>
+      <div class="concept-layer">
+        <div class="layer-title" style="color:var(--blue)">주식 100주 손익</div>
+        <div class="layer-value" id="f7Stock">+$500</div>
+        <div class="layer-desc" id="f7StockDesc">투입 10,000달러 대비 손익률 +5%</div>
+      </div>
+    </div>
+    <div class="note-strip" id="f7Note">고정: 현재가 100, 행사가 80, 프리미엄 25, 델타 0.78. 변화: 만기 주가. 옵션 손익 = (max(S−80, 0) − 25) × 100, 주식 손익 = (S − 100) × 100. 손익분기점 105달러에서 옵션 손익은 0입니다.</div>
+    <div class="fig-caption">투입 현금 대비 수익률은 옵션이 클 수 있지만, 만기와 시간가치 비용이 함께 붙습니다.</div>
+  </div>
+</section>
+
+<!-- Figure 8: leverage illusion panel -->
+<section class="section-wide reveal" id="figure-08-wrap">
+  <div class="fig" id="figure-08">
+    <div class="fig-label">Figure 08 — 레버리지 착시 경고 패널</div>
+    <h2>옵션 비용은 작아도 델타 등가 노출은 크게 늘어납니다</h2>
+    <div class="controls">
+      <div class="control-head">
+        <div class="control-title">80콜 LEAPS 계약 수</div>
+        <div class="control-value" id="f8ContLabel">1계약</div>
+      </div>
+      <input id="f8Cont" type="range" min="1" max="5" value="1" step="1" aria-label="계약 수">
+    </div>
+    <div class="metric-grid" style="margin-top:14px">
+      <div class="metric"><span>투입 비용 · 최대손실</span><strong id="f8Cost" style="color:var(--amber)">$2,500</strong></div>
+      <div class="metric"><span>델타 등가 주식</span><strong id="f8Shares" style="color:var(--green)">78주</strong></div>
+      <div class="metric"><span>현재가 기준 노출</span><strong id="f8Notional" style="color:var(--red)">$7,800</strong></div>
+    </div>
+    <div class="note-strip" id="f8Note">프리미엄 25달러, 델타 0.78, 현재가 100달러 기준입니다. 1계약은 비용 2,500달러에 약 78주 노출이지만, 5계약이면 비용 12,500달러에 390주, 현재가 기준 39,000달러어치 방향 노출입니다. 지불 현금, 델타 등가 노출, 최대손실을 분리해서 봐야 합니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 06 · misconception ===== -->
+<section class="section reveal" id="section-06">
+  <div class="section-num">06 · 흔한 오해</div>
+  <h2>내가격 콜이 주식처럼 안전하다는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>여기서 가장 조심할 오해는 “내가격 콜은 주식 대체니까 주식처럼 안전하다”는 생각입니다.</p>
+<p>내가격 콜은 주식과 비슷한 방향 노출을 줄 수 있습니다. 델타가 높을수록 기초자산 가격 변화에 더 가까이 반응합니다. 하지만 옵션은 만기가 있고, 시간가치가 있고, 델타가 변합니다. 주식은 계속 보유할 수 있지만 옵션 권리는 끝나는 날짜가 있습니다.</p>
+<p>두 번째 오해는 “투입금이 작으니 리스크도 작다”는 생각입니다. 80콜 LEAPS 1계약은 2,500달러만 필요하지만 델타 기준으로 약 78주 노출입니다. 5계약이면 390주 노출입니다. 계좌의 실제 방향 리스크는 지불한 프리미엄보다 델타 등가 노출에서 더 잘 드러날 때가 많습니다.</p>
+<p>세 번째 오해는 “깊은 내가격이면 시간가치가 거의 없으니 신경 쓰지 않아도 된다”는 생각입니다. 시간가치가 작아도 0은 아닐 수 있습니다. 주가가 제자리거나 천천히 움직이면 그 작은 시간가치가 수익률을 깎습니다. 만기가 가까워질수록 롤오버 여부도 결정해야 합니다.</p>
+<p>유동성도 현실 비용입니다. 옵션은 행사가와 만기마다 유동성이 갈립니다. 내가격 옵션은 스프레드가 넓을 수 있고, 장기 옵션은 거래가 드문 경우도 있습니다. 배당과 조기행사도 미국식 주식옵션에서는 확인해야 합니다. 입문 단계에서 모두 계산할 필요는 없지만, 장기 내가격 옵션을 주식 대체로 볼 때 배당, 금리, 조기행사, 호가 스프레드가 현실 조건이라는 점은 기억해야 합니다.</p>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 07 · summary ===== -->
+<section class="section reveal" id="section-07">
+  <div class="section-num">07 · 이번 회차 압축</div>
+  <h2>자본효율은 좋아질 수 있지만 만기와 시간가치는 남습니다</h2>
+  <div class="prose">
+<p>내가격 옵션은 지금 행사 가치가 있는 옵션입니다. 콜 기준으로는 현재 주가보다 낮은 행사가, 풋 기준으로는 현재 주가보다 높은 행사가가 내가격입니다. 가격은 내재가치와 시간가치로 나뉩니다.</p>
+<p>내가격 콜은 델타가 높아 주식처럼 움직일 수 있습니다. 0.85 델타 콜 1계약은 대략 주식 85주 노출과 비슷합니다. 이 노출을 더 적은 현금으로 만들 수 있기 때문에 자본효율이 좋아 보입니다. 그 대가로 시간가치, 만기, 델타 변화, 유동성, 배당과 조기행사 같은 현실 조건이 붙습니다.</p>
+<p>오늘의 체크포인트는 다섯 가지입니다. 내재가치와 시간가치를 분해합니다. 델타 등가 주식 수를 계산합니다. 만기 손익분기점을 계산합니다. 불리한 주가 시나리오에서 손실률을 봅니다. 마지막으로 유동성과 롤오버 계획을 확인합니다.</p>
+  </div>
+  <div class="three" style="margin-top:8px">
+    <div class="mini-card"><div class="mini-k">노출</div><div class="mini-v pos">높은 델타</div><div class="mini-p">적은 현금으로 주식과 비슷한 방향 노출을 압축해 담습니다.</div></div>
+    <div class="mini-card"><div class="mini-k">비용</div><div class="mini-v">시간가치 · 만기</div><div class="mini-p">주가가 제자리여도 시간가치가 줄고, 권리는 만기에 끝납니다.</div></div>
+    <div class="mini-card"><div class="mini-k">착시</div><div class="mini-v neg">레버리지</div><div class="mini-p">옵션 비용이 작아도 델타 등가 노출은 계약 수만큼 커집니다.</div></div>
+  </div>
+  <div class="prose" style="margin-top:24px">
+    <ul>
+      <li>내가격 옵션은 높은 델타로 주식 대체처럼 보일 수 있습니다.</li>
+      <li>그래도 만기, 시간가치, 호가, 배당과 조기행사 리스크는 남습니다.</li>
+      <li>자본효율은 좋아질 수 있지만 주식보다 단순히 안전한 상품은 아닙니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Figure 9: stock-substitute worksheet -->
+<section class="section-wide reveal" id="figure-09-wrap">
+  <div class="fig" id="figure-09">
+    <div class="fig-label">Figure 09 — 주식 대체 체크 워크시트</div>
+    <h2>내가격 옵션을 주식 대체로 볼 때 필요한 숫자를 직접 채웁니다</h2>
+    <div class="worksheet-grid" id="w9Sheet">
+      <div class="worksheet-field"><label>현재 주가 S ($)</label><input id="w9S" type="number" min="0" step="1" inputmode="decimal" placeholder="예: 100"></div>
+      <div class="worksheet-field"><label>행사가 K ($)</label><input id="w9K" type="number" min="0" step="1" inputmode="decimal" placeholder="예: 70"></div>
+      <div class="worksheet-field"><label>프리미엄 ($)</label><input id="w9Prem" type="number" min="0" step="0.01" inputmode="decimal" placeholder="예: 32"></div>
+      <div class="worksheet-field"><label>델타</label><input id="w9Delta" type="number" min="0" max="1" step="0.01" inputmode="decimal" placeholder="예: 0.85"></div>
+      <div class="worksheet-field"><label>계약 수</label><input id="w9Cont" type="number" min="1" step="1" inputmode="numeric" placeholder="예: 1"></div>
+    </div>
+    <div class="segmented" style="margin-top:12px">
+      <button class="answer-btn" id="w9Fill" type="button">예시 채우기</button>
+      <button class="answer-btn" id="w9Clear" type="button">비우기</button>
+      <button class="answer-btn" id="w9Calc" type="button">계산하기</button>
+      <button class="answer-btn" id="w9Print" type="button">인쇄용 보기</button>
+    </div>
+    <div class="metric-grid" style="margin-top:16px">
+      <div class="metric"><span>내재가치</span><strong id="w9Intr">—</strong></div>
+      <div class="metric"><span>시간가치</span><strong id="w9Time">—</strong></div>
+      <div class="metric"><span>손익분기점</span><strong id="w9Be">—</strong></div>
+    </div>
+    <div class="metric-grid" style="margin-top:10px; grid-template-columns:repeat(2,1fr)">
+      <div class="metric"><span>델타 등가 주식 수</span><strong id="w9Shares">—</strong></div>
+      <div class="metric"><span>현재가 기준 등가 노출</span><strong id="w9Notional">—</strong></div>
+    </div>
+    <div class="note-strip" id="w9Note">내재가치 = max(S − K, 0), 시간가치 = 프리미엄 − 내재가치, 손익분기점 = K + 프리미엄, 델타 등가 주식 수 = 델타 × 계약 수 × 100, 등가 노출 = 등가 주식 수 × S. 값을 넣고 “계산하기”를 누르면 채워집니다. 학습용 예시이며 수수료·세금·호가 스프레드는 반영하지 않습니다.</div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- ===== 08 · next ===== -->
+<section class="section reveal" id="section-08">
+  <div class="section-num">08 · 다음 회차로</div>
+  <h2>다음 회차부터 주식과 옵션을 묶는 전략으로 갑니다</h2>
+  <div class="prose">
+<p>다음 21회차에서는 커버드콜을 봅니다. 지금까지는 옵션 하나를 사거나 파는 구조를 주로 다뤘습니다. 이제부터는 주식과 옵션을 함께 묶어 포트폴리오 성격을 바꾸는 전략으로 넘어갑니다.</p>
+<p>커버드콜은 주식을 보유한 상태에서 콜을 매도해 프리미엄을 받는 구조입니다. 대신 주가가 크게 오를 때 상승 일부를 넘기게 됩니다. 20회차에서 배운 주식 대체 효과와 델타 노출 감각은 커버드콜의 상방 제한을 이해하는 데 바로 연결됩니다.</p>
+  </div>
+  <a class="next-card" href="session-21.html">
+    <div>
+      <div class="next-label">다음 회차</div>
+      <div class="next-title">21회차 — 커버드콜, 수익을 앞당겨 받는 대신 상승 일부를 넘긴다</div>
+      <p class="next-desc">주식을 보유한 채 콜을 매도해 프리미엄을 받는 구조를 봅니다. 옵션 하나를 넘어 주식과 옵션을 함께 묶는 전략으로 넘어갑니다.</p>
+    </div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 2026 무기견. All rights reserved.</div>
+  <div><a href="../copyright.html">저작권 및 이용 제한</a></div>
+</footer>
+<script>
+/* ── Theme ── */
+var THEME_KEY = 'mugigyeon-options-course-theme-v2';
+var root = document.documentElement;
+var themeButtons = [].slice.call(document.querySelectorAll('[data-theme-choice]'));
+function applyTheme(theme) {
+  var next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  themeButtons.forEach(function(button) {
+    var active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (e) { applyTheme('dark'); }
+themeButtons.forEach(function(button) { button.addEventListener('click', function() { applyTheme(button.dataset.themeChoice); }); });
+
+/* ── Progress ── */
+var progress = document.querySelector('.progress');
+function updateProgress() {
+  var scrollTop = window.scrollY || document.documentElement.scrollTop;
+  var height = document.documentElement.scrollHeight - window.innerHeight;
+  var pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+/* ── Reveal ── */
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+function money(n) {
+  var sign = n < 0 ? '-$' : '$';
+  return sign + Math.abs(Math.round(n)).toLocaleString();
+}
+
+/* ── Figure 1: ITM strike map ── */
+(function() {
+  var side = 'call';
+  var marks = document.getElementById('f1Marks');
+  var pMin = 60, pMax = 140, xL = 40, xR = 600;
+  function px(p) { return xL + (p - pMin) / (pMax - pMin) * (xR - xL); }
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function tick(p, label, color, strong) {
+    var x = px(p);
+    var g = document.createElementNS(SVGNS, 'g');
+    var line = document.createElementNS(SVGNS, 'line');
+    line.setAttribute('x1', x); line.setAttribute('x2', x);
+    line.setAttribute('y1', strong ? 96 : 104); line.setAttribute('y2', 118);
+    line.setAttribute('stroke', color); line.setAttribute('stroke-width', strong ? 3 : 2);
+    g.appendChild(line);
+    var dot = document.createElementNS(SVGNS, 'circle');
+    dot.setAttribute('cx', x); dot.setAttribute('cy', strong ? 96 : 104);
+    dot.setAttribute('r', strong ? 6 : 4); dot.setAttribute('fill', color);
+    g.appendChild(dot);
+    var t = document.createElementNS(SVGNS, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', 140); t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('fill', color); t.setAttribute('style', 'font-size:11px;font-weight:700');
+    t.textContent = label;
+    g.appendChild(t);
+    marks.appendChild(g);
+  }
+  function render() {
+    marks.innerHTML = '';
+    tick(100, '현재가 100', 'var(--text)', true);
+    if (side === 'call') {
+      tick(70, '70콜', 'var(--amber)', false);
+      tick(80, '80콜', 'var(--amber)', false);
+      tick(90, '90콜', 'var(--amber)', false);
+      tick(120, '120', 'var(--text-dim)', false);
+      document.getElementById('f1ItmLabel').textContent = '내가격 콜 행사가';
+      document.getElementById('f1Strikes').textContent = '70 · 80 · 90';
+      document.getElementById('f1Note').textContent = '콜은 현재가보다 낮은 행사가가 내가격입니다. 70콜·80콜·90콜은 지금 행사하면 각각 30·20·10달러의 내재가치가 있습니다. 행사가가 낮을수록 내재가치가 크고 시간가치 비중은 작아집니다.';
+    } else {
+      tick(110, '110풋', 'var(--amber)', false);
+      tick(120, '120풋', 'var(--amber)', false);
+      tick(130, '130풋', 'var(--amber)', false);
+      tick(80, '80', 'var(--text-dim)', false);
+      document.getElementById('f1ItmLabel').textContent = '내가격 풋 행사가';
+      document.getElementById('f1Strikes').textContent = '110 · 120 · 130';
+      document.getElementById('f1Note').textContent = '풋은 현재가보다 높은 행사가가 내가격입니다. 110풋·120풋·130풋은 지금 행사하면 각각 10·20·30달러의 내재가치가 있습니다. 행사가가 높을수록 내재가치가 큽니다.';
+    }
+    document.querySelectorAll('#f1Toggle .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.f1 === side);
+    });
+  }
+  document.querySelectorAll('#f1Toggle .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { side = b.dataset.f1; render(); });
+  });
+  render();
+})();
+
+/* ── Figure 2: premium decomposition ── */
+(function() {
+  var data = {
+    'c70': { prem: 32, intr: 30, time: 2,
+      note: '70콜은 프리미엄 32달러 중 내재가치가 30달러, 시간가치가 2달러입니다. 깊은 내가격일수록 시간가치 비중은 작지만 0은 아닙니다. 주가가 제자리여도 만기에는 이 시간가치가 사라질 수 있습니다.' },
+    'leaps80': { prem: 25, intr: 20, time: 5,
+      note: '80콜 LEAPS는 프리미엄 25달러 중 내재가치가 20달러, 시간가치가 5달러입니다. 만기가 길수록 시간가치 비중이 커집니다. 자본효율 뒤에 더 큰 시간가치 비용이 붙어 있다는 뜻입니다.' }
+  };
+  function setF2(k) {
+    var d = data[k];
+    document.getElementById('f2PremLabel').textContent = '$' + d.prem;
+    document.getElementById('f2Prem').textContent = '$' + d.prem;
+    document.getElementById('f2IntrVal').textContent = '$' + d.intr;
+    document.getElementById('f2TimeVal').textContent = '$' + d.time;
+    var intrPct = d.intr / d.prem * 100;
+    var intrSeg = document.getElementById('f2Intr');
+    var timeSeg = document.getElementById('f2Time');
+    intrSeg.style.width = intrPct.toFixed(2) + '%';
+    timeSeg.style.width = (100 - intrPct).toFixed(2) + '%';
+    intrSeg.textContent = '내재 $' + d.intr;
+    timeSeg.textContent = '$' + d.time;
+    document.getElementById('f2Note').textContent = d.note;
+    document.querySelectorAll('#f2Toggle .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.f2 === k);
+    });
+  }
+  document.querySelectorAll('#f2Toggle .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { setF2(b.dataset.f2); });
+  });
+  setF2('c70');
+})();
+
+/* ── Payoff chart helper (long call) ── */
+function buildPayoff(cfg) {
+  var xL = 55, xR = 595, yMid = cfg.yMid || 155, yTop = 30;
+  var pMax = cfg.pnlMax;
+  function sx(s) { return xL + (s - cfg.sMin) / (cfg.sMax - cfg.sMin) * (xR - xL); }
+  function sy(v) {
+    var c = Math.max(-pMax, Math.min(pMax, v));
+    var up = yMid - yTop;
+    var down = 250 - yMid;
+    return v >= 0 ? yMid - (c / pMax) * up : yMid - (c / pMax) * down;
+  }
+  function pnl(s) { return Math.max(s - cfg.strike, 0) - cfg.premium; }
+  var path = '';
+  for (var s = cfg.sMin; s <= cfg.sMax; s += 0.5) {
+    path += (s === cfg.sMin ? 'M' : 'L') + sx(s).toFixed(1) + ' ' + sy(pnl(s)).toFixed(1);
+  }
+  document.getElementById(cfg.curveId).setAttribute('d', path);
+  var be = cfg.strike + cfg.premium;
+  var bx = sx(be);
+  var beLine = document.getElementById(cfg.beLineId);
+  beLine.setAttribute('x1', bx.toFixed(1));
+  beLine.setAttribute('x2', bx.toFixed(1));
+  var beLabel = document.getElementById(cfg.beLabelId);
+  beLabel.setAttribute('x', bx.toFixed(1));
+  beLabel.textContent = 'B/E ' + be;
+  return { sx: sx, sy: sy, pnl: pnl };
+}
+
+/* ── Figure 4: ITM call payoff calculator ── */
+(function() {
+  var cfg = { curveId: 'f4Curve', beLineId: 'f4BeLine', beLabelId: 'f4BeLabel',
+    sMin: 60, sMax: 140, premium: 32, strike: 70, pnlMax: 40 };
+  var api = buildPayoff(cfg);
+  var slider = document.getElementById('f4Slider');
+  var cost = cfg.premium * 100;
+  function render() {
+    var sv = Number(slider.value);
+    var v = api.pnl(sv);
+    var total = v * 100;
+    document.getElementById('f4PriceLabel').textContent = sv;
+    var shareEl = document.getElementById('f4Share');
+    shareEl.textContent = (v >= 0 ? '+' : '') + v.toFixed(2);
+    shareEl.style.color = v > 0 ? 'var(--green)' : (v < 0 ? 'var(--red)' : 'var(--text-muted)');
+    var pnlEl = document.getElementById('f4Pnl');
+    pnlEl.textContent = (total >= 0 ? '+' : '-') + '$' + Math.abs(total).toLocaleString();
+    pnlEl.style.color = total > 0 ? 'var(--green)' : (total < 0 ? 'var(--red)' : 'var(--text-muted)');
+    var roiEl = document.getElementById('f4Roi');
+    var roi = total / cost * 100;
+    roiEl.textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+    roiEl.style.color = roi > 0 ? 'var(--green)' : (roi < 0 ? 'var(--red)' : 'var(--text-muted)');
+    var cx = api.sx(sv), cy = api.sy(v);
+    var dot = document.getElementById('f4Dot');
+    dot.setAttribute('cx', cx.toFixed(1)); dot.setAttribute('cy', cy.toFixed(1));
+    var dt = document.getElementById('f4DotText');
+    dt.setAttribute('x', cx.toFixed(1)); dt.setAttribute('y', (cy - 12).toFixed(1));
+    dt.textContent = (v >= 0 ? '+' : '') + v.toFixed(2);
+    var note = document.getElementById('f4Note');
+    if (sv < 102) {
+      note.textContent = '만기 주가 ' + sv + '달러: 손익분기점 102달러 아래라 1계약 손익은 ' + money(total) + '입니다. 주가가 제자리거나 약하면 시간가치 2달러까지 더해 손실이 납니다.';
+    } else if (sv === 102) {
+      note.textContent = '만기 주가 102달러: 손익분기점입니다. 70 + 32 = 102달러에서 1계약 손익이 0이 됩니다.';
+    } else {
+      note.textContent = '만기 주가 ' + sv + '달러: 손익분기점 102달러를 넘어 1계약 손익은 ' + money(total) + ', 투입 3,200달러 대비 ' + (total / cost * 100).toFixed(1) + '%입니다.';
+    }
+  }
+  slider.addEventListener('input', render);
+  document.querySelectorAll('#f4Quick .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { slider.value = b.dataset.f4q; render(); });
+  });
+  render();
+})();
+
+/* ── Figure 5: stock vs ITM call payoff ── */
+(function() {
+  var xL = 55, xR = 595, sMin = 60, sMax = 140, yZero = 150, pMax = 4000;
+  function sx(s) { return xL + (s - sMin) / (sMax - sMin) * (xR - xL); }
+  function sy(v) { var c = Math.max(-pMax, Math.min(pMax, v)); return yZero - (c / pMax) * 120; }
+  function stockPnl(s) { return (s - 100) * 100; }
+  function optPnl(s) { return (Math.max(s - 70, 0) - 32) * 100; }
+  function path(fn) {
+    var d = '';
+    for (var s = sMin; s <= sMax; s += 1) { d += (s === sMin ? 'M' : 'L') + sx(s).toFixed(1) + ' ' + sy(fn(s)).toFixed(1); }
+    return d;
+  }
+  document.getElementById('f5Stock').setAttribute('d', path(stockPnl));
+  document.getElementById('f5Opt').setAttribute('d', path(optPnl));
+  function setF5(p) {
+    var sp = stockPnl(p), op = optPnl(p), diff = op - sp;
+    var spEl = document.getElementById('f5StockPnl');
+    spEl.textContent = (sp >= 0 ? '+' : '') + money(sp).replace('-', '');
+    spEl.textContent = money(sp);
+    spEl.style.color = sp > 0 ? 'var(--green)' : (sp < 0 ? 'var(--red)' : 'var(--text-muted)');
+    var opEl = document.getElementById('f5OptPnl');
+    opEl.textContent = money(op);
+    opEl.style.color = op > 0 ? 'var(--green)' : (op < 0 ? 'var(--red)' : 'var(--text-muted)');
+    var dEl = document.getElementById('f5Diff');
+    dEl.textContent = money(diff);
+    dEl.style.color = diff > 0 ? 'var(--green)' : (diff < 0 ? 'var(--red)' : 'var(--text-muted)');
+    var sd = document.getElementById('f5StockDot');
+    sd.setAttribute('cx', sx(p).toFixed(1)); sd.setAttribute('cy', sy(sp).toFixed(1));
+    var od = document.getElementById('f5OptDot');
+    od.setAttribute('cx', sx(p).toFixed(1)); od.setAttribute('cy', sy(op).toFixed(1));
+    var note = document.getElementById('f5Note');
+    if (p < 102) {
+      note.textContent = '만기 주가 ' + p + '달러: 주식 손익 ' + money(sp) + ', 옵션 손익 ' + money(op) + '입니다. 손익분기점 102달러 아래에서는 옵션이 시간가치 소멸까지 떠안아 주식보다 손실이 큽니다.';
+    } else {
+      note.textContent = '만기 주가 ' + p + '달러: 주식 손익 ' + money(sp) + ', 옵션 손익 ' + money(op) + '입니다. 102달러부터 옵션은 만기 이익으로 돌아서며, 달러 이익은 주식보다 작아도 투입금 대비 수익률은 더 큽니다.';
+    }
+    document.querySelectorAll('#f5Points .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', Number(b.dataset.f5p) === p);
+    });
+  }
+  document.querySelectorAll('#f5Points .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { setF5(Number(b.dataset.f5p)); });
+  });
+  setF5(70);
+})();
+
+/* ── Figure 6: delta equivalent calculator ── */
+(function() {
+  var deltaEl = document.getElementById('f6Delta');
+  var contEl = document.getElementById('f6Cont');
+  var priceEl = document.getElementById('f6Price');
+  function render() {
+    var delta = Number(deltaEl.value);
+    var cont = Number(contEl.value);
+    var price = Number(priceEl.value) || 0;
+    var perContract = delta * 100;
+    var shares = delta * cont * 100;
+    var notional = shares * price;
+    document.getElementById('f6DeltaOut').textContent = delta.toFixed(2);
+    document.getElementById('f6ContOut').textContent = cont;
+    document.getElementById('f6Shares').textContent = Math.round(shares).toLocaleString() + '주';
+    document.getElementById('f6Notional').textContent = '$' + Math.round(notional).toLocaleString();
+    document.getElementById('f6PerContract').textContent = Math.round(perContract).toLocaleString() + '주';
+    document.getElementById('f6Note').textContent = '델타 등가 주식 수 = 델타 × 계약 수 × 100. 등가 노출액 = 등가 주식 수 × 현재 주가. 지금 설정에서 ' + cont + '계약은 약 ' + Math.round(shares).toLocaleString() + '주, 현재가 ' + price.toLocaleString() + '달러 기준 ' + Math.round(notional).toLocaleString() + '달러어치 방향 노출입니다. 이 숫자는 현재 조건의 근사값이며 가격 경로가 바뀌면 함께 변합니다.';
+  }
+  deltaEl.addEventListener('input', render);
+  contEl.addEventListener('input', render);
+  priceEl.addEventListener('input', render);
+  render();
+})();
+
+/* ── Figure 7: LEAPS scenario board ── */
+(function() {
+  var cost = 2500, stockCost = 10000;
+  function optPnl(s) { return (Math.max(s - 80, 0) - 25) * 100; }
+  function stockPnl(s) { return (s - 100) * 100; }
+  function setF7(s) {
+    var op = optPnl(s), sp = stockPnl(s);
+    var opEl = document.getElementById('f7Opt');
+    opEl.textContent = money(op);
+    opEl.style.color = op > 0 ? 'var(--green)' : (op < 0 ? 'var(--red)' : 'var(--text-muted)');
+    document.getElementById('f7OptDesc').textContent = '투입 2,500달러 대비 손익률 ' + (op / cost * 100).toFixed(0) + '%';
+    var spEl = document.getElementById('f7Stock');
+    spEl.textContent = money(sp);
+    spEl.style.color = sp > 0 ? 'var(--green)' : (sp < 0 ? 'var(--red)' : 'var(--text-muted)');
+    document.getElementById('f7StockDesc').textContent = '투입 10,000달러 대비 손익률 ' + (sp / stockCost * 100).toFixed(0) + '%';
+    var note = document.getElementById('f7Note');
+    if (s < 105) {
+      note.textContent = '만기 주가 ' + s + '달러: 손익분기점 105달러 아래라 옵션 손익은 ' + money(op) + ', 주식 손익은 ' + money(sp) + '입니다. 옵션은 투입금 대비 손실률이 주식보다 빠르게 커집니다.';
+    } else if (s === 105) {
+      note.textContent = '만기 주가 105달러: 손익분기점입니다. 80 + 25 = 105달러에서 옵션 손익은 0, 주식은 +500달러입니다.';
+    } else {
+      note.textContent = '만기 주가 ' + s + '달러: 옵션 손익 ' + money(op) + '(투입 대비 ' + (op / cost * 100).toFixed(0) + '%), 주식 손익 ' + money(sp) + '(투입 대비 ' + (sp / stockCost * 100).toFixed(0) + '%)입니다. 달러 이익은 주식이 크지만 수익률은 옵션이 큽니다.';
+    }
+    document.querySelectorAll('#f7Toggle .strike-btn').forEach(function(b) {
+      b.classList.toggle('active', Number(b.dataset.f7) === s);
+    });
+  }
+  document.querySelectorAll('#f7Toggle .strike-btn').forEach(function(b) {
+    b.addEventListener('click', function() { setF7(Number(b.dataset.f7)); });
+  });
+  setF7(105);
+})();
+
+/* ── Figure 8: leverage illusion panel ── */
+(function() {
+  var premium = 25, delta = 0.78, price = 100;
+  var contEl = document.getElementById('f8Cont');
+  function render() {
+    var cont = Number(contEl.value);
+    var cost = premium * 100 * cont;
+    var shares = delta * 100 * cont;
+    var notional = shares * price;
+    document.getElementById('f8ContLabel').textContent = cont + '계약';
+    document.getElementById('f8Cost').textContent = '$' + cost.toLocaleString();
+    document.getElementById('f8Shares').textContent = Math.round(shares).toLocaleString() + '주';
+    document.getElementById('f8Notional').textContent = '$' + Math.round(notional).toLocaleString();
+    document.getElementById('f8Note').textContent = '프리미엄 25달러, 델타 0.78, 현재가 100달러 기준입니다. ' + cont + '계약은 비용 ' + cost.toLocaleString() + '달러에 약 ' + Math.round(shares).toLocaleString() + '주, 현재가 기준 ' + Math.round(notional).toLocaleString() + '달러어치 방향 노출입니다. 지불 현금, 델타 등가 노출, 최대손실을 분리해서 봐야 합니다.';
+  }
+  contEl.addEventListener('input', render);
+  render();
+})();
+
+/* ── Figure 9: stock-substitute worksheet ── */
+(function() {
+  var ids = ['w9S', 'w9K', 'w9Prem', 'w9Delta', 'w9Cont'];
+  var example = ['100', '70', '32', '0.85', '1'];
+  var outs = ['w9Intr', 'w9Time', 'w9Be', 'w9Shares', 'w9Notional'];
+  function clearOuts() {
+    outs.forEach(function(id) { document.getElementById(id).textContent = '—'; });
+  }
+  function calc() {
+    var S = Number(document.getElementById('w9S').value);
+    var K = Number(document.getElementById('w9K').value);
+    var prem = Number(document.getElementById('w9Prem').value);
+    var delta = Number(document.getElementById('w9Delta').value);
+    var cont = Number(document.getElementById('w9Cont').value);
+    if (!S || !K || !prem || !delta || !cont) {
+      clearOuts();
+      document.getElementById('w9Note').textContent = '현재 주가, 행사가, 프리미엄, 델타, 계약 수를 모두 입력한 뒤 “계산하기”를 눌러주세요.';
+      return;
+    }
+    var intr = Math.max(S - K, 0);
+    var time = prem - intr;
+    var be = K + prem;
+    var shares = delta * cont * 100;
+    var notional = shares * S;
+    document.getElementById('w9Intr').textContent = '$' + (Math.round(intr * 100) / 100);
+    document.getElementById('w9Time').textContent = '$' + (Math.round(time * 100) / 100);
+    document.getElementById('w9Be').textContent = '$' + (Math.round(be * 100) / 100);
+    document.getElementById('w9Shares').textContent = Math.round(shares).toLocaleString() + '주';
+    document.getElementById('w9Notional').textContent = '$' + Math.round(notional).toLocaleString();
+    document.getElementById('w9Note').textContent = '내재가치 ' + (Math.round(intr * 100) / 100) + '달러, 시간가치 ' + (Math.round(time * 100) / 100) + '달러, 손익분기점 ' + (Math.round(be * 100) / 100) + '달러. 델타 등가 주식 수는 ' + Math.round(shares).toLocaleString() + '주, 현재가 기준 등가 노출은 ' + Math.round(notional).toLocaleString() + '달러입니다.';
+  }
+  document.getElementById('w9Fill').addEventListener('click', function() {
+    ids.forEach(function(id, i) { document.getElementById(id).value = example[i]; });
+    calc();
+  });
+  document.getElementById('w9Clear').addEventListener('click', function() {
+    ids.forEach(function(id) { document.getElementById(id).value = ''; });
+    clearOuts();
+    document.getElementById('w9Note').textContent = '내재가치 = max(S − K, 0), 시간가치 = 프리미엄 − 내재가치, 손익분기점 = K + 프리미엄, 델타 등가 주식 수 = 델타 × 계약 수 × 100, 등가 노출 = 등가 주식 수 × S. 값을 넣고 “계산하기”를 누르면 채워집니다. 학습용 예시이며 수수료·세금·호가 스프레드는 반영하지 않습니다.';
+  });
+  document.getElementById('w9Calc').addEventListener('click', calc);
+  document.getElementById('w9Print').addEventListener('click', function() { window.print(); });
+})();
+</script>
+  <script src="../assets/auth-config.js?v=privacy-20260619"></script>
+  <script src="../assets/course-visibility.js"></script>
+  <script src="../assets/auth-gate.js?v=privacy-20260619"></script>
+</body>
+</html>

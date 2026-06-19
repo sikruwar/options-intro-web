@@ -251,8 +251,20 @@
   }
 
   function visibilityMap(rows) {
-    const map = new Map(DEFAULT_COURSE_SESSIONS.map((item) => [item.slug, item.slug === 'prologue']));
-    rows.forEach((row) => map.set(row.slug, row.visible === true));
+    const publishedThrough = Number(config.publishedThroughSession || 0);
+    const isStaticallyPublished = (slug) => {
+      if (slug === 'prologue') return true;
+      const match = String(slug).match(/^session-(\d{2})$/);
+      return match ? Number(match[1]) <= publishedThrough : false;
+    };
+    const map = new Map(DEFAULT_COURSE_SESSIONS.map((item) => [item.slug, isStaticallyPublished(item.slug)]));
+    rows.forEach((row) => {
+      if (isStaticallyPublished(row.slug)) {
+        map.set(row.slug, true);
+        return;
+      }
+      map.set(row.slug, row.visible === true);
+    });
     return map;
   }
 
