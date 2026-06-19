@@ -31,10 +31,6 @@
       .hi-auth-card input:focus { outline: 2px solid rgba(245,177,76,.35); border-color:#f5b14c; }
       .hi-auth-card button { width:100%; min-height:48px; margin-top:18px; border:0; border-radius:999px; background:#f5b14c; color:#11130f; font-weight:900; cursor:pointer; }
       .hi-auth-card button:disabled { opacity:.55; cursor:wait; }
-      .hi-oauth-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:48px; margin:0 0 16px; border:1px solid #44483d !important; border-radius:999px; background:#f1eee5 !important; color:#11130f !important; font-weight:900; cursor:pointer; }
-      .hi-oauth-mark { display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:#fff; color:#4285f4; font-family:Arial,sans-serif; font-weight:900; }
-      .hi-auth-divider { display:flex; align-items:center; gap:12px; margin:16px 0 6px; color:#746f65; font-size:12px; }
-      .hi-auth-divider::before, .hi-auth-divider::after { content:''; flex:1; border-top:1px solid #2d302a; }
       .hi-consent { display:flex !important; align-items:flex-start; gap:9px; color:#a49b8b !important; line-height:1.6; }
       .hi-consent input { width:auto !important; min-height:auto !important; margin-top:4px; accent-color:#f5b14c; }
       .hi-consent a { color:#f5b14c; text-decoration:underline; text-underline-offset:2px; }
@@ -201,15 +197,6 @@
     return data?.session || null;
   }
 
-  async function signInWithGoogle() {
-    const supabase = await getClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.href }
-    });
-    if (error) throw error;
-  }
-
   function renderApprovedBadge(approval) {
     if (!approval?.email) return;
     css();
@@ -269,8 +256,6 @@
       <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
       <h2>${config.courseTitle || '강의'} 접근 신청</h2>
       <p>승인된 이메일만 강의를 볼 수 있습니다. 이메일과 X 아이디를 남기면 구독 여부 확인 후 접근 권한이 열립니다.</p>
-      <button id="hi-google-login" class="hi-oauth-btn" type="button"><span class="hi-oauth-mark">G</span>Google로 로그인</button>
-      <div class="hi-auth-divider">또는 이메일 링크</div>
       <form id="hi-login-form">
         <label for="hi-email">이메일</label>
         <input id="hi-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
@@ -285,17 +270,6 @@
       <p id="hi-auth-message" class="hi-auth-message">입력한 이메일로 로그인 링크가 전송됩니다. 승인 전에는 대기 화면이 표시됩니다.</p>
       <p class="hi-auth-small">X 아이디는 프로필 주소에 표시되는 @아이디입니다. 예: @sniffshiba</p>
     `);
-    document.getElementById('hi-google-login')?.addEventListener('click', async (event) => {
-      const btn = event.currentTarget;
-      btn.disabled = true;
-      try {
-        statusMessage('Google 로그인으로 이동합니다. 승인된 Gmail이면 로그인 후 바로 강의가 열립니다.');
-        await signInWithGoogle();
-      } catch (error) {
-        statusMessage(`Google 로그인에 실패했습니다: ${error.message}`);
-        btn.disabled = false;
-      }
-    });
     document.getElementById('hi-login-form')?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const form = event.currentTarget;

@@ -71,15 +71,6 @@ def test_auth_rate_limit_message_is_friendly():
     assert 'secondsUntilOtpRetry' in js
 
 
-def test_google_oauth_fallback_exists_for_email_rate_limits():
-    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    assert 'signInWithGoogle' in js
-    assert 'signInWithOAuth' in js
-    assert "provider: 'google'" in js
-    assert 'Google로 로그인' in js
-    assert '승인된 Gmail이면 로그인 후 바로 강의가 열립니다' in js
-
-
 def test_expired_magic_link_message_is_friendly():
     js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
     assert 'authUrlError' in js
