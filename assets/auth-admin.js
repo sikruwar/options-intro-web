@@ -447,7 +447,7 @@
     const bySlug = new Map(rows.map((row) => [row.slug, row]));
     return DEFAULT_COURSE_SESSIONS.map((item) => {
       const row = bySlug.get(item.slug);
-      return { ...item, visible: row ? row.visible !== false : true };
+      return { ...item, visible: row ? row.visible === true : false };
     });
   }
 
@@ -485,7 +485,7 @@
       title: item.title,
       href: item.href,
       sort_order: item.sort_order,
-      visible: visibleBySlug.get(item.slug) !== false,
+      visible: visibleBySlug.get(item.slug) === true,
       updated_at: new Date().toISOString()
     }));
     const { error } = await supabase
