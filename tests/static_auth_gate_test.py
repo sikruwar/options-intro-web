@@ -10,22 +10,41 @@ def test_auth_assets_exist():
     assert (ROOT / 'assets' / 'auth-gate.js').exists()
     assert (ROOT / 'assets' / 'auth-admin.js').exists()
     assert (ROOT / 'supabase_schema.sql').exists()
+    assert (ROOT / 'supabase_x_access_patch.sql').exists()
     assert (ROOT / 'references.html').exists()
     assert (ROOT / 'copyright.html').exists()
     assert (ROOT / 'robots.txt').exists()
     assert (ROOT / 'sitemap.xml').exists()
 
 
-def test_email_gate_is_disabled_and_access_code_gate_is_enabled():
+def test_x_handle_gate_is_prepared_and_access_code_gate_stays_enabled_until_rpc_deploy():
     config = (ROOT / 'assets' / 'auth-config.js').read_text(encoding='utf-8')
     gate = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
     assert 'accessGateEnabled: false' in config
+    assert 'xHandleGateEnabled: false' in config
+    assert 'xHandleStorageKey' in config
     assert 'accessCodeGateEnabled: true' in config
     assert 'OPTION-OPEN-05' in config
     assert 'accessCodeStorageKey' in config
     assert 'accessGateEnabled' in gate
+    assert 'xHandleGateEnabled' in gate
     assert 'accessCodeGateEnabled' in gate
-    assert 'emailGateEnabled || accessCodeGateEnabled' in gate
+    assert 'emailGateEnabled || xHandleGateEnabled || accessCodeGateEnabled' in gate
+
+
+def test_x_handle_gate_ui_and_rpc_exist():
+    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
+    schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
+    patch = (ROOT / 'supabase_x_access_patch.sql').read_text(encoding='utf-8')
+    assert 'renderXHandleGate' in js
+    assert 'bootXHandle' in js
+    assert 'request_x_course_access' in js
+    assert 'X 아이디를 입력하면 활성 구독자/승인 목록과 대조합니다' in js
+    assert '입력한 X 아이디와 접속 회차는 관리자 페이지에 기록됩니다' in js
+    assert 'create table if not exists public.x_access_visits' in schema
+    assert 'create or replace function public.request_x_course_access' in schema
+    assert 'grant execute on function public.request_x_course_access' in schema
+    assert 'create or replace function public.request_x_course_access' in patch
 
 
 def test_access_code_gate_ui_exists():
@@ -107,6 +126,10 @@ def test_admin_page_loads_admin_script():
     assert 'assets/auth-admin.js' in html
     assert 'access_requests' in js
     assert 'approved_users' in js
+    assert '최근 강의 진입 기록' in html
+    assert 'visit-list' in html
+    assert 'loadAccessVisits' in js
+    assert 'x_access_visits' in js
 
 
 def test_privacy_consent_copy_uses_clear_x_id_language():
@@ -270,6 +293,10 @@ def test_x_subscriber_allowlist_admin_ui_exists():
     assert 'x_subscribers' in js
     assert 'x_subscribers' in schema
     assert 'Admins can manage x subscribers' in schema
+    assert 'x_access_visits' in schema
+    assert 'Admins can read x access visits' in schema
+    assert 'normalize_x_handle' in schema
+    assert 'x_handle_synthetic_email' in schema
 
 
 def test_access_request_rls_keeps_user_requests_pending_only():

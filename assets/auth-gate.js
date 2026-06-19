@@ -1,9 +1,10 @@
 (() => {
   const config = window.HOWINSIGHT_AUTH_CONFIG || {};
   const emailGateEnabled = config.accessGateEnabled !== false;
+  const xHandleGateEnabled = config.xHandleGateEnabled === true;
   const accessCodeGateEnabled = config.accessCodeGateEnabled === true;
-  const accessGateEnabled = emailGateEnabled || accessCodeGateEnabled;
-  const isConfigured = emailGateEnabled && Boolean(config.supabaseUrl && config.supabaseAnonKey);
+  const accessGateEnabled = emailGateEnabled || xHandleGateEnabled || accessCodeGateEnabled;
+  const isConfigured = (emailGateEnabled || xHandleGateEnabled) && Boolean(config.supabaseUrl && config.supabaseAnonKey);
   const path = window.location.pathname;
   const shouldProtect = config.protectedPathPattern instanceof RegExp
     ? config.protectedPathPattern.test(path)
@@ -94,6 +95,10 @@
     return config.accessCodeStorageKey || 'howinsight-options-access-v1';
   }
 
+  function xHandleStorageKey() {
+    return config.xHandleStorageKey || 'howinsight-options-x-access-v1';
+  }
+
   function configuredAccessCodes() {
     return Array.isArray(config.accessCodes)
       ? config.accessCodes.map((code) => String(code || '').trim()).filter(Boolean)
@@ -152,6 +157,103 @@
       return;
     }
     renderAccessCodeGate();
+  }
+
+  function savedXAccess() {
+    try {
+      return JSON.parse(localStorage.getItem(xHandleStorageKey()) || 'null');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function rememberXAccess(result) {
+    localStorage.setItem(xHandleStorageKey(), JSON.stringify({
+      granted: true,
+      grantedAt: new Date().toISOString(),
+      method: 'x_handle',
+      xHandle: result?.x_handle || result?.xHandle || ''
+    }));
+  }
+
+  function clearXAccess() {
+    localStorage.removeItem(xHandleStorageKey());
+  }
+
+  async function requestXAccess(rawHandle) {
+    const supabase = await getClient();
+    const { data, error } = await supabase.rpc('request_x_course_access', {
+      raw_x_handle: normalizeXHandle(rawHandle),
+      source_path: path,
+      user_agent_text: navigator.userAgent || ''
+    });
+    if (error) throw error;
+    return Array.isArray(data) ? data[0] : data;
+  }
+
+  function renderXHandleGate(message = 'X 아이디를 입력하면 활성 구독자/승인 목록과 대조합니다.') {
+    const saved = savedXAccess();
+    overlay(`
+      <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
+      <h2>${config.courseTitle || '강의'} 접근 확인</h2>
+      <p>강의 접근 기록을 남기기 위해 X 아이디를 확인합니다. 관리자 승인 목록 또는 활성 구독자 명단과 매칭되면 바로 입장합니다.</p>
+      <form id="hi-x-access-form">
+        <label for="hi-x-access">X 아이디</label>
+        <input id="hi-x-access" name="x_handle" type="text" placeholder="@sniffshiba" autocomplete="nickname" value="${escapeHtml(saved?.xHandle || '')}" required>
+        <button type="submit">접근 확인</button>
+      </form>
+      <p id="hi-auth-message" class="hi-auth-message">${escapeHtml(message)}</p>
+      <p class="hi-auth-small">입력한 X 아이디와 접속 회차는 관리자 페이지에 기록됩니다.</p>
+    `);
+    document.getElementById('hi-x-access-form')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const btn = form.querySelector('button');
+      btn.disabled = true;
+      try {
+        const result = await requestXAccess(form.x_handle.value);
+        if (result?.allowed === true) {
+          rememberXAccess(result);
+          removeLock();
+          return;
+        }
+        clearXAccess();
+        statusMessage(result?.message || '승인 대기 상태입니다. 관리자가 X 아이디를 확인한 뒤 접근 권한을 열 수 있습니다.');
+      } catch (error) {
+        statusMessage(`접근 확인 중 문제가 생겼습니다: ${error.message}`);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  async function bootXHandle() {
+    if (!isConfigured) {
+      console.warn('[HowInsight Auth] Supabase config is empty. X handle gate cannot run.');
+      return;
+    }
+    overlay(`
+      <div class="hi-auth-brand">${config.brandLabel || 'HowInsight'}</div>
+      <h2>접근 권한 확인 중입니다</h2>
+      <p>X 아이디 승인 상태를 확인하고 있습니다.</p>
+    `);
+    const saved = savedXAccess();
+    if (!saved?.xHandle) {
+      renderXHandleGate();
+      return;
+    }
+    try {
+      const result = await requestXAccess(saved.xHandle);
+      if (result?.allowed === true) {
+        rememberXAccess(result);
+        removeLock();
+        return;
+      }
+      clearXAccess();
+      renderXHandleGate(result?.message || '승인 상태가 확인되지 않았습니다. X 아이디를 다시 입력해주세요.');
+    } catch (error) {
+      renderXHandleGate(`접근 확인 중 문제가 생겼습니다: ${error.message}`);
+    }
   }
 
   function authErrorMessage(error) {
@@ -403,7 +505,7 @@
     }
   }
 
-  const bootGate = accessCodeGateEnabled ? bootAccessCode : boot;
+  const bootGate = xHandleGateEnabled ? bootXHandle : accessCodeGateEnabled ? bootAccessCode : boot;
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootGate);
   } else {

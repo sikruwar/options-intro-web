@@ -47,6 +47,10 @@
     .subscriber-status.missing { color:var(--red); border-color:rgba(239,68,68,.32); }
     .subscriber-status.empty { color:var(--text-dim); }
     .subscriber-summary { border:1px solid var(--border); border-radius:12px; background:var(--bg-card); padding:12px 14px; color:var(--text-muted); margin-top:12px; }
+    .visit-list { display:grid; gap:10px; }
+    .visit-row { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; border:1px solid var(--border); background:var(--bg-card); border-radius:14px; padding:13px 15px; }
+    .visit-row strong { display:block; color:var(--text); }
+    .visit-row small { display:block; color:var(--text-dim); margin-top:4px; }
 
     .session-visibility-list { display:grid; gap:10px; }
     .session-visibility-row { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; border:1px solid var(--border); background:var(--bg-card); border-radius:14px; padding:13px 15px; }
@@ -86,6 +90,21 @@
         </div>
         <div id="request-list" class="request-list">
           <p class="muted">신청 목록을 불러오는 중입니다.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>최근 강의 진입 기록</h2>
+            <p>X 아이디로 접근 확인을 시도한 기록입니다.</p>
+          </div>
+          <div>
+            <button id="refresh-visits" class="secondary" type="button">기록 새로고침</button>
+          </div>
+        </div>
+        <div id="visit-list" class="visit-list">
+          <p class="muted">진입 기록을 불러오는 중입니다.</p>
         </div>
       </section>
 

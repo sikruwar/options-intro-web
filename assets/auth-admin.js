@@ -15,6 +15,7 @@
   };
 
   const canonicalXHandle = (handle) => normalizeXHandle(handle).toLowerCase();
+  const isSyntheticXEmail = (email) => /@x\.howinsight\.local$/i.test(String(email || ''));
 
   const DEFAULT_COURSE_SESSIONS = [
   {
@@ -385,6 +386,7 @@
     const requested = req.requested_at ? new Date(req.requested_at).toLocaleString('ko-KR') : '-';
     const status = req.status || 'pending';
     const email = escapeHtml(req.email);
+    const displayEmail = isSyntheticXEmail(req.email) ? 'X 아이디 신청' : email;
     const xHandle = escapeHtml(req.x_handle || '-');
     const rowClass = status === 'approved' ? ' is-approved' : status === 'rejected' ? ' is-rejected' : '';
     const actions = status === 'approved'
@@ -395,7 +397,7 @@
     return `
       <div class="request-row${rowClass}" data-email="${email}">
         <div>
-          <strong>${email}</strong>
+          <strong>${displayEmail}</strong>
           <span>${xHandle}</span>
           ${subscriberBadge(req.x_handle)}
           <small>${requested} · ${status}</small>
@@ -415,6 +417,39 @@
     const list = $('request-list');
     if (!list) return;
     list.innerHTML = data?.length ? data.map(rowTemplate).join('') : '<p class="muted">신청자가 아직 없습니다.</p>';
+  }
+
+  function visitRowTemplate(row) {
+    const visited = row.visited_at ? new Date(row.visited_at).toLocaleString('ko-KR') : '-';
+    const statusClass = row.allowed ? 'approved' : 'rejected';
+    const statusText = row.allowed ? '입장 허용' : '대기/거절';
+    const path = escapeHtml(row.source_path || '-');
+    const xHandle = escapeHtml(row.x_handle || '-');
+    return `
+      <div class="visit-row">
+        <div>
+          <strong>${xHandle}</strong>
+          <small>${visited} · ${path}</small>
+        </div>
+        <span class="request-status ${statusClass}">${statusText}</span>
+      </div>
+    `;
+  }
+
+  async function loadAccessVisits(supabase) {
+    const list = $('visit-list');
+    if (!list) return;
+    const { data, error } = await supabase
+      .from('x_access_visits')
+      .select('x_handle, source_path, allowed, status, visited_at')
+      .order('visited_at', { ascending: false })
+      .limit(80);
+    if (error) {
+      console.warn('[HowInsight Admin] x_access_visits table unavailable:', error.message);
+      list.innerHTML = '<p class="muted">진입 기록 테이블이 아직 연결되지 않았습니다. supabase_schema.sql의 X 접근 기록 SQL을 적용해주세요.</p>';
+      return;
+    }
+    list.innerHTML = data?.length ? data.map(visitRowTemplate).join('') : '<p class="muted">진입 기록이 아직 없습니다.</p>';
   }
 
   async function approve(supabase, email, xHandle) {
@@ -570,6 +605,7 @@
     setStatus('신청 목록을 불러왔습니다.');
     await loadSubscribers(supabase);
     await loadRequests(supabase);
+    await loadAccessVisits(supabase);
     await loadSessionVisibility(supabase);
 
     $('request-list')?.addEventListener('click', async (event) => {
@@ -613,7 +649,12 @@
     $('refresh-requests')?.addEventListener('click', async () => {
       await loadSubscribers(supabase);
       await loadRequests(supabase);
+      await loadAccessVisits(supabase);
       setStatus('새로고침 완료');
+    });
+    $('refresh-visits')?.addEventListener('click', async () => {
+      await loadAccessVisits(supabase);
+      setStatus('최근 강의 진입 기록을 새로고침했습니다.');
     });
     $('refresh-subscribers')?.addEventListener('click', async () => {
       await loadSubscribers(supabase);
