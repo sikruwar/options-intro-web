@@ -199,6 +199,15 @@ def test_course_readability_overrides_are_loaded_on_course_pages():
         assert expected_href in html
 
 
+def test_session_05_option_chain_figure_has_reading_guide():
+    html = (ROOT / 'sessions' / 'session-05.html').read_text(encoding='utf-8')
+    assert 'Figure 07 — 자체 제작 옵션 체인 모형' in html
+    assert '이 화면은 무엇을 보여주나요?' in html
+    assert '옵션 체인 읽는 순서' in html
+    assert '처음에는 가격보다 위치를 먼저 봅니다' in html
+    assert 'ITM·ATM·OTM을 찾는 데 집중' in html
+
+
 
 def test_course_visibility_admin_ui_exists():
     admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
