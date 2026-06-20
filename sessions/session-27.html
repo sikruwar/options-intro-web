@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>27회차 — 감마와 동적헷징, 왜 큰 움직임이 헷지 수량을 바꾸는가</title>
+  <meta name="description" content="감마와 동적헷징, 왜 큰 움직임이 헷지 수량을 바꾸는가">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { color-scheme: dark; --bg:#0b0d0c; --bg-card:#151715; --bg-card2:#1d211d; --text:#f1eee5; --text-muted:#a49b8b; --text-dim:#746f65; --amber:#f5b14c; --green:#35d07f; --blue:#7dd3fc; --red:#ef4444; --violet:#a78bfa; --border:#2d302a; --border-light:#44483d; --nav-bg:rgba(11,13,12,.91); --hero-glow-warm:rgba(245,177,76,.08); --hero-glow-cool:rgba(125,211,252,.05); --prose-text:#d8d1c3; --cta-text:#11130f; --shadow:0 18px 60px rgba(0,0,0,.28); }
+    :root[data-theme="olive"] { color-scheme: light; --bg:#fafaf2; --bg-card:#fff; --bg-card2:#f1f3e7; --text:#1b2518; --text-muted:#5d684f; --text-dim:#889078; --amber:#7d8f3a; --green:#4f7a35; --blue:#3d7796; --red:#b94a48; --violet:#7561a8; --border:#e3e7d4; --border-light:#d1d9bb; --nav-bg:rgba(250,250,242,.92); --hero-glow-warm:rgba(125,143,58,.12); --hero-glow-cool:rgba(61,119,150,.08); --prose-text:#35402f; --cta-text:#fff; --shadow:0 18px 60px rgba(82,91,56,.12); }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR', sans-serif; font-size:16px; line-height:1.82; -webkit-font-smoothing:antialiased; transition:background .25s,color .25s; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    .progress { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--blue),var(--amber),var(--green)); z-index:100; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:90; background:var(--nav-bg); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); padding:13px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-brand { font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text-muted); letter-spacing:.08em; } .nav-brand span { color:var(--amber); }
+    .nav-right { display:flex; align-items:center; gap:14px; }
+    .nav-prev,.nav-next,.nav-session { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-dim); } .nav-prev:hover,.nav-next:hover { color:var(--amber); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); }
+    .theme-btn { border:0; min-width:44px; min-height:32px; padding:6px 10px; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; cursor:pointer; }
+    .theme-btn.active { background:var(--amber); color:var(--cta-text); }
+    .hero { min-height:94vh; display:flex; align-items:center; padding:122px 10vw 80px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:-220px -160px auto auto; width:760px; height:760px; background:radial-gradient(circle,var(--hero-glow-warm) 0%,transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; left:-120px; bottom:-180px; width:620px; height:620px; background:radial-gradient(circle,var(--hero-glow-cool) 0%,transparent 70%); pointer-events:none; }
+    .hero-inner { position:relative; z-index:1; max-width:920px; width:100%; }
+    .eyebrow { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:26px; }
+    .hero h1 { font-size:clamp(40px,7vw,84px); font-weight:900; line-height:1.06; letter-spacing:0; margin-bottom:24px; }
+    .hero h1 .hi { color:var(--amber); }
+    .hero-sub { font-size:clamp(15px,2vw,19px); color:var(--text-muted); font-weight:300; max-width:740px; line-height:1.72; margin-bottom:38px; overflow-wrap:anywhere; }
+    .thesis { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border-light); border-left:3px solid var(--amber); padding:21px 28px; border-radius:0 12px 12px 0; box-shadow:var(--shadow); max-width:760px; width:100%; }
+    .thesis-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; margin-bottom:9px; }
+    .thesis-main { font-size:18px; font-weight:700; line-height:1.62; overflow-wrap:anywhere; }
+    .divider { border:0; border-top:1px solid var(--border); }
+    .section { max-width:810px; margin:0 auto; padding:78px 24px; }
+    .section-wide { max-width:1080px; margin:0 auto; padding:78px 24px; }
+    .section-num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.15em; margin-bottom:16px; text-transform:uppercase; }
+    .section h2,.section-wide h2 { font-size:clamp(24px,4vw,38px); font-weight:800; line-height:1.24; letter-spacing:0; margin-bottom:28px; overflow-wrap:anywhere; }
+    .prose p { font-size:16px; line-height:1.86; color:var(--prose-text); margin-bottom:19px; overflow-wrap:anywhere; }
+    .prose p:last-child { margin-bottom:0; }
+    .prose strong { color:var(--text); font-weight:700; }
+    .prose code, code { font-family:'JetBrains Mono', monospace; font-size:.92em; color:var(--amber); }
+    .prose ul { color:var(--prose-text); margin:0 0 18px 20px; }
+    .prose li { margin:7px 0; overflow-wrap:anywhere; }
+    .subhead { font-size:21px; font-weight:800; margin:34px 0 14px; color:var(--text); }
+    .fig { background:var(--bg-card); border:1px solid var(--border-light); border-radius:16px; padding:28px; margin:32px 0; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .fig::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent); opacity:.48; }
+    .fig-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--amber); letter-spacing:.15em; text-transform:uppercase; margin-bottom:20px; }
+    .fig h3 { font-size:22px; line-height:1.35; margin:0 0 18px; }
+    .fig-caption { margin-top:18px; font-size:13px; color:var(--text-muted); line-height:1.65; overflow-wrap:anywhere; }
+    .two,.three,.four { display:grid; gap:14px; }
+    .two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .mini-k { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:10px; text-transform:uppercase; }
+    .mini-v { font-size:20px; font-weight:800; color:var(--text); line-height:1.35; }
+    .mini-p { font-size:13px; color:var(--text-muted); line-height:1.58; margin-top:8px; overflow-wrap:anywhere; }
+    .badge { display:inline-flex; align-items:center; min-height:24px; padding:3px 9px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin:0 6px 8px 0; }
+    .badge.good { color:var(--green); border-color:rgba(53,208,127,.36); }
+    .badge.bad { color:var(--red); border-color:rgba(239,68,68,.36); }
+    .badge.warn { color:var(--amber); border-color:rgba(245,177,76,.36); }
+    .bridge-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .bridge-arrow { min-width:86px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--amber); font-family:'JetBrains Mono', monospace; background:linear-gradient(135deg,rgba(245,177,76,.10),rgba(125,211,252,.06)); }
+    .progress-rail { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .rail-step.done { border-color:rgba(53,208,127,.36); }
+    .rail-step.current { border-color:rgba(245,177,76,.48); box-shadow:0 0 0 1px rgba(245,177,76,.12) inset; }
+    .rail-step strong { display:block; color:var(--text); font-size:14px; margin-bottom:4px; }
+    .rail-step span { font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; }
+    .contract-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:16px; }
+    .contract-main { background:linear-gradient(135deg,rgba(245,177,76,.13),rgba(125,211,252,.07)); border:1px solid var(--border-light); border-radius:16px; padding:22px; }
+    .contract-main .right-word { color:var(--amber); font-weight:900; }
+    .contract-meta { display:grid; gap:10px; }
+    .meta-row { display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--border); padding:9px 0; font-size:14px; }
+    .meta-row:last-child { border-bottom:0; }
+    .meta-row span { color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; }
+    .meta-row strong { color:var(--text); text-align:right; }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .scenario-card.good { border-color:rgba(53,208,127,.36); }
+    .scenario-card.bad { border-color:rgba(239,68,68,.32); }
+    .scenario-card strong { display:block; margin-bottom:6px; color:var(--text); }
+    .flow-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+    .flow-arrow { display:grid; place-items:center; color:var(--amber); font-family:'JetBrains Mono', monospace; font-size:12px; line-height:1.7; text-align:center; min-width:104px; }
+    .premium-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+    .premium-center { grid-column:1/-1; background:radial-gradient(circle at top,rgba(245,177,76,.16),transparent 62%),var(--bg-card2); border:1px solid var(--border-light); border-radius:16px; padding:24px; text-align:center; }
+    .premium-center b { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:24px; letter-spacing:.08em; }
+    .calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .calc-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:20px; }
+    .slider-head { display:flex; justify-content:space-between; gap:14px; align-items:baseline; margin-bottom:14px; }
+    .slider-title { font-weight:800; color:var(--text); }
+    .slider-val { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:20px; }
+    input[type="range"] { width:100%; accent-color:var(--amber); }
+    .calc-results { display:grid; gap:10px; }
+    .result { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; }
+    .result span { display:block; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .result strong { font-size:22px; color:var(--text); }
+    .result.pos strong { color:var(--green); }
+    .result.neg strong { color:var(--red); }
+    .result.zero strong { color:var(--text-muted); }
+    .scenario-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .scenario-strip div { border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-card); }
+    .scenario-strip span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; }
+    .scenario-strip strong { display:block; color:var(--text); margin-top:4px; font-size:13px; }
+    .worksheet-lines { display:grid; gap:10px; margin-bottom:16px; }
+    .worksheet-lines div { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; color:var(--prose-text); line-height:1.65; overflow-wrap:anywhere; }
+    .answer-btn { border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card2); color:var(--text); padding:10px 14px; font:inherit; font-weight:800; cursor:pointer; min-height:44px; }
+    .answer-btn:hover { border-color:var(--amber); }
+    .answers { display:none; margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .answers.open { display:block; }
+    .answer-row { border:0; border-top:1px solid var(--border); border-radius:0; display:grid; grid-template-columns:120px 1fr; gap:14px; }
+    .answer-row:first-child { border-top:0; }
+    .answer-row strong { color:var(--amber); }
+    .answer-row p { color:var(--text-muted); font-size:14px; line-height:1.62; margin:0; }
+    .next-card { background:linear-gradient(135deg,var(--bg-card),var(--bg-card2)); border:1px solid var(--border); border-radius:16px; padding:26px 30px; margin-top:34px; display:flex; justify-content:space-between; gap:20px; color:inherit; }
+    .next-card:hover { border-color:var(--amber); }
+    .next-label { font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.12em; margin-bottom:7px; text-transform:uppercase; }
+    .next-title { font-size:17px; font-weight:800; }
+    .next-desc { margin-top:8px; color:var(--text-muted); font-size:14px; line-height:1.65; }
+    .next-arrow { font-size:24px; color:var(--amber); }
+    footer { border-top:1px solid var(--border); padding:30px 10vw; display:flex; justify-content:space-between; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; }
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+
+    .viz-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,.9fr); gap:18px; align-items:stretch; }
+    .viz-panel { background:var(--bg-card2); border:1px solid var(--border); border-radius:14px; padding:18px; min-width:0; }
+    .viz-panel.accent { background:linear-gradient(135deg,rgba(245,177,76,.11),rgba(125,211,252,.06)),var(--bg-card2); border-color:var(--border-light); }
+    .viz-panel h4 { font-size:15px; line-height:1.42; color:var(--text); margin:0 0 12px; }
+    .viz-copy { color:var(--text-muted); font-size:13px; line-height:1.62; margin:8px 0 0; overflow-wrap:anywhere; }
+    .viz-svg { width:100%; min-height:238px; display:block; overflow:visible; }
+    .viz-axis { stroke:var(--border-light); stroke-width:1; }
+    .viz-gridline { stroke:var(--border); stroke-width:1; opacity:.72; }
+    .viz-line { fill:none; stroke:var(--amber); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+    .viz-line.blue { stroke:var(--blue); }
+    .viz-line.green { stroke:var(--green); }
+    .viz-line.red { stroke:var(--red); }
+    .viz-area { fill:rgba(245,177,76,.13); }
+    .viz-label { font-family:'JetBrains Mono', monospace; font-size:10px; fill:var(--text-muted); }
+    .viz-number { font-family:'JetBrains Mono', monospace; font-size:13px; fill:var(--text); font-weight:700; }
+    .viz-dot { fill:var(--amber); stroke:var(--bg-card); stroke-width:3; }
+    .viz-dot.blue { fill:var(--blue); }
+    .viz-dot.green { fill:var(--green); }
+    .viz-dot.red { fill:var(--red); }
+    .viz-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .viz-metric { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:13px; min-width:0; }
+    .viz-metric span { display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:6px; text-transform:uppercase; }
+    .viz-metric strong { display:block; color:var(--text); font-size:17px; line-height:1.3; overflow-wrap:anywhere; }
+    .viz-metric small { display:block; margin-top:6px; color:var(--text-muted); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+    .viz-range { margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); }
+    .viz-range label { display:flex; align-items:baseline; justify-content:space-between; gap:12px; color:var(--text); font-weight:800; font-size:14px; }
+    .viz-range output { font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:18px; }
+    .viz-range input[type="range"] { width:100%; margin-top:12px; accent-color:var(--amber); }
+    .viz-bars { display:grid; gap:10px; margin-top:12px; }
+    .viz-bar { display:grid; grid-template-columns:128px 1fr 62px; gap:10px; align-items:center; }
+    .viz-bar span { color:var(--text-muted); font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+    .viz-bar b { font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text); text-align:right; }
+    .viz-track { height:14px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border); overflow:hidden; }
+    .viz-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--amber)); }
+    .viz-fill.good { background:linear-gradient(90deg,var(--green),var(--blue)); }
+    .viz-fill.bad { background:linear-gradient(90deg,var(--amber),var(--red)); }
+    .viz-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; margin-top:14px; }
+    .viz-step { border:1px solid var(--border); border-radius:12px; background:var(--bg-card2); padding:14px; min-height:116px; position:relative; }
+    .viz-step::after { content:'→'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--amber); font-family:'JetBrains Mono', monospace; }
+    .viz-step:last-child::after { content:''; }
+    .viz-step span { display:block; font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+    .viz-step strong { display:block; color:var(--text); font-size:15px; line-height:1.4; }
+    .viz-step p { margin:8px 0 0; color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .viz-timeline { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .viz-time { border:1px solid var(--border); background:var(--bg-card2); border-radius:12px; padding:14px; min-height:120px; }
+    .viz-time span { display:block; font-family:'JetBrains Mono', monospace; color:var(--amber); font-size:11px; margin-bottom:8px; }
+    .viz-time strong { color:var(--text); font-size:15px; line-height:1.35; }
+    .viz-time p { color:var(--text-muted); font-size:12px; line-height:1.5; margin-top:8px; }
+    .viz-matrix { width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--border); font-size:13px; }
+    .viz-matrix th,.viz-matrix td { border-bottom:1px solid var(--border); padding:12px; text-align:left; color:var(--text-muted); vertical-align:top; }
+    .viz-matrix th { background:var(--bg-card2); color:var(--text); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .viz-matrix tr:last-child td { border-bottom:0; }
+    .viz-checklist { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+    .viz-check { display:flex; gap:10px; align-items:flex-start; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; color:var(--text-muted); font-size:13px; line-height:1.45; }
+    .viz-check input { margin-top:3px; accent-color:var(--amber); }
+    .viz-toggle { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .viz-toggle button { min-height:38px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:7px 12px; font-family:'JetBrains Mono', monospace; font-size:10px; cursor:pointer; }
+    .viz-toggle button.active { background:var(--amber); color:var(--cta-text); border-color:var(--amber); }
+    .viz-note { margin-top:14px; border-left:3px solid var(--amber); background:linear-gradient(90deg,rgba(245,177,76,.09),transparent); padding:13px 15px; color:var(--text-muted); font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
+    .viz-pill-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .viz-pill { border:1px solid var(--border-light); border-radius:999px; padding:6px 10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:10px; }
+    @media (max-width:760px) { .viz-grid,.viz-flow,.viz-timeline,.viz-checklist { grid-template-columns:1fr; } .viz-metrics { grid-template-columns:1fr; } .viz-step::after { display:none; } .viz-bar { grid-template-columns:1fr; } .viz-bar b { text-align:left; } .viz-svg { min-height:200px; } }
+    .worksheet-answer { display:none; margin-top:14px; }
+    .worksheet-answer.open { display:block; }
+
+    @media (max-width:760px) { nav { padding:11px 16px; width:100vw; max-width:100vw; overflow:hidden; } .nav-session,.nav-prev,.nav-index,.nav-forward { display:none; } .nav-right { position:absolute; right:12px; top:50%; transform:translateY(-50%); gap:0; } .nav-brand { font-size:12px; max-width:190px; overflow:hidden; white-space:nowrap; } .theme-toggle { transform:scale(.78); transform-origin:right center; } .theme-btn { min-width:42px; min-height:30px; } .hero { padding:104px 24px 62px; min-height:88vh; width:100vw; max-width:100vw; } .hero-inner { max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .hero h1 { font-size:clamp(38px,12vw,52px); line-height:1.12; overflow-wrap:anywhere; word-break:break-all; } .hero-sub { word-break:break-all; } .thesis { padding:20px 22px; max-width:calc(100vw - 48px); width:calc(100vw - 48px); } .thesis-main { word-break:break-all; } .section,.section-wide { padding:58px 20px; max-width:100vw; overflow:hidden; } .fig { padding:20px; max-width:calc(100vw - 40px); } .two,.three,.four,.bridge-grid,.progress-rail,.contract-grid,.scenario-grid,.flow-grid,.premium-map,.calc,.scenario-strip { grid-template-columns:1fr; } .bridge-arrow,.flow-arrow { min-width:0; min-height:46px; } .answer-row { grid-template-columns:1fr; } .next-card { flex-direction:column; } footer { flex-direction:column; gap:8px; text-align:center; } }
+    @media print { nav,.progress,.theme-toggle { display:none !important; } body { background:#fff; color:#111; } .hero { min-height:auto; padding:40px 24px; } .reveal { opacity:1; transform:none; } .fig,.mini-card,.contract-card,.scenario-card,.rail-step,.input-card,.answer-row,.calc-panel,.result,.worksheet-lines div { box-shadow:none; break-inside:avoid; background:#fff; color:#111; border-color:#bbb; } .prose p,.mini-p,.fig-caption,.answer-row p { color:#333; } .answers { display:block !important; } }
+  
+    /* Mobile title tuning: keep session hero titles readable on phones. */
+    @media (max-width:760px) { .hero h1 { font-size:clamp(30px,9.2vw,42px) !important; line-height:1.14 !important; } }
+  
+    /* Mobile course navigation: keep previous/index/next reachable on phones. */
+    @media (max-width:760px) {
+      nav { display:grid !important; grid-template-columns:1fr auto auto; grid-template-rows:auto auto; row-gap:8px; align-items:center; padding:10px 14px 9px !important; overflow:visible !important; }
+      .nav-brand { grid-column:1 / 2; grid-row:1; max-width:170px !important; min-width:0; }
+      .nav-right { display:contents !important; position:static !important; transform:none !important; }
+      .nav-session { display:none !important; }
+      .theme-toggle { grid-column:3; grid-row:1; justify-self:end; transform:scale(.76) !important; transform-origin:right center; }
+      .nav-prev,.nav-index,.nav-forward { display:inline-flex !important; align-items:center; justify-content:center; min-height:28px; padding:0 10px; border:1px solid var(--border); border-radius:999px; background:var(--bg-card); color:var(--text-muted) !important; font-size:11px !important; line-height:1; white-space:nowrap; }
+      .nav-prev { grid-column:1; grid-row:2; justify-self:start; }
+      .nav-index { grid-column:2; grid-row:2; justify-self:center; }
+      .nav-forward { grid-column:3; grid-row:2; justify-self:end; }
+    }
+
+    /* Session 27 figure-specific styles (theme tokens reused, no global redesign) */
+    .s27-flow { display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; margin-top:8px; }
+    .s27-fstep { flex:1 1 150px; min-width:150px; background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:14px; }
+    .s27-fstep .k { display:block; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--amber); letter-spacing:.06em; margin-bottom:7px; }
+    .s27-fstep strong { display:block; color:var(--text); font-size:14px; margin-bottom:5px; }
+    .s27-fstep p { color:var(--text-muted); font-size:12px; line-height:1.52; }
+    .s27-fstep b { font-family:'JetBrains Mono',monospace; color:var(--blue); font-weight:700; }
+    .s27-farrow { display:flex; align-items:center; color:var(--amber); font-family:'JetBrains Mono',monospace; font-size:15px; }
+    .s27-calc { display:grid; grid-template-columns:1.02fr .98fr; gap:16px; }
+    .s27-controls { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:18px; }
+    .s27-ctl { margin-bottom:16px; }
+    .s27-ctl:last-child { margin-bottom:0; }
+    .s27-ctl-head { display:flex; justify-content:space-between; gap:12px; align-items:baseline; margin-bottom:9px; }
+    .s27-ctl-head label { font-weight:800; color:var(--text); font-size:14px; }
+    .s27-ctl-head output { font-family:'JetBrains Mono',monospace; color:var(--amber); font-size:18px; }
+    .s27-ctl input[type="range"] { width:100%; accent-color:var(--amber); min-height:30px; }
+    .s27-ctl small { display:block; color:var(--text-dim); font-size:11px; margin-top:6px; }
+    .s27-seg { display:inline-flex; gap:4px; padding:3px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); flex-wrap:wrap; }
+    .s27-seg button { min-height:38px; border:0; border-radius:999px; background:transparent; color:var(--text-dim); font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; padding:6px 14px; cursor:pointer; }
+    .s27-seg button.active { background:var(--amber); color:var(--cta-text); }
+    .s27-seg-label { display:block; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:.08em; margin-bottom:8px; text-transform:uppercase; }
+    .s27-out { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:15px; margin-bottom:10px; }
+    .s27-out:last-child { margin-bottom:0; }
+    .s27-out .lab { display:block; color:var(--text-dim); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; margin-bottom:5px; text-transform:uppercase; }
+    .s27-out .val { font-size:22px; font-weight:800; color:var(--text); font-family:'JetBrains Mono',monospace; }
+    .s27-out.pos .val { color:var(--green); }
+    .s27-out.neg .val { color:var(--red); }
+    .s27-out.zero .val { color:var(--text-muted); }
+    .s27-action { border-radius:12px; padding:15px; border:1px solid var(--border-light); text-align:center; font-weight:800; }
+    .s27-action.hold { color:var(--green); border-color:rgba(53,208,127,.42); background:rgba(53,208,127,.08); }
+    .s27-action.sell { color:var(--red); border-color:rgba(239,68,68,.42); background:rgba(239,68,68,.08); }
+    .s27-action.buy { color:var(--blue); border-color:rgba(125,211,252,.42); background:rgba(125,211,252,.08); }
+    .s27-action small { display:block; font-weight:400; color:var(--text-muted); font-size:12px; margin-top:5px; }
+    .s27-rail { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+    .s27-rcell { border:1px solid var(--border); border-radius:12px; padding:11px; background:var(--bg-card2); }
+    .s27-rcell.active { border-color:var(--amber); box-shadow:0 0 0 1px rgba(245,177,76,.18) inset; }
+    .s27-rcell span { display:block; font-family:'JetBrains Mono',monospace; color:var(--text-dim); font-size:10px; margin-bottom:5px; letter-spacing:.06em; }
+    .s27-rcell strong { display:block; color:var(--text); font-size:14px; }
+    .s27-rcell em { font-style:normal; color:var(--text-muted); font-size:11px; }
+    .s27-board { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px; }
+    .s27-bpan { border:1px solid var(--border); border-radius:14px; padding:18px; background:var(--bg-card2); transition:opacity .2s,border-color .2s; }
+    .s27-bpan.dim { opacity:.42; }
+    .s27-bpan.up.on { border-color:rgba(53,208,127,.46); box-shadow:0 0 0 1px rgba(53,208,127,.16) inset; }
+    .s27-bpan.down.on { border-color:rgba(239,68,68,.46); box-shadow:0 0 0 1px rgba(239,68,68,.16) inset; }
+    .s27-bpan .tag { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; }
+    .s27-bpan.up .tag { color:var(--green); }
+    .s27-bpan.down .tag { color:var(--red); }
+    .s27-bpan h4 { font-size:15px; color:var(--text); margin:4px 0 12px; }
+    .s27-line { display:flex; justify-content:space-between; gap:10px; border-bottom:1px solid var(--border); padding:8px 0; font-size:13px; color:var(--text-muted); }
+    .s27-line:last-of-type { border-bottom:0; }
+    .s27-line b { font-family:'JetBrains Mono',monospace; color:var(--text); }
+    .s27-line b.g { color:var(--green); }
+    .s27-line b.r { color:var(--red); }
+    .s27-act { margin-top:12px; border-radius:10px; padding:12px; text-align:center; font-weight:800; font-size:14px; }
+    .s27-act.sell { color:var(--red); border:1px solid rgba(239,68,68,.42); background:rgba(239,68,68,.08); }
+    .s27-act.buy { color:var(--blue); border:1px solid rgba(125,211,252,.42); background:rgba(125,211,252,.08); }
+    .s27-dash { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px; }
+    .s27-dpan { border:1px solid var(--border); border-radius:14px; padding:18px; background:var(--bg-card2); }
+    .s27-dpan.long { border-color:rgba(53,208,127,.34); }
+    .s27-dpan.short { border-color:rgba(239,68,68,.34); }
+    .s27-dpan h4 { font-size:15px; color:var(--text); margin-bottom:4px; }
+    .s27-dpan .tag { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; }
+    .s27-dpan.long .tag { color:var(--green); }
+    .s27-dpan.short .tag { color:var(--red); }
+    .s27-drow { display:flex; gap:10px; align-items:flex-start; border-top:1px solid var(--border); padding:11px 0; }
+    .s27-drow:first-of-type { border-top:0; }
+    .s27-drow .ic { font-family:'JetBrains Mono',monospace; font-size:12px; min-width:46px; color:var(--amber); }
+    .s27-drow strong { display:block; color:var(--text); font-size:13px; }
+    .s27-drow em { font-style:normal; color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .s27-flowmap { display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; margin-top:6px; }
+    .s27-mstep { flex:1 1 150px; min-width:150px; border:1px solid var(--border); border-radius:12px; padding:13px; background:var(--bg-card2); }
+    .s27-mstep span { display:block; font-family:'JetBrains Mono',monospace; color:var(--text-dim); font-size:10px; letter-spacing:.06em; margin-bottom:6px; }
+    .s27-mstep strong { display:block; color:var(--text); font-size:13px; margin-bottom:4px; }
+    .s27-mstep p { color:var(--text-muted); font-size:12px; line-height:1.5; }
+    .s27-mstep.stress { border-color:rgba(239,68,68,.4); background:linear-gradient(135deg,rgba(239,68,68,.09),transparent); }
+    .s27-marrow { display:flex; align-items:center; color:var(--amber); font-family:'JetBrains Mono',monospace; font-size:15px; }
+    .s27-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .s27-form label { display:grid; gap:6px; color:var(--text-muted); font-size:13px; }
+    .s27-form input, .s27-form select, .s27-form textarea { min-height:44px; border:1px solid var(--border); border-radius:10px; background:var(--bg-card2); color:var(--text); padding:10px; font:inherit; }
+    .s27-form textarea { min-height:60px; resize:vertical; }
+    .s27-form .wide { grid-column:1/-1; }
+    .s27-actions { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+    .s27-actions button { min-height:44px; border:1px solid var(--border-light); border-radius:999px; background:var(--bg-card); color:var(--text-muted); padding:9px 14px; font:inherit; font-weight:800; cursor:pointer; }
+    .s27-actions button:hover { border-color:var(--amber); }
+    .s27-actions button.primary { background:var(--amber); border-color:var(--amber); color:var(--cta-text); }
+    .s27-results { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .s27-eyebrow { display:inline-flex; align-items:center; min-height:24px; padding:3px 10px; border:1px solid var(--border-light); border-radius:999px; color:var(--text-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; margin-bottom:12px; }
+    @media (max-width:760px) {
+      .s27-farrow, .s27-marrow { display:none; }
+      .s27-fstep, .s27-mstep { flex:1 1 100%; }
+      .s27-calc, .s27-board, .s27-dash, .s27-form, .s27-results { grid-template-columns:1fr; }
+      .s27-rail { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/readability-overrides.css">
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<nav>
+  <a href="../index.html" class="nav-brand">무기견 <span>@sniffshiba</span></a>
+  <div class="nav-right">
+    <a href="session-26.html" class="nav-prev">26회차</a>
+    <span class="nav-session">SESSION 27</span>
+    <a href="../index.html" class="nav-next nav-index">목차</a>
+    <a href="session-28.html" class="nav-next nav-forward">28회차 →</a>
+    <div class="theme-toggle" role="group" aria-label="배경 모드 선택">
+      <button class="theme-btn active" type="button" data-theme-choice="dark" aria-pressed="true">DARK</button>
+      <button class="theme-btn" type="button" data-theme-choice="olive" aria-pressed="false">OLIVE</button>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-inner reveal">
+    <div class="eyebrow">무기견의 옵션 입문 · Session 27 · Level 5</div>
+    <h1>감마와 동적헷징, 왜 큰 움직임이 헷지 수량을 바꾸는가</h1>
+    <p class="hero-sub">델타를 배운 뒤 가장 불편한 지점은 숫자가 계속 바뀐다는 점입니다. 주식 100주는 오늘도 내일도 대체로 +100주 델타입니다. 옵션 1계약의 델타는 현재 주가, 만기, 변동성에 따라 움직입니다.</p>
+    <div class="thesis"><div class="thesis-label">오늘의 중심 문장</div><div class="thesis-main">감마는 주가가 움직일 때 델타가 얼마나 빨리 바뀌는지를 보여주며, 감마가 클수록 동적헷징은 더 자주, 더 큰 수량으로 조정해야 합니다.</div></div>
+  </div>
+</header>
+<hr class="divider">
+<section class="section reveal" id="section-01">
+  <div class="section-num">00</div>
+  <h2>델타헷지에서 감마가 만드는 반복 작업으로 넘어갑니다</h2>
+  <div class="prose">
+<p>26회차에서는 델타헷지를 배웠습니다. 콜 1계약의 델타가 +0.52이고 계약 승수가 100이면 주식 환산 노출은 +52주입니다. 이 노출을 줄이려면 주식 52주를 매도했습니다.</p>
+<p>그런데 델타헷지는 한 번 맞추고 끝나지 않았습니다. 주가가 100달러에서 103달러로 오르면 콜 델타가 +0.52에서 +0.70으로 커질 수 있었죠. 기존 주식 숏은 -52주 그대로인데, 옵션 델타는 +70주가 되니 순델타 +18주가 다시 생겼습니다.</p>
+<p>이번 회차는 그 이유를 다룹니다. 델타를 움직이는 힘이 감마입니다. 감마를 이해하면 동적헷징이 왜 바쁜 작업이 되는지, 그리고 롱감마와 숏감마가 왜 완전히 다른 체감 리스크를 갖는지 보입니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-01">
+  <div class="fig">
+    <div class="fig-label">Figure 01 — 26회차 델타헷지에서 27회차 감마로 넘어가는 다리</div>
+    <h3>26회차 델타헷지에서 27회차 감마로 넘어가는 다리</h3>
+    <p class="viz-copy">26회차에서 순델타를 주식으로 상쇄해 중립을 만들었습니다. 27회차는 그 중립이 왜 다시 깨지는지를 봅니다. 아래 여섯 칸이 오늘 페이지의 지도입니다. 흔드는 힘은 ④에 있는 감마입니다.</p>
+    <div class="s27-flow">
+      <div class="s27-fstep"><span class="k">① 초기 델타</span><strong>방향 노출</strong><p>100콜 1계약 델타 <b>+0.50</b>, 주식 환산 <b>+50주</b>.</p></div>
+      <div class="s27-farrow">→</div>
+      <div class="s27-fstep"><span class="k">② 주식 헷지</span><strong>중립 만들기</strong><p>주식 <b>50주 매도</b> → 순델타 <b>0주</b>.</p></div>
+      <div class="s27-farrow">→</div>
+      <div class="s27-fstep"><span class="k">③ 주가 이동</span><strong>가격이 움직임</strong><p>주가가 <b>100 → 101</b>로 오릅니다.</p></div>
+      <div class="s27-farrow">→</div>
+      <div class="s27-fstep"><span class="k">④ 감마가 델타를 바꿈</span><strong>델타 +0.58</strong><p>감마 <b>+0.08</b> 때문에 델타가 <b>+0.08</b> 커집니다.</p></div>
+      <div class="s27-farrow">→</div>
+      <div class="s27-fstep"><span class="k">⑤ 순델타 재발생</span><strong>중립이 깨짐</strong><p>옵션 +58주, 주식 −50주라 순델타 <b>+8주</b>.</p></div>
+      <div class="s27-farrow">→</div>
+      <div class="s27-fstep"><span class="k">⑥ 재조정</span><strong>다시 맞추기</strong><p>주식 <b>8주 추가 매도</b>로 0 근처로 되돌립니다.</p></div>
+    </div>
+    <div class="viz-note">델타는 현재 노출, 감마는 노출 변화 속도입니다. ③에서 ⑥은 주가가 움직일 때마다 다시 도는 반복 작업입니다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-02">
+  <div class="section-num">01</div>
+  <h2>델타는 왜 한 번 맞춰도 계속 바뀔까요</h2>
+  <div class="prose">
+<p>델타를 배운 뒤 가장 불편한 지점은 숫자가 계속 바뀐다는 점입니다. 주식 100주는 오늘도 내일도 대체로 +100주 델타입니다. 옵션 1계약의 델타는 현재 주가, 만기, 변동성에 따라 움직입니다.</p>
+<p>현재 주가 100달러, 행사가 100달러, 14일 만기 콜 1계약이 있다고 하겠습니다. 델타는 +0.50, 감마는 +0.08입니다. 행사가 100달러, 만기 14일, 콜 1계약, 계약 승수 100을 놓고 기초자산 가격 변화가 델타를 어떻게 밀어 올리거나 내려보내는지 봅니다.</p>
+<p>주가가 1달러 오르면 델타는 대략 +0.58이 됩니다. 주가가 1달러 내리면 델타는 대략 +0.42가 됩니다. 감마 +0.08은 기초자산 1달러 변화마다 델타가 약 0.08만큼 변한다는 뜻입니다.</p>
+<p>이 숫자가 작아 보여도 계약 승수 100을 곱하면 꽤 큽니다. 델타 +0.50은 +50주 노출이고, 델타 +0.58은 +58주 노출입니다. 주가가 1달러 움직였을 뿐인데 헷지 수량은 8주 달라졌습니다.</p>
+<p>오늘의 질문은 여기서 시작합니다. 감마가 크면 왜 델타헷지가 바빠질까요. 그리고 옵션 매수자와 옵션 매도자는 같은 주가 변화를 왜 다르게 겪을까요.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-03">
+  <div class="section-num">02</div>
+  <h2>감마가 클수록 헷지 수량은 더 자주 바뀝니다</h2>
+  <div class="prose">
+<p>이번 회차의 핵심을 한 문장으로 줄이면 이렇습니다.</p>
+<p>감마는 주가가 움직일 때 델타가 얼마나 빨리 바뀌는지를 보여주며, 감마가 클수록 동적헷징은 더 자주, 더 큰 수량으로 조정해야 합니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">03</div>
+  <h2>롱감마와 숏감마의 헷지 방향을 비교합니다</h2>
+  <div class="prose">
+<p>감마는 델타의 변화율입니다. 델타가 기초자산 1달러 변화에 대한 옵션 가격의 1차 민감도라면, 감마는 그 델타 자체가 얼마나 바뀌는지 보는 2차 민감도입니다. 수식보다 먼저 감각을 잡는 게 좋습니다.</p>
+<p>예를 들어 콜 델타가 +0.50이고 감마가 +0.08이라고 하겠습니다. 주가가 100달러에서 101달러로 오르면 델타는 대략 +0.58이 됩니다. 주가가 99달러로 내려가면 델타는 대략 +0.42가 됩니다. 여기서는 감마 +0.08을 현재 근사값으로 놓고, 주가 변화가 델타를 얼마나 밀어내는지 봅니다.</p>
+<p>이 근사는 작은 가격 변화에서 유용합니다. 주가가 5달러, 10달러 움직이면 감마 자체도 바뀝니다. 그래서 감마는 직선 계산표라기보다 “델타가 미끄러지는 속도계”에 가깝습니다.</p>
+<p>ATM 옵션에서 감마가 커지는 이유도 직관적입니다. 주가가 행사가 근처에 있을 때 옵션은 내가격과 외가격 사이를 빠르게 오갑니다. 100콜에서 주가가 99달러에서 101달러로 움직이면 옵션의 성격이 꽤 달라집니다. 반대로 주가가 130달러인 깊은 내가격 콜은 이미 주식처럼 움직이고, 70달러인 먼 외가격 콜은 여전히 가능성이 낮습니다.</p>
+<p>만기와 변동성도 감마의 모양을 바꿉니다. 만기가 짧고 변동성이 낮은 ATM 옵션은 작은 가격 변화에도 델타가 급하게 움직일 수 있습니다. 예를 들어 3일 만기 100콜이 주가 99.50달러에서 델타 +0.35를 갖고 있다가, 주가가 100.50달러로 올라 델타 +0.65가 될 수 있습니다. 짧은 만기와 낮은 변동성 환경에서는 주가 1달러 변화만으로도 주식 환산 델타가 +35주에서 +65주로 뛰며, 헷지 수량은 30주나 달라집니다.</p>
+<p>만기가 길고 변동성이 높은 옵션은 같은 1달러 움직임에도 델타 변화가 완만할 수 있습니다. 90일 만기 100콜의 델타가 +0.48에서 +0.52로 변하는 정도라면 주식 환산 노출은 +48주에서 +52주입니다. 긴 만기와 높은 변동성 환경을 기준선으로 두고 같은 주가 1달러의 변화를 확인합니다. 헷지 수량 변화는 4주에 그칩니다.</p>
+<p>이 차이가 동적헷징의 체감 난이도를 바꿉니다. 같은 델타 중립 포지션이라도 감마가 큰 포지션은 금방 중립에서 벗어납니다. 감마가 작은 포지션은 델타가 천천히 움직입니다. 델타헷지의 바쁨은 현재 델타 수준보다 감마 크기에 더 직접적으로 연결됩니다.</p>
+<p>롱감마는 옵션을 매수한 쪽의 기본 성질입니다. 콜을 사든 풋을 사든 옵션 매수자는 양의 감마를 갖습니다. 주가가 오르면 포지션 델타가 상승 방향으로 커지고, 주가가 내리면 델타가 하락 방향으로 작아집니다.</p>
+<p>롱콜을 델타 중립으로 시작해보겠습니다. 주가 100달러, 100콜 1계약 델타 +0.50, 감마 +0.08입니다. 처음에는 주식 50주를 매도해 순델타 0으로 맞춥니다. 주식 숏 -50주은 그대로 두고, 결과를 흔드는 쪽은 콜 델타입니다.</p>
+<p>주가가 101달러로 오르면 콜 델타는 +0.58이 됩니다. 옵션 델타는 +58주, 주식 숏은 -50주라 순델타는 +8주입니다. 중립으로 돌아가려면 주식 8주를 추가 매도합니다. 오른 뒤에 파는 거래가 됩니다.</p>
+<p>주가가 99달러로 내려가면 콜 델타는 +0.42가 됩니다. 옵션 델타는 +42주, 주식 숏은 -50주라 순델타는 -8주입니다. 중립으로 돌아가려면 주식 8주를 매수합니다. 내린 뒤에 사는 거래가 됩니다.</p>
+<p>이 흐름 때문에 롱감마 헷지는 가격 변동을 흡수하는 성격을 가집니다. 가격이 오르면 일부를 팔고, 가격이 내리면 일부를 삽니다. 다만 이 표현만 보고 좋은 전략이라고 단정하면 곤란합니다. 롱감마는 보통 음의 세타를 함께 가집니다. 시간이 지나면 옵션의 시간가치가 줄어듭니다.</p>
+<p>따라서 롱감마 포지션의 손익 감각은 조정에서 얻는 현금 흐름과 세타 비용의 경쟁으로 볼 수 있습니다. 기초자산이 충분히 흔들리면 재헷지에서 얻는 이익이 시간가치 감소를 보상할 수 있습니다. 조용한 시장이면 헷지 기회는 적고 세타 비용이 더 뚜렷하게 남습니다.</p>
+<p>숏감마는 옵션을 매도한 쪽의 기본 성질입니다. 콜을 매도하든 풋을 매도하든 옵션 매도자는 음의 감마를 갖습니다. 주가가 오르면 포지션 델타가 불리한 방향으로 더 기울고, 주가가 내리면 다시 불리한 방향으로 바뀝니다.</p>
+<p>숏콜 예시를 보겠습니다. 주가 100달러, 100콜 1계약 매도, 옵션 델타 효과는 -0.50입니다. 계약 승수 100을 곱하면 -50주 노출입니다. 처음에는 주식 50주를 매수해 순델타 0으로 맞춥니다. 비교의 출발점은 주식 롱 +50주이고, 관찰 대상은 숏콜의 델타 효과입니다.</p>
+<p>주가가 101달러로 오르면 콜 델타는 +0.58이 되고, 숏콜 포지션의 델타 효과는 -58주가 됩니다. 주식 롱 +50주와 합치면 순델타는 -8주입니다. 중립으로 돌아가려면 주식 8주를 추가 매수합니다. 오른 뒤에 더 사는 거래입니다.</p>
+<p>주가가 99달러로 내리면 콜 델타는 +0.42가 되고, 숏콜 델타 효과는 -42주가 됩니다. 주식 롱 +50주와 합치면 순델타는 +8주입니다. 중립으로 돌아가려면 주식 8주를 매도합니다. 내린 뒤에 파는 거래입니다.</p>
+<p>이게 숏감마의 불편한 지점입니다. 가격이 오르면 사고, 가격이 내리면 팔아야 중립으로 돌아갑니다. 평소에는 세타가 들어와 편안해 보일 수 있지만, 큰 움직임이 나오면 헷지 거래가 가격 움직임을 따라가며 손실을 키울 수 있습니다.</p>
+<p>여기서 시장 구조로 연결되는 힌트가 나옵니다. 많은 참여자가 옵션을 사고, 마켓메이커가 그 옵션을 매도해 숏감마가 되는 상황을 생각해보세요. 마켓메이커는 델타를 줄이기 위해 기초자산을 사고팔아야 합니다. 주가 상승기에 숏콜 헷지가 추가 매수를 부르면 상승 흐름을 더 밀 수 있습니다. 하락기에는 숏풋 헷지가 추가 매도를 부를 수 있겠죠.</p>
+<p>개인투자자에게는 이 구조를 매매 신호로 단순화하지 않는 게 중요합니다. 실제 시장의 감마 노출은 행사가, 만기, 딜러 포지션, 고객 포지션, 옵션 체결 방향, 유동성에 따라 달라집니다. 다만 감마가 기초자산 수급과 연결될 수 있다는 감각은 28회차 마켓감마를 이해하는 출발점이 됩니다.</p>
+<p>숫자로 헷지 빈도를 비교해보겠습니다. A 포지션은 감마 +0.02, B 포지션은 감마 +0.10입니다. 둘 다 초기 델타 +0.50 콜 1계약이고, 주식 50주 매도로 중립을 맞췄습니다. 허용 범위는 순델타 ±10주입니다.</p>
+<p>주가가 1달러 움직이면 A의 델타는 +0.52가 되어 옵션 델타 +52주, 순델타 +2주입니다. 허용 범위 안입니다. B의 델타는 +0.60이 되어 옵션 델타 +60주, 순델타 +10주입니다. 허용 범위 끝에 도달합니다. 초기 델타 +0.50, 계약 승수 100, 주식 숏 -50주, 허용 범위 ±10주를 같은 조건으로 두면, 차이를 만든 것은 감마 크기입니다.</p>
+<p>주가가 2달러 움직이면 차이는 더 커집니다. A는 델타 +0.54로 순델타 +4주입니다. B는 델타 +0.70으로 순델타 +20주입니다. B는 조정이 필요합니다. 같은 주가 변화라도 감마가 큰 포지션은 헷지 임계값에 더 빨리 닿습니다.</p>
+<p>감마가 큰 포지션은 보통 ATM 근처, 만기 임박, 낮은 변동성 환경에서 더 예민합니다. 그래서 만기일 근처의 등가격 옵션은 입문자에게 특히 위험할 수 있습니다. 옵션 가격이 싸 보일 수 있지만, 델타가 갑자기 바뀌고 손익도 빠르게 흔들립니다.</p>
+<p>동적헷징은 현실 비용도 함께 봐야 합니다. 조정을 자주 하면 델타 노출은 줄어듭니다. 대신 수수료, 호가 스프레드, 슬리피지, 세금, 공매도 제약이 쌓입니다. 조정을 덜 하면 비용은 줄지만, 델타가 남아 손익이 기초자산 방향에 더 끌려갑니다.</p>
+<p>전문 트레이더와 개인투자자의 차이도 여기서 큽니다. 전문 트레이더는 낮은 비용, 빠른 체결, 여러 포지션의 자연 상쇄, 리스크 시스템을 갖습니다. 개인투자자는 보통 비용이 높고 체결 속도가 느리며, 포지션 수가 적어 특정 종목 방향 리스크에 더 노출됩니다. 그래서 이 회차는 실전 델타헷지 권유보다 감마를 시장 언어로 이해하는 데 초점을 둡니다.</p>
+<h3 class="subhead">짧은 보충 예시</h3>
+<p>감마가 큰 포지션은 방향 센서가 예민한 장비처럼 작동합니다. 작은 움직임에도 수치가 빨리 바뀌니 자주 조정해야 합니다. 조정 자체가 나쁜 것은 아니지만, 거래비용과 시간 비용을 같이 먹습니다.</p>
+  </div>
+</section><section class="section-wide reveal" id="figure-02">
+  <div class="fig">
+    <div class="fig-label">Figure 02 — 감마 공식 감각 카드</div>
+    <h3>감마 공식 감각 카드</h3>
+    <p class="viz-copy">감마는 “주가 1달러 변화당 델타가 얼마나 바뀌는가”입니다. 새 델타 = 초기 델타 + 감마 × 주가 이동. 슬라이더로 주가 이동을 바꾸면 새 델타와 주식 환산 델타가 함께 움직입니다.</p>
+    <div class="s27-calc">
+      <div class="s27-controls">
+        <div class="s27-out"><span class="lab">고정 입력</span><div class="val" style="font-size:15px;">초기 델타 +0.50 · 감마 +0.08 · 승수 100</div></div>
+        <div class="s27-ctl">
+          <div class="s27-ctl-head"><label for="f2-move">주가 이동</label><output id="f2-move-out">+1.0달러</output></div>
+          <input type="range" id="f2-move" min="-2" max="2" step="0.5" value="1" aria-label="주가 이동">
+          <small>−2달러에서 +2달러까지 0.5달러 단위로 움직입니다.</small>
+        </div>
+        <div class="s27-out"><span class="lab">계산식</span><div class="val" id="f2-formula" style="font-size:15px;">+0.50 + 0.08 × (+1.0)</div></div>
+      </div>
+      <div>
+        <div class="s27-out pos"><span class="lab">새 델타</span><div class="val" id="f2-delta">+0.58</div></div>
+        <div class="s27-out pos"><span class="lab">주식 환산 델타</span><div class="val" id="f2-eq">+58주</div></div>
+        <div class="s27-out zero"><span class="lab">델타 변화량 (1계약)</span><div class="val" id="f2-diff">+8주</div></div>
+      </div>
+    </div>
+    <div class="viz-note">고정값은 현재 감마이고, 바뀌는 값은 기초자산 가격입니다. 주가가 +1달러면 델타는 +0.58, 주식 환산 +58주가 됩니다. 큰 가격 변화에서는 감마 자체도 바뀌므로 이 표는 작은 움직임의 근사입니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-03">
+  <div class="fig">
+    <div class="fig-label">Figure 03 — ATM 근처에서 감마가 커지는 이유</div>
+    <h3>ATM 근처에서 감마가 커지는 이유</h3>
+    <div class="viz-grid">
+      <div class="viz-panel accent">
+        <svg class="viz-svg" viewBox="0 0 600 250" role="img" aria-label="행사가 100 콜의 주가별 델타 곡선. 행사가 근처에서 기울기가 가장 가파릅니다.">
+          <line class="viz-axis" x1="70" y1="42" x2="70" y2="218"/>
+          <line class="viz-axis" x1="70" y1="218" x2="572" y2="218"/>
+          <line class="viz-gridline" x1="70" y1="130" x2="572" y2="130"/>
+          <rect x="290.5" y="42" width="49" height="176" fill="rgba(245,177,76,.13)"/>
+          <line x1="315" y1="42" x2="315" y2="218" stroke="var(--amber)" stroke-dasharray="4 4" stroke-width="1.5"/>
+          <polyline class="viz-line blue" points="70,204 192.5,183 290.5,144 315,130 339.5,116 437.5,77 560,56"/>
+          <circle id="f3-dot" class="viz-dot" cx="315" cy="130" r="7"/>
+          <text class="viz-label" x="296" y="36">ATM 구간</text>
+          <text class="viz-label" x="60" y="46">델타 1.0</text>
+          <text class="viz-label" x="60" y="216">0.0</text>
+          <text class="viz-label" x="70" y="236">90달러</text>
+          <text class="viz-label" x="300" y="236">100</text>
+          <text class="viz-label" x="540" y="236">110</text>
+        </svg>
+      </div>
+      <div class="viz-panel">
+        <h4>현재 주가 위치와 델타</h4>
+        <div class="s27-out pos"><span class="lab">현재 주가</span><div class="val" id="f3-price">100달러</div></div>
+        <div class="s27-out pos"><span class="lab">콜 델타</span><div class="val" id="f3-delta">+0.50</div></div>
+        <div class="s27-out zero"><span class="lab">이 구간의 감마 체감</span><div class="val" id="f3-gamma" style="font-size:16px;">가장 가파름</div></div>
+        <div class="viz-range" style="margin-top:12px;"><label for="f3-slider">주가 이동 <output id="f3-slider-out">100달러</output></label><input type="range" id="f3-slider" min="90" max="110" step="1" value="100" aria-label="주가"></div>
+      </div>
+    </div>
+    <div class="s27-rail">
+      <div class="s27-rcell" data-price="95"><span>외가격 95</span><strong>델타 +0.20</strong><em>완만</em></div>
+      <div class="s27-rcell active" data-price="100"><span>등가격 100</span><strong>델타 +0.50</strong><em>가장 가파름</em></div>
+      <div class="s27-rcell" data-price="105"><span>내가격 105</span><strong>델타 +0.80</strong><em>완만</em></div>
+      <div class="s27-rcell" data-price="110"><span>깊은 내가격 110</span><strong>델타 +0.92</strong><em>주식에 근접</em></div>
+    </div>
+    <div class="viz-note">행사가 근처에서는 옵션이 내가격과 외가격 사이를 빠르게 오가서 델타가 급하게 바뀝니다. 깊은 내가격 콜은 이미 주식처럼 움직이고, 먼 외가격 콜은 가능성이 낮아 둘 다 감마가 작습니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-04">
+  <div class="fig">
+    <div class="fig-label">Figure 04 — 만기와 변동성이 감마를 바꾸는 비교</div>
+    <h3>만기와 변동성이 감마를 바꾸는 비교</h3>
+    <div class="viz-grid">
+      <div class="viz-panel accent">
+        <svg class="viz-svg" viewBox="0 0 600 250" role="img" aria-label="같은 행사가 100 콜의 델타 곡선 비교. 짧은 만기 낮은 변동성 곡선은 가파르고, 긴 만기 높은 변동성 곡선은 완만합니다.">
+          <line class="viz-axis" x1="70" y1="42" x2="70" y2="218"/>
+          <line class="viz-axis" x1="70" y1="218" x2="572" y2="218"/>
+          <line class="viz-gridline" x1="70" y1="130" x2="572" y2="130"/>
+          <line x1="315" y1="42" x2="315" y2="218" stroke="var(--amber)" stroke-dasharray="4 4" stroke-width="1.5"/>
+          <polyline id="f4-short" class="viz-line red" points="130,156 315,130 500,104"/>
+          <polyline id="f4-long" class="viz-line blue" points="130,134 315,130 500,126"/>
+          <circle class="viz-dot red" cx="130" cy="156" r="5"/><circle class="viz-dot red" cx="500" cy="104" r="5"/>
+          <circle class="viz-dot blue" cx="130" cy="134" r="5"/><circle class="viz-dot blue" cx="500" cy="126" r="5"/>
+          <text class="viz-label" x="60" y="46">델타</text>
+          <text class="viz-label" x="104" y="236">99.5</text>
+          <text class="viz-label" x="300" y="236">100</text>
+          <text class="viz-label" x="476" y="236">100.5</text>
+        </svg>
+        <div class="viz-pill-row"><span class="viz-pill" style="color:var(--red);">짧은 만기·낮은 IV</span><span class="viz-pill" style="color:var(--blue);">긴 만기·높은 IV</span></div>
+      </div>
+      <div class="viz-panel">
+        <h4>같은 1달러, 다른 헷지 수량</h4>
+        <div class="s27-seg" id="f4-toggle" style="margin-bottom:14px;">
+          <button type="button" class="active" data-case="short">짧은 만기·낮은 IV</button>
+          <button type="button" data-case="long">긴 만기·높은 IV</button>
+        </div>
+        <div class="s27-out" id="f4-box"><span class="lab" id="f4-name">3일 만기 100콜</span><div class="val" id="f4-delta" style="font-size:16px;">델타 +0.35 → +0.65</div></div>
+        <div class="s27-out zero"><span class="lab">주식 환산 델타 변화</span><div class="val" id="f4-eq">+35주 → +65주</div></div>
+        <div class="s27-out" id="f4-hedge-box"><span class="lab">헷지 수량 변화</span><div class="val" id="f4-hedge">30주</div></div>
+      </div>
+    </div>
+    <div class="viz-note">같은 1달러 움직임도 감마 환경에 따라 헷지 수량 변화가 다릅니다. 짧은 만기·낮은 변동성 ATM 옵션은 델타가 +35주에서 +65주로 30주 뛰지만, 긴 만기·높은 변동성 옵션은 +48주에서 +52주로 4주만 바뀝니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-05">
+  <div class="fig">
+    <div class="fig-label">Figure 05 — 롱감마 헷지 방향 보드</div>
+    <h3>롱감마 헷지 방향 보드</h3>
+    <p class="viz-copy">롱콜 1계약 델타 +0.50을 주식 50주 매도로 중립에 맞췄습니다. 주식 숏 −50주는 고정이고, 흔드는 값은 콜 델타입니다. 위쪽 토글로 상승/하락 시나리오를 선택하면 해당 칸이 강조됩니다.</p>
+    <div class="s27-seg" id="f5-toggle" style="margin-bottom:14px;">
+      <button type="button" class="active" data-dir="up">주가 상승 (+1달러)</button>
+      <button type="button" data-dir="down">주가 하락 (−1달러)</button>
+    </div>
+    <div class="s27-board">
+      <div class="s27-bpan up on" id="f5-up">
+        <div class="tag">주가 100 → 101</div>
+        <h4>상승: 강세에 매도</h4>
+        <div class="s27-line">콜 델타 <b class="g">+0.58</b></div>
+        <div class="s27-line">옵션 주식 환산 <b>+58주</b></div>
+        <div class="s27-line">기존 주식 헷지 <b>−50주</b></div>
+        <div class="s27-line">순델타 <b class="g">+8주</b></div>
+        <div class="s27-act sell">주식 8주 추가 매도 → 중립 복귀</div>
+      </div>
+      <div class="s27-bpan down" id="f5-down">
+        <div class="tag">주가 100 → 99</div>
+        <h4>하락: 약세에 매수</h4>
+        <div class="s27-line">콜 델타 <b class="r">+0.42</b></div>
+        <div class="s27-line">옵션 주식 환산 <b>+42주</b></div>
+        <div class="s27-line">기존 주식 헷지 <b>−50주</b></div>
+        <div class="s27-line">순델타 <b class="r">−8주</b></div>
+        <div class="s27-act buy">주식 8주 매수 → 중립 복귀</div>
+      </div>
+    </div>
+    <div class="viz-note">고정은 기존 주식 숏 −50주, 변하는 것은 콜 델타입니다. 롱감마는 오르면 일부 팔고 내리면 일부 사며 변동을 흡수합니다. 다만 보통 음의 세타를 함께 내므로, 움직임이 조용하면 시간가치 감소가 더 뚜렷합니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-06">
+  <div class="fig">
+    <div class="fig-label">Figure 06 — 숏감마 헷지 방향 보드</div>
+    <h3>숏감마 헷지 방향 보드</h3>
+    <p class="viz-copy">같은 100콜 1계약을 매도하면 델타 효과는 −0.50입니다. 주식 50주 매수로 중립에 맞췄습니다. 주식 롱 +50주는 고정이고, 관찰 대상은 숏콜의 델타 효과입니다. Figure 05와 같은 레이아웃이라 방향 차이가 바로 보입니다.</p>
+    <div class="s27-seg" id="f6-toggle" style="margin-bottom:14px;">
+      <button type="button" class="active" data-dir="up">주가 상승 (+1달러)</button>
+      <button type="button" data-dir="down">주가 하락 (−1달러)</button>
+    </div>
+    <div class="s27-board">
+      <div class="s27-bpan up on" id="f6-up">
+        <div class="tag">주가 100 → 101</div>
+        <h4>상승: 강세에 매수</h4>
+        <div class="s27-line">숏콜 델타 효과 <b class="r">−0.58</b></div>
+        <div class="s27-line">옵션 주식 환산 <b>−58주</b></div>
+        <div class="s27-line">기존 주식 헷지 <b>+50주</b></div>
+        <div class="s27-line">순델타 <b class="r">−8주</b></div>
+        <div class="s27-act buy">주식 8주 추가 매수 → 중립 복귀</div>
+      </div>
+      <div class="s27-bpan down" id="f6-down">
+        <div class="tag">주가 100 → 99</div>
+        <h4>하락: 약세에 매도</h4>
+        <div class="s27-line">숏콜 델타 효과 <b class="g">−0.42</b></div>
+        <div class="s27-line">옵션 주식 환산 <b>−42주</b></div>
+        <div class="s27-line">기존 주식 헷지 <b>+50주</b></div>
+        <div class="s27-line">순델타 <b class="g">+8주</b></div>
+        <div class="s27-act sell">주식 8주 매도 → 중립 복귀</div>
+      </div>
+    </div>
+    <div class="viz-note">숏감마는 오르면 사고 내리면 팔아야 중립으로 돌아갑니다. 평소에는 세타가 들어와 편안해 보이지만, 큰 움직임이 나오면 헷지 거래가 가격을 따라가며 손실을 키울 수 있습니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-07">
+  <div class="fig">
+    <div class="fig-label">Figure 07 — 감마 크기별 헷지 임계값 계산기</div>
+    <h3>감마 크기별 헷지 임계값 계산기</h3>
+    <p class="viz-copy">초기 델타 +0.50, 주식 헷지 −50주, 계약 승수 100은 고정입니다. 감마와 주가 이동만 바꿉니다. 새 델타 = 0.50 + 감마 × 주가 이동, 순델타 = 새 델타 × 100 − 50. 순델타가 허용 범위를 벗어나면 그만큼 주식을 거래합니다.</p>
+    <div class="s27-calc">
+      <div class="s27-controls">
+        <div class="s27-ctl">
+          <span class="s27-seg-label">감마 선택</span>
+          <div class="s27-seg" id="f7-gamma">
+            <button type="button" data-gamma="0.02">+0.02</button>
+            <button type="button" data-gamma="0.05">+0.05</button>
+            <button type="button" class="active" data-gamma="0.10">+0.10</button>
+          </div>
+        </div>
+        <div class="s27-ctl">
+          <div class="s27-ctl-head"><label for="f7-move">주가 이동</label><output id="f7-move-out">+2.0달러</output></div>
+          <input type="range" id="f7-move" min="-3" max="3" step="0.5" value="2" aria-label="주가 이동">
+        </div>
+        <div class="s27-ctl">
+          <div class="s27-ctl-head"><label for="f7-tol">허용 범위 ±</label><output id="f7-tol-out">10주</output></div>
+          <input type="range" id="f7-tol" min="5" max="25" step="1" value="10" aria-label="허용 범위">
+        </div>
+      </div>
+      <div>
+        <div class="s27-out pos"><span class="lab">새 델타</span><div class="val" id="f7-delta">+0.70</div></div>
+        <div class="s27-out pos"><span class="lab">순델타</span><div class="val" id="f7-net">+20주</div></div>
+        <div class="s27-action sell" id="f7-action">주식 20주 추가 매도<small id="f7-action-sub">허용 범위 ±10주를 벗어났습니다.</small></div>
+      </div>
+    </div>
+    <div class="viz-note">초기 델타와 헷지는 고정, 변하는 것은 감마와 주가 이동입니다. 감마 +0.10이면 주가 +2달러만으로 순델타가 +20주가 되어 허용 범위를 넘습니다. 같은 조건에서 감마 +0.02면 순델타는 +4주에 그쳐 조정이 필요 없을 수 있습니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-08">
+  <div class="fig">
+    <div class="fig-label">Figure 08 — 감마, 세타 교환관계 미니 대시보드</div>
+    <h3>감마, 세타 교환관계 미니 대시보드</h3>
+    <span class="s27-eyebrow">교육용 구조 비교 · 투자 권유 아님</span>
+    <p class="viz-copy">감마는 움직임 노출이고, 세타는 시간을 지나는 비용 또는 수취입니다. 시장 상태를 바꾸면 롱감마와 숏감마가 같은 상황을 어떻게 다르게 겪는지 라벨이 바뀝니다.</p>
+    <div class="s27-seg" id="f8-toggle" style="margin-bottom:14px;">
+      <button type="button" class="active" data-mode="quiet">조용한 장</button>
+      <button type="button" data-mode="choppy">출렁이는 장</button>
+      <button type="button" data-mode="gap">급변·갭</button>
+    </div>
+    <div class="s27-dash">
+      <div class="s27-dpan long">
+        <div class="tag">LONG GAMMA · 옵션 매수</div>
+        <h4>롱감마</h4>
+        <div class="s27-drow"><div class="ic">움직임</div><div><strong id="f8-lg-move">조정 기회 적음</strong><em id="f8-lg-move-d">가격이 거의 안 움직여 재헷지로 얻을 현금 흐름이 적습니다.</em></div></div>
+        <div class="s27-drow"><div class="ic">세타</div><div><strong id="f8-lg-theta">시간가치 감소 부각</strong><em id="f8-lg-theta-d">움직임이 없으면 음의 세타가 먼저 계좌에 보입니다.</em></div></div>
+      </div>
+      <div class="s27-dpan short">
+        <div class="tag">SHORT GAMMA · 옵션 매도</div>
+        <h4>숏감마</h4>
+        <div class="s27-drow"><div class="ic">움직임</div><div><strong id="f8-sg-move">재헷지 부담 적음</strong><em id="f8-sg-move-d">가격이 잔잔해 헷지 거래를 자주 할 필요가 없습니다.</em></div></div>
+        <div class="s27-drow"><div class="ic">세타</div><div><strong id="f8-sg-theta">세타 수취 편안</strong><em id="f8-sg-theta-d">시간가치가 들어와 평온한 장에서 유리해 보입니다.</em></div></div>
+      </div>
+    </div>
+    <div class="viz-note">조용한 장은 롱감마에 불리하고 숏감마에 편합니다. 급변·갭에서는 반대로 롱감마가 조정 기회를 얻고 숏감마는 손실이 빨리 커질 수 있습니다. 어느 쪽도 항상 좋거나 나쁘지 않습니다.</div>
+  </div>
+</section><section class="section-wide reveal" id="figure-09">
+  <div class="fig">
+    <div class="fig-label">Figure 09 — 감마에서 마켓감마로 이어지는 리스크 워크시트</div>
+    <h3>감마에서 마켓감마로 이어지는 리스크 워크시트</h3>
+    <span class="s27-eyebrow">28회차 예고 · 실제 시장 데이터 없이 구조만</span>
+    <h4 style="font-size:16px;color:var(--text);margin:6px 0 4px;">시장 흐름 미리보기</h4>
+    <div class="s27-seg" id="f9-flow-toggle" style="margin-bottom:10px;">
+      <button type="button" class="active" data-flow="call">콜 흐름</button>
+      <button type="button" data-flow="put">풋 흐름</button>
+    </div>
+    <div class="s27-flowmap" id="f9-flowmap">
+      <div class="s27-mstep"><span>STEP 1</span><strong id="f9-s1">고객이 콜 매수</strong><p id="f9-s1d">개인 참여자가 콜을 삽니다.</p></div>
+      <div class="s27-marrow">→</div>
+      <div class="s27-mstep"><span>STEP 2</span><strong id="f9-s2">마켓메이커 콜 매도</strong><p id="f9-s2d">반대편에서 콜을 팔아 숏감마가 됩니다.</p></div>
+      <div class="s27-marrow">→</div>
+      <div class="s27-mstep"><span>STEP 3</span><strong id="f9-s3">델타 헷지</strong><p id="f9-s3d">델타를 줄이려 기초자산을 사고팝니다.</p></div>
+      <div class="s27-marrow">→</div>
+      <div class="s27-mstep stress" id="f9-s4"><span>STEP 4</span><strong id="f9-s4t">주가 상승 → 추가 매수</strong><p id="f9-s4d">숏감마 헷지가 상승기에 추가 매수를 불러 흐름을 더 밀 수 있습니다.</p></div>
+    </div>
+    <div class="viz-note">개별 포지션의 감마가 시장 수급 언어로 확장됩니다. 실제 감마 노출은 행사가, 만기, 딜러·고객 포지션, 체결 방향, 유동성에 따라 달라지므로 매매 신호로 단순화하지 않습니다. 자세한 마켓감마와 감마 스퀴즈는 28회차에서 다룹니다.</div>
+
+    <h4 style="font-size:16px;color:var(--text);margin:22px 0 4px;">감마 리스크 워크시트</h4>
+    <p class="viz-copy">아래 입력은 브라우저 안에서만 계산하며 어디에도 저장하거나 전송하지 않습니다. 예시를 불러와 구조를 익힌 뒤 관심 종목으로 바꿔보세요.</p>
+    <div class="s27-actions">
+      <button type="button" id="f9-ex-long">예시 불러오기: 롱콜</button>
+      <button type="button" id="f9-ex-short">예시 불러오기: 숏콜</button>
+      <button type="button" class="primary" id="f9-calc">계산하기</button>
+      <button type="button" id="f9-clear">비우기</button>
+      <button type="button" id="f9-print">인쇄용 보기</button>
+    </div>
+    <form class="s27-form" id="f9-form" onsubmit="return false;">
+      <label>기초자산<input type="text" id="f9-underlying" aria-label="예: ABC"></label>
+      <label>옵션 유형
+        <select id="f9-type"><option value="call">콜</option><option value="put">풋</option></select>
+      </label>
+      <label>롱/숏
+        <select id="f9-side"><option value="long">롱(매수)</option><option value="short">숏(매도)</option></select>
+      </label>
+      <label>현재 포지션 델타<input type="number" id="f9-delta" step="0.01" aria-label="예: 0.50 또는 -0.50"></label>
+      <label>감마<input type="number" id="f9-gamma" step="0.01" aria-label="예: 0.08 또는 -0.08"></label>
+      <label>계약 승수<input type="number" id="f9-mult" step="1" aria-label="예: 100"></label>
+      <label>계약 수<input type="number" id="f9-contracts" step="1" aria-label="예: 1"></label>
+      <label>주가 이동(달러)<input type="number" id="f9-move" step="0.5" aria-label="예: 1"></label>
+      <label>현재 주식 헷지(주)<input type="number" id="f9-hedge" step="1" aria-label="예: -50"></label>
+      <label>허용 순델타 ±(주)<input type="number" id="f9-tol" step="1" aria-label="예: 10"></label>
+      <label>세타 추정<input type="text" id="f9-theta" aria-label="예: 하루 -0.05"></label>
+      <label>호가 스프레드<input type="text" id="f9-spread" aria-label="예: 1틱"></label>
+      <label class="wide">남은 리스크<textarea id="f9-risks" aria-label="예: 세타 비용, 유동성, 갭 리스크, 증거금"></textarea></label>
+    </form>
+    <div class="s27-results">
+      <div class="s27-out" id="f9-r-delta-box"><span class="lab">새 델타</span><div class="val" id="f9-r-delta">—</div></div>
+      <div class="s27-out" id="f9-r-eq-box"><span class="lab">주식 환산 델타 변화</span><div class="val" id="f9-r-eq">—</div></div>
+      <div class="s27-out" id="f9-r-net-box"><span class="lab">헷지 후 순델타</span><div class="val" id="f9-r-net">—</div></div>
+      <div class="s27-out" id="f9-r-trade-box"><span class="lab">필요한 주식 거래</span><div class="val" id="f9-r-trade" style="font-size:18px;">—</div></div>
+      <div class="s27-out" id="f9-r-band-box" style="grid-column:1/-1;"><span class="lab">허용 범위 판정</span><div class="val" id="f9-r-band" style="font-size:16px;">—</div></div>
+    </div>
+    <div class="viz-note">학습자가 감마를 자기 포지션 점검표로 번역하고, 28회차 마켓메이커와 감마 스퀴즈로 자연스럽게 연결하는 워크시트입니다.</div>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-05">
+  <div class="section-num">04</div>
+  <h2>감마가 크면 무조건 좋다는 생각은 위험합니다</h2>
+  <div class="prose">
+<p>첫 번째 오해는 감마가 크면 무조건 좋다고 보는 것입니다. 롱감마는 큰 움직임에 유리할 수 있지만, 보통 세타 비용을 냅니다. 움직임이 충분하지 않으면 시간가치 감소가 먼저 계좌에 반영됩니다.</p>
+<p>두 번째 오해는 숏감마가 무조건 나쁘다고 보는 것입니다. 숏감마는 평온한 시장에서 세타 수취를 기대할 수 있습니다. 위험은 큰 움직임이 나올 때 손실이 빨리 커질 수 있다는 점입니다. 그래서 숏감마는 손실 한도, 만기, 유동성, 증거금, 갭 리스크를 함께 봐야 합니다.</p>
+<p>세 번째 오해는 감마를 고정 숫자로 외우는 것입니다. 감마는 현재 위치의 민감도입니다. 주가가 행사가에서 멀어지거나, 만기가 줄거나, 변동성이 바뀌면 감마 자체도 움직입니다.</p>
+<p>네 번째 오해는 마켓메이커의 감마 이야기를 모든 상승과 하락의 설명으로 쓰는 것입니다. 감마 수급은 단기 가격 흐름을 키우거나 누르는 힘이 될 수 있습니다. 그러나 실적, 금리, 유동성, 포지션 청산, 뉴스, 매크로 변수와 함께 봐야 합니다. 감마만으로 시장을 설명하면 시야가 좁아집니다.</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-06">
+  <div class="section-num">05</div>
+  <h2>감마는 변동성 기회와 세타 비용을 함께 요구합니다</h2>
+  <div class="prose">
+<p>감마는 델타의 변화율입니다. 기초자산이 1달러 움직일 때 옵션 델타가 얼마나 바뀌는지 보여줍니다. 델타가 바뀌면 주식 환산 노출도 바뀌고, 델타헷지 수량도 다시 계산해야 합니다.</p>
+<p>감마가 클수록 델타헷지는 바빠집니다. 같은 1달러 움직임에서도 감마 +0.02 포지션은 순델타가 2주 변하는 정도일 수 있고, 감마 +0.10 포지션은 10주 변할 수 있습니다. 계약 승수와 초기 델타가 같아도 감마가 다르면 재헷지 빈도가 달라집니다.</p>
+<p>롱감마는 가격이 오르면 팔고 내리면 사는 조정 흐름을 만들 수 있습니다. 숏감마는 가격이 오르면 사고 내리면 파는 불편한 조정에 놓일 수 있습니다. 이 차이가 옵션 매수와 매도, 그리고 마켓메이커 헷지 흐름을 이해하는 기초입니다.</p>
+<p>오늘 가져갈 체크포인트는 간단합니다. 델타는 현재 방향 노출이고, 감마는 그 방향 노출이 얼마나 빨리 바뀌는지입니다. 동적헷징의 난이도는 감마에서 시작됩니다.</p>
+<h3 class="subhead">이번 회차 압축</h3>
+<ul>
+<li>감마가 클수록 델타가 빨리 바뀌고 헷지도 더 자주 필요하다.</li>
+<li>롱감마는 흔들림에서 기회를 얻지만 세타를 낸다.</li>
+<li>숏감마는 평온할 때 세타를 받지만 급변 구간에서 불리한 방향으로 헷지 수량이 커진다.</li>
+</ul>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-07">
+  <div class="section-num">06</div>
+  <h2>주가 변화에 따른 델타와 헷지 수량을 계산합니다</h2>
+  <div class="prose">
+<p>아래 숫자는 학습용 예시입니다. 실제 옵션 가격, 수수료, 세금, 호가 스프레드, 공매도 가능 여부, 배당, 유동성, 증거금은 반영하지 않습니다.</p>
+<h3 class="subhead">Worksheet A. 감마로 새 델타 계산하기</h3>
+<p>현재 주가 100달러입니다. 14일 만기 100콜 1계약의 델타는 +0.50, 감마는 +0.08입니다. 계약 승수는 100입니다.</p>
+<ol>
+<li>주가가 101달러로 오르면 델타는 대략 얼마입니까?</li>
+<li>주가가 99달러로 내리면 델타는 대략 얼마입니까?</li>
+<li>각각의 주식 환산 델타는 몇 주입니까?</li>
+<li>이 예시에서 처음 넣은 입력값과 이후 함께 움직이는 값을 분리해 적어보세요.</li>
+</ol>
+<p>계산 기준: 101달러에서는 델타가 대략 +0.58, 주식 환산 델타는 +58주입니다. 99달러에서는 델타가 대략 +0.42, 주식 환산 델타는 +42주입니다. 초기 델타 +0.50, 감마 +0.08, 계약 승수 100을 먼저 넣고, 주가와 새 델타가 함께 움직인다고 보면 됩니다.</p>
+<h3 class="subhead">Worksheet B. 롱감마 재헷지 판단</h3>
+<p>처음에 100콜 1계약을 매수하고 주식 50주를 매도해 순델타를 0으로 맞췄습니다. 허용 범위는 순델타 ±10주입니다.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">주가</th>
+<th style="text-align: right;">콜 델타</th>
+<th style="text-align: right;">옵션 주식 환산 델타</th>
+<th style="text-align: right;">기존 주식 헷지</th>
+<th style="text-align: right;">순델타</th>
+<th>행동</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">+0.42</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-50주</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">+0.50</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-50주</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">+0.58</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-50주</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">102</td>
+<td style="text-align: right;">+0.66</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">-50주</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>풀이의 핵심: 99달러에서는 +42주와 -50주가 합쳐져 순델타 -8주입니다. 100달러에서는 0주입니다. 101달러에서는 +8주입니다. 102달러에서는 +16주라 허용 범위를 넘고, 중립에 가깝게 만들려면 주식 16주를 추가 매도합니다. 기존 주식 헷지 -50주와 허용 범위 ±10주를 기준선으로 두고 콜 델타의 변화를 확인합니다.</p>
+<h3 class="subhead">Worksheet C. 숏감마 재헷지 판단</h3>
+<p>이번에는 같은 100콜 1계약을 매도하고 주식 50주를 매수해 순델타를 0으로 맞췄습니다. 허용 범위는 순델타 ±10주입니다.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">주가</th>
+<th style="text-align: right;">콜 델타</th>
+<th style="text-align: right;">숏콜 델타 효과</th>
+<th style="text-align: right;">기존 주식 헷지</th>
+<th style="text-align: right;">순델타</th>
+<th>행동</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">+0.42</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">+50주</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">+0.50</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">+50주</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">101</td>
+<td style="text-align: right;">+0.58</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">+50주</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">102</td>
+<td style="text-align: right;">+0.66</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">+50주</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>점검 기준: 숏콜 델타 효과는 콜 델타에 -1을 곱해 봅니다. 99달러에서는 -42주와 +50주가 합쳐져 순델타 +8주입니다. 101달러에서는 -58주와 +50주가 합쳐져 순델타 -8주입니다. 102달러에서는 -66주와 +50주가 합쳐져 순델타 -16주라 허용 범위를 넘고, 중립에 가깝게 만들려면 주식 16주를 추가 매수합니다.</p>
+<h3 class="subhead">Worksheet D. 감마 크기별 헷지 빈도 비교</h3>
+<p>두 포지션 모두 초기 콜 델타 +0.50, 계약 승수 100, 기존 주식 헷지 -50주입니다. 허용 범위는 순델타 ±10주입니다.</p>
+<table>
+<thead>
+<tr>
+<th>포지션</th>
+<th style="text-align: right;">감마</th>
+<th style="text-align: right;">주가 +1달러 후 델타</th>
+<th style="text-align: right;">순델타</th>
+<th>조정 필요 여부</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td style="text-align: right;">+0.02</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td>B</td>
+<td style="text-align: right;">+0.10</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>확인 기준: A는 델타 +0.52, 순델타 +2주라 조정하지 않을 수 있습니다. B는 델타 +0.60, 순델타 +10주로 허용 범위 끝에 닿습니다. 주가가 조금 더 오르면 B는 곧바로 조정 대상이 됩니다. 초기 델타와 헷지 수량은 그대로 두고, 결과를 흔드는 쪽은 감마입니다.</p>
+<h3 class="subhead">Worksheet E. 나의 감마 리스크 체크리스트</h3>
+<p>관심 있는 종목 하나를 고르고, 아래 문장을 채워보세요. 실제 거래를 하라는 뜻은 아닙니다. 감마를 리스크 언어로 번역하는 연습입니다.</p>
+<p>“내가 가정한 옵션 포지션은 ________입니다. 현재 델타는 ________, 감마는 ________입니다. 기초자산이 1달러 움직이면 델타는 대략 ________만큼 바뀝니다. 계약 승수까지 반영하면 주식 환산 노출은 ________주 변합니다. 내가 허용할 순델타 범위는 ________주입니다. 이 포지션이 롱감마라면 비용은 주로 ________에서 오고, 숏감마라면 위험은 주로 ________에서 옵니다. 실제 계좌에서 확인할 비용은 수수료 ________, 호가 스프레드 ________, 슬리피지 ________, 증거금 ________입니다.”</p>
+  </div>
+</section><hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">07</div>
+  <h2>다음 회차에서는 감마를 시장 구조로 확장합니다</h2>
+  <div class="prose">
+<p>다음 28회차에서는 오늘 배운 감마를 시장 구조로 확장합니다. 개인이 옵션을 사고, 마켓메이커가 반대편에서 옵션을 매도하면, 마켓메이커는 델타를 줄이기 위해 주식이나 선물을 사고팔아야 합니다. 이 거래가 특정 조건에서는 기초자산 가격 움직임을 억제하거나 키울 수 있습니다.</p>
+<p>개인적으로는 여기서부터 옵션 지식이 매크로 시황과 직접 연결된다고 봅니다. VIX, 스큐, 감마 포지셔닝, 만기일 수급을 읽을 때 “누가 옵션을 들고 있고, 누가 헷지 거래를 해야 하는가”라는 질문이 생깁니다. 28회차에서는 마켓메이커, 마켓감마, 감마 스퀴즈를 이 질문으로 풀어보겠습니다.</p>
+  </div>
+</section>
+<section class="section reveal" id="next">
+  <a class="next-card" href="session-28.html">
+    <div><div class="next-label">다음 회차</div><div class="next-title">28회차 — 마켓메이커, 마켓감마, 감마 스퀴즈</div><p class="next-desc">다음 28회차에서는 오늘 배운 감마를 시장 구조로 확장합니다. 개인이 옵션을 사고, 마켓메이커가 반대편에서 옵션을 매도하면, 마켓메이커는 델타를 줄이기 위해 주식이나 선물을 사고팔아야 합니다. 이 거래가 특정 조건에서는 기초자산 가격 움직임을 억제하거나 키울 수 있습니다.</p></div>
+    <div class="next-arrow">→</div>
+  </a>
+</section>
+<footer>
+  <div>© 2026 무기견. All rights reserved.</div>
+  <div><a href="../copyright.html">저작권 및 이용 제한</a></div>
+</footer>
+<script>
+
+const THEME_KEY = 'mugigyeon-options-course-theme-v2';
+const root = document.documentElement;
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function applyTheme(theme) {
+  const next = theme === 'olive' ? 'olive' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) {}
+  themeButtons.forEach((button) => {
+    const active = button.dataset.themeChoice === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+try { applyTheme(localStorage.getItem(THEME_KEY) || 'dark'); } catch (error) { applyTheme('dark'); }
+themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeChoice)));
+const progress = document.querySelector('.progress');
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  if (progress) progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+function $(id) { return document.getElementById(id); }
+// 주식 환산 주수 표기: 부호를 붙여 문자열로 만든다.
+function shares(value) {
+  const rounded = Math.round(value);
+  const sign = rounded > 0 ? '+' : (rounded < 0 ? '−' : '');
+  return sign + Math.abs(rounded) + '주';
+}
+// 델타 표기: +0.58, −0.42 형태.
+function deltaText(value) {
+  const sign = value > 0 ? '+' : (value < 0 ? '−' : '');
+  return sign + Math.abs(value).toFixed(2);
+}
+// 달러 이동 표기: +1.0달러, −2.0달러.
+function moveText(value) {
+  const sign = value > 0 ? '+' : (value < 0 ? '−' : '');
+  return sign + Math.abs(value).toFixed(1) + '달러';
+}
+function tone(box, net, tol) {
+  if (!box) return;
+  box.classList.remove('pos', 'neg', 'zero');
+  if (Math.abs(net) <= (tol === undefined ? 0 : tol)) box.classList.add('zero');
+  else if (net > 0) box.classList.add('pos');
+  else box.classList.add('neg');
+}
+
+// Figure 02 — 감마 공식 감각 카드. 새 델타 = 0.50 + 0.08 × 주가 이동.
+(function () {
+  const slider = $('f2-move');
+  if (!slider) return;
+  const INIT = 0.50, GAMMA = 0.08, MULT = 100;
+  function render() {
+    const move = Number(slider.value);
+    const delta = INIT + GAMMA * move;
+    const eq = delta * MULT;
+    const diff = GAMMA * move * MULT;
+    $('f2-move-out').textContent = moveText(move);
+    $('f2-formula').textContent = '+0.50 + 0.08 × (' + moveText(move).replace('달러', '') + ')';
+    $('f2-delta').textContent = deltaText(delta);
+    $('f2-eq').textContent = shares(eq);
+    $('f2-diff').textContent = shares(diff);
+    tone($('f2-diff').parentElement, Math.round(diff), 0);
+  }
+  slider.addEventListener('input', render);
+  render();
+})();
+
+// Figure 03 — ATM 델타 곡선. 교육용 구간 보간값.
+(function () {
+  const slider = $('f3-slider');
+  if (!slider) return;
+  // 데이터 포인트: 주가 → (델타, SVG x, SVG y).
+  const pts = [
+    { p: 90, d: 0.08, x: 70, y: 204 },
+    { p: 95, d: 0.20, x: 192.5, y: 183 },
+    { p: 99, d: 0.42, x: 290.5, y: 144 },
+    { p: 100, d: 0.50, x: 315, y: 130 },
+    { p: 101, d: 0.58, x: 339.5, y: 116 },
+    { p: 105, d: 0.80, x: 437.5, y: 77 },
+    { p: 110, d: 0.92, x: 560, y: 56 }
+  ];
+  function interp(price) {
+    if (price <= pts[0].p) return pts[0];
+    if (price >= pts[pts.length - 1].p) return pts[pts.length - 1];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      if (price >= a.p && price <= b.p) {
+        const t = (price - a.p) / (b.p - a.p);
+        return { p: price, d: a.d + t * (b.d - a.d), x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) };
+      }
+    }
+    return pts[3];
+  }
+  const rail = document.querySelectorAll('#figure-03 .s27-rcell');
+  function gammaWord(price) {
+    const dist = Math.abs(price - 100);
+    if (dist <= 2) return '가장 가파름';
+    if (dist <= 6) return '완만해짐';
+    return '거의 평평';
+  }
+  function render() {
+    const price = Number(slider.value);
+    const v = interp(price);
+    const dot = $('f3-dot');
+    dot.setAttribute('cx', v.x.toFixed(1));
+    dot.setAttribute('cy', v.y.toFixed(1));
+    $('f3-slider-out').textContent = price + '달러';
+    $('f3-price').textContent = price + '달러';
+    $('f3-delta').textContent = deltaText(v.d);
+    $('f3-gamma').textContent = gammaWord(price);
+    rail.forEach((cell) => cell.classList.toggle('active', Number(cell.dataset.price) === price));
+  }
+  slider.addEventListener('input', render);
+  rail.forEach((cell) => cell.addEventListener('click', () => { slider.value = cell.dataset.price; render(); }));
+  render();
+})();
+
+// Figure 04 — 만기·변동성 비교 토글.
+(function () {
+  const toggle = $('f4-toggle');
+  if (!toggle) return;
+  const data = {
+    short: { name: '3일 만기 100콜 · 낮은 IV', delta: '델타 +0.35 → +0.65', eq: '+35주 → +65주', hedge: '30주', cls: 'neg' },
+    long: { name: '90일 만기 100콜 · 높은 IV', delta: '델타 +0.48 → +0.52', eq: '+48주 → +52주', hedge: '4주', cls: 'zero' }
+  };
+  function render(key) {
+    const d = data[key];
+    $('f4-name').textContent = d.name;
+    $('f4-delta').textContent = d.delta;
+    $('f4-eq').textContent = d.eq;
+    $('f4-hedge').textContent = d.hedge;
+    const box = $('f4-hedge-box');
+    box.classList.remove('pos', 'neg', 'zero');
+    box.classList.add(d.cls);
+    $('f4-short').style.opacity = key === 'short' ? '1' : '.32';
+    $('f4-long').style.opacity = key === 'long' ? '1' : '.32';
+  }
+  toggle.querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => {
+    toggle.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+    render(btn.dataset.case);
+  }));
+  render('short');
+})();
+
+// Figure 05 / 06 — 상승/하락 시나리오 보드 토글.
+function bindBoard(toggleId, upId, downId) {
+  const toggle = $(toggleId);
+  if (!toggle) return;
+  const up = $(upId), down = $(downId);
+  toggle.querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => {
+    toggle.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+    const isUp = btn.dataset.dir === 'up';
+    up.classList.toggle('on', isUp);
+    up.classList.toggle('dim', !isUp);
+    down.classList.toggle('on', !isUp);
+    down.classList.toggle('dim', isUp);
+  }));
+  down.classList.add('dim');
+}
+bindBoard('f5-toggle', 'f5-up', 'f5-down');
+bindBoard('f6-toggle', 'f6-up', 'f6-down');
+
+// Figure 07 — 헷지 임계값 계산기. 새 델타 = 0.50 + 감마 × 주가 이동.
+(function () {
+  const gammaSeg = $('f7-gamma');
+  const moveS = $('f7-move');
+  const tolS = $('f7-tol');
+  if (!gammaSeg || !moveS || !tolS) return;
+  const INIT = 0.50, MULT = 100, HEDGE = -50;
+  let gamma = 0.10;
+  function render() {
+    const move = Number(moveS.value);
+    const tol = Math.round(Number(tolS.value));
+    const delta = INIT + gamma * move;
+    const net = Math.round(delta * MULT) + HEDGE;
+    $('f7-move-out').textContent = moveText(move);
+    $('f7-tol-out').textContent = tol + '주';
+    $('f7-delta').textContent = deltaText(delta);
+    $('f7-net').textContent = shares(net);
+    tone($('f7-net').parentElement, net, tol);
+    const action = $('f7-action');
+    const sub = $('f7-action-sub');
+    action.classList.remove('hold', 'sell', 'buy');
+    if (Math.abs(net) <= tol) {
+      action.classList.add('hold');
+      action.childNodes[0].nodeValue = '허용 범위 안 — 그대로 둠';
+      sub.textContent = '순델타 ' + shares(net) + '는 ±' + tol + '주 안에 있습니다.';
+    } else if (net > 0) {
+      action.classList.add('sell');
+      action.childNodes[0].nodeValue = '주식 ' + Math.abs(net) + '주 추가 매도';
+      sub.textContent = '허용 범위 ±' + tol + '주를 벗어났습니다.';
+    } else {
+      action.classList.add('buy');
+      action.childNodes[0].nodeValue = '주식 ' + Math.abs(net) + '주 매수';
+      sub.textContent = '허용 범위 ±' + tol + '주를 벗어났습니다.';
+    }
+  }
+  gammaSeg.querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => {
+    gammaSeg.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+    gamma = Number(btn.dataset.gamma);
+    render();
+  }));
+  moveS.addEventListener('input', render);
+  tolS.addEventListener('input', render);
+  render();
+})();
+
+// Figure 08 — 감마·세타 교환관계 (교육용 라벨 비교).
+(function () {
+  const toggle = $('f8-toggle');
+  if (!toggle) return;
+  const data = {
+    quiet: {
+      lgMove: '조정 기회 적음', lgMoveD: '가격이 거의 안 움직여 재헷지로 얻을 현금 흐름이 적습니다.',
+      lgTheta: '시간가치 감소 부각', lgThetaD: '움직임이 없으면 음의 세타가 먼저 계좌에 보입니다.',
+      sgMove: '재헷지 부담 적음', sgMoveD: '가격이 잔잔해 헷지 거래를 자주 할 필요가 없습니다.',
+      sgTheta: '세타 수취 편안', sgThetaD: '시간가치가 들어와 평온한 장에서 유리해 보입니다.'
+    },
+    choppy: {
+      lgMove: '조정 기회 늘어남', lgMoveD: '오르면 팔고 내리면 사며 재헷지 현금 흐름이 생깁니다.',
+      lgTheta: '세타와 경쟁', lgThetaD: '조정 이익이 시간가치 감소를 보상하는지가 관건입니다.',
+      sgMove: '재헷지 빈도 증가', sgMoveD: '오르면 사고 내리면 파는 불리한 거래가 잦아집니다.',
+      sgTheta: '세타 수취 유지', sgThetaD: '세타는 들어오지만 조정 비용이 함께 커집니다.'
+    },
+    gap: {
+      lgMove: '큰 움직임에 유리', lgMoveD: '급변 구간에서 재헷지 이익이 커질 수 있습니다.',
+      lgTheta: '세타 비용 감수', lgThetaD: '큰 움직임만 충분하면 시간가치 감소를 넘어설 수 있습니다.',
+      sgMove: '손실 빠르게 확대', sgMoveD: '헷지가 가격을 따라가며 손실이 급하게 커질 수 있습니다.',
+      sgTheta: '세타로 부족', sgThetaD: '받아둔 세타보다 갭 손실이 더 클 수 있습니다.'
+    }
+  };
+  function render(mode) {
+    const d = data[mode];
+    $('f8-lg-move').textContent = d.lgMove; $('f8-lg-move-d').textContent = d.lgMoveD;
+    $('f8-lg-theta').textContent = d.lgTheta; $('f8-lg-theta-d').textContent = d.lgThetaD;
+    $('f8-sg-move').textContent = d.sgMove; $('f8-sg-move-d').textContent = d.sgMoveD;
+    $('f8-sg-theta').textContent = d.sgTheta; $('f8-sg-theta-d').textContent = d.sgThetaD;
+  }
+  toggle.querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => {
+    toggle.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+    render(btn.dataset.mode);
+  }));
+  render('quiet');
+})();
+
+// Figure 09 — 마켓 흐름 토글 + 감마 리스크 워크시트(브라우저 내부 계산).
+(function () {
+  const flowToggle = $('f9-flow-toggle');
+  if (flowToggle) {
+    const flows = {
+      call: {
+        s1: '고객이 콜 매수', s1d: '개인 참여자가 콜을 삽니다.',
+        s2: '마켓메이커 콜 매도', s2d: '반대편에서 콜을 팔아 숏감마가 됩니다.',
+        s3: '델타 헷지', s3d: '델타를 줄이려 기초자산을 사고팝니다.',
+        s4t: '주가 상승 → 추가 매수', s4d: '숏감마 헷지가 상승기에 추가 매수를 불러 흐름을 더 밀 수 있습니다.'
+      },
+      put: {
+        s1: '고객이 풋 매수', s1d: '개인 참여자가 풋을 삽니다.',
+        s2: '마켓메이커 풋 매도', s2d: '반대편에서 풋을 팔아 숏감마가 됩니다.',
+        s3: '델타 헷지', s3d: '델타를 줄이려 기초자산을 사고팝니다.',
+        s4t: '주가 하락 → 추가 매도', s4d: '숏감마 헷지가 하락기에 추가 매도를 불러 하방 압력을 더할 수 있습니다.'
+      }
+    };
+    function renderFlow(key) {
+      const f = flows[key];
+      $('f9-s1').textContent = f.s1; $('f9-s1d').textContent = f.s1d;
+      $('f9-s2').textContent = f.s2; $('f9-s2d').textContent = f.s2d;
+      $('f9-s3').textContent = f.s3; $('f9-s3d').textContent = f.s3d;
+      $('f9-s4t').textContent = f.s4t; $('f9-s4d').textContent = f.s4d;
+    }
+    flowToggle.querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => {
+      flowToggle.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+      renderFlow(btn.dataset.flow);
+    }));
+    renderFlow('call');
+  }
+
+  if (!$('f9-calc')) return;
+  const set = (id, v) => { const el = $(id); if (el) el.value = v; };
+  const examples = {
+    long: { 'f9-underlying': 'ABC', 'f9-type': 'call', 'f9-side': 'long', 'f9-delta': 0.50, 'f9-gamma': 0.08, 'f9-mult': 100, 'f9-contracts': 1, 'f9-move': 1, 'f9-hedge': -50, 'f9-tol': 10, 'f9-theta': '하루 -0.05', 'f9-spread': '1틱', 'f9-risks': '세타 비용, 유동성, 갭 리스크' },
+    short: { 'f9-underlying': 'ABC', 'f9-type': 'call', 'f9-side': 'short', 'f9-delta': -0.50, 'f9-gamma': -0.08, 'f9-mult': 100, 'f9-contracts': 1, 'f9-move': 1, 'f9-hedge': 50, 'f9-tol': 10, 'f9-theta': '하루 +0.05', 'f9-spread': '1틱', 'f9-risks': '큰 움직임 손실, 증거금, 갭 리스크' }
+  };
+  function load(key) { const ex = examples[key]; Object.keys(ex).forEach((id) => set(id, ex[id])); calc(); }
+  function calc() {
+    const delta = Number($('f9-delta').value);
+    const gamma = Number($('f9-gamma').value);
+    const mult = Number($('f9-mult').value);
+    const contracts = Number($('f9-contracts').value);
+    const move = Number($('f9-move').value);
+    const hedge = Number($('f9-hedge').value);
+    const tolRaw = $('f9-tol').value.trim();
+    const hasCore = [delta, gamma, mult, contracts, move].every(Number.isFinite) && $('f9-delta').value !== '' && $('f9-gamma').value !== '' && $('f9-mult').value !== '' && $('f9-contracts').value !== '' && $('f9-move').value !== '';
+    if (!hasCore) { $('f9-r-delta').textContent = '입력값 확인 필요'; return; }
+    const newDelta = delta + gamma * move;
+    const eqChange = gamma * move * mult * contracts;
+    $('f9-r-delta').textContent = deltaText(newDelta);
+    $('f9-r-eq').textContent = shares(eqChange);
+    tone($('f9-r-eq-box'), Math.round(eqChange), 0);
+    if (!Number.isFinite(hedge) || $('f9-hedge').value === '') {
+      $('f9-r-net').textContent = '주식 헷지 입력 필요';
+      $('f9-r-trade').textContent = '—';
+      $('f9-r-band').textContent = '—';
+      return;
+    }
+    const net = Math.round(newDelta * mult * contracts) + Math.round(hedge);
+    $('f9-r-net').textContent = shares(net);
+    tone($('f9-r-net-box'), net, 0);
+    if (net > 0) $('f9-r-trade').textContent = '주식 ' + Math.abs(net) + '주 매도';
+    else if (net < 0) $('f9-r-trade').textContent = '주식 ' + Math.abs(net) + '주 매수';
+    else $('f9-r-trade').textContent = '거래 없음';
+    const bandBox = $('f9-r-band-box');
+    bandBox.classList.remove('pos', 'neg', 'zero');
+    if (tolRaw === '' || !Number.isFinite(Number(tolRaw))) {
+      $('f9-r-band').textContent = '허용 범위 입력 필요';
+    } else {
+      const tol = Math.abs(Number(tolRaw));
+      if (Math.abs(net) <= tol) { $('f9-r-band').textContent = '범위 안 (조정 보류 가능)'; bandBox.classList.add('zero'); }
+      else { $('f9-r-band').textContent = '범위 밖 (조정 대상)'; bandBox.classList.add(net > 0 ? 'pos' : 'neg'); }
+    }
+  }
+  $('f9-ex-long').addEventListener('click', () => load('long'));
+  $('f9-ex-short').addEventListener('click', () => load('short'));
+  $('f9-calc').addEventListener('click', calc);
+  $('f9-clear').addEventListener('click', () => {
+    ['f9-underlying', 'f9-delta', 'f9-gamma', 'f9-mult', 'f9-contracts', 'f9-move', 'f9-hedge', 'f9-tol', 'f9-theta', 'f9-spread', 'f9-risks'].forEach((id) => { const el = $(id); if (el) el.value = ''; });
+    $('f9-type').selectedIndex = 0;
+    $('f9-side').selectedIndex = 0;
+    ['f9-r-delta', 'f9-r-eq', 'f9-r-net', 'f9-r-trade', 'f9-r-band'].forEach((id) => { $(id).textContent = '—'; });
+    ['f9-r-eq-box', 'f9-r-net-box', 'f9-r-band-box'].forEach((id) => $(id).classList.remove('pos', 'neg', 'zero'));
+  });
+  $('f9-print').addEventListener('click', () => window.print());
+  load('long');
+})();
+
+
+</script>
+  <script src="../assets/auth-config.js?v=privacy-20260619"></script>
+  <script src="../assets/course-visibility.js"></script>
+  <script src="../assets/auth-gate.js?v=privacy-20260619"></script>
+</body>
+</html>

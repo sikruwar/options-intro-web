@@ -589,7 +589,7 @@
       const slug = input.dataset.sessionVisible;
       if (mode === 'all') input.checked = true;
       else if (mode === 'none') input.checked = false;
-      else if (mode === 'through25') input.checked = slug === 'prologue' || (slug.startsWith('session-') && Number(slug.replace('session-', '')) <= 25);
+      else if (mode === 'through30') input.checked = slug === 'prologue' || slug === 'epilogue' || (slug.startsWith('session-') && Number(slug.replace('session-', '')) <= 30);
       const pill = input.closest('.session-visibility-row')?.querySelector('.visibility-pill');
       if (pill) pill.textContent = input.checked ? 'OPEN' : 'LOCKED';
     });
@@ -714,7 +714,7 @@
         event.currentTarget.disabled = false;
       }
     });
-    $('select-visible-through-25')?.addEventListener('click', () => setVisibilityPreset('through25'));
+    $('select-visible-through-30')?.addEventListener('click', () => setVisibilityPreset('through30'));
     $('select-all-sessions')?.addEventListener('click', () => setVisibilityPreset('all'));
     $('select-none-sessions')?.addEventListener('click', () => setVisibilityPreset('none'));
     $('admin-sign-out')?.addEventListener('click', async () => {

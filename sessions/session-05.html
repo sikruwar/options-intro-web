@@ -479,6 +479,51 @@
       font-size: 12px;
       line-height: 1.5;
     }
+    .chain-intro {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.78;
+      margin: 0 0 18px;
+    }
+    .chain-intro strong { color: var(--text); font-weight: 700; }
+    .chain-gloss-title {
+      font-size: 15px; font-weight: 800; color: var(--text);
+      margin: 22px 0 4px;
+    }
+    .chain-gloss-sub {
+      color: var(--text-dim); font-size: 13px; line-height: 1.6; margin: 0 0 14px;
+    }
+    .chain-gloss {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 0 0 8px;
+    }
+    .chain-gloss-item {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
+      border-radius: 0 10px 10px 0;
+      padding: 13px 16px;
+    }
+    .chain-gloss-item .term {
+      display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .chain-gloss-item .term b {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 800; color: var(--text);
+    }
+    .chain-gloss-item .term em {
+      font-style: normal; font-size: 11px; color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .chain-gloss-item p {
+      color: var(--text-muted); font-size: 13px; line-height: 1.62;
+    }
+    .chain-gloss-item.is-key { border-left-color: var(--amber); }
+    .chain-gloss-item.is-call { border-left-color: var(--green); }
+    .chain-gloss-item.is-put { border-left-color: var(--blue); }
 
     /* ── WARN BOX ── */
     .warn-box {
@@ -552,7 +597,7 @@
       .bridge-note { max-width: none; }
       .strike-row { grid-template-columns: 60px 1fr 64px 64px; gap: 8px; }
       .chain-header, .chain-row { grid-template-columns: 1fr 80px 1fr; }
-      .chain-guide, .chain-read-order { grid-template-columns: 1fr; }
+      .chain-guide, .chain-read-order, .chain-gloss { grid-template-columns: 1fr; }
       .stack-row { grid-template-columns: 64px 1fr 54px; gap: 8px; }
       .matrix-table th, .matrix-table td { padding: 10px 8px; }
       .theme-btn { min-width: 42px; min-height: 30px; }
@@ -602,7 +647,7 @@
     <h1>내가격,<br><span class="hi">등가격</span>,<br>외가격</h1>
     <p class="hero-sub">현재가와 행사가의 관계를 세 단어로 나눕니다. 질문은 단순합니다. 지금 행사하면 가치가 있는가.</p>
     <div class="thesis">
-      <div class="thesis-label">5회차 중심 문장</div>
+      <div class="thesis-label">오늘의 중심 문장</div>
       <div class="thesis-main">ITM, ATM, OTM은 옵션이 지금 얼마나 살아 있는 권리인지 구분하는 언어입니다.</div>
     </div>
   </div>
@@ -889,6 +934,7 @@
         <p>가장 먼저 가운데의 행사가 K를 현재 주가 S와 비교합니다. K=$90, $100, $110이 현재가 $100과 어떤 관계인지 보면 콜과 풋의 ITM·ATM·OTM 이름표가 먼저 정리됩니다. bid/ask, IV, delta는 그 다음에 읽습니다.</p>
       </div>
     </div>
+    <p class="chain-intro">앞에서는 행사가 하나를 떼어 ITM·ATM·OTM을 따져봤습니다. 하지만 증권사 앱이나 거래 화면을 열면 옵션은 한 줄이 아니라 <strong>표 전체</strong>로 쏟아집니다. 가로로는 콜과 풋, 세로로는 행사가가 층층이 쌓이고, 각 칸에는 호가와 거래량, IV, 델타 같은 숫자가 빼곡합니다. 처음 보면 복잡하지만, 사실 이 표는 <strong>"같은 만기 안에서 행사가가 위아래로 늘어선 명단"</strong>일 뿐입니다. 아래 모형은 현재가 $100, 만기 30일을 가정한 교육용 화면입니다. 숫자 하나하나를 외우려 하기보다, 화면의 어느 칸이 무엇을 뜻하는지 위치 감각부터 잡고 넘어가면 됩니다.</p>
     <div class="chain-read-order" aria-label="옵션 체인 읽는 순서">
       <div class="chain-read-step"><span>01 만기</span><p>같은 30일 만기 행만 비교합니다.</p></div>
       <div class="chain-read-step"><span>02 행사가</span><p>K를 현재가 $100과 먼저 비교합니다.</p></div>
@@ -924,21 +970,44 @@
         </tbody>
       </table>
     </div>
-    <div class="three" style="margin-top:18px">
-      <div class="mini-card">
-        <div class="mini-k">expiration · strike</div>
-        <div class="mini-v">30일 · K=$90</div>
-        <p class="mini-p">call bid/ask 10.60 / 10.90 · put bid/ask 0.40 / 0.50<br>volume 320 · open interest 4,800 · IV 24% · delta 콜 +0.82 / 풋 -0.18</p>
+    <div class="chain-gloss-title">표의 각 칸은 무슨 뜻인가요?</div>
+    <p class="chain-gloss-sub">위 표의 열(칼럼)을 왼쪽부터 하나씩 풀어 봅니다. 지금은 모든 숫자를 해석하려 하기보다, 각 칸이 <strong style="color:var(--text)">"무엇을 보여주는 자리인지"</strong>만 알아두면 충분합니다.</p>
+    <div class="chain-gloss">
+      <div class="chain-gloss-item is-key">
+        <div class="term"><b>만기</b><em>expiration</em></div>
+        <p>옵션의 권리가 사라지는 날까지 남은 기간입니다. 비교는 항상 <strong style="color:var(--text)">같은 만기끼리</strong> 합니다. 여기서는 세 줄 모두 30일이라 만기 변수는 잠시 빼고 행사가만 봅니다.</p>
       </div>
-      <div class="mini-card">
-        <div class="mini-k">expiration · strike</div>
-        <div class="mini-v">30일 · K=$100</div>
-        <p class="mini-p">call bid/ask 4.80 / 5.10 · put bid/ask 4.70 / 5.00<br>volume 1,240 · open interest 8,900 · IV 28% · delta 콜 +0.51 / 풋 -0.49</p>
+      <div class="chain-gloss-item is-key">
+        <div class="term"><b>행사가</b><em>strike · K</em></div>
+        <p>권리를 행사하는 기준 가격입니다. 현재가 $100과 이 K를 비교하는 순간 콜·풋의 ITM·ATM·OTM 이름표가 정해집니다. 표를 읽을 때 가장 먼저 보는 칸입니다.</p>
       </div>
-      <div class="mini-card">
-        <div class="mini-k">expiration · strike</div>
-        <div class="mini-v">30일 · K=$110</div>
-        <p class="mini-p">call bid/ask 1.15 / 1.30 · put bid/ask 10.80 / 11.10<br>volume 410 · open interest 5,200 · IV 25% · delta 콜 +0.20 / 풋 -0.80</p>
+      <div class="chain-gloss-item is-call">
+        <div class="term"><b>콜 bid / ask</b><em>call quote</em></div>
+        <p>콜을 사려는 쪽이 부르는 값(bid)과 팔려는 쪽이 부르는 값(ask)입니다. 지금 <strong style="color:var(--text)">사면 보통 ask</strong>, 팔면 bid 가격에 체결됩니다. 둘 사이 간격이 좁을수록 거래가 매끄럽습니다.</p>
+      </div>
+      <div class="chain-gloss-item is-call">
+        <div class="term"><b>콜 Δ</b><em>delta</em></div>
+        <p>기초자산이 $1 오를 때 콜 가격이 대략 얼마 움직이는지를 나타냅니다. ATM 근처에서 약 +0.5, 깊은 ITM일수록 +1에 가까워집니다. 방향 민감도의 대략적인 눈금입니다.</p>
+      </div>
+      <div class="chain-gloss-item is-put">
+        <div class="term"><b>풋 bid / ask</b><em>put quote</em></div>
+        <p>풋의 매수·매도 호가입니다. 같은 행사가라도 콜과 풋은 상태가 반대로 갈리므로, 콜이 OTM이면 같은 줄의 풋은 ITM이 되는 식으로 짝지어 읽습니다.</p>
+      </div>
+      <div class="chain-gloss-item is-put">
+        <div class="term"><b>풋 Δ</b><em>delta</em></div>
+        <p>풋의 델타는 음수입니다. 주가가 내릴수록 이득이라 부호가 반대이고, 깊은 ITM 풋일수록 −1에 가까워집니다. 콜 델타와 절댓값을 비교해 보면 감이 잡힙니다.</p>
+      </div>
+      <div class="chain-gloss-item">
+        <div class="term"><b>거래량</b><em>volume</em></div>
+        <p>오늘 하루 체결된 계약 수입니다. 그날의 관심이 어디 몰렸는지 보여주는 단서로, 보통 ATM 부근에서 가장 큽니다.</p>
+      </div>
+      <div class="chain-gloss-item">
+        <div class="term"><b>OI</b><em>open interest</em></div>
+        <p>아직 청산되지 않고 살아 있는 미결제약정의 수입니다. 거래량과 함께 <strong style="color:var(--text)">유동성의 단서</strong>일 뿐, 가격이 옳다는 보증은 아닙니다.</p>
+      </div>
+      <div class="chain-gloss-item">
+        <div class="term"><b>IV</b><em>implied volatility</em></div>
+        <p>시장이 옵션 가격에 반영한 미래 변동성 기대치입니다. 같은 행사가라도 IV가 높으면 옵션이 비싸집니다. 자세한 의미는 뒤 회차에서 다룹니다.</p>
       </div>
     </div>
     <div class="fig-caption">실제 옵션 체인에서는 콜과 풋을 같은 만기와 같은 행사가 기준으로 나란히 봅니다. bid는 누군가 사겠다고 대기 중인 가격, ask는 누군가 팔겠다고 내놓은 가격입니다. 지금 매수한다면 보통 ask 쪽을, 지금 매도한다면 bid 쪽을 보게 됩니다. volume과 open interest는 유동성의 단서일 뿐 안전 보증은 아닙니다. IV는 시장이 붙인 변동성 가격, delta는 방향 변화 민감도의 대략적인 숫자입니다. 5회차에서는 이 숫자들을 모두 해석하려 하기보다, 먼저 현재가와 행사가를 비교해 ITM·ATM·OTM을 찾는 데 집중하면 됩니다.</div>

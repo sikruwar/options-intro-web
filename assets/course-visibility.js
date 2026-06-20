@@ -254,6 +254,7 @@
     const publishedThrough = Number(config.publishedThroughSession || 0);
     const isStaticallyPublished = (slug) => {
       if (slug === 'prologue') return true;
+      if (slug === 'epilogue') return publishedThrough >= 30;
       const match = String(slug).match(/^session-(\d{2})$/);
       return match ? Number(match[1]) <= publishedThrough : false;
     };

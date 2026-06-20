@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_ROOT = ROOT.parent
-PROTECTED = [ROOT / 'prologue.html'] + [ROOT / 'sessions' / f'session-{num:02d}.html' for num in range(1, 26)]
+PROTECTED = [ROOT / 'prologue.html'] + [ROOT / 'sessions' / f'session-{num:02d}.html' for num in range(1, 31)] + [ROOT / 'epilogue.html']
 
 
 def test_auth_assets_exist():
@@ -26,7 +26,8 @@ def test_x_handle_and_access_code_gate_are_enabled_together():
     assert 'accessCodeGateEnabled: true' in config
     assert 'OPTION-OPEN-05' in config
     assert 'OPTION-OPEN-25' in config
-    assert 'publishedThroughSession: 25' in config
+    assert 'OPTION-OPEN-30' in config
+    assert 'publishedThroughSession: 30' in config
     assert 'accessCodeStorageKey' in config
     assert 'accessGateEnabled' in gate
     assert 'xHandleGateEnabled' in gate
@@ -122,7 +123,7 @@ def test_copyright_page_and_robot_policy_exist():
 
 
 def test_public_pages_link_to_copyright_footer():
-    pages = [ROOT / 'index.html', ROOT / 'prologue.html', ROOT / 'references.html', ROOT / 'privacy.html', ROOT / 'upcoming.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
+    pages = [ROOT / 'index.html', ROOT / 'prologue.html', ROOT / 'references.html', ROOT / 'privacy.html', ROOT / 'upcoming.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
     for path in pages:
         html = path.read_text(encoding='utf-8')
         assert '© 2026 무기견. All rights reserved.' in html
@@ -179,8 +180,8 @@ def test_expired_magic_link_message_is_friendly():
 
 
 def test_mobile_course_navigation_is_visible_on_course_pages():
-    pages = [ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
-    assert len(pages) == 26
+    pages = [ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
+    assert len(pages) == 32
     for path in pages:
         html = path.read_text(encoding='utf-8')
         assert 'Mobile course navigation: keep previous/index/next reachable on phones.' in html
@@ -191,8 +192,8 @@ def test_mobile_course_navigation_is_visible_on_course_pages():
 
 def test_course_readability_overrides_are_loaded_on_course_pages():
     assert (ROOT / 'assets' / 'readability-overrides.css').exists()
-    pages = [ROOT / 'index.html', ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
-    assert len(pages) == 27
+    pages = [ROOT / 'index.html', ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
+    assert len(pages) == 33
     for path in pages:
         html = path.read_text(encoding='utf-8')
         expected_href = '../assets/readability-overrides.css' if path.parent.name == 'sessions' else 'assets/readability-overrides.css'
@@ -230,8 +231,8 @@ def test_course_visibility_admin_ui_exists():
 
 def test_course_visibility_script_is_loaded_on_course_pages():
     assert (ROOT / 'assets' / 'course-visibility.js').exists()
-    pages = [ROOT / 'index.html', ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
-    assert len(pages) == 27
+    pages = [ROOT / 'index.html', ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
+    assert len(pages) == 33
     for path in pages:
         html = path.read_text(encoding='utf-8')
         assert 'course-visibility.js' in html
@@ -239,26 +240,25 @@ def test_course_visibility_script_is_loaded_on_course_pages():
         assert html.index('auth-config.js') < html.index('course-visibility.js')
 
 
-def test_unreleased_sessions_are_kept_out_of_public_deploy():
+def test_all_sessions_are_in_public_deploy():
     public_sessions = sorted(path.name for path in (ROOT / 'sessions').glob('session-*.html'))
-    assert public_sessions == [f'session-{num:02d}.html' for num in range(1, 26)]
-    assert (ROOT / 'sessions' / 'session-25.html').exists()
-    assert not (ROOT / 'sessions' / 'session-26.html').exists()
-    assert (OUTPUT_ROOT / 'drafts' / 'sessions' / 'session-26.html').exists()
+    assert public_sessions == [f'session-{num:02d}.html' for num in range(1, 31)]
+    assert (ROOT / 'sessions' / 'session-30.html').exists()
+    assert (ROOT / 'epilogue.html').exists()
     assert (OUTPUT_ROOT / 'drafts' / 'sessions' / 'session-30.html').exists()
     assert (OUTPUT_ROOT / 'drafts' / 'epilogue.html').exists()
 
 
-def test_session_five_points_to_next_public_session_and_latest_points_to_upcoming():
+def test_session_five_and_session_twenty_five_point_to_next_public_session():
     html = (ROOT / 'sessions' / 'session-05.html').read_text(encoding='utf-8')
-    latest = (ROOT / 'sessions' / 'session-25.html').read_text(encoding='utf-8')
+    session25 = (ROOT / 'sessions' / 'session-25.html').read_text(encoding='utf-8')
     upcoming = (ROOT / 'upcoming.html').read_text(encoding='utf-8')
     assert 'session-06.html' in html
-    assert '../upcoming.html' in latest
-    assert 'session-26.html' not in latest
+    assert '../upcoming.html' not in session25
+    assert 'session-26.html' in session25
     assert '다음 회차를 준비하고 있습니다' in upcoming
     assert '공개 회차 확인하기' in upcoming
-    assert 'sessions/session-25.html' in upcoming
+    assert 'epilogue.html' in upcoming
 
 
 def test_index_marks_published_sessions_open_and_remote_visibility_is_respected_afterward():
@@ -266,17 +266,17 @@ def test_index_marks_published_sessions_open_and_remote_visibility_is_respected_
     config = (ROOT / 'assets' / 'auth-config.js').read_text(encoding='utf-8')
     js = (ROOT / 'assets' / 'course-visibility.js').read_text(encoding='utf-8')
     admin = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
-    assert html.count('<span class="rt-status open">공개</span>') == 26
-    assert '<span class="rt-status pending">비공개</span>' in html
-    assert 'publishedThroughSession: 25' in config
+    assert html.count('<span class="rt-status open">공개</span>') == 32
+    assert '<span class="rt-status pending">비공개</span>' not in html
+    assert 'publishedThroughSession: 30' in config
     assert 'isStaticallyPublished' in js
     assert 'row.visible === true' in js
     assert 'map.get(item.slug) === true' in js
     assert 'map.get(slug) !== true' in js
     assert "row ? row.visible === true : item.slug === 'prologue'" in admin
     assert 'visible: visibleBySlug.get(item.slug) === true' in admin
-    assert 'select-visible-through-25' in admin
-    assert "setVisibilityPreset('through25')" in admin
+    assert 'select-visible-through-30' in admin
+    assert "setVisibilityPreset('through30')" in admin
 
 
 
