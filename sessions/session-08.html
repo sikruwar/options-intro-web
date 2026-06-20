@@ -546,6 +546,7 @@
     <p>여기서 첫 번째 벽이 나옵니다. <strong>방향을 모르는데도 왜 옵션 가격이 올라갈 수 있을까요?</strong></p>
     <p>주식투자자는 대개 방향을 먼저 봅니다. 오르면 좋고, 내리면 나쁘다는 감각이 익숙하죠. 그런데 옵션은 방향만 보지 않습니다. 가격이 정해진 행사가 근처까지 도달할 수 있는 폭, 그 폭이 나타날 속도, 만기까지 남은 시간을 함께 봅니다.</p>
     <p>그래서 실적 발표 전에는 콜과 풋이 동시에 비싸질 수 있습니다. 시장이 어느 방향인지 확신해서가 아닙니다. 위든 아래든 크게 움직일 가능성을 프리미엄에 반영하기 때문입니다.</p>
+    <p>개인적으로는 이 지점이 옵션 입문의 첫 번째 벽이라고 봅니다. 주식에서는 “맞는 방향”이 중심이지만, 옵션에서는 “충분한 움직임”이 별도의 가격 변수가 됩니다.</p>
   </div>
   <div class="fig" id="figure-02">
     <div class="fig-label">Figure 02 — 낮은 변동성 경로와 높은 변동성 경로 비교</div>
@@ -556,68 +557,121 @@
     </div>
     <div class="note-strip">이 그림에서 중요한 것은 어느 쪽으로 간다는 예측이 아닙니다. 같은 105콜이라도 흔들림의 폭이 넓어지면 권리가 살아날 가능성이 달라진다는 점입니다.</div>
   </div>
+  <div class="prose intro-interpretation">
+    <p>이제부터는 이 “흔들림의 폭”을 조금 더 숫자로 바꿔보겠습니다. 변동성을 배울 때 중요한 일은 방향 예측과 폭의 가격을 분리하는 것입니다. 방향을 모르는 시장에서도 폭이 커지면 옵션 프리미엄은 올라갈 수 있습니다.</p>
+  </div>
 </section>
 <hr class="divider">
 <section class="section reveal" id="section-02">
   <div class="section-num">02</div>
   <h2>변동성은 만기까지 움직일 수 있는 범위의 가격입니다</h2>
   <div class="prose">
-<p>이번 회차는 다음 문장으로 묶겠습니다.</p>
-<p>변동성은 방향의 확신이 아니라, 만기까지 가격이 움직일 수 있는 범위에 붙는 가격입니다.</p>
+    <p>이번 회차는 다음 문장으로 묶겠습니다.</p>
+    <p>변동성은 방향의 확신이 아니라, 만기까지 가격이 움직일 수 있는 범위에 붙는 가격입니다.</p>
+    <p>이 문장을 실제로 이해하려면 “폭”을 눈으로 봐야 합니다. 평균이 100으로 같아도 분포가 좁은 시장과 넓은 시장은 같은 105콜에 다른 가격을 붙입니다.</p>
   </div>
 </section>
-<section class="section-wide reveal" id="figure-03"><div class="fig"><div class="fig-label">Figure 03 — 예상분포 폭과 행사가 도달 가능성</div><h2>분포의 폭이 넓어질수록 105 위쪽 꼬리가 두꺼워집니다</h2><div class="svg-card"><svg viewBox="0 0 620 300" role="img" aria-label="변동성 슬라이더에 따라 예상분포 폭과 105 초과 영역이 바뀝니다"><line class="axis-line" x1="60" y1="240" x2="560" y2="240"/><line class="strike-line" x1="360" y1="44" x2="360" y2="246"/><text x="348" y="34">K 105</text><path class="muted-dist" d="M120 238 C190 230 230 126 310 92 C390 126 430 230 500 238 L500 240 L120 240 Z"/><path id="distPath" class="dist-line" d="M92 238 C180 230 210 92 310 68 C410 92 440 230 528 238"/><path id="tailArea" class="dist-fill" d="M360 156 C410 112 455 230 528 238 L528 240 L360 240 Z"/><text x="103" y="262">80</text><text x="300" y="262">100</text><text x="523" y="262">120</text><text id="distSigmaLabel" x="78" y="54">IV 30% · 교육용 분포</text></svg></div><div class="controls"><div class="control-head"><div class="control-title">ANNUAL VOLATILITY</div><div class="control-value" id="volSliderVal">30%</div></div><input id="volSlider" type="range" min="10" max="50" value="30" step="1" aria-label="연간 변동성"><div class="metric-grid"><div class="metric"><span>교육용 σ</span><strong id="sigmaVal">9.0</strong></div><div class="metric"><span>105 초과 감각</span><strong id="tailVal">보통</strong></div><div class="metric"><span>해석</span><strong id="distMood">폭 확대</strong></div></div></div><div class="fig-caption">숫자는 교육용 가정입니다. 68%와 95% 감각은 정규분포에 가까운 단순화이며, 실제 시장에는 두꺼운 꼬리와 갭이 있습니다.</div></div></section>
-<hr class="divider">
-<section class="section reveal" id="section-04">
+
+<section class="section reveal" id="section-03">
   <div class="section-num">03</div>
   <h2>낮은 흔들림과 높은 흔들림은 다른 프리미엄을 만듭니다</h2>
   <div class="prose">
-<p>변동성을 가장 쉽게 잡는 방법은 시장의 속도라고 보는 것입니다. 천천히 움직이는 시장은 낮은 변동성 시장이고, 빠르게 넓게 움직이는 시장은 높은 변동성 시장입니다.</p>
-<p>현재가 100달러인 A주식과 B주식이 있습니다. A주식은 최근 하루 변동이 대체로 0.5달러 안팎입니다. B주식은 하루에 3달러씩 위아래로 흔들립니다. 같은 30일 만기 105콜이라면 B주식 옵션이 더 비쌉니다.</p>
-<p>여기서 이 예시에서 그대로 둔 조건은 현재가 100달러, 행사가 105달러, 만기 30일, 금리와 배당 없음이고, 움직인 쪽은 가격이 흔들릴 수 있는 폭입니다. 이 폭이 커지면 105달러에 도달하거나 넘을 가능성이 커지고, 그 가능성이 시간가치에 붙습니다.</p>
-<p>변동성은 표준편차의 언어로도 표현됩니다. 예를 들어 선도 가격을 단순히 100으로 두고, 1년 변동성이 20%라고 해보겠습니다. 아주 거칠게는 1년 뒤 가격이 80~120 사이에 있을 가능성이 약 68%라고 말할 수 있습니다. 60~140 사이에 있을 가능성은 약 95%로 넓어집니다.</p>
-<p>이 숫자는 방향 예측이 아닙니다. 평균을 100으로 두고, 가격이 평균 주변에서 어느 정도 넓게 퍼질 수 있는지를 보여주는 좌표입니다. 옵션 매수자는 이 분포의 꼬리와 폭에 민감합니다.</p>
-<p>단, 이 68%와 95% 감각은 정규분포에 가까운 단순 교육용 설명입니다. 실제 자산 수익률은 꼬리가 두껍고, 급락이나 갭처럼 표준편차만으로 설명하기 어려운 움직임이 나올 수 있습니다. 옵션에서 변동성을 배울 때는 “대략적인 폭을 잡는 도구”와 “실제 시장이 그대로 따라주는 약속”을 구분해야 합니다.</p>
-<p>만기가 짧아지면 연간 변동성을 기간에 맞춰 줄여서 생각해야 합니다. 실무적으로는 시간의 제곱근을 사용합니다. 1년 변동성이 20%라면 30일 변동 폭은 대략 20% × √(30/365), 약 5.7%입니다. 현재가 100달러 기준으로 30일 한 표준편차 범위가 대략 94.3~105.7달러라는 뜻입니다.</p>
-<p>여기서 조건을 연간 변동성 20%, 현재가 100달러로 묶어두면, 결과를 흔드는 변수는 관찰 기간입니다. 같은 연간 변동성이라도 1년 전체의 흔들림과 30일의 흔들림은 같지 않습니다.</p>
-<p>이제 행사가 105달러 콜을 다시 봅니다. 30일 한 표준편차 상단이 105.7달러 근처라면, 105콜은 완전히 허무한 권리가 아닙니다. 반대로 30일 예상 변동 폭이 2%에 그친다면 상단은 102달러 근처입니다. 같은 105콜이라도 시간가치가 훨씬 작아집니다.</p>
-<p>옵션 가격 모델에서 변동성은 직접 관찰하기 어려운 입력값입니다. 현재 주가, 행사가, 만기, 금리, 배당은 비교적 명확합니다. 하지만 앞으로 얼마나 흔들릴지는 아직 일어나지 않았습니다.</p>
-<p>그래서 변동성에는 두 가지 언어가 필요합니다. 하나는 실현변동성입니다. 실제로 과거 또는 미래에 가격이 얼마나 움직였는지를 계산한 값입니다. 다른 하나는 내재변동성입니다. 시장에서 거래되는 옵션 가격을 보고, 그 가격이 어떤 변동성 가정을 품고 있는지 거꾸로 계산한 값입니다.</p>
-<p>예를 들어 현재 주가 100달러, 행사가 105달러, 만기 30일인 콜옵션이 있습니다. 모델의 다른 입력을 고정했을 때 연간 변동성 20%를 넣으면 옵션 가치가 1.80달러라고 하겠습니다. 그런데 시장에서는 이 옵션이 2.60달러에 거래됩니다.</p>
-<p>이 차이를 설명하려면 변동성 입력을 올려야 할 수 있습니다. 다른 조건을 그대로 둔 채 변동성을 28%로 높였더니 모델 가격이 2.60달러가 되었다면, 시장은 이 옵션을 대략 28% 내재변동성으로 거래하고 있는 셈입니다.</p>
-<p>이 예시에서 현재가, 행사가, 만기, 금리, 배당은 그대로 놓고 변동성 입력 하나를 따로 움직여 보면 구조가 더 선명해집니다. 옵션 가격이 더 비싸다는 말은 시장이 더 넓은 가격 분포를 프리미엄에 반영하고 있다는 뜻으로 읽을 수 있습니다.</p>
-<p>실적 발표 전 옵션이 비싸지는 이유도 이 구조로 보면 됩니다. 시장은 실적 방향을 완전히 알지 못합니다. 대신 발표 직후 가격이 크게 튈 수 있다는 사실을 압니다. 그래서 콜과 풋의 시간가치가 같이 올라갑니다.</p>
-<p>이때 콜이 비싸졌다고 시장이 무조건 상승을 본다는 뜻은 아닙니다. 풋도 함께 비싸질 수 있습니다. 옵션 시장이 가격에 반영하는 것은 방향의 확신보다 움직임의 크기일 때가 많습니다.</p>
-<p>변동성이 높아질 때 모든 옵션이 똑같이 반응하지는 않습니다. 등가격 옵션은 총 금액 기준으로 변동성 변화에 민감한 경우가 많습니다. 외가격 옵션은 가격 자체가 작기 때문에 백분율 변화가 크게 보일 수 있습니다.</p>
-<p>현재가 100달러인 주식에서 100콜이 4.00달러에서 5.20달러가 되면 1.20달러 상승입니다. 115콜이 0.40달러에서 0.90달러가 되면 총액은 0.50달러 상승에 그칩니다. 하지만 수익률로 보면 115콜은 125% 상승입니다.</p>
-<p>같은 기초자산과 같은 만기를 놓고 행사가 위치만 바꿔보면 차이가 선명해집니다. 등가격은 변동성 변화의 달러 영향이 잘 보이고, 외가격은 작은 프리미엄 때문에 퍼센트 변화가 크게 보입니다.</p>
-<p>만기도 중요합니다. 같은 변동성 변화라면 7일 만기보다 90일 만기 옵션이 더 많이 반응할 수 있습니다. 변동성이 적용될 시간이 더 길기 때문입니다.</p>
-<p>다만 이 말이 긴 만기 옵션이 항상 좋은 선택이라는 뜻은 아닙니다. 긴 만기는 더 많은 가능성을 담지만, 그 가능성의 가격도 더 비쌉니다. 옵션 매수자는 “크게 움직일 것인가”와 함께 “이미 그 움직임이 비싸게 반영됐는가”를 같이 물어야 합니다.</p>
+    <p>변동성을 가장 쉽게 잡는 방법은 시장의 속도라고 보는 것입니다. 천천히 움직이는 시장은 낮은 변동성 시장이고, 빠르게 넓게 움직이는 시장은 높은 변동성 시장입니다.</p>
+    <p>현재가 100달러인 A주식과 B주식이 있습니다. A주식은 최근 하루 변동이 대체로 0.5달러 안팎입니다. B주식은 하루에 3달러씩 위아래로 흔들립니다. 같은 30일 만기 105콜이라면 B주식 옵션이 더 비쌉니다.</p>
+    <p>여기서 이 예시에서 그대로 둔 조건은 현재가 100달러, 행사가 105달러, 만기 30일, 금리와 배당 없음이고, 움직인 쪽은 가격이 흔들릴 수 있는 폭입니다. 이 폭이 커지면 105달러에 도달하거나 넘을 가능성이 커지고, 그 가능성이 시간가치에 붙습니다.</p>
+    <p>변동성은 표준편차의 언어로도 표현됩니다. 예를 들어 선도 가격을 단순히 100으로 두고, 1년 변동성이 20%라고 해보겠습니다. 아주 거칠게는 1년 뒤 가격이 80~120 사이에 있을 가능성이 약 68%라고 말할 수 있습니다. 60~140 사이에 있을 가능성은 약 95%로 넓어집니다.</p>
+    <p>이 숫자는 방향 예측이 아닙니다. 평균을 100으로 두고, 가격이 평균 주변에서 어느 정도 넓게 퍼질 수 있는지를 보여주는 좌표입니다. 옵션 매수자는 이 분포의 꼬리와 폭에 민감합니다.</p>
+    <p>단, 이 68%와 95% 감각은 정규분포에 가까운 단순 교육용 설명입니다. 실제 자산 수익률은 꼬리가 두껍고, 급락이나 갭처럼 표준편차만으로 설명하기 어려운 움직임이 나올 수 있습니다. 옵션에서 변동성을 배울 때는 “대략적인 폭을 잡는 도구”와 “실제 시장이 그대로 따라주는 약속”을 구분해야 합니다.</p>
+    <p>아래 그림은 이 설명을 분포의 폭으로 바꾼 것입니다. 평균이 100으로 같아도 변동성 입력이 커지면 105 위쪽 꼬리가 두꺼워집니다.</p>
+  </div>
+</section>
+<section class="section-wide reveal" id="figure-03"><div class="fig"><div class="fig-label">Figure 03 — 예상분포 폭과 행사가 도달 가능성</div><h2>분포의 폭이 넓어질수록 105 위쪽 꼬리가 두꺼워집니다</h2><div class="svg-card"><svg viewBox="0 0 620 300" role="img" aria-label="변동성 슬라이더에 따라 예상분포 폭과 105 초과 영역이 바뀝니다"><line class="axis-line" x1="60" y1="240" x2="560" y2="240"/><line class="strike-line" x1="360" y1="44" x2="360" y2="246"/><text x="348" y="34">K 105</text><path class="muted-dist" d="M120 238 C190 230 230 126 310 92 C390 126 430 230 500 238 L500 240 L120 240 Z"/><path id="distPath" class="dist-line" d="M92 238 C180 230 210 92 310 68 C410 92 440 230 528 238"/><path id="tailArea" class="dist-fill" d="M360 156 C410 112 455 230 528 238 L528 240 L360 240 Z"/><text x="103" y="262">80</text><text x="300" y="262">100</text><text x="523" y="262">120</text><text id="distSigmaLabel" x="78" y="54">IV 30% · 교육용 분포</text></svg></div><div class="controls"><div class="control-head"><div class="control-title">ANNUAL VOLATILITY</div><div class="control-value" id="volSliderVal">30%</div></div><input id="volSlider" type="range" min="10" max="50" value="30" step="1" aria-label="연간 변동성"><div class="metric-grid"><div class="metric"><span>교육용 σ</span><strong id="sigmaVal">9.0</strong></div><div class="metric"><span>105 초과 감각</span><strong id="tailVal">보통</strong></div><div class="metric"><span>해석</span><strong id="distMood">폭 확대</strong></div></div></div><div class="fig-caption">숫자는 교육용 가정입니다. 68%와 95% 감각은 정규분포에 가까운 단순화이며, 실제 시장에는 두꺼운 꼬리와 갭이 있습니다.</div></div></section>
+
+<hr class="divider">
+<section class="section reveal" id="section-04">
+  <div class="section-num">04</div>
+  <h2>연간 변동성은 만기 일수에 맞춰 줄여서 봅니다</h2>
+  <div class="prose">
+    <p>만기가 짧아지면 연간 변동성을 기간에 맞춰 줄여서 생각해야 합니다. 실무적으로는 시간의 제곱근을 사용합니다. 1년 변동성이 20%라면 30일 변동 폭은 대략 20% × √(30/365), 약 5.7%입니다. 현재가 100달러 기준으로 30일 한 표준편차 범위가 대략 94.3~105.7달러라는 뜻입니다.</p>
+    <p>여기서 조건을 연간 변동성 20%, 현재가 100달러로 묶어두면, 결과를 흔드는 변수는 관찰 기간입니다. 같은 연간 변동성이라도 1년 전체의 흔들림과 30일의 흔들림은 같지 않습니다.</p>
+    <p>이제 행사가 105달러 콜을 다시 봅니다. 30일 한 표준편차 상단이 105.7달러 근처라면, 105콜은 완전히 허무한 권리가 아닙니다. 반대로 30일 예상 변동 폭이 2%에 그친다면 상단은 102달러 근처입니다. 같은 105콜이라도 시간가치가 훨씬 작아집니다.</p>
+    <p>다음 계산기는 같은 연간 변동성이라도 만기 일수에 따라 실제 옵션이 바라보는 폭이 어떻게 달라지는지 보여줍니다.</p>
   </div>
 </section>
 <section class="section-wide reveal" id="figure-04"><div class="fig"><div class="fig-label">Figure 04 — 연간 변동성을 30일 변동 폭으로 바꾸기</div><h2>연간 변동성은 만기 일수에 맞춰 줄여서 봅니다</h2><div class="controls"><div class="control-head"><div class="control-title">VOL × √(DTE/365)</div><div class="control-value" id="rangeFormula">20% × √(30/365)</div></div><div class="segmented" id="volButtons"><button type="button" data-vol="10">10%</button><button type="button" class="active" data-vol="20">20%</button><button type="button" data-vol="30">30%</button><button type="button" data-vol="40">40%</button></div><div class="segmented" id="dteButtons"><button type="button" data-dte="7">7일</button><button type="button" class="active" data-dte="30">30일</button><button type="button" data-dte="90">90일</button></div><div class="metric-grid"><div class="metric"><span>기간 변동 폭</span><strong id="periodMove">5.7%</strong></div><div class="metric"><span>하단</span><strong id="lowerRange">94.3</strong></div><div class="metric"><span>상단</span><strong id="upperRange">105.7</strong></div></div></div><div class="note-strip">현재가 100 기준입니다. 20%와 30일을 선택하면 20% × √(30/365) ≈ 5.7%, 범위는 대략 94.3~105.7달러입니다. 40%와 30일이면 약 11.5%, 범위는 대략 88.5~111.5달러입니다.</div></div></section>
-<section class="section-wide reveal" id="figure-05"><div class="fig"><div class="fig-label">Figure 05 — IV별 옵션 프리미엄 막대</div><h2>다른 조건을 고정하고 변동성만 올리면 프리미엄이 올라갑니다</h2><div class="bar-chart"><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:20%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 15%">$1.00</div></div><div class="bar-label">IV 15%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:44%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 25%">$2.20</div></div><div class="bar-label">IV 25%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:72%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 35%">$3.55</div></div><div class="bar-label">IV 35%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:100%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 45%">$4.95</div></div><div class="bar-label">IV 45%</div></div></div><div class="fig-caption">S=100, K=105, 30D, 금리와 배당 0을 고정한 교육용 단순 예시입니다. 실제 모델값이 아니라 변동성 입력의 역할을 보기 위한 숫자입니다.</div></div></section>
-<section class="section-wide reveal" id="figure-06"><div class="fig"><div class="fig-label">Figure 06 — 실현변동성과 내재변동성 비교 카드</div><h2>지나간 움직임과 시장이 매긴 보험료를 구분합니다</h2><div class="two"><div class="mini-card"><div class="mini-k">REALIZED VOLATILITY</div><div class="mini-v">실현변동성 18%</div><p class="mini-p">실제로 과거 또는 미래에 가격이 얼마나 움직였는지를 계산한 값입니다. 18%는 지나간 길입니다.</p></div><div class="mini-card"><div class="mini-k">IMPLIED VOLATILITY</div><div class="mini-v">내재변동성 28%</div><p class="mini-p">옵션 가격에서 역산한 시장의 변동성 가정입니다. 28%는 시장이 지금 매긴 보험료입니다.</p></div></div><div class="fig-caption">실현변동성은 실제 움직임의 기록이고, 내재변동성은 현재 옵션 프리미엄 안에 들어 있는 시장의 가정입니다.</div></div></section>
-<section class="section-wide reveal" id="figure-07"><div class="fig"><div class="fig-label">Figure 07 — 옵션 가격에서 내재변동성을 역산하는 흐름</div><h2>옵션 가격이 비싸다는 말을 IV 언어로 번역합니다</h2><div class="flow-steps"><div class="mini-card"><div class="mini-k">MARKET PRICE</div><div class="mini-v" id="marketPriceLabel">$2.60</div><p class="mini-p">시장에서 거래되는 105콜 가격</p></div><div class="flow-arrow">→</div><div class="mini-card"><div class="mini-k">FIXED INPUTS</div><div class="mini-v">S=100 · K=105 · 30D</div><p class="mini-p">금리와 배당은 0으로 고정</p></div><div class="flow-arrow">→</div><div class="mini-card"><div class="mini-k">IMPLIED VOL</div><div class="mini-v" id="ivEstimate">28%</div><p class="mini-p">변동성만 조정해 시장가를 설명</p></div></div><div class="controls"><div class="control-head"><div class="control-title">MARKET OPTION PRICE</div><div class="control-value" id="marketSliderVal">$2.60</div></div><input id="marketSlider" type="range" min="1.5" max="4" value="2.6" step="0.1" aria-label="시장 옵션가격"></div><div class="fig-caption">20% 변동성을 넣으면 모델 가격이 1.80달러, 시장가가 2.60달러라면 변동성 입력을 약 28%로 올려야 설명된다는 교육용 단순 mapping입니다.</div></div></section>
-<hr class="divider">
+
 <section class="section reveal" id="section-05">
-  <div class="section-num">04</div>
-  <h2>변동성이 높으면 항상 유리하다는 생각을 경계합니다</h2>
+  <div class="section-num">05</div>
+  <h2>옵션 가격이 비싸다는 말을 IV 언어로 번역합니다</h2>
   <div class="prose">
-<p>실전에서 비싸게 돌아올 수 있는 오해는 변동성이 높으면 옵션 매수자에게 항상 좋다고 생각하는 것입니다.</p>
-<p>옵션을 이미 들고 있는 사람에게 내재변동성 상승은 대체로 유리하게 작용할 수 있습니다. 특히 롱옵션은 베가가 양수인 경우가 많아서, 시장이 더 큰 움직임을 가격에 반영하면 프리미엄이 올라갈 수 있습니다.</p>
-<p>하지만 높은 변동성에서 새로 옵션을 사는 사람은 비싼 보험료를 내고 들어갑니다. 이후 실제 움직임이 그 가격을 정당화하지 못하거나, 이벤트가 끝난 뒤 내재변동성이 빠지면 방향을 맞혀도 손실이 날 수 있습니다.</p>
-<p>예를 들어 실적 전 100달러 주식의 105콜을 4달러에 샀다고 해보겠습니다. 실적 후 주가가 103달러로 올랐습니다. 방향은 맞았습니다. 그러나 만기가 짧아졌고, 이벤트가 끝나며 내재변동성이 낮아졌고, 105콜은 여전히 외가격입니다. 옵션 가격이 4달러에서 2달러로 떨어질 수 있습니다.</p>
-<p>이 예시에서 주가 방향은 매수자에게 유리하게 변했습니다. 반대로 시간과 변동성은 불리하게 변했습니다. 옵션 손익은 이 세 변수가 합쳐진 결과입니다.</p>
-<p>그래서 변동성은 “높다/낮다”보다 “내가 지불한 변동성보다 실제로 더 크게 움직일 것인가”로 봐야 합니다. 이 질문이 들어오면 옵션은 복권처럼 보이지 않고, 보험료와 실제 사고 빈도를 비교하는 문제로 바뀝니다.</p>
-<p>사족이지만, VIX를 공포지수라고만 외우면 이 감각을 놓치기 쉽습니다. VIX는 시장이 S&amp;P 500 옵션에 반영한 단기 변동성 가격에 가깝습니다. 공포가 오르면 보통 올라가지만, 더 정확히는 보험료가 비싸진 상태를 보여줍니다.</p>
+    <p>옵션 가격 모델에서 변동성은 직접 관찰하기 어려운 입력값입니다. 현재 주가, 행사가, 만기, 금리, 배당은 비교적 명확합니다. 하지만 앞으로 얼마나 흔들릴지는 아직 일어나지 않았습니다.</p>
+    <p>먼저 다른 조건을 고정하고 변동성 입력만 바꿔보겠습니다. 현재가 100달러, 행사가 105달러, 만기 30일, 금리와 배당 0이라는 조건을 그대로 두면, 프리미엄을 밀어 올리는 쪽은 IV입니다.</p>
+  </div>
+</section>
+<section class="section-wide reveal" id="figure-05"><div class="fig"><div class="fig-label">Figure 05 — IV별 옵션 프리미엄 막대</div><h2>다른 조건을 고정하고 변동성만 올리면 프리미엄이 올라갑니다</h2><div class="bar-chart"><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:20%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 15%">$1.00</div></div><div class="bar-label">IV 15%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:44%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 25%">$2.20</div></div><div class="bar-label">IV 25%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:72%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 35%">$3.55</div></div><div class="bar-label">IV 35%</div></div><div class="bar-cell"><div class="bar-shell"><div class="bar-fill-v" style="height:100%" title="고정: S=100, K=105, 30D, r=0, q=0 · 변화: IV 45%">$4.95</div></div><div class="bar-label">IV 45%</div></div></div><div class="fig-caption">S=100, K=105, 30D, 금리와 배당 0을 고정한 교육용 단순 예시입니다. 실제 모델값이 아니라 변동성 입력의 역할을 보기 위한 숫자입니다.</div></div></section>
+
+<section class="section reveal" id="section-06">
+  <div class="section-num">06</div>
+  <h2>실현변동성과 내재변동성은 다른 언어입니다</h2>
+  <div class="prose">
+    <p>그래서 변동성에는 두 가지 언어가 필요합니다. 하나는 실현변동성입니다. 실제로 과거 또는 미래에 가격이 얼마나 움직였는지를 계산한 값입니다. 다른 하나는 내재변동성입니다. 시장에서 거래되는 옵션 가격을 보고, 그 가격이 어떤 변동성 가정을 품고 있는지 거꾸로 계산한 값입니다.</p>
+    <p>실현변동성은 지나간 길에 가깝고, 내재변동성은 시장이 지금 프리미엄에 넣고 있는 기대에 가깝습니다. 둘을 섞으면 “많이 흔들렸던 종목”과 “지금 옵션이 비싸게 거래되는 종목”을 구분하기 어려워집니다.</p>
+  </div>
+</section>
+<section class="section-wide reveal" id="figure-06"><div class="fig"><div class="fig-label">Figure 06 — 실현변동성과 내재변동성 비교 카드</div><h2>지나간 움직임과 시장이 매긴 보험료를 구분합니다</h2><div class="two"><div class="mini-card"><div class="mini-k">REALIZED VOLATILITY</div><div class="mini-v">실현변동성 18%</div><p class="mini-p">실제로 과거 또는 미래에 가격이 얼마나 움직였는지를 계산한 값입니다. 18%는 지나간 길입니다.</p></div><div class="mini-card"><div class="mini-k">IMPLIED VOLATILITY</div><div class="mini-v">내재변동성 28%</div><p class="mini-p">옵션 가격에서 역산한 시장의 변동성 가정입니다. 28%는 시장이 지금 매긴 보험료입니다.</p></div></div><div class="fig-caption">실현변동성은 실제 움직임의 기록이고, 내재변동성은 현재 옵션 프리미엄 안에 들어 있는 시장의 가정입니다.</div></div></section>
+
+<section class="section reveal" id="section-07">
+  <div class="section-num">07</div>
+  <h2>시장 가격에서 내재변동성을 거꾸로 찾습니다</h2>
+  <div class="prose">
+    <p>예를 들어 현재 주가 100달러, 행사가 105달러, 만기 30일인 콜옵션이 있습니다. 모델의 다른 입력을 고정했을 때 연간 변동성 20%를 넣으면 옵션 가치가 1.80달러라고 하겠습니다. 그런데 시장에서는 이 옵션이 2.60달러에 거래됩니다.</p>
+    <p>이 차이를 설명하려면 변동성 입력을 올려야 할 수 있습니다. 다른 조건을 그대로 둔 채 변동성을 28%로 높였더니 모델 가격이 2.60달러가 되었다면, 시장은 이 옵션을 대략 28% 내재변동성으로 거래하고 있는 셈입니다.</p>
+    <p>이 예시에서 현재가, 행사가, 만기, 금리, 배당은 그대로 놓고 변동성 입력 하나를 따로 움직여 보면 구조가 더 선명해집니다. 옵션 가격이 더 비싸다는 말은 시장이 더 넓은 가격 분포를 프리미엄에 반영하고 있다는 뜻으로 읽을 수 있습니다.</p>
+  </div>
+</section>
+<section class="section-wide reveal" id="figure-07"><div class="fig"><div class="fig-label">Figure 07 — 옵션 가격에서 내재변동성을 역산하는 흐름</div><h2>옵션 가격이 비싸다는 말을 IV 언어로 번역합니다</h2><div class="flow-steps"><div class="mini-card"><div class="mini-k">MARKET PRICE</div><div class="mini-v" id="marketPriceLabel">$2.60</div><p class="mini-p">시장에서 거래되는 105콜 가격</p></div><div class="flow-arrow">→</div><div class="mini-card"><div class="mini-k">FIXED INPUTS</div><div class="mini-v">S=100 · K=105 · 30D</div><p class="mini-p">금리와 배당은 0으로 고정</p></div><div class="flow-arrow">→</div><div class="mini-card"><div class="mini-k">IMPLIED VOL</div><div class="mini-v" id="ivEstimate">28%</div><p class="mini-p">변동성만 조정해 시장가를 설명</p></div></div><div class="controls"><div class="control-head"><div class="control-title">MARKET OPTION PRICE</div><div class="control-value" id="marketSliderVal">$2.60</div></div><input id="marketSlider" type="range" min="1.5" max="4" value="2.6" step="0.1" aria-label="시장 옵션가격"></div><div class="fig-caption">20% 변동성을 넣으면 모델 가격이 1.80달러, 시장가가 2.60달러라면 변동성 입력을 약 28%로 올려야 설명된다는 교육용 단순 mapping입니다.</div></div></section>
+
+<hr class="divider">
+<section class="section reveal" id="section-08">
+  <div class="section-num">08</div>
+  <h2>높은 변동성은 이미 비싼 보험료일 수 있습니다</h2>
+  <div class="prose">
+    <p>실적 발표 전 옵션이 비싸지는 이유도 이 구조로 보면 됩니다. 시장은 실적 방향을 완전히 알지 못합니다. 대신 발표 직후 가격이 크게 튈 수 있다는 사실을 압니다. 그래서 콜과 풋의 시간가치가 같이 올라갑니다.</p>
+    <p>이때 콜이 비싸졌다고 시장이 무조건 상승을 본다는 뜻은 아닙니다. 풋도 함께 비싸질 수 있습니다. 옵션 시장이 가격에 반영하는 것은 방향의 확신보다 움직임의 크기일 때가 많습니다.</p>
+    <p>실전에서 비싸게 돌아올 수 있는 오해는 변동성이 높으면 옵션 매수자에게 항상 좋다고 생각하는 것입니다.</p>
+    <p>옵션을 이미 들고 있는 사람에게 내재변동성 상승은 대체로 유리하게 작용할 수 있습니다. 특히 롱옵션은 베가가 양수인 경우가 많아서, 시장이 더 큰 움직임을 가격에 반영하면 프리미엄이 올라갈 수 있습니다.</p>
+    <p>하지만 높은 변동성에서 새로 옵션을 사는 사람은 비싼 보험료를 내고 들어갑니다. 이후 실제 움직임이 그 가격을 정당화하지 못하거나, 이벤트가 끝난 뒤 내재변동성이 빠지면 방향을 맞혀도 손실이 날 수 있습니다.</p>
+    <p>예를 들어 실적 전 100달러 주식의 105콜을 4달러에 샀다고 해보겠습니다. 실적 후 주가가 103달러로 올랐습니다. 방향은 맞았습니다. 그러나 만기가 짧아졌고, 이벤트가 끝나며 내재변동성이 낮아졌고, 105콜은 여전히 외가격입니다. 옵션 가격이 4달러에서 2달러로 떨어질 수 있습니다.</p>
+    <p>이 예시에서 주가 방향은 매수자에게 유리하게 변했습니다. 반대로 시간과 변동성은 불리하게 변했습니다. 옵션 손익은 이 세 변수가 합쳐진 결과입니다.</p>
+    <p>아래 그림은 “방향만 보기”와 “방향+시간+IV 보기”를 나눠 보여줍니다. 주가가 오른 사실만 보면 유리해 보이지만, 옵션 가격은 시간과 IV 변화까지 같이 반영합니다.</p>
   </div>
 </section>
 <section class="section-wide reveal" id="figure-08"><div class="fig"><div class="fig-label">Figure 08 — 이벤트 전후 옵션가격: 방향은 맞았지만 IV가 빠진 경우</div><h2>방향은 유리했지만 시간과 변동성이 불리하면 옵션은 손실일 수 있습니다</h2><div class="segmented" id="eventToggle"><button type="button" class="active" data-event="direction">방향만 보기</button><button type="button" data-event="full">방향+시간+IV 보기</button></div><div class="event-grid" style="margin-top:14px"><div class="mini-card event-card direction-only"><div class="mini-k">STOCK</div><div class="mini-v">100 → 103</div><p class="mini-p">주가 방향은 콜옵션 매수자에게 유리했습니다.</p></div><div class="mini-card event-card detail-only"><div class="mini-k">OPTION</div><div class="mini-v">$4 → $2</div><p class="mini-p">만기가 하루 줄고, 이벤트 종료 후 IV가 55%에서 28%로 낮아졌고, 105콜은 여전히 외가격입니다.</p></div><div class="mini-card event-card detail-only"><div class="mini-k">TIME</div><div class="mini-v">-1 day</div><p class="mini-p">시간은 불리하게 작용했습니다.</p></div><div class="mini-card event-card detail-only"><div class="mini-k">IV</div><div class="mini-v">55% → 28%</div><p class="mini-p">변동성은 불리하게 작용했습니다.</p></div></div><div class="fig-caption">실적 전후 교육용 시나리오입니다. 방향은 맞았지만 옵션 손익은 방향, 시간, 변동성이 합쳐진 결과입니다.</div></div></section>
+
+<section class="section reveal" id="section-09">
+  <div class="section-num">09</div>
+  <h2>위치와 만기에 따라 변동성 민감도가 달라집니다</h2>
+  <div class="prose">
+    <p>변동성이 높아질 때 모든 옵션이 똑같이 반응하지는 않습니다. 등가격 옵션은 총 금액 기준으로 변동성 변화에 민감한 경우가 많습니다. 외가격 옵션은 가격 자체가 작기 때문에 백분율 변화가 크게 보일 수 있습니다.</p>
+    <p>현재가 100달러인 주식에서 100콜이 4.00달러에서 5.20달러가 되면 1.20달러 상승입니다. 115콜이 0.40달러에서 0.90달러가 되면 총액은 0.50달러 상승에 그칩니다. 하지만 수익률로 보면 115콜은 125% 상승입니다.</p>
+    <p>같은 기초자산과 같은 만기를 놓고 행사가 위치만 바꿔보면 차이가 선명해집니다. 등가격은 변동성 변화의 달러 영향이 잘 보이고, 외가격은 작은 프리미엄 때문에 퍼센트 변화가 크게 보입니다.</p>
+    <p>만기도 중요합니다. 같은 변동성 변화라면 7일 만기보다 90일 만기 옵션이 더 많이 반응할 수 있습니다. 변동성이 적용될 시간이 더 길기 때문입니다.</p>
+    <p>다만 이 말이 긴 만기 옵션이 항상 좋은 선택이라는 뜻은 아닙니다. 긴 만기는 더 많은 가능성을 담지만, 그 가능성의 가격도 더 비쌉니다. 옵션 매수자는 “크게 움직일 것인가”와 함께 “이미 그 움직임이 비싸게 반영됐는가”를 같이 물어야 합니다.</p>
+  </div>
+</section>
 <section class="section-wide reveal" id="figure-09"><div class="fig"><div class="fig-label">Figure 09 — ATM/OTM/만기별 변동성 민감도 미리보기</div><h2>변동성 변화는 위치와 만기에 따라 다르게 보입니다</h2><div class="sensitivity-grid"><div class="mini-card"><div class="mini-k">ATM 총액 민감도</div><div class="mini-v">100콜 $4.00 → $5.20</div><p class="mini-p">총액 기준 +$1.20. 등가격은 달러 영향이 잘 보입니다.</p></div><div class="mini-card"><div class="mini-k">OTM 퍼센트 민감도</div><div class="mini-v">115콜 $0.40 → $0.90</div><p class="mini-p">총액은 +$0.50이지만 퍼센트로는 +125%처럼 크게 보입니다.</p></div><div class="mini-card"><div class="mini-k">단기 옵션</div><div class="mini-v">30D</div><p class="mini-p">남은 시간이 짧으면 변동성이 적용될 시간이 제한됩니다.</p></div><div class="mini-card"><div class="mini-k">장기 옵션</div><div class="mini-v">90D</div><p class="mini-p">같은 변동성 변화라도 적용될 시간이 길어 총액 반응이 커질 수 있습니다.</p></div></div><div class="fig-caption">여기서는 베가를 공식화하지 않습니다. 변동성 민감도는 15회차에서 베가로 다시 정리합니다.</div></div></section>
+
+<section class="section reveal" id="section-10">
+  <div class="section-num">10</div>
+  <h2>변동성은 “높다/낮다”보다 지불한 가격과 비교해야 합니다</h2>
+  <div class="prose">
+    <p>그래서 변동성은 “높다/낮다”보다 “내가 지불한 변동성보다 실제로 더 크게 움직일 것인가”로 봐야 합니다. 이 질문이 들어오면 옵션은 복권처럼 보이지 않고, 보험료와 실제 사고 빈도를 비교하는 문제로 바뀝니다.</p>
+    <p>사족이지만, VIX를 공포지수라고만 외우면 이 감각을 놓치기 쉽습니다. VIX는 시장이 S&amp;P 500 옵션에 반영한 단기 변동성 가격에 가깝습니다. 공포가 오르면 보통 올라가지만, 더 정확히는 보험료가 비싸진 상태를 보여줍니다.</p>
+  </div>
+</section>
 <hr class="divider">
-<section class="section reveal" id="section-06">
-  <div class="section-num">05</div>
+<section class="section reveal" id="section-11">
+  <div class="section-num">11</div>
   <h2>변동성은 움직임의 폭을 나타냅니다</h2>
   <div class="prose">
 <p>변동성은 가격이 오를지 내릴지를 말하는 단어가 아닙니다. 가격이 만기까지 얼마나 넓게 움직일 수 있는지를 나타내는 입력값입니다.</p>
@@ -627,8 +681,8 @@
   </div>
 </section>
 <hr class="divider">
-<section class="section reveal" id="section-07">
-  <div class="section-num">06</div>
+<section class="section reveal" id="section-12">
+  <div class="section-num">12</div>
   <h2>변동성 범위와 이벤트 손익을 직접 계산합니다</h2>
   <div class="prose">
 <p>현재 주가가 100달러인 주식을 가정합니다. 행사가 105달러 콜옵션, 만기 30일, 금리와 배당은 없다고 둡니다.</p>
@@ -657,8 +711,8 @@
 </section>
 <section class="section-wide reveal" id="figure-10"><div class="fig"><div class="fig-label">Figure 10 — 변동성 판단 워크시트</div><h2>고정 변수와 변화 변수를 분리해서 적어봅니다</h2><div class="worksheet-grid"><div class="worksheet-field"><label>현재가</label><input value="100달러"></div><div class="worksheet-field"><label>행사가</label><input value="105달러 콜"></div><div class="worksheet-field"><label>만기</label><input value="30일"></div><div class="worksheet-field"><label>IV</label><input placeholder="예: 20% 또는 40%"></div><div class="worksheet-field"><label>예상 실현변동성</label><input placeholder="내가 보는 실제 움직임의 폭"></div><div class="worksheet-field"><label>이벤트 여부</label><input placeholder="실적, FOMC, CPI 등"></div><div class="worksheet-field"><label>내가 지불하는 프리미엄</label><input placeholder="예: 4달러"></div><div class="worksheet-field"><label>옵션 영향</label><input placeholder="비싼가, 싼가, 충분히 움직여야 하는가"></div></div><button class="answer-btn" type="button" id="answerToggle" aria-expanded="false" aria-controls="answers08">정답 보기</button><div class="answers" id="answers08"><p><strong>Worksheet A.</strong> 20% × √(30/365) ≈ 5.7%, 범위는 대략 94.3~105.7달러입니다. 40%라면 약 11.5%, 범위는 대략 88.5~111.5달러입니다. 다른 조건이 같다면 40% 변동성 환경에서 105콜의 시간가치가 더 큽니다.</p><p><strong>Worksheet B.</strong> 방향은 유리, 시간은 불리, 변동성은 불리입니다. 옵션 손익은 방향만으로 결정되지 않습니다.</p><p><strong>Worksheet C.</strong> 예시 답안: 만기까지 필요한 움직임의 폭.</p></div><div class="fig-caption">입력칸은 기록용입니다. 실제 주문 전에는 옵션 체인의 만기, 행사가, 프리미엄, IV, 이벤트 일정을 함께 확인해야 합니다.</div></div></section>
 <hr class="divider">
-<section class="section reveal" id="section-08">
-  <div class="section-num">07</div>
+<section class="section reveal" id="section-13">
+  <div class="section-num">13</div>
   <h2>다음 회차에서는 방향을 맞혀도 손실 나는 구조를 봅니다</h2>
   <div class="prose">
 <p>다음 회차에서는 이 질문을 정면으로 다루겠습니다.</p>
