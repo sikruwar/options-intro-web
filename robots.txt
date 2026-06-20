@@ -22,8 +22,19 @@ Disallow: /
 User-agent: anthropic-ai
 Disallow: /
 
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
 User-agent: *
 Disallow: /sessions/
+Disallow: /prologue.html
+Disallow: /epilogue.html
 Disallow: /assets/
 
 Sitemap: https://howinsight.com/sitemap.xml

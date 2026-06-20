@@ -200,13 +200,26 @@ def test_course_readability_overrides_are_loaded_on_course_pages():
         assert expected_href in html
 
 
-def test_session_05_option_chain_figure_has_reading_guide():
-    html = (ROOT / 'sessions' / 'session-05.html').read_text(encoding='utf-8')
-    assert 'Figure 07 — 자체 제작 옵션 체인 모형' in html
-    assert '이 화면은 무엇을 보여주나요?' in html
-    assert '옵션 체인 읽는 순서' in html
-    assert '처음에는 가격보다 위치를 먼저 봅니다' in html
-    assert 'ITM·ATM·OTM을 찾는 데 집중' in html
+def test_protected_course_pages_do_not_ship_lesson_body_during_security_update():
+    sensitive_terms = [
+        'Figure 07 — 자체 제작 옵션 체인 모형',
+        '이 화면은 무엇을 보여주나요?',
+        '옵션 체인 읽는 순서',
+        '처음에는 가격보다 위치를 먼저 봅니다',
+        'ITM·ATM·OTM을 찾는 데 집중',
+        '콜 매수',
+        '풋 매수',
+        '콜 매도',
+        '풋 매도',
+        '손익분기점',
+    ]
+    pages = [ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
+    for path in pages:
+        html = path.read_text(encoding='utf-8')
+        assert '강의 본문 보호 구조를 전환하고 있습니다.' in html
+        assert 'noindex, nofollow, noarchive, nosnippet' in html
+        for term in sensitive_terms:
+            assert term not in html
 
 
 
