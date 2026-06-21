@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COURSE_LOGIN_ENTRY = 'https://course.howinsight.com/prologue'
+COURSE_LOGIN_ENTRY = 'https://course.howinsight.com/prologue?entry=login'
 COURSE_ADMIN = 'https://course.howinsight.com/admin.html'
 
 
