@@ -1,353 +1,70 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT_ROOT = ROOT.parent
-PROTECTED = [ROOT / 'prologue.html'] + [ROOT / 'sessions' / f'session-{num:02d}.html' for num in range(1, 31)] + [ROOT / 'epilogue.html']
+COURSE_HOME = 'https://course.howinsight.com/index.html'
+COURSE_ADMIN = 'https://course.howinsight.com/admin.html'
 
 
-def test_auth_assets_exist():
-    assert (ROOT / 'assets' / 'auth-config.js').exists()
-    assert (ROOT / 'assets' / 'auth-gate.js').exists()
-    assert (ROOT / 'assets' / 'auth-admin.js').exists()
-    assert (ROOT / 'supabase_schema.sql').exists()
-    assert (ROOT / 'supabase_x_access_patch.sql').exists()
-    assert (ROOT / 'references.html').exists()
-    assert (ROOT / 'copyright.html').exists()
-    assert (ROOT / 'robots.txt').exists()
-    assert (ROOT / 'sitemap.xml').exists()
+def read(rel):
+    return (ROOT / rel).read_text(encoding='utf-8')
 
 
-def test_x_handle_and_access_code_gate_are_enabled_together():
-    config = (ROOT / 'assets' / 'auth-config.js').read_text(encoding='utf-8')
-    gate = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    assert 'accessGateEnabled: false' in config
-    assert 'xHandleGateEnabled: true' in config
-    assert 'xHandleStorageKey' in config
-    assert 'accessCodeGateEnabled: true' in config
-    assert 'OPTION-OPEN-05' in config
-    assert 'OPTION-OPEN-25' in config
-    assert 'OPTION-OPEN-30' in config
-    assert 'publishedThroughSession: 30' in config
-    assert 'accessCodeStorageKey' in config
-    assert 'accessGateEnabled' in gate
-    assert 'xHandleGateEnabled' in gate
-    assert 'accessCodeGateEnabled' in gate
-    assert 'emailGateEnabled || xHandleGateEnabled || accessCodeGateEnabled' in gate
-    assert 'bootCodeAndXHandle' in gate
-    assert 'xHandleGateEnabled && accessCodeGateEnabled' in gate
-    assert 'requestXAccessWithFallback' in gate
-    assert 'isMissingXAccessRpc' in gate
+def test_www_index_is_brand_landing_to_course_site():
+    html = read('index.html')
+    assert 'HowInsight · 무기견의 투자 학습 공간' in html
+    assert '공개 안내/브랜드 공간' in html
+    assert COURSE_HOME in html
+    assert COURSE_ADMIN in html
+    assert 'assets/auth-gate.js' not in html
+    assert '접근 코드' not in html
 
 
-def test_x_handle_gate_ui_and_rpc_exist():
-    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
-    patch = (ROOT / 'supabase_x_access_patch.sql').read_text(encoding='utf-8')
-    assert 'renderXHandleGate' in js
-    assert 'bootXHandle' in js
-    assert 'request_x_course_access' in js
-    assert 'X 아이디를 입력하면 활성 구독자/승인 목록과 대조합니다' in js
-    assert '입력한 X 아이디와 접속 회차는 관리자 페이지에 기록됩니다' in js
-    assert 'create table if not exists public.x_access_visits' in schema
-    assert 'create or replace function public.request_x_course_access' in schema
-    assert 'grant execute on function public.request_x_course_access' in schema
-    assert 'create or replace function public.request_x_course_access' in patch
+def test_legacy_admin_is_retired_and_redirects_to_course_admin():
+    html = read('admin.html')
+    assert '관리자 페이지가 이동했습니다' in html
+    assert COURSE_ADMIN in html
+    assert 'session-visibility-list' not in html
+    assert 'x-subscriber-handles' not in html
+    assert 'assets/auth-admin.js' not in html
+    assert 'noindex,nofollow' in html
 
 
-def test_access_code_gate_ui_exists():
-    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    assert 'renderAccessCodeGate' in js
-    assert 'renderCodeAndXHandleGate' in js
-    assert '강의 접근 코드 입력' in js
-    assert '접근 코드와 X 아이디를 함께 확인합니다' in js
-    assert '강의 들어가기' in js
-    assert '접근 코드가 맞지 않습니다' in js
-    assert 'method: \'access_code\'' in js
-    assert 'localStorage.setItem(accessCodeStorageKey()' in js
-    assert '접근 코드가 맞을 때만 X 아이디 신청/진입 기록' in js
-    assert '접근 코드가 확인됐습니다. X 아이디 신청 기록을 남겼습니다.' in js
-
-
-def test_protected_pages_load_gate_after_config():
-    for path in PROTECTED:
-        html = path.read_text(encoding='utf-8')
-        assert 'assets/auth-config.js' in html or '../assets/auth-config.js' in html
-        assert 'assets/auth-gate.js' in html or '../assets/auth-gate.js' in html
-        assert html.index('auth-config.js') < html.index('auth-gate.js')
-
-
-def test_public_index_hides_admin_link_and_request_copy():
-    html = (ROOT / 'index.html').read_text(encoding='utf-8')
-    assert 'admin.html' not in html
-    assert '접근 제한을 켜면' not in html
-    assert 'href="#roadmap"' in html
-    assert '공개 회차 확인하기' in html
-    assert 'id="roadmap"' in html
-    assert '저작권 보호 안내' in html
-    assert '무단 복제·전재·배포·재판매·2차 가공·AI 학습데이터 수집을 금지' in html
-    assert '© 2026 무기견. All rights reserved.' in html
-    assert 'href="copyright.html"' in html
-    assert '강의자료 레퍼런스 안내' in html
-    assert '무기견의 내부 지식맵' not in html
-    assert 'OIC, OCC, SEC, FINRA, Cboe' in html
-    assert 'href="references.html"' in html
-
-
-def test_references_page_lists_actual_sources():
-    html = (ROOT / 'references.html').read_text(encoding='utf-8')
-    assert '참고문헌과 출처' in html
-    assert 'Options Industry Council, Options Basics' in html
-    assert 'OCC, Characteristics and Risks of Standardized Options' in html
-    assert 'SEC Investor.gov, Options' in html
-    assert 'FINRA, Options' in html
-    assert 'Volatility Index Methodology: Cboe Volatility Index' in html
-    assert 'Sheldon Natenberg' in html
-    assert 'John C. Hull' in html
-    assert '무기견의 내부 지식맵' not in html
-    assert '<h2>제작 원칙</h2>' not in html
-
-
-def test_copyright_page_and_robot_policy_exist():
-    copyright_html = (ROOT / 'copyright.html').read_text(encoding='utf-8')
-    robots = (ROOT / 'robots.txt').read_text(encoding='utf-8')
-    sitemap = (ROOT / 'sitemap.xml').read_text(encoding='utf-8')
-    assert '저작권 및 이용 제한' in copyright_html
-    assert '© 2026 무기견. All rights reserved.' in copyright_html
-    assert '무단 복제, 전재, 배포, 공유, 재판매' in copyright_html
-    assert 'AI 학습데이터 수집' in copyright_html
-    assert 'User-agent: GPTBot' in robots
-    assert 'User-agent: Google-Extended' in robots
-    assert 'User-agent: ClaudeBot' in robots
-    assert 'Disallow: /sessions/' in robots
-    assert 'https://howinsight.com/copyright.html' in sitemap
-
-
-def test_public_pages_link_to_copyright_footer():
-    pages = [ROOT / 'index.html', ROOT / 'prologue.html', ROOT / 'references.html', ROOT / 'privacy.html', ROOT / 'upcoming.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
-    for path in pages:
-        html = path.read_text(encoding='utf-8')
-        assert '© 2026 무기견. All rights reserved.' in html
-        assert '저작권 및 이용 제한' in html
-
-
-def test_admin_page_loads_admin_script():
-    html = (ROOT / 'admin.html').read_text(encoding='utf-8')
-    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
-    assert 'assets/auth-config.js' in html
-    assert 'assets/auth-admin.js' in html
-    assert 'access_requests' in js
-    assert 'approved_users' in js
-    assert '최근 강의 진입 기록' in html
-    assert 'visit-list' in html
-    assert 'loadAccessVisits' in js
-    assert 'x_access_visits' in js
-
-
-def test_privacy_consent_copy_uses_clear_x_id_language():
-    gate = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
-    privacy = (ROOT / 'privacy.html').read_text(encoding='utf-8')
-    assert 'X 닉네임' not in gate
-    assert 'X 닉네임' not in admin
-    assert 'X 아이디' in gate
-    assert 'privacy_consent' in gate
-    assert '개인정보처리방침' in gate
-    assert 'privacyHref' in gate
-    assert '수집 항목' in privacy
-    assert 'X 아이디(예:' in privacy
-    assert '접근 코드 확인' in privacy
-
-
-def test_approved_user_identity_badge_exists():
-    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    assert 'renderApprovedBadge' in js
-    assert '승인 계정' in js
-    assert 'x_handle' in js
-    assert 'hi-approved-sign-out' in js
-
-
-def test_auth_rate_limit_message_is_friendly():
-    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    assert 'authErrorMessage' in js
-    assert '인증 메일 요청이 잠시 제한됐습니다' in js
-    assert 'secondsUntilOtpRetry' in js
-
-
-def test_expired_magic_link_message_is_friendly():
-    js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    assert 'authUrlError' in js
-    assert '인증 링크가 만료됐거나 이미 사용된 링크입니다' in js
-
-
-def test_mobile_course_navigation_is_visible_on_course_pages():
-    pages = [ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
+def test_public_course_pages_redirect_to_private_course_domain_without_lesson_body():
+    pages = [ROOT / 'prologue.html', ROOT / 'epilogue.html'] + sorted((ROOT / 'sessions').glob('session-*.html'))
     assert len(pages) == 32
-    for path in pages:
-        html = path.read_text(encoding='utf-8')
-        assert 'Mobile course navigation: keep previous/index/next reachable on phones.' in html
-        assert '.nav-prev,.nav-index,.nav-forward { display:inline-flex !important;' in html
-        assert 'nav-index' in html
-        assert 'nav-forward' in html
-
-
-def test_course_readability_overrides_are_loaded_on_course_pages():
-    assert (ROOT / 'assets' / 'readability-overrides.css').exists()
-    pages = [ROOT / 'index.html', ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
-    assert len(pages) == 33
-    for path in pages:
-        html = path.read_text(encoding='utf-8')
-        expected_href = '../assets/readability-overrides.css' if path.parent.name == 'sessions' else 'assets/readability-overrides.css'
-        assert expected_href in html
-
-
-def test_protected_course_pages_do_not_ship_lesson_body_during_security_update():
     sensitive_terms = [
-        'Figure 07 — 자체 제작 옵션 체인 모형',
-        '이 화면은 무엇을 보여주나요?',
+        'Figure 07',
         '옵션 체인 읽는 순서',
-        '처음에는 가격보다 위치를 먼저 봅니다',
-        'ITM·ATM·OTM을 찾는 데 집중',
         '콜 매수',
         '풋 매수',
-        '콜 매도',
-        '풋 매도',
         '손익분기점',
+        '델타헷지',
+        '감마 스퀴즈',
     ]
-    pages = [ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
     for path in pages:
         html = path.read_text(encoding='utf-8')
-        assert '강의 본문 보호 구조를 전환하고 있습니다.' in html
-        assert 'noindex, nofollow, noarchive, nosnippet' in html
+        rel = path.relative_to(ROOT).as_posix()
+        assert f'https://course.howinsight.com/{rel}' in html
+        assert '강의 페이지가 이동했습니다' in html
+        assert 'noindex,nofollow' in html
         for term in sensitive_terms:
             assert term not in html
 
 
-
-def test_course_visibility_admin_ui_exists():
-    admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
-    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
-    schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
-    assert 'session-visibility-list' in admin
-    assert 'save-visibility' in admin
-    assert '필수 Supabase 테이블' not in admin
-    assert 'course_session_visibility' in js
-    assert 'course_session_visibility' in schema
-    assert 'Anyone can read course session visibility' in schema
-    assert 'Admins can manage course session visibility' in schema
-    assert '저장 전 확인창' in admin
-    assert 'confirmVisibilitySave' in js
-    assert 'summarizeVisibilityChanges' in js
-    assert '공개로 변경' in js
-    assert '비공개로 변경' in js
-    assert 'window.confirm' in js
+def test_course_specific_aux_pages_redirect_to_course_home():
+    for rel in ['upcoming.html', 'references.html']:
+        html = read(rel)
+        assert COURSE_HOME in html
+        assert '강의 안내가 이동했습니다' in html
+        assert 'noindex,nofollow' in html
 
 
-def test_course_visibility_script_is_loaded_on_course_pages():
-    assert (ROOT / 'assets' / 'course-visibility.js').exists()
-    pages = [ROOT / 'index.html', ROOT / 'prologue.html'] + sorted((ROOT / 'sessions').glob('session-*.html')) + [ROOT / 'epilogue.html']
-    assert len(pages) == 33
-    for path in pages:
-        html = path.read_text(encoding='utf-8')
-        assert 'course-visibility.js' in html
-        assert 'auth-config.js' in html
-        assert html.index('auth-config.js') < html.index('course-visibility.js')
-
-
-def test_all_sessions_are_in_public_deploy():
-    public_sessions = sorted(path.name for path in (ROOT / 'sessions').glob('session-*.html'))
-    assert public_sessions == [f'session-{num:02d}.html' for num in range(1, 31)]
-    assert (ROOT / 'sessions' / 'session-30.html').exists()
-    assert (ROOT / 'epilogue.html').exists()
-    assert (OUTPUT_ROOT / 'drafts' / 'sessions' / 'session-30.html').exists()
-    assert (OUTPUT_ROOT / 'drafts' / 'epilogue.html').exists()
-
-
-def test_session_five_and_session_twenty_five_point_to_next_public_session():
-    html = (ROOT / 'sessions' / 'session-05.html').read_text(encoding='utf-8')
-    session25 = (ROOT / 'sessions' / 'session-25.html').read_text(encoding='utf-8')
-    upcoming = (ROOT / 'upcoming.html').read_text(encoding='utf-8')
-    assert 'session-06.html' in html
-    assert '../upcoming.html' not in session25
-    assert 'session-26.html' in session25
-    assert '다음 회차를 준비하고 있습니다' in upcoming
-    assert '공개 회차 확인하기' in upcoming
-    assert 'epilogue.html' in upcoming
-
-
-def test_index_marks_published_sessions_open_and_remote_visibility_is_respected_afterward():
-    html = (ROOT / 'index.html').read_text(encoding='utf-8')
-    config = (ROOT / 'assets' / 'auth-config.js').read_text(encoding='utf-8')
-    js = (ROOT / 'assets' / 'course-visibility.js').read_text(encoding='utf-8')
-    admin = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
-    assert html.count('<span class="rt-status open">공개</span>') == 32
-    assert '<span class="rt-status pending">비공개</span>' not in html
-    assert 'publishedThroughSession: 30' in config
-    assert 'isStaticallyPublished' in js
-    assert 'row.visible === true' in js
-    assert 'map.get(item.slug) === true' in js
-    assert 'map.get(slug) !== true' in js
-    assert "row ? row.visible === true : item.slug === 'prologue'" in admin
-    assert 'visible: visibleBySlug.get(item.slug) === true' in admin
-    assert 'select-visible-through-30' in admin
-    assert "setVisibilityPreset('through30')" in admin
-
-
-
-def test_admin_request_approval_feedback_exists():
-    admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
-    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
-    assert 'request-status approved' in js
-    assert '승인됨' in js
-    assert 'is-approved' in admin
-    assert '승인 계정 목록에 반영됐습니다' in js
-    assert 'data-action="revoke"' in js
-    assert '접근불가' in js
-
-
-def test_visibility_checkboxes_render_before_remote_table():
-    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
-    assert 'list.innerHTML = mergeVisibilityRows([]).map(visibilityRowTemplate).join' in js
-    assert '체크박스는 먼저 선택할 수 있고' not in js
-    assert 'course_session_visibility table unavailable' in js
-
-
-
-def test_x_subscriber_allowlist_admin_ui_exists():
-    admin = (ROOT / 'admin.html').read_text(encoding='utf-8')
-    js = (ROOT / 'assets' / 'auth-admin.js').read_text(encoding='utf-8')
-    schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
-    assert 'x-subscriber-handles' in admin
-    assert 'sync-subscribers' in admin
-    assert 'x-subscriber-add-one' in admin
-    assert 'add-one-subscriber' in admin
-    assert 'normalize-subscriber-input' in admin
-    assert '입력칸 명단 저장' in admin
-    assert '삭제는 입력칸에서 해당 줄을 지우고 저장하면 반영됩니다' in admin
-    assert '활성구독자 확인' in js
-    assert '구독자 목록 없음' in js
-    assert 'addOneSubscriberToTextarea' in js
-    assert 'normalizeSubscriberTextarea' in js
-    assert '추가·삭제가 반영됐습니다' in js
-    assert "textarea.value = handles.join('\\n')" in js
-    assert '입력칸에 현재 명단을 표시했고' in js
-    assert 'x_subscribers' in js
-    assert 'x_subscribers' in schema
-    assert 'Admins can manage x subscribers' in schema
-    assert 'x_access_visits' in schema
-    assert 'Admins can read x access visits' in schema
-    assert 'normalize_x_handle' in schema
-    assert 'x_handle_synthetic_email' in schema
-
-
-def test_access_request_rls_keeps_user_requests_pending_only():
-    gate_js = (ROOT / 'assets' / 'auth-gate.js').read_text(encoding='utf-8')
-    schema = (ROOT / 'supabase_schema.sql').read_text(encoding='utf-8')
-
-    assert "Anyone can create pending access request" in schema
-    assert "Authenticated users can update pending own request metadata" in schema
-    assert 'drop policy if exists "Anyone can request access"' in schema
-    assert 'drop policy if exists "Authenticated users can update own request"' in schema
-    assert "status = 'pending'" in schema
-    assert "approved_at is null" in schema
-    assert "status: 'pending'" in gate_js
-    assert "approved_at: null" in gate_js
+def test_robots_and_sitemap_match_brand_role():
+    robots = read('robots.txt')
+    sitemap = read('sitemap.xml')
+    assert 'Disallow: /admin' in robots
+    assert 'Disallow: /sessions/' in robots
+    assert 'Disallow: /prologue.html' in robots
+    assert 'Sitemap: https://howinsight.com/sitemap.xml' in robots
+    assert '<loc>https://howinsight.com/</loc>' in sitemap
+    assert 'course.howinsight.com' not in sitemap

@@ -1,40 +1,11 @@
-User-agent: GPTBot
-Disallow: /
-
-User-agent: ChatGPT-User
-Disallow: /
-
-User-agent: Google-Extended
-Disallow: /
-
-User-agent: ClaudeBot
-Disallow: /
-
-User-agent: Claude-User
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
-
-User-agent: PerplexityBot
-Disallow: /
-
-User-agent: anthropic-ai
-Disallow: /
-
-User-agent: Bytespider
-Disallow: /
-
-User-agent: Applebot-Extended
-Disallow: /
-
-User-agent: Meta-ExternalAgent
-Disallow: /
-
 User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin.html
 Disallow: /sessions/
 Disallow: /prologue.html
 Disallow: /epilogue.html
-Disallow: /assets/
+Disallow: /upcoming.html
+Disallow: /references.html
 
 Sitemap: https://howinsight.com/sitemap.xml
