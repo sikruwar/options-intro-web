@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>무기견의 옵션 입문 · 프롤로그와 열람 신청</title>
+  <meta name="description" content="무기견의 옵션 입문 공개 프롤로그를 읽고, 구독자용 강의자료 열람을 신청하는 페이지입니다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; --bg:#0b0d0c; --card:#151715; --card2:#1d211d; --text:#f1eee5; --muted:#a49b8b; --dim:#746f65; --amber:#f5b14c; --green:#35d07f; --red:#ef4444; --border:#2d302a; --border2:#44483d; --cta:#11130f; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:radial-gradient(circle at 82% 6%,rgba(245,177,76,.13),transparent 30%),radial-gradient(circle at 8% 80%,rgba(53,208,127,.07),transparent 34%),var(--bg); color:var(--text); font-family:'Noto Sans KR',system-ui,sans-serif; line-height:1.78; }
+    a { color:inherit; }
+    nav { position:sticky; top:0; z-index:10; display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px clamp(18px,5vw,48px); background:rgba(11,13,12,.88); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .brand { font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:13px; letter-spacing:.08em; text-decoration:none; }
+    .brand span, .eyebrow, code { color:var(--amber); }
+    .nav-cta { display:inline-flex; align-items:center; min-height:38px; padding:0 14px; border-radius:999px; background:var(--amber); color:var(--cta); font-weight:900; text-decoration:none; font-size:13px; }
+    .hero { min-height:82vh; display:grid; align-items:center; padding:90px clamp(22px,10vw,120px) 70px; }
+    .hero-inner { max-width:900px; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; letter-spacing:.16em; font-size:12px; text-transform:uppercase; margin-bottom:22px; }
+    h1 { margin:0 0 24px; font-size:clamp(38px,8vw,84px); line-height:1.08; letter-spacing:-.04em; }
+    .lead { max-width:760px; color:var(--muted); font-size:clamp(16px,2.2vw,20px); margin:0 0 30px; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
+    .btn { min-height:48px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; padding:0 20px; text-decoration:none; font-weight:900; border:1px solid var(--border2); }
+    .btn.primary { background:var(--amber); color:var(--cta); border-color:var(--amber); }
+    .btn.secondary { background:rgba(21,23,21,.62); color:var(--text); }
+    .section { max-width:880px; margin:0 auto; padding:74px 22px; }
+    .wide { max-width:1080px; }
+    .section-num { font-family:'JetBrains Mono',monospace; color:var(--dim); font-size:11px; letter-spacing:.16em; margin-bottom:14px; }
+    h2 { margin:0 0 24px; font-size:clamp(25px,4vw,40px); line-height:1.26; letter-spacing:-.02em; }
+    p { color:#d8d1c3; margin:0 0 18px; }
+    .card { border:1px solid var(--border2); border-radius:18px; background:linear-gradient(135deg,rgba(21,23,21,.96),rgba(29,33,29,.96)); padding:clamp(22px,4vw,34px); box-shadow:0 24px 80px rgba(0,0,0,.28); }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .mini { border:1px solid var(--border); border-radius:14px; background:var(--card2); padding:20px; }
+    .mini-k { font-family:'JetBrains Mono',monospace; color:var(--dim); font-size:11px; letter-spacing:.08em; margin-bottom:8px; }
+    .mini-v { color:var(--text); font-weight:900; font-size:20px; margin-bottom:8px; }
+    .mini p { color:var(--muted); font-size:14px; margin:0; }
+    .notice { border-left:3px solid var(--amber); padding:18px 20px; background:rgba(245,177,76,.08); border-radius:0 12px 12px 0; color:var(--muted); }
+    .form { display:grid; gap:14px; }
+    label { display:grid; gap:7px; color:var(--muted); font-size:13px; }
+    input { width:100%; min-height:48px; border:1px solid var(--border2); border-radius:12px; background:#0f1110; color:var(--text); padding:0 14px; font:inherit; }
+    input:focus { outline:2px solid rgba(245,177,76,.28); border-color:var(--amber); }
+    .consent { display:flex; gap:10px; align-items:flex-start; line-height:1.6; }
+    .consent input { width:18px; min-height:18px; margin-top:4px; flex:0 0 auto; }
+    button { min-height:50px; border:0; border-radius:999px; background:var(--amber); color:var(--cta); font:inherit; font-weight:900; cursor:pointer; }
+    button:disabled { opacity:.55; cursor:wait; }
+    .message { display:none; border:1px solid var(--border); border-radius:14px; background:#0f1110; padding:14px 16px; color:var(--muted); font-size:14px; }
+    .message.is-visible { display:block; }
+    .message.is-success { border-color:rgba(53,208,127,.45); color:var(--green); }
+    .message.is-error { border-color:rgba(239,68,68,.45); color:var(--red); }
+    footer { border-top:1px solid var(--border); padding:28px; text-align:center; color:var(--dim); font-family:'JetBrains Mono',monospace; font-size:12px; }
+    @media (max-width:720px) { nav { align-items:flex-start; flex-direction:column; } .grid { grid-template-columns:1fr; } .hero { padding-top:72px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/">HowInsight <span>@sniffshiba</span></a>
+    <a class="nav-cta" href="#access-request">강의 열람 신청</a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">무기견의 옵션 입문 · 공개 프롤로그</div>
+      <h1>옵션 공부는<br>동기 점검에서<br>시작합니다</h1>
+      <p class="lead">옵션을 배우기 전에 먼저 확인해야 할 것은 어떤 콜과 풋을 살지가 아닙니다. 내가 왜 이 상품을 배우려 하는지, 그 마음이 어떤 리스크를 부를 수 있는지부터 봐야 합니다.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#access-request">구독자 강의자료 열람 신청하기</a>
+        <a class="btn secondary" href="#prologue">프롤로그 먼저 읽기</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="prologue">
+    <div class="section-num">00 · PROLOGUE</div>
+    <h2>옵션을 배우고 싶다는 마음은 보통 차분한 곳에서 시작하지 않습니다</h2>
+    <p>대부분은 강한 가격 움직임을 본 뒤에 시작합니다. 누군가는 작은 돈으로 몇 배를 벌었다는 이야기를 듣습니다. 누군가는 주식에서 큰 손실을 보고, 빠르게 복구할 방법을 찾습니다. 또 누군가는 시장이 무너질 때 내 계좌를 지킬 방법이 없다는 무력감을 느낍니다.</p>
+    <p>저도 이 마음을 가볍게 보지 않습니다. 투자자는 손실 앞에서 조급해지고, 남들이 빠르게 버는 시장에서는 뒤처진 느낌을 받습니다. 옵션이라는 단어는 그럴 때 유난히 강하게 들립니다.</p>
+    <p>하지만 이 강의는 옵션을 대박의 도구로 포장하지 않습니다.</p>
+    <div class="notice">이 공개 프롤로그의 역할은 수강 신청 전에 방향을 맞추는 것입니다. 본 강의는 옵션을 더 자주 매매하게 만드는 자료가 아니라, 내가 어떤 리스크를 사고파는지 알아보게 만드는 강의입니다.</div>
+  </section>
+
+  <section class="section wide">
+    <div class="section-num">01 · MOTIVATION MAP</div>
+    <h2>내가 가진 마음을 먼저 분류합니다</h2>
+    <div class="grid">
+      <div class="mini"><div class="mini-k">FAST MONEY</div><div class="mini-v">빠른 수익</div><p>작은 돈으로 큰 수익을 노리고 싶다. 짧은 만기와 외가격 옵션의 유혹이 커지는 출발점입니다.</p></div>
+      <div class="mini"><div class="mini-k">RECOVERY</div><div class="mini-v">손실 복구</div><p>무너진 계좌를 빨리 되돌리고 싶다. 포지션 크기와 만기 선택이 급해지기 쉽습니다.</p></div>
+      <div class="mini"><div class="mini-k">PROTECTION</div><div class="mini-v">포트폴리오 방어</div><p>급락장에서 계좌를 지킬 방법을 알고 싶다. 풋옵션과 보험료를 구조적으로 이해해야 합니다.</p></div>
+      <div class="mini"><div class="mini-k">RISK PRICING</div><div class="mini-v">리스크 가격 읽기</div><p>시장이 불확실성을 얼마에 사고파는지 알고 싶다. 옵션을 시장 해석 언어로 배우는 출발점입니다.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-num">02 · COURSE PRINCIPLE</div>
+    <h2>옵션은 불확실성에 가격을 매기는 계약입니다</h2>
+    <p>옵션은 큰돈을 빠르게 벌기 위한 지름길보다 미래의 불확실성에 가격을 매기는 계약에 가깝습니다. 가격의 방향, 움직이는 속도, 남은 시간, 시장이 예상하는 변동성, 손실을 피하려는 보험 수요가 한 상품 안에 들어갑니다.</p>
+    <p>그래서 옵션 공부의 출발점은 매수 버튼이 아닙니다. 계약 구조, 가격 구조, 리스크 언어를 낮은 단계부터 확인하는 일입니다.</p>
+    <p>구독자용 본편은 1회차부터 권리와 의무, 콜과 풋, 만기 손익그래프, 내가격·등가격·외가격, 프리미엄과 그릭스, 전략과 헷지 구조로 올라갑니다.</p>
+  </section>
+
+  <section class="section" id="access-request">
+    <div class="section-num">03 · ACCESS REQUEST</div>
+    <h2>구독자용 강의자료 열람 신청</h2>
+    <div class="card">
+      <p>아래 이메일과 X 아이디로 구독 여부를 확인합니다. 활성 구독자로 확인되면 입력한 이메일이 강의실 접근 명단에 등록되고, 등록 완료 메일로 1회차 입장 링크를 보내드립니다.</p>
+      <form class="form" id="course-access-request-form">
+        <label>이메일<input name="email" type="email" placeholder="example@email.com" autocomplete="email" required></label>
+        <label>구독 여부 확인을 위한 X 아이디<input name="x_handle" type="text" placeholder="@sniffshiba" autocomplete="nickname" required></label>
+        <label class="consent"><input name="privacy_consent" type="checkbox" required><span>강의 접근 권한 확인을 위해 이메일과 X 아이디를 수집·처리하는 데 동의합니다.</span></label>
+        <button type="submit">강의자료 열람 신청하기</button>
+        <p class="message" id="course-access-request-message"></p>
+      </form>
+    </div>
+  </section>
+
+  <footer>© 2026 무기견. All rights reserved.</footer>
+
+  <script>
+    (function () {
+      const functionUrl = 'https://jrswfxwnsiuxiwmczzkc.supabase.co/functions/v1/course-access-request';
+      const courseEntry = 'https://course.howinsight.com/sessions/session-01?entry=login';
+      const form = document.getElementById('course-access-request-form');
+      const message = document.getElementById('course-access-request-message');
+      if (!form || !message) return;
+      function normalizeHandle(value) {
+        const raw = String(value || '').trim().toLowerCase();
+        if (!raw) return '';
+        return raw.startsWith('@') ? raw : `@${raw}`;
+      }
+      function escapeHtml(value) {
+        return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+      function show(html, type) {
+        message.innerHTML = html;
+        message.className = `message is-visible ${type ? `is-${type}` : ''}`;
+      }
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const button = form.querySelector('button[type="submit"]');
+        const email = String(form.email.value || '').trim().toLowerCase();
+        const xHandle = normalizeHandle(form.x_handle.value);
+        if (!email || !email.includes('@')) return show('이메일 주소를 확인해주세요.', 'error');
+        if (!xHandle || xHandle.length < 2) return show('X 아이디를 입력해주세요. 예: @sniffshiba', 'error');
+        if (!form.privacy_consent.checked) return show('접근 권한 처리를 위한 개인정보 수집·이용 동의가 필요합니다.', 'error');
+        button.disabled = true;
+        show('신청 정보를 확인하고 있습니다. 잠시만 기다려주세요.', '');
+        try {
+          const response = await fetch(functionUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, x_handle: xHandle, source_path: '/options.html', privacy_consent: true })
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data.ok === false) throw new Error(data.message || '신청 처리 중 오류가 발생했습니다.');
+          if (String(data.status || '').toLowerCase() === 'approved') {
+            show(`<strong>열람 권한 등록이 완료됐습니다.</strong><br>등록 이메일: ${escapeHtml(email)}<br>X 아이디: ${escapeHtml(xHandle)}<br><br>아래 버튼으로 1회차에 들어가면 이메일 OTP 인증이 시작됩니다.<br><br><a class="btn primary" href="${courseEntry}">1회차로 이동해 OTP 인증하기</a>`, 'success');
+          } else {
+            show(`<strong>신청이 접수됐습니다.</strong><br>신청 이메일: ${escapeHtml(email)}<br>X 아이디: ${escapeHtml(xHandle)}<br><br>구독 여부 확인이 끝나면 이메일로 1회차 입장 링크를 보내드립니다. 구독 중인데 대기 상태가 길어지면 입력한 X 아이디가 실제 @아이디와 같은지 확인해주세요.`, '');
+          }
+          form.reset();
+        } catch (error) {
+          show(error.message || '신청 처리 중 오류가 발생했습니다. 잠시 뒤 다시 시도해주세요.', 'error');
+        } finally {
+          button.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

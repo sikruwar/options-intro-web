@@ -1,7 +1,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COURSE_LOGIN_ENTRY = 'https://course.howinsight.com/prologue?entry=login'
+COURSE_APPLY = 'options.html'
+COURSE_ENTRY = 'https://course.howinsight.com/sessions/session-01?entry=login'
 COURSE_ADMIN = 'https://course.howinsight.com/admin.html'
 
 
@@ -13,10 +14,24 @@ def test_www_index_is_brand_landing_to_course_site():
     html = read('index.html')
     assert 'HowInsight · 무기견의 투자 학습 공간' in html
     assert '공개 안내/브랜드 공간' in html
-    assert COURSE_LOGIN_ENTRY in html
-    assert '이메일 인증하고 강의실 들어가기' in html
+    assert COURSE_APPLY in html
+    assert '프롤로그 읽고 강의자료 열람 신청하기' in html
+    assert 'https://course.howinsight.com/prologue?entry=login' not in html
     assert 'https://course.howinsight.com/index.html' not in html
     assert COURSE_ADMIN in html
+    assert 'assets/auth-gate.js' not in html
+    assert '접근 코드' not in html
+
+
+def test_options_page_contains_public_prologue_and_application_form():
+    html = read('options.html')
+    assert '무기견의 옵션 입문 · 프롤로그와 열람 신청' in html
+    assert '옵션 공부는<br>동기 점검에서' in html
+    assert 'id="course-access-request-form"' in html
+    assert '구독 여부 확인을 위한 X 아이디' in html
+    assert 'course-access-request' in html
+    assert COURSE_ENTRY in html
+    assert '1회차로 이동해 OTP 인증하기' in html
     assert 'assets/auth-gate.js' not in html
     assert '접근 코드' not in html
 
@@ -56,7 +71,7 @@ def test_public_course_pages_redirect_to_private_course_domain_without_lesson_bo
 def test_course_specific_aux_pages_redirect_to_course_home():
     for rel in ['upcoming.html', 'references.html']:
         html = read(rel)
-        assert COURSE_LOGIN_ENTRY in html
+        assert COURSE_APPLY in html
         assert '강의 안내가 이동했습니다' in html
         assert 'noindex,nofollow' in html
 
