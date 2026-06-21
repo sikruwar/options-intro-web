@@ -84,4 +84,5 @@ def test_robots_and_sitemap_match_brand_role():
     assert 'Disallow: /prologue.html' in robots
     assert 'Sitemap: https://howinsight.com/sitemap.xml' in robots
     assert '<loc>https://howinsight.com/</loc>' in sitemap
+    assert '<loc>https://howinsight.com/options.html</loc>' in sitemap
     assert 'course.howinsight.com' not in sitemap
