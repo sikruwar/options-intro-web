@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COURSE_HOME = 'https://course.howinsight.com/index.html'
+COURSE_LOGIN_ENTRY = 'https://course.howinsight.com/prologue'
 COURSE_ADMIN = 'https://course.howinsight.com/admin.html'
 
 
@@ -13,7 +13,9 @@ def test_www_index_is_brand_landing_to_course_site():
     html = read('index.html')
     assert 'HowInsight · 무기견의 투자 학습 공간' in html
     assert '공개 안내/브랜드 공간' in html
-    assert COURSE_HOME in html
+    assert COURSE_LOGIN_ENTRY in html
+    assert '이메일 인증하고 강의실 들어가기' in html
+    assert 'https://course.howinsight.com/index.html' not in html
     assert COURSE_ADMIN in html
     assert 'assets/auth-gate.js' not in html
     assert '접근 코드' not in html
@@ -54,7 +56,7 @@ def test_public_course_pages_redirect_to_private_course_domain_without_lesson_bo
 def test_course_specific_aux_pages_redirect_to_course_home():
     for rel in ['upcoming.html', 'references.html']:
         html = read(rel)
-        assert COURSE_HOME in html
+        assert COURSE_LOGIN_ENTRY in html
         assert '강의 안내가 이동했습니다' in html
         assert 'noindex,nofollow' in html
 
