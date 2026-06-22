@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COURSE_APPLY = 'options.html'
-COURSE_ENTRY = 'https://course.howinsight.com/sessions/session-01?entry=login'
+COURSE_ENTRY = 'https://course.howinsight.com/prologue?entry=login'
 COURSE_ADMIN = 'https://course.howinsight.com/admin.html'
 
 
@@ -27,11 +27,14 @@ def test_options_page_contains_public_prologue_and_application_form():
     html = read('options.html')
     assert '무기견의 옵션 입문 · 프롤로그와 열람 신청' in html
     assert '옵션 공부는<br>동기 점검에서' in html
+    assert 'hero-actions' not in html
+    assert '01 · MOTIVATION MAP' not in html
+    assert '02 · COURSE PRINCIPLE' not in html
     assert 'id="course-access-request-form"' in html
     assert '구독 여부 확인을 위한 X 아이디' in html
     assert 'course-access-request' in html
     assert COURSE_ENTRY in html
-    assert '1회차로 이동해 OTP 인증하기' in html
+    assert '프롤로그로 이동해 OTP 인증하기' in html
     assert 'assets/auth-gate.js' not in html
     assert '접근 코드' not in html
 

@@ -23,7 +23,6 @@
     .eyebrow { font-family:'JetBrains Mono',monospace; letter-spacing:.16em; font-size:12px; text-transform:uppercase; margin-bottom:22px; }
     h1 { margin:0 0 24px; font-size:clamp(38px,8vw,84px); line-height:1.08; letter-spacing:-.04em; }
     .lead { max-width:760px; color:var(--muted); font-size:clamp(16px,2.2vw,20px); margin:0 0 30px; }
-    .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
     .btn { min-height:48px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; padding:0 20px; text-decoration:none; font-weight:900; border:1px solid var(--border2); }
     .btn.primary { background:var(--amber); color:var(--cta); border-color:var(--amber); }
     .btn.secondary { background:rgba(21,23,21,.62); color:var(--text); }
@@ -66,10 +65,6 @@
       <div class="eyebrow">무기견의 옵션 입문 · 공개 프롤로그</div>
       <h1>옵션 공부는<br>동기 점검에서<br>시작합니다</h1>
       <p class="lead">옵션을 배우기 전에 먼저 확인해야 할 것은 어떤 콜과 풋을 살지가 아닙니다. 내가 왜 이 상품을 배우려 하는지, 그 마음이 어떤 리스크를 부를 수 있는지부터 봐야 합니다.</p>
-      <div class="hero-actions">
-        <a class="btn primary" href="#access-request">구독자 강의자료 열람 신청하기</a>
-        <a class="btn secondary" href="#prologue">프롤로그 먼저 읽기</a>
-      </div>
     </div>
   </section>
 
@@ -82,30 +77,12 @@
     <div class="notice">이 공개 프롤로그의 역할은 수강 신청 전에 방향을 맞추는 것입니다. 본 강의는 옵션을 더 자주 매매하게 만드는 자료가 아니라, 내가 어떤 리스크를 사고파는지 알아보게 만드는 강의입니다.</div>
   </section>
 
-  <section class="section wide">
-    <div class="section-num">01 · MOTIVATION MAP</div>
-    <h2>내가 가진 마음을 먼저 분류합니다</h2>
-    <div class="grid">
-      <div class="mini"><div class="mini-k">FAST MONEY</div><div class="mini-v">빠른 수익</div><p>작은 돈으로 큰 수익을 노리고 싶다. 짧은 만기와 외가격 옵션의 유혹이 커지는 출발점입니다.</p></div>
-      <div class="mini"><div class="mini-k">RECOVERY</div><div class="mini-v">손실 복구</div><p>무너진 계좌를 빨리 되돌리고 싶다. 포지션 크기와 만기 선택이 급해지기 쉽습니다.</p></div>
-      <div class="mini"><div class="mini-k">PROTECTION</div><div class="mini-v">포트폴리오 방어</div><p>급락장에서 계좌를 지킬 방법을 알고 싶다. 풋옵션과 보험료를 구조적으로 이해해야 합니다.</p></div>
-      <div class="mini"><div class="mini-k">RISK PRICING</div><div class="mini-v">리스크 가격 읽기</div><p>시장이 불확실성을 얼마에 사고파는지 알고 싶다. 옵션을 시장 해석 언어로 배우는 출발점입니다.</p></div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-num">02 · COURSE PRINCIPLE</div>
-    <h2>옵션은 불확실성에 가격을 매기는 계약입니다</h2>
-    <p>옵션은 큰돈을 빠르게 벌기 위한 지름길보다 미래의 불확실성에 가격을 매기는 계약에 가깝습니다. 가격의 방향, 움직이는 속도, 남은 시간, 시장이 예상하는 변동성, 손실을 피하려는 보험 수요가 한 상품 안에 들어갑니다.</p>
-    <p>그래서 옵션 공부의 출발점은 매수 버튼이 아닙니다. 계약 구조, 가격 구조, 리스크 언어를 낮은 단계부터 확인하는 일입니다.</p>
-    <p>구독자용 본편은 1회차부터 권리와 의무, 콜과 풋, 만기 손익그래프, 내가격·등가격·외가격, 프리미엄과 그릭스, 전략과 헷지 구조로 올라갑니다.</p>
-  </section>
 
   <section class="section" id="access-request">
-    <div class="section-num">03 · ACCESS REQUEST</div>
+    <div class="section-num">구독자용 강의자료 열람 신청</div>
     <h2>구독자용 강의자료 열람 신청</h2>
     <div class="card">
-      <p>아래 이메일과 X 아이디로 구독 여부를 확인합니다. 활성 구독자로 확인되면 입력한 이메일이 강의실 접근 명단에 등록되고, 등록 완료 메일로 1회차 입장 링크를 보내드립니다.</p>
+      <p>아래 이메일과 X 아이디로 구독 여부를 확인합니다. 활성 구독자로 확인되면 입력한 이메일이 강의실 접근 명단에 등록되고, 등록 완료 메일로 프롤로그 입장 링크를 보내드립니다.</p>
       <form class="form" id="course-access-request-form">
         <label>이메일<input name="email" type="email" placeholder="example@email.com" autocomplete="email" required></label>
         <label>구독 여부 확인을 위한 X 아이디<input name="x_handle" type="text" placeholder="@sniffshiba" autocomplete="nickname" required></label>
@@ -121,7 +98,7 @@
   <script>
     (function () {
       const functionUrl = 'https://jrswfxwnsiuxiwmczzkc.supabase.co/functions/v1/course-access-request';
-      const courseEntry = 'https://course.howinsight.com/sessions/session-01?entry=login';
+      const courseEntry = 'https://course.howinsight.com/prologue?entry=login';
       const form = document.getElementById('course-access-request-form');
       const message = document.getElementById('course-access-request-message');
       if (!form || !message) return;
@@ -156,9 +133,9 @@
           const data = await response.json().catch(() => ({}));
           if (!response.ok || data.ok === false) throw new Error(data.message || '신청 처리 중 오류가 발생했습니다.');
           if (String(data.status || '').toLowerCase() === 'approved') {
-            show(`<strong>열람 권한 등록이 완료됐습니다.</strong><br>등록 이메일: ${escapeHtml(email)}<br>X 아이디: ${escapeHtml(xHandle)}<br><br>아래 버튼으로 1회차에 들어가면 이메일 OTP 인증이 시작됩니다.<br><br><a class="btn primary" href="${courseEntry}">1회차로 이동해 OTP 인증하기</a>`, 'success');
+            show(`<strong>열람 권한 등록이 완료됐습니다.</strong><br>등록 이메일: ${escapeHtml(email)}<br>X 아이디: ${escapeHtml(xHandle)}<br><br>아래 버튼으로 프롤로그에 들어가면 이메일 OTP 인증이 시작됩니다.<br><br><a class="btn primary" href="${courseEntry}">프롤로그로 이동해 OTP 인증하기</a>`, 'success');
           } else {
-            show(`<strong>신청이 접수됐습니다.</strong><br>신청 이메일: ${escapeHtml(email)}<br>X 아이디: ${escapeHtml(xHandle)}<br><br>구독 여부 확인이 끝나면 이메일로 1회차 입장 링크를 보내드립니다. 구독 중인데 대기 상태가 길어지면 입력한 X 아이디가 실제 @아이디와 같은지 확인해주세요.`, '');
+            show(`<strong>신청이 접수됐습니다.</strong><br>신청 이메일: ${escapeHtml(email)}<br>X 아이디: ${escapeHtml(xHandle)}<br><br>구독 여부 확인이 끝나면 이메일로 프롤로그 입장 링크를 보내드립니다. 구독 중인데 대기 상태가 길어지면 입력한 X 아이디가 실제 @아이디와 같은지 확인해주세요.`, '');
           }
           form.reset();
         } catch (error) {
