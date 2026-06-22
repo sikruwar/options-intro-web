@@ -35,6 +35,8 @@ def test_options_page_contains_public_prologue_and_application_form():
     assert 'course-access-request' in html
     assert COURSE_ENTRY in html
     assert '프롤로그로 이동해 OTP 인증하기' in html
+    assert '이미 등록된 X 아이디입니다' in html
+    assert '운영자에게 수동 변경을 요청' in html
     assert 'assets/auth-gate.js' not in html
     assert '접근 코드' not in html
 
